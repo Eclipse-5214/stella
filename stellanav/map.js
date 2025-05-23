@@ -188,7 +188,7 @@ StellaNav.register("renderOverlay", () => {
                     yaw: null,
                     visited: p?.visitedRooms,
                     cleared: p?.clearedRooms,
-                    deaths: p?.deaths,
+                    deaths: 0,
                     secrets: 0,
                     initSecrets: 0,
                     currSecrets: 0,
@@ -201,7 +201,6 @@ StellaNav.register("renderOverlay", () => {
             players[player].class = Dungeon.players[player].className;
             players[player].visited = p?.visitedRooms;
             players[player].cleared = p?.clearedRooms;
-            players[player].deaths = p?.deaths;
             updatePlayerUUID(player);
         });
 
@@ -340,6 +339,18 @@ StellaNav.register("renderOverlay", () => {
             });
         },
         /^\s*(Master Mode)? ?(?:The)? Catacombs - (Entrance|Floor .{1,3})$/
+    )
+    .register(
+        "chat",
+        (info) => {
+            let player = ChatLib.removeFormatting(info).split(" ")[0];
+            for (let p of players) {
+                if (p.name === player || (p.username == Player.getName() && player.toLowerCase() === "you")) {
+                    p.deaths++;
+                }
+            }
+        },
+        "&r&c ☠ ${info} became a ghost&r&7.&r"
     )
     .register(
         "chat",
