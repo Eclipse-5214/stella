@@ -12,10 +12,8 @@ const data = new LocalStore(
 
 const slotBinnding = FeatManager.createFeature("slotBinding");
 const bindingKeybind = new KeyBind("Bind Slots", Keyboard.KEY_NONE, "Stella");
-
-let previousSlot = null;
-
 const getPlayerController = () => Client.getMinecraft().field_71442_b;
+let previousSlot = null;
 
 const handleShiftClick = (slotClicked) => {
     let slot = slotClicked;
@@ -24,15 +22,12 @@ const handleShiftClick = (slotClicked) => {
         slot = Object.keys(data.binds).find((key) => data.binds[key] === slotClicked);
     }
     const hotbarSlot = data.binds[slot] % 36;
-
     if (hotbarSlot == null || hotbarSlot >= 9) return;
-
     getPlayerController().func_78753_a(container.getWindowId(), slot, hotbarSlot, 2, Player.getPlayer());
 };
 
 slotBinnding.register("guiMouseClick", (_, __, mbtn, gui, event) => {
     if (mbtn !== 0 || !(gui instanceof net.minecraft.client.gui.inventory.GuiInventory)) return;
-
     const slot = gui.getSlotUnderMouse()?.field_75222_d;
     // 0 - 4 crafting slots
     if (!slot || slot < 5) return;
@@ -52,7 +47,6 @@ slotBinnding.register("guiMouseClick", (_, __, mbtn, gui, event) => {
     }
 
     if (!Keyboard.isKeyDown(bindingKeybind.getKeyCode())) return;
-
     if (slot in data.binds || Object.values(data.binds).includes(slot)) {
         cancel(event);
         let tempslot = slot;
@@ -71,15 +65,12 @@ slotBinnding.register("guiMouseClick", (_, __, mbtn, gui, event) => {
     }
 
     cancel(event);
-
     if (slot === previousSlot) return;
 
     data.binds[previousSlot] = slot;
-
     data.save();
 
     ChatLib.chat(`${prefix} &bSaved binding&r: &6${previousSlot} &5-> &6${slot}`);
-
     previousSlot = null;
 });
 
