@@ -1,5 +1,6 @@
-import { fetch } from "../tska/polyfill/Fetch";
 import { LocalStore } from "../tska/storage/LocalStore";
+import { prefix } from "./utils/utils";
+import { fetch } from "../tska/polyfill/Fetch";
 import { hud } from "./utils/hud";
 import settings from "./utils/config";
 
@@ -64,73 +65,51 @@ let updateMessage = `&9&m${ChatLib.getChatBreak("-")}\n`;
 function compareVersions(v1, v2) {
     const a = v1.split(".").map(Number),
         b = v2.split(".").map(Number);
-    for (let i = 0; i < Math.max(a.length, b.length); i++) {
-        if ((a[i] || 0) > (b[i] || 0)) return 1;
-        if ((a[i] || 0) < (b[i] || 0)) return -1;
-    }
+    for (let i = 0, l = Math.max(a.length, b.length); i < l; i++) if ((a[i] || 0) !== (b[i] || 0)) return (a[i] || 0) > (b[i] || 0) ? 1 : -1;
     return 0;
 }
 
 function buildUpdateMessage(releases) {
-    let message = `&9&m${ChatLib.getChatBreak("-")}\n`;
-    message += `&b&lStella Changelog: \n&fChanges since &bv${LOCAL_VERSION}&e:\n`;
+    let message = `&9&m${ChatLib.getChatBreak("-")}\n&d&lStella Changelog: \n&fChanges since &bv${ud.version}&f:\n`;
     releases
-        .filter((release) => compareVersions(release.tag_name.replace(/^v/, ""), LOCAL_VERSION) > 0)
-        .forEach((release) => {
-            release.body.split("\n").forEach((line) => {
-                const trimmedLine = line.trim();
-                if (trimmedLine !== "" && !trimmedLine.includes("**Full Changelog**")) {
-                    message += `&b${trimmedLine}\n`;
-                }
-            });
-        });
+        .filter((release) => compareVersions(release.tag_name.replace(/^v/, ""), ud.version) > 0)
+        .forEach((r) => r.body.split("\n").forEach((l) => l.trim() !== "" && !l.trim().includes("**Full Changelog**") && (message += `&b${l.trim()}\n`)));
     return message + `&9&m${ChatLib.getChatBreak("-")}`;
 }
 
 function checkUpdate(silent = false) {
     fetch(API_URL, {
-        headers: { "User-Agent": "Stella" },
+        headers: { "User-Agent": "MeowAddons" },
         json: true,
     })
         .then((releases) => {
-            if (!releases.length && !silent) {
-                ChatLib.chat("&d[Stella] &bNo releases found!");
-                return;
-            }
-
-            const latestRelease = releases[0];
-            const remoteVersion = latestRelease.tag_name.replace(/^v/, "");
+            if (!releases.length && !silent) return ChatLib.chat("&e[MeowAddons] &fNo releases found!");
             updateMessage = buildUpdateMessage(releases);
-
-            if (!silent) ChatLib.chat("&d[Stella] &bChecking for updates...");
-
-            if (compareVersions(LOCAL_VERSION, remoteVersion) > 0 && !silent) {
-                ChatLib.chat("&d[Stella] &bYou're running a development build that is newer than the latest release!");
-            } else if (compareVersions(LOCAL_VERSION, remoteVersion) < 0 && !silent) {
-                ChatLib.chat(`&d[Stella] &bUpdate available: &6v${remoteVersion}&b! Current: &6v${LOCAL_VERSION}`);
-                ChatLib.chat(new TextComponent(`&d[Stella] &bClick here to go to the Github release page!`).setClick("open_url", `https://github.com/Eclipse-5214/stella/releases/latest`)).setHoverValue(`&bOpens the release page - Github`);
-                ChatLib.chat(new TextComponent(`&d[Stella] &bHover over this message to view changelogs!`).setHoverValue(updateMessage));
-            } else if (!silent) {
-                ChatLib.chat("&d[Stella] &bYou're running the latest version!");
-            }
+            if (silent) return;
+            compareVersions(LOCAL_VERSION, releases[0].tag_name) > 0
+                ? ChatLib.chat(prefix + " &fYou're on a development build.")
+                : compareVersions(LOCAL_VERSION, releases[0].tag_name) < 0 &&
+                  (ChatLib.chat(prefix + ` &fUpdate available: &bv${releases[0].tag_name}&f! Current: &bv${LOCAL_VERSION}`),
+                  ChatLib.chat(new TextComponent(prefix + ` &fClick here to go to the release page!`).setClick("open_url", `https://github.com/Eclipse-5214/stella/releases/latest`)),
+                  ChatLib.chat(new TextComponent(prefix + ` &fHover over this message to view changelogs!`).setHoverValue(updateMessage)));
         })
-        .catch((error) => {
-            ChatLib.chat(`&d[Stella] &bUpdate check failed: ${error}`);
-        });
+        .catch((error) => ChatLib.chat(prefix + ` &fUpdate check failed: &c${error}`));
 }
 
+// Update check
+
 let updateChecked = false;
-register("worldLoad", () => {
-    if (!updateChecked) {
-        if (ud.version < LOCAL_VERSION) {
-            checkUpdate(true);
-            Client.scheduleTask(40, () => ChatLib.chat(updateMessage));
-            ud.version = LOCAL_VERSION;
-        }
-        updateChecked = true;
-        Client.scheduleTask(1000, () => {
-            checkUpdate();
-            updateMessage = `&9&m${ChatLib.getChatBreak("-")}\n`;
-        });
-    }
-});
+
+const Changelog = register("worldLoad", () => {
+    checkUpdate(true);
+    Changelog.unregister();
+    Client.scheduleTask(40, () => (ChatLib.chat(updateMessage + "\n&bWe now have a discord server\n&bJoin it at https://discord.gg/EzEfQyGdAg"), (ud.version = LOCAL_VERSION)));
+}).unregister();
+
+const UpdateCH = register("worldLoad", () => {
+    updateChecked = true;
+    UpdateCH.unregister();
+    Client.scheduleTask(1000, () => (checkUpdate(), (updateMessage = `&9&m${ChatLib.getChatBreak("-")}\n`)));
+}).unregister();
+
+register("gameLoad", () => (ud.version < LOCAL_VERSION && Changelog.register(), !updateChecked && UpdateCH.register()));
