@@ -8,6 +8,10 @@
             },
             {
                 "type": 2,
+                "name": "MySite"
+            },
+            {
+                "type": 2,
                 "name": "MyDiscord"
             },
             {
@@ -15,12 +19,8 @@
                 "name": "MyGithub"
             },
             {
-                "type": 2,
-                "name": "OpenSR"
-            },
-            {
-                "type": 2,
-                "name": "InstallsrSR"
+                "type": 9,
+                "name": "RoutesStuff"
             }
         ]
     },

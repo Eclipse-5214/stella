@@ -30,7 +30,7 @@ const FI = register("step", () => {
         `   &r&d/sa help &3&l- &r&bFor a list of commands!\n` +
         `\n` +
         `   &r&dGithub: https://github.com/Eclipse-5214/stella\n` +
-        `   &r&dDiscord: Coming Soon\n` +
+        `   &r&dDiscord: https://discord.gg/EzEfQyGdAg\n` +
         `&b&l-----------------------------------------------------`;
     ChatLib.chat(message);
 })

@@ -41,12 +41,25 @@ const defaultConf = new DefaultConfig("stella", "data/settings.json")
     .addButton({
         category: "General",
         subcategory: "",
+        configName: "MySite",
+        title: "Stella Website",
+        description: "The website for all things Stella",
+        tags: ["website", "site"],
+        onClick(setting) {
+            ChatLib.command("ct copy https://stellarskys.co", true);
+            ChatLib.chat("&6Copied Site Link!");
+        },
+    })
+
+    .addButton({
+        category: "General",
+        subcategory: "",
         configName: "MyDiscord",
         title: "Discord Server",
         description: "Join if you want to report a bug or want to make a suggestion",
         tags: ["discord"],
         onClick(setting) {
-            ChatLib.command("ct copy coming soon", true);
+            ChatLib.command("ct copy https://discord.gg/EzEfQyGdAg", true);
             ChatLib.chat("&6Copied Discord Link!");
         },
     })
@@ -60,37 +73,22 @@ const defaultConf = new DefaultConfig("stella", "data/settings.json")
         tags: ["github"],
         onClick(setting) {
             ChatLib.command("ct copy https://github.com/Eclipse-5214/stella", true);
-            ChatLib.chat("&6Copied Discord Link!");
+            ChatLib.chat("&6Copied Github Link!");
         },
     })
 
-    .addButton({
+    .addTextParagraph({
         category: "General",
+        configName: "RoutesStuff",
+        title: `&bRoutes (/ct import stellaroutes)`,
+        description: "&6Routes are currently in a separate module\n&6note that this will be merged into Stella in the future",
+        centered: true,
         subcategory: "",
-        configName: "OpenSR",
-        title: "Routes",
-        description: "Open Stella Routes config (if installed)",
-        //tags: ["discord"],
-        onClick(setting) {
-            ChatLib.command("stellaroutes", true);
-        },
     })
 
-    .addButton({
-        category: "General",
-        subcategory: "",
-        configName: "InstallsrSR",
-        title: "Install Stella Routes",
-        description: "Installs the Stella Routes addon (if not installed)",
-        //tags: ["discord"],
-        onClick(setting) {
-            ChatLib.command("ct import stellaRoutes", true);
-        },
-    })
+    //dungeons
 
-    //dungoens
-
-    //dugeon trash
+    //dungeon trash
     .addSwitch({
         category: "Dungeons",
         configName: "highlightTrash",
