@@ -79,11 +79,11 @@ function buildUpdateMessage(releases) {
 
 function checkUpdate(silent = false) {
     fetch(API_URL, {
-        headers: { "User-Agent": "MeowAddons" },
+        headers: { "User-Agent": "Stella" },
         json: true,
     })
         .then((releases) => {
-            if (!releases.length && !silent) return ChatLib.chat("&e[MeowAddons] &fNo releases found!");
+            if (!releases.length && !silent) return ChatLib.chat(prefix + " &fNo releases found!");
             updateMessage = buildUpdateMessage(releases);
             if (silent) return;
             compareVersions(LOCAL_VERSION, releases[0].tag_name) > 0
