@@ -79,7 +79,7 @@
             {
                 "type": 6,
                 "name": "highlightTerms",
-                "value": false
+                "value": true
             },
             {
                 "type": 5,
@@ -94,12 +94,12 @@
             {
                 "type": 6,
                 "name": "showTermClass",
-                "value": false
+                "value": true
             },
             {
                 "type": 6,
                 "name": "classColor",
-                "value": false
+                "value": true
             },
             {
                 "type": 6,
@@ -109,7 +109,7 @@
             {
                 "type": 6,
                 "name": "m7Roles",
-                "value": false
+                "value": true
             },
             {
                 "type": 7,

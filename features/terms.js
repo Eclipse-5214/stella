@@ -96,7 +96,7 @@ termTracker
         "chat",
         () => {
             completed.forEach((data, name) => {
-                ChatLib.chat(shortPrefix + "&b" + name + " &7completed &f" + data.terminal + "&7 terms, &f" + data.device + "&7 devices, and &f" + data.lever + " &7levers!");
+                ChatLib.chat(shortPrefix + " &b" + name + " &7completed &f" + data.terminal + "&7 terms, &f" + data.device + "&7 devices, and &f" + data.lever + " &7levers!");
             });
         },
         "The Core entrance is opening!"
