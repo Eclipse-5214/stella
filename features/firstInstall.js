@@ -10,14 +10,18 @@ import { LocalStore } from "../../tska/storage/LocalStore";
 
     --------------------------------------------- */
 
-const firstInstall = new LocalStore("stella", {
-    firstInstall: false,
-},"./data/stella.json");
+const firstInstall = new LocalStore(
+    "stella",
+    {
+        firstInstall: false,
+    },
+    "./data/stella.json"
+);
 
 const FI = register("step", () => {
-    if (!World.isLoaded()) return
-    firstInstall.firstInstall = true
-    fi.unregister()
+    if (!World.isLoaded()) return;
+    firstInstall.firstInstall = true;
+    FI.unregister();
     let message =
         `&b&l-----------------------------------------------------\n` +
         `   &r&3Thank you for installing &b&lStella&r&3!\n` +
@@ -29,10 +33,11 @@ const FI = register("step", () => {
         `   &r&dDiscord: Coming Soon\n` +
         `&b&l-----------------------------------------------------`;
     ChatLib.chat(message);
-    
-}).setDelay(2).unregister()
+})
+    .setDelay(2)
+    .unregister();
 
-register("gameLoad", () => firstInstall.firstInstall && FI.register())
+register("gameLoad", () => firstInstall.firstInstall && FI.register());
 
 //debug command for testing
 register("command", () => {

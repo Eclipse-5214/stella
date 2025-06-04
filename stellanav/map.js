@@ -344,9 +344,11 @@ StellaNav.register("renderOverlay", () => {
         "chat",
         (info) => {
             let player = ChatLib.removeFormatting(info).split(" ")[0];
-            for (let p of players) {
-                if (p.name === player || (p.username == Player.getName() && player.toLowerCase() === "you")) {
-                    p.deaths++;
+            if (!players) return;
+
+            for (let p of Object.keys(players)) {
+                if (p === player || (p == Player.getName() && player.toLowerCase() === "you")) {
+                    players[p].deaths++;
                 }
             }
         },
@@ -594,6 +596,7 @@ const renderCheckmarks = (map) => {
         let mapType = settings().mapPuzzleType;
 
         if (!room.checkmark || !room.comps) continue;
+        if (!settings().mapDontDelayRender && !room.corner) continue;
 
         if (roomType == 2 && room?.secrets != 0 && (room.type == 0 || room.type == 6)) continue;
         if ((roomType == 1 || roomType == 3) && (room.type == 0 || room.type == 6)) continue;
@@ -639,6 +642,7 @@ const renderRoomNames = () => {
         let type = settings().mapRoomType;
         if (type < 1) continue;
         if (!room || !room.explored || !room.comps || !room.name) continue;
+        if (!settings().mapDontDelayRender && !room.corner) continue;
         if (room.type != 0 && room.type != 6) continue;
 
         let textColor = null;
@@ -661,6 +665,7 @@ const renderRoomNames = () => {
         let roomWidth = Math.max(...room.comps.map((a) => a[0])) - minX;
         let roomHeight = Math.max(...room.comps.map((a) => a[1])) - minZ;
         location = [minX + roomWidth / 2, minZ + roomHeight / 2];
+
         if (room.shape == "L") {
             if (room.comps.filter((a) => a[1] == minZ).length == 2) location[1] -= roomHeight / 2;
             else location[1] += roomHeight / 2;
@@ -701,6 +706,7 @@ const renderPuzzleNames = () => {
         let type = settings().mapPuzzleType;
         if (type < 1) continue;
         if (!room || !room.explored || !room.comps || !room.name) continue;
+        if (!settings().mapDontDelayRender && !room.corner) continue;
         if (room.type != 1) continue;
 
         let textColor = null;

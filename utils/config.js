@@ -604,6 +604,14 @@ const defaultConf = new DefaultConfig("stella", "data/settings.json")
         },
     })
 
+    .addSwitch({
+        configName: "mapDontDelayRender",
+        title: "Don't Delay Render",
+        description: "Renders the map names / secrets without being in the render distance of the room, can cause graphical issues",
+        category: "StellaNav",
+        subcategory: "Advanced",
+    })
+
     //themeing
     .addSelection({
         category: "Theme",

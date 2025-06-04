@@ -69,7 +69,7 @@
             {
                 "type": 6,
                 "name": "termNumbers",
-                "value": false
+                "value": true
             },
             {
                 "type": 7,
@@ -119,7 +119,7 @@
             {
                 "type": 6,
                 "name": "termTracker",
-                "value": false
+                "value": true
             }
         ]
     },
@@ -129,7 +129,7 @@
             {
                 "type": 6,
                 "name": "overlayEnabled",
-                "value": false
+                "value": true
             },
             {
                 "type": 5,
@@ -144,7 +144,7 @@
             {
                 "type": 6,
                 "name": "fillBlockOverlay",
-                "value": false
+                "value": true
             },
             {
                 "type": 5,
@@ -159,7 +159,7 @@
             {
                 "type": 6,
                 "name": "chromaHighlight",
-                "value": false
+                "value": true
             },
             {
                 "type": 1,
@@ -274,9 +274,9 @@
                 "type": 5,
                 "name": "mapWitherDoorColor",
                 "value": [
+                    172,
                     0,
-                    0,
-                    0,
+                    255,
                     255
                 ]
             },
@@ -284,10 +284,10 @@
                 "type": 5,
                 "name": "mapBackgroundColor",
                 "value": [
+                    172,
                     0,
-                    0,
-                    0,
-                    100
+                    255,
+                    79
                 ]
             },
             {
@@ -298,17 +298,22 @@
             {
                 "type": 1,
                 "name": "mapBorderWidth",
-                "value": 1
+                "value": 2
             },
             {
                 "type": 5,
                 "name": "mapBorderColor",
                 "value": [
+                    172,
                     0,
-                    0,
-                    0,
+                    255,
                     255
                 ]
+            },
+            {
+                "type": 6,
+                "name": "mapDontDelayRender",
+                "value": false
             }
         ]
     },

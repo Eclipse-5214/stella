@@ -40,7 +40,7 @@ const termLabels = {
 };
 
 TermNumbers.register("renderWorld", () => {
-    if (!Dungeon.inBoss() || Dungeon.floorNumber == 7) return;
+    if (!Dungeon.inBoss() || Dungeon.floorNumber != 7) return;
 
     let [r, g, b] = [settings().termColor[0] / 255, settings().termColor[1] / 255, settings().termColor[2] / 255];
     let playerPos = [Math.round(Player.getX() + 0.25) - 1, Math.round(Player.getY()), Math.round(Player.getZ() + 0.25) - 1];
@@ -99,7 +99,7 @@ termTracker
                 ChatLib.chat(shortPrefix + "&b" + name + " &7completed &f" + data.terminal + "&7 terms, &f" + data.device + "&7 devices, and &f" + data.lever + " &7levers!");
             });
         },
-        "^The Core entrance is opening!"
+        "The Core entrance is opening!"
     )
     .onRegister(() => completed.clear())
     .onUnregister(() => completed.clear());
