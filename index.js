@@ -24,6 +24,7 @@ import "./stellanav/map";
     --------------------------------------------- */
 
 //commands
+
 register("command", (...args) => {
     if (args[0] === "help") {
         ChatLib.chat("&8&m-------------------------------------------------");
