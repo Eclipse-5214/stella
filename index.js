@@ -79,10 +79,10 @@ function checkUpdate(silent = false) {
             if (!releases.length && !silent) return ChatLib.chat(prefix + " &fNo releases found!");
             updateMessage = buildUpdateMessage(releases);
             if (silent) return;
-            compareVersions(LOCAL_VERSION, releases[0].tag_name) > 0
-                ? ChatLib.chat(prefix + " &fYou're on a development build.")
+            compareVersions(LOCAL_VERSION, releases[0].tag_name.replace(/^v/, "")) > 0
+                ? ChatLib.chat(prefix + ` &fYou're on a development build.`)
                 : compareVersions(LOCAL_VERSION, releases[0].tag_name) < 0 &&
-                  (ChatLib.chat(prefix + ` &fUpdate available: &bv${releases[0].tag_name}&f! Current: &bv${LOCAL_VERSION}`),
+                  (ChatLib.chat(prefix + ` &fUpdate available: &b${releases[0].tag_name}&f! Current: &bv${LOCAL_VERSION}`),
                   ChatLib.chat(new TextComponent(prefix + ` &fClick here to go to the release page!`).setClick("open_url", `https://github.com/Eclipse-5214/stella/releases/latest`)),
                   ChatLib.chat(new TextComponent(prefix + ` &fHover over this message to view changelogs!`).setHoverValue(updateMessage)));
         })

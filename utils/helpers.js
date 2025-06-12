@@ -1,4 +1,5 @@
 import { FeatureManager } from "../../tska/event/FeatureManager";
+import { LocalStore } from "../../tska/storage/LocalStore";
 //import { Event } from "../../tska/event/Event";
 import settings from "./config";
 

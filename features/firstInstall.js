@@ -21,7 +21,7 @@ const FI = register("step", () => {
         `   &r&3Commands\n` +
         `   &r&d/sa help &3&l- &r&bFor a list of commands!\n` +
         `\n` +
-        `   &r&dGithub: https://github.com/Eclipse-5214/stella\n` +
+        `   &r&dGithub:  https://github.com/Eclipse-5214/stella\n` +
         `   &r&dDiscord: https://discord.gg/EzEfQyGdAg\n` +
         `&b&l-----------------------------------------------------`;
     ChatLib.chat(message);
@@ -29,7 +29,7 @@ const FI = register("step", () => {
     .setDelay(2)
     .unregister();
 
-register("gameLoad", () => data.firstInstall && FI.register());
+register("gameLoad", () => !data.firstInstall && FI.register());
 
 //debug command for testing
 register("command", () => {
