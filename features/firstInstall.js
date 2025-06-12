@@ -1,4 +1,4 @@
-import { LocalStore } from "../../tska/storage/LocalStore";
+import { data } from "../utils/helpers";
 
 /*  ----------- First Install Message -----------
 
@@ -10,17 +10,9 @@ import { LocalStore } from "../../tska/storage/LocalStore";
 
     --------------------------------------------- */
 
-const firstInstall = new LocalStore(
-    "stella",
-    {
-        firstInstall: false,
-    },
-    "./data/stella.json"
-);
-
 const FI = register("step", () => {
     if (!World.isLoaded()) return;
-    firstInstall.firstInstall = true;
+    data.firstInstall = true;
     FI.unregister();
     let message =
         `&b&l-----------------------------------------------------\n` +
@@ -37,7 +29,7 @@ const FI = register("step", () => {
     .setDelay(2)
     .unregister();
 
-register("gameLoad", () => firstInstall.firstInstall && FI.register());
+register("gameLoad", () => data.firstInstall && FI.register());
 
 //debug command for testing
 register("command", () => {

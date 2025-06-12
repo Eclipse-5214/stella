@@ -1,6 +1,6 @@
-import { LocalStore } from "../tska/storage/LocalStore";
 import { prefix } from "./utils/utils";
 import { fetch } from "../tska/polyfill/Fetch";
+import { data } from "./utils/helpers";
 import { hud } from "./utils/hud";
 import settings from "./utils/config";
 
@@ -50,14 +50,7 @@ register("command", (...args) => {
     .setName("stella")
     .setAliases("sa", "sta");
 
-const ud = new LocalStore(
-    "stella",
-    {
-        version: "0.0.0",
-    },
-    "./data/stella.json"
-);
-
+// Update check
 const LOCAL_VERSION = JSON.parse(FileLib.read("stella", "metadata.json")).version.replace(/^v/, "");
 const API_URL = "https://api.github.com/repos/Eclipse-5214/stella/releases";
 let updateMessage = `&9&m${ChatLib.getChatBreak("-")}\n`;
@@ -70,9 +63,9 @@ function compareVersions(v1, v2) {
 }
 
 function buildUpdateMessage(releases) {
-    let message = `&9&m${ChatLib.getChatBreak("-")}\n&d&lStella Changelog: \n&fChanges since &bv${ud.version}&f:\n`;
+    let message = `&9&m${ChatLib.getChatBreak("-")}\n&d&lStella Changelog: \n&fChanges since &bv${data.version}&f:\n`;
     releases
-        .filter((release) => compareVersions(release.tag_name.replace(/^v/, ""), ud.version) > 0)
+        .filter((release) => compareVersions(release.tag_name.replace(/^v/, ""), data.version) > 0)
         .forEach((r) => r.body.split("\n").forEach((l) => l.trim() !== "" && !l.trim().includes("**Full Changelog**") && (message += `&b${l.trim()}\n`)));
     return message + `&9&m${ChatLib.getChatBreak("-")}`;
 }
@@ -96,14 +89,12 @@ function checkUpdate(silent = false) {
         .catch((error) => ChatLib.chat(prefix + ` &fUpdate check failed: &c${error}`));
 }
 
-// Update check
-
 let updateChecked = false;
 
 const Changelog = register("worldLoad", () => {
     checkUpdate(true);
     Changelog.unregister();
-    Client.scheduleTask(40, () => (ChatLib.chat(updateMessage + "\n&bWe now have a discord server\n&bJoin it at https://discord.gg/EzEfQyGdAg"), (ud.version = LOCAL_VERSION)));
+    Client.scheduleTask(40, () => (ChatLib.chat(updateMessage + "\n&bWe now have a discord server\n&bJoin it at https://discord.gg/EzEfQyGdAg"), (data.version = LOCAL_VERSION)));
 }).unregister();
 
 const UpdateCH = register("worldLoad", () => {
@@ -112,4 +103,4 @@ const UpdateCH = register("worldLoad", () => {
     Client.scheduleTask(1000, () => (checkUpdate(), (updateMessage = `&9&m${ChatLib.getChatBreak("-")}\n`)));
 }).unregister();
 
-register("gameLoad", () => (ud.version < LOCAL_VERSION && Changelog.register(), !updateChecked && UpdateCH.register()));
+register("gameLoad", () => (data.version < LOCAL_VERSION && Changelog.register(), !updateChecked && UpdateCH.register()));
