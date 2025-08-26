@@ -1,4 +1,4 @@
-import dev.deftu.gradle.utils.MinecraftVersion
+import dev.deftu.gradle.utils.version.MinecraftVersions
 import dev.deftu.gradle.utils.includeOrShade
 
 plugins {
@@ -11,6 +11,10 @@ plugins {
     id("dev.deftu.gradle.tools.shadow")
     id("dev.deftu.gradle.tools.minecraft.loom")
     id("dev.deftu.gradle.tools.minecraft.releases")
+}
+
+repositories {
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 }
 
 toolkitMultiversion {
@@ -27,37 +31,41 @@ toolkitLoomHelper {
         useForgeMixin(modData.id)
     }
 
-    if (mcData.isForgeLike && mcData.version >= MinecraftVersion.VERSION_1_16_5) {
+    if (mcData.isForgeLike && mcData.version >= MinecraftVersions.VERSION_1_16_5) {
         useKotlinForForge()
     }
 }
 
 dependencies {
-    val textileVersion = "0.3.1"
-    val omnicoreVersion = "0.6.0"
-    modImplementation("dev.deftu:textile-$mcData:$textileVersion")
-    modImplementation("dev.deftu:omnicore-$mcData:$omnicoreVersion")
+    modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
+    modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)
+    runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     if (mcData.isFabric) {
         modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
         modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    } else if (mcData.version <= MinecraftVersion.VERSION_1_12_2) {
+
+        if (mcData.version >= MinecraftVersions.VERSION_1_21_5) {
+            modImplementation(includeOrShade("gg.essential:elementa:710")!!)
+            modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
+        }
+
+    } else if (mcData.version <= MinecraftVersions.VERSION_1_12_2) {
         implementation(includeOrShade(kotlin("stdlib-jdk8"))!!)
         implementation(includeOrShade("org.jetbrains.kotlin:kotlin-reflect:1.6.10")!!)
 
         modImplementation(includeOrShade("org.spongepowered:mixin:0.7.11-SNAPSHOT")!!)
+        modImplementation(includeOrShade("gg.essential:elementa:710")!!)
+        modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
 
-        includeOrShade("dev.deftu:textile-$mcData:$textileVersion")
-        includeOrShade("dev.deftu:omnicore-$mcData:$omnicoreVersion")
     }
 }
 
 tasks {
-
     fatJar {
         if (mcData.isLegacyForge) {
-            relocate("dev.deftu.textile", "dev.deftu.favorita.textile")
-            relocate("dev.deftu.omnicore", "dev.deftu.favorita.omnicore")
+            relocate("gg.essential.elementa", "co.stellarskys.elementa")
+            relocate("gg.essential.universalcraft", "co.stellarskys.universalcraft")
         }
     }
 

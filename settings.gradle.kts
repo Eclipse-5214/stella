@@ -21,52 +21,22 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("jvm") version("2.0.0")
-        id("dev.deftu.gradle.multiversion-root") version("2.2.1")
+        kotlin("jvm") version("2.2.0")
+        id("dev.deftu.gradle.multiversion-root") version("2.50.0")
     }
 }
 
-val projectName: String = extra["mod.name"]?.toString()
-    ?: throw MissingPropertyException("mod.name has not been set.")
+val projectName: String = extra["mod.name"].toString()
+
 rootProject.name = projectName
 rootProject.buildFileName = "root.gradle.kts"
 
 listOf(
     "1.8.9-forge",
-
-    "1.12.2-forge",
-
     "1.16.5-forge",
     "1.16.5-fabric",
-
-    "1.17.1-forge",
-    "1.17.1-fabric",
-
-    "1.18.2-forge",
-    "1.18.2-fabric",
-
-    "1.19.2-forge",
-    "1.19.2-fabric",
-
-    "1.19.4-forge",
-    "1.19.4-fabric",
-
-    "1.20.1-forge",
-    "1.20.1-fabric",
-
-    "1.20.2-forge",
-    "1.20.2-neoforge",
-    "1.20.2-fabric",
-
-    "1.20.4-forge",
-    "1.20.4-neoforge",
-    "1.20.4-fabric",
-
-    "1.20.6-neoforge",
-    "1.20.6-fabric",
-
-    "1.21-neoforge",
-    "1.21-fabric"
+    "1.21.5-fabric",
+    "1.21.7-fabric"
 ).forEach { version ->
     include(":$version")
     project(":$version").apply {

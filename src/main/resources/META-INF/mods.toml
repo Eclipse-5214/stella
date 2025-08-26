@@ -1,13 +1,13 @@
 modLoader="javafml"
 loaderVersion="[31,)"
-issueTrackerURL="https://github.com/Deftu/${mod_name}/issues"
+issueTrackerURL="https://github.com/eclipse-5214/${mod_name}/issues"
 license="LGPL-3.0-or-later"
 
 [[mods]]
     modId="${mod_id}"
     version="${mod_version}"
     displayName="${mod_name}"
-    authors="Deftu"
+    authors="Eclipse"
     description="${mod_description}"
 
 [[dependencies.${mod_id}]]
@@ -21,19 +21,5 @@ license="LGPL-3.0-or-later"
     modId="minecraft"
     mandatory=true
     versionRange="[${minor_mc_version}]"
-    ordering="NONE"
-    side="BOTH"
-
-[[dependencies.${mod_id}]]
-    modId="textile"
-    mandatory=true
-    versionRange="*"
-    ordering="NONE"
-    side="BOTH"
-
-[[dependencies.${mod_id}]]
-    modId="omnicore"
-    mandatory=true
-    versionRange="*"
     ordering="NONE"
     side="BOTH"

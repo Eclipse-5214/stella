@@ -5,7 +5,7 @@
     "name": "${mod_name}",
     "description": "${mod_description}",
     "authors": [
-        "Deftu"
+        "Eclipse"
     ],
     "contact": {
         "issues": "https://github.com/Deftu/${mod_name}/issues",
@@ -14,22 +14,20 @@
     "license": "LGPL-3.0-or-later",
     "environment": "*",
     "entrypoints": {
-        "main": [
+        "client": [
             {
-                "adapter": "kotlin",
-                "value": "dev.deftu.modtemplate.entrypoint.ModTemplateEntrypoint"
+                "value": "co.stellarskys.stella.Stella",
+                "adapter": "kotlin"
             }
         ]
     },
     "mixins": [
-        "mixins.${mod_id}.json"
+        "mixins.stella.json"
     ],
     "depends": {
         "minecraft": "~${minor_mc_version}",
         "fabric": "*",
         "fabricloader": ">=0.15.11",
-        "fabric-language-kotlin": "*",
-        "textile": "*",
-        "omnicore": "*"
+        "fabric-language-kotlin": "*"
     }
 }
