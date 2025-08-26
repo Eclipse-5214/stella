@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/versions/1.12.2-forge" />
+            <option value="$PROJECT_DIR$/versions/1.16.5-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.16.5-forge" />
+            <option value="$PROJECT_DIR$/versions/1.17.1-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.17.1-forge" />
+            <option value="$PROJECT_DIR$/versions/1.18.2-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.18.2-forge" />
+            <option value="$PROJECT_DIR$/versions/1.19.2-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.19.2-forge" />
+            <option value="$PROJECT_DIR$/versions/1.19.4-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.19.4-forge" />
+            <option value="$PROJECT_DIR$/versions/1.20.1-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.20.1-forge" />
+            <option value="$PROJECT_DIR$/versions/1.20.2-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.20.2-forge" />
+            <option value="$PROJECT_DIR$/versions/1.20.2-neoforge" />
+            <option value="$PROJECT_DIR$/versions/1.20.4-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.20.4-forge" />
+            <option value="$PROJECT_DIR$/versions/1.20.4-neoforge" />
+            <option value="$PROJECT_DIR$/versions/1.20.6-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.20.6-neoforge" />
+            <option value="$PROJECT_DIR$/versions/1.21-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.21-neoforge" />
+            <option value="$PROJECT_DIR$/versions/1.8.9-forge" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

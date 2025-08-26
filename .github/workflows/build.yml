@@ -1,0 +1,54 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '*'
+    paths-ignore:
+      - 'README'
+      - 'README.md'
+      - 'LICENSE'
+      - 'LICENSE.md'
+  pull_request:
+    branches:
+      - '*'
+    paths-ignore:
+      - 'README'
+      - 'README.md'
+      - 'LICENSE'
+      - 'LICENSE.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build and test with gradle
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: |
+            8
+            16
+            17
+            21
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: |
+            build/libs/*.jar
+            versions/*/build/libs/*.jar
+          if-no-files-found: error
