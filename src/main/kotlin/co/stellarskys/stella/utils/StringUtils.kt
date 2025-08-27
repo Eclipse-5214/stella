@@ -1,11 +1,16 @@
 package co.stellarskys.stella.utils
 
+//#if MC >= 1.21.5
 import net.minecraft.util.Formatting
+//#endif
+
 import org.apache.commons.lang3.StringUtils as ApacheStringUtils
 
 fun CharSequence?.countMatches(subString: CharSequence): Int = ApacheStringUtils.countMatches(this, subString)
 
+//#if MC >= 1.21.5
 fun String.stripControlCodes(): String = Formatting.strip(this)!!
+//#endif
 
 fun CharSequence?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
 fun CharSequence.startsWithAny(sequences: Iterable<CharSequence>): Boolean = sequences.any { startsWith(it) }
@@ -30,5 +35,7 @@ fun String.splitToWords(): String = this.split('_', ' ').joinToString(" ") { it.
 fun String.isInteger(): Boolean = this.toIntOrNull() != null
 
 private val removeCodesRegex = "[\\u00a7&][0-9a-fk-or]".toRegex()
+private val emoteRegex = "[^\\u0000-\\u007F]".toRegex()
 
 fun String.clearCodes(): String = this.replace(removeCodesRegex, "")
+fun String.removeEmotes(): String = this.replace(emoteRegex, "")

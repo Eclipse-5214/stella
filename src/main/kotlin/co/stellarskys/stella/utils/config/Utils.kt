@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils.config
 
+/*
 import co.stellarskys.stella.Stella
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
@@ -67,3 +68,4 @@ object UCRenderPipelines {
         depthTest = URenderPipeline.DepthTest.LessOrEqual
     }.build()
 }
+*/

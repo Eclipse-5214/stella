@@ -9,7 +9,11 @@ import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.*
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
+//#if MC >= 1.21.5
 import org.lwjgl.glfw.GLFW
+//#elseif MC == 1.8.9
+//$$ import org.lwjgl.input.Keyboard
+//#endif
 import java.awt.Color
 
 
@@ -85,6 +89,10 @@ class KeybindUIBuilder {
         257 -> "Enter"
         256 -> "Escape"
         in 290..301 -> "F${keyCode - 289}" // F1–F12
+        //#if MC >= 1.21.5
         else -> GLFW.glfwGetKeyName(keyCode, 0) ?: "Key$keyCode"
+        //#elseif MC == 1.8.9
+        //$$ else -> Keyboard.getKeyName(keyCode) ?: "Key$keyCode"
+        //#endif
     }
 }

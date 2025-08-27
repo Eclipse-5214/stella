@@ -2,10 +2,6 @@ package co.stellarskys.stella.utils
 import co.stellarskys.stella.Stella
 //import co.stellarskys.stella.hud.HUDEditor
 import co.stellarskys.stella.utils.config.core.Config
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.context.CommandContext
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
 val config = Config("Stella", "stella") {
     category("General"){

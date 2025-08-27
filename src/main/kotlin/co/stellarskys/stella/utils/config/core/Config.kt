@@ -8,9 +8,10 @@ import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.Utils.createBlock
-import co.stellarskys.stella.utils.config.UCRenderPipelines
-import co.stellarskys.stella.utils.config.drawTexture
+//import co.stellarskys.stella.utils.config.UCRenderPipelines
+//import co.stellarskys.stella.utils.config.drawTexture
 import co.stellarskys.stella.utils.config.ui.elements.*
+import com.google.gson.*
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.WindowScreen
@@ -21,10 +22,8 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.elementa.markdown.MarkdownComponent
 import gg.essential.universal.UMatrixStack
-import net.minecraft.client.MinecraftClient
-import kotlinx.serialization.json.*
-import net.minecraft.client.util.DefaultSkinHelper
-import net.minecraft.entity.player.PlayerModelPart
+//import net.minecraft.client.util.DefaultSkinHelper
+//import net.minecraft.entity.player.PlayerModelPart
 import java.awt.Color
 import java.io.File
 
@@ -131,7 +130,12 @@ class Config(
                     height = PixelConstraint(12f)
                 }.setChildOf(window)
 
+                //#if MC >= 1.21.5
                 val username = UIText(Stella.mc.player?.name?.string ?: "null", false)
+                    //#elseif MC == 1.8.9
+                    //$$ val username = UIText(Stella.mc.thePlayer?.name ?: "null", false)
+                    //#endif
+
                     .constrain {
                         x = RelativeConstraint() + 17.pixels()
                         y = CenterConstraint() + 2.pixels()
@@ -223,11 +227,14 @@ class Config(
                 }
             }
 
+            //#if MC >= 1.21.5
             override fun shouldPause(): Boolean = false
+            //#endif
 
             override fun onDrawScreen(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
                 super.onDrawScreen(matrixStack, mouseX, mouseY, partialTicks)
 
+                /*
                 val player = Stella.mc.player ?: return
                 val entry = Stella.mc.networkHandler?.getPlayerListEntry(player.uuid)
                 val skin = entry?.skinTextures?.comp_1626  ?: DefaultSkinHelper.getTexture()
@@ -242,6 +249,8 @@ class Config(
                 if (hasHat) {
                     drawTexture(matrixStack, UCRenderPipelines.guiTexturePipeline, skin, x, y, size, size, 40.0, 8.0, 8.0, 8.0)
                 }
+
+                 */
             }
         }
     }
@@ -389,7 +398,11 @@ class Config(
     fun open() {
         buildIfNeeded()
         TickUtils.schedule(1){
-            MinecraftClient.getInstance().setScreen(configUI)
+            //#if MC > 1.21.5
+            Stella.mc.setScreen(configUI)
+            //#elseif MC == 1.8.9
+            //$$ Stella.mc.displayGuiScreen(configUI)
+            //#endif
         }
     }
 
@@ -488,65 +501,67 @@ class Config(
     }
 
     private fun toJson(): JsonObject {
-        return buildJsonObject {
-            categories.forEach { (_, category) ->
-                val subcategoryJson = buildJsonObject {
-                    category.subcategories.forEach { (_, subcategory) ->
-                        val elementJson = buildJsonObject {
-                            subcategory.elements.forEach { (_, element) ->
-                                val id = element.configName
-                                val value = element.value
+        val root = JsonObject()
 
-                                if (id.isNotBlank() && value != null) {
-                                    val jsonValue = when (value) {
-                                        is Boolean -> JsonPrimitive(value)
-                                        is Int -> JsonPrimitive(value)
-                                        is Float -> JsonPrimitive(value)
-                                        is Double -> JsonPrimitive(value)
-                                        is String -> JsonPrimitive(value)
-                                        is RGBA -> JsonPrimitive(value.toHex())
-                                        else -> {
-                                            println("Unsupported type for $id: ${value::class.simpleName}")
-                                            return@forEach
-                                        }
-                                    }
+        categories.forEach { (_, category) ->
+            val subcategoryJson = JsonObject()
 
-                                    put(id, jsonValue)
-                                }
+            category.subcategories.forEach { (_, subcategory) ->
+                val elementJson = JsonObject()
+
+                subcategory.elements.forEach { (_, element) ->
+                    val id = element.configName
+                    val value = element.value
+
+                    if (id.isNotBlank() && value != null) {
+                        val jsonValue = when (value) {
+                            is Boolean -> JsonPrimitive(value)
+                            is Int -> JsonPrimitive(value)
+                            is Float -> JsonPrimitive(value)
+                            is Double -> JsonPrimitive(value)
+                            is String -> JsonPrimitive(value)
+                            is RGBA -> JsonPrimitive(value.toHex())
+                            else -> {
+                                println("Unsupported type for $id: ${value::class.simpleName}")
+                                return@forEach
                             }
                         }
 
-                        if (elementJson.isNotEmpty()) {
-                            put(subcategory.subName, elementJson)
-                        }
+                        elementJson.add(id, jsonValue)
                     }
                 }
 
-                if (subcategoryJson.isNotEmpty()) {
-                    put(category.name, subcategoryJson)
+                if (elementJson.entrySet().isNotEmpty()) {
+                    subcategoryJson.add(subcategory.subName, elementJson)
                 }
             }
+
+            if (subcategoryJson.entrySet().isNotEmpty()) {
+                root.add(category.name, subcategoryJson)
+            }
         }
+
+        return root
     }
 
     private fun fromJson(json: JsonObject) {
         categories.forEach { (_, category) ->
-            val categoryData = json[category.name]?.jsonObject ?: return@forEach
+            val categoryData = json.getAsJsonObject(category.name) ?: return@forEach
 
             category.subcategories.forEach { (_, subcategory) ->
-                val subcategoryData = categoryData[subcategory.subName]?.jsonObject ?: return@forEach
+                val subcategoryData = categoryData.getAsJsonObject(subcategory.subName) ?: return@forEach
 
                 subcategory.elements.forEach { (_, element) ->
                     val id = element.configName
-                    val jsonValue = subcategoryData[id] ?: return@forEach
+                    val jsonValue = subcategoryData.get(id) ?: return@forEach
 
                     val newValue = when (val current = element.value) {
-                        is Boolean -> jsonValue.jsonPrimitive.booleanOrNull
-                        is Int -> jsonValue.jsonPrimitive.intOrNull
-                        is Float -> jsonValue.jsonPrimitive.floatOrNull
-                        is Double -> jsonValue.jsonPrimitive.doubleOrNull
-                        is String -> jsonValue.jsonPrimitive.contentOrNull
-                        is RGBA -> jsonValue.jsonPrimitive.contentOrNull?.let { RGBA.fromHex(it) }
+                        is Boolean -> jsonValue.asBoolean
+                        is Int -> jsonValue.asInt
+                        is Float -> jsonValue.asFloat
+                        is Double -> jsonValue.asDouble
+                        is String -> jsonValue.asString
+                        is RGBA -> RGBA.fromHex(jsonValue.asString)
                         else -> {
                             println("Skipping unsupported load type for '$id': ${current?.let { it::class.simpleName } ?: "null"}")
                             null
@@ -581,21 +596,16 @@ class Config(
         }
     }
 
-
-    fun save(){
+    fun save() {
         try {
             val target = resolvedFile
             target.parentFile?.mkdirs()
 
             val json = toJson()
+            val gson = GsonBuilder().setPrettyPrinting().create()
+            val jsonString = gson.toJson(json)
 
-            val jsonOutput = Json {
-                prettyPrint = true
-            }
-
-            val jsonString = jsonOutput.encodeToString(JsonObject.serializer(), json)
             target.writeText(jsonString)
-
         } catch (e: Exception) {
             println("Failed to save config for '$mod': ${e.message}")
             e.printStackTrace()
@@ -608,11 +618,10 @@ class Config(
             if (!target.exists()) return
 
             val jsonText = target.readText()
-            val loadedJson = Json.decodeFromString(JsonObject.serializer(), jsonText)
+            val gson = Gson()
+            val loadedJson = gson.fromJson(jsonText, JsonObject::class.java)
 
-            // Inject into config
             fromJson(loadedJson)
-
         } catch (e: Exception) {
             println("Failed to load config for '$mod': ${e.message}")
             e.printStackTrace()
