@@ -7,15 +7,16 @@ import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.TickUtils
 import co.stellarskys.stella.utils.config
 import java.util.concurrent.ConcurrentHashMap
-import net.fabricmc.api.ClientModInitializer
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.common.Mod.EventHandler
+import net.minecraftforge.fml.common.event.FMLInitializationEvent
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiInventory
 
-class Stella
-    : ClientModInitializer
-{
+@Mod(modid = "stella", version = "1.0.0", useMetadata = true, clientSideOnly = true)
+class Stella {
     private var shown = false
+    private var eventCall: EventBus.EventCall? = null
 
     @Target(AnnotationTarget.CLASS)
     annotation class Module
@@ -23,19 +24,23 @@ class Stella
     @Target(AnnotationTarget.CLASS)
     annotation class Command
 
-    override
-    fun onInitializeClient() {
+    @EventHandler
+    fun onInitializeClient(event: FMLInitializationEvent) {
+        EventBus.post(GameEvent.Load())
+
         init()
         FeatureLoader.init()
 
-        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
-            if (shown) return@register
-
-            ChatUtils.addMessage(
-                "$PREFIX §fMod loaded.",
-                "§c${FeatureLoader.getFeatCount()} modules §8- §c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands"
-            )
-        }
+        eventCall = EventBus.register<EntityEvent.Join> ({ event ->
+            if (event.entity == mc.thePlayer) {
+                ChatUtils.addMessage(
+                    "$PREFIX §fMod loaded.",
+                    "§c${FeatureLoader.getFeatCount()} modules §8- §c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands"
+                )
+                eventCall?.unregister()
+                eventCall = null
+            }
+        })
 
         config.registerListener{ name, value ->
             configListeners[name]?.forEach { it.update() }
@@ -43,11 +48,7 @@ class Stella
         }
 
         EventBus.register<GuiEvent.Open> ({ event ->
-            //#if MC >= 1.21.5
-            if (event.screen is InventoryScreen) isInInventory = true
-            //#elseif MC == 1.8.9
-            //$$ if (event.screen is GuiInventory) isInInventory = true
-            //#endif
+            if (event.screen is GuiInventory) isInInventory = true
         })
 
         EventBus.register<GuiEvent.Close> ({
@@ -74,7 +75,7 @@ class Stella
         private val areaFeatures = mutableListOf<Feature>()
         private val subareaFeatures = mutableListOf<Feature>()
 
-        val mc = MinecraftClient.getInstance()
+        val mc = Minecraft.getMinecraft()
         val NAMESPACE: String = "stella"
         val INSTANCE: Stella? = null
         val PREFIX: String = "§d[Stella]"

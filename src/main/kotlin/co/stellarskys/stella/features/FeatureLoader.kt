@@ -62,8 +62,6 @@ object FeatureLoader {
         //$$        e.printStackTrace()
         //$$    }
         //$$ }
-        //$$ println("[Stella] got past 1.21.5 check")
-        //$$ println("command count: $commandCount")
         //#endif
 
         loadtime = starttime.since.millis

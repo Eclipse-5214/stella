@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils
 import co.stellarskys.stella.Stella
 import net.minecraft.command.ICommandSender
 
+@Stella.Command
 object MainCommand: CommandUtils(
     "stella",
     "Opens the Config",
