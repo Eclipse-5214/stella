@@ -8,8 +8,8 @@ import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.Utils.createBlock
-//import co.stellarskys.stella.utils.config.UCRenderPipelines
-//import co.stellarskys.stella.utils.config.drawTexture
+import co.stellarskys.stella.utils.config.UCRenderPipelines
+import co.stellarskys.stella.utils.config.drawTexture
 import co.stellarskys.stella.utils.config.ui.elements.*
 import com.google.gson.*
 import gg.essential.elementa.ElementaVersion
@@ -22,8 +22,8 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.elementa.markdown.MarkdownComponent
 import gg.essential.universal.UMatrixStack
-//import net.minecraft.client.util.DefaultSkinHelper
-//import net.minecraft.entity.player.PlayerModelPart
+import net.minecraft.client.util.DefaultSkinHelper
+import net.minecraft.entity.player.PlayerModelPart
 import java.awt.Color
 import java.io.File
 
@@ -234,7 +234,6 @@ class Config(
             override fun onDrawScreen(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
                 super.onDrawScreen(matrixStack, mouseX, mouseY, partialTicks)
 
-                /*
                 val player = Stella.mc.player ?: return
                 val entry = Stella.mc.networkHandler?.getPlayerListEntry(player.uuid)
                 val skin = entry?.skinTextures?.comp_1626  ?: DefaultSkinHelper.getTexture()
@@ -249,8 +248,6 @@ class Config(
                 if (hasHat) {
                     drawTexture(matrixStack, UCRenderPipelines.guiTexturePipeline, skin, x, y, size, size, 40.0, 8.0, 8.0, 8.0)
                 }
-
-                 */
             }
         }
     }

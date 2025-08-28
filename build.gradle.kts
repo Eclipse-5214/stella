@@ -58,6 +58,7 @@ dependencies {
         modImplementation(includeOrShade("gg.essential:elementa:710")!!)
         modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
 
+        runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
     }
 }
 

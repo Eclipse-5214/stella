@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent
 
 @Mod(modid = "stella", version = "1.0.0", useMetadata = true, clientSideOnly = true)
 class Stella {
@@ -67,6 +68,12 @@ class Stella {
             }
         })
     }
+
+    @EventHandler
+    fun stop(event: FMLServerStoppingEvent) {
+        EventBus.post(GameEvent.Unload())
+    }
+
 
     companion object {
         private val features = mutableListOf<Feature>()

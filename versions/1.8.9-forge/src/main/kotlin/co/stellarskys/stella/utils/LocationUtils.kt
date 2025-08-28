@@ -3,13 +3,11 @@ package co.stellarskys.stella.utils
 import co.stellarskys.stella.events.AreaEvent
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.PacketEvent
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
-import net.minecraft.network.packet.s2c.play.TeamS2CPacket
+import co.stellarskys.stella.utils.clearCodes
+import co.stellarskys.stella.utils.removeEmotes
+import net.minecraft.network.play.server.S38PacketPlayerListItem
+import net.minecraft.network.play.server.S3EPacketTeams
 
-/*
- * Modified from Devonian code
- * Under GPL 3.0 License
- */
 object LocationUtils {
     private val areaRegex = "^(?:Area|Dungeon): ([\\w ]+)$".toRegex()
     private val subAreaRegex = "^ ([⏣ф]) .*".toRegex()
@@ -27,18 +25,16 @@ object LocationUtils {
         private set
 
     init {
-        EventBus.register<PacketEvent.Received> { event ->
+        EventBus.register<PacketEvent.Received> ({ event ->
             when (val packet = event.packet) {
-                is PlayerListS2CPacket -> {
-                    val action = packet.actions.firstOrNull()
-                    if (action != PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME && action != PlayerListS2CPacket.Action.ADD_PLAYER) return@register
+                is S38PacketPlayerListItem -> {
+                    if (packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME && packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER) return@register
                     packet.entries?.forEach { entry ->
-                        val displayName = entry.displayName?.string ?: return@forEach
-
+                        val displayName = entry.displayName?.unformattedText ?: return@forEach
                         val line = displayName.removeEmotes()
                         val match = areaRegex.find(line) ?: return@forEach
                         val newArea = match.groupValues[1]
-                        if (newArea.lowercase() != area) {
+                        if (newArea != area) {
                             synchronized(lock) {
                                 EventBus.post(AreaEvent.Main(newArea))
                                 area = newArea.lowercase()
@@ -46,14 +42,13 @@ object LocationUtils {
                         }
                     }
                 }
+                is S3EPacketTeams -> {
+                    val teamPrefix = packet.prefix
+                    val teamSuffix = packet.suffix
+                    if (teamPrefix.isEmpty() || teamSuffix.isEmpty()) return@register
 
-                is TeamS2CPacket -> {
-                    val prefix = packet.team.orElse(null)?.prefix?.string ?: ""
-                    val suffix = packet.team.orElse(null)?.suffix?.string ?: ""
-                    if (prefix.isEmpty() || suffix.isEmpty()) return@register
-
-                    val line = prefix + suffix
-                    if (!subAreaRegex.matches(line)) return@register
+                    val line = teamPrefix + teamSuffix
+                    if (!subAreaRegex.matches(line.clearCodes())) return@register
                     if (line.endsWith("cth") || line.endsWith("ch")) return@register
                     val cleanSubarea = line.clearCodes().replace(uselessRegex, "").trim().lowercase()
                     if (cleanSubarea != subarea) {
@@ -68,7 +63,7 @@ object LocationUtils {
                     }
                 }
             }
-        }
+        })
 
         EventBus.register<AreaEvent.Main> ({
             synchronized(lock) {
