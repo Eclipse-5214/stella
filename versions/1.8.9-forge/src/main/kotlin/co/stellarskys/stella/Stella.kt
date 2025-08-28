@@ -11,7 +11,11 @@ import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.renderer.entity.RenderPlayer
+import net.minecraft.client.resources.DefaultPlayerSkin
+import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent
 
 @Mod(modid = "stella", version = "1.0.0", useMetadata = true, clientSideOnly = true)
@@ -112,5 +116,6 @@ class Stella {
         //fun getResource(path: String) = Identifier.of(NAMESPACE, path)
 
         fun init() {}
+
     }
 }

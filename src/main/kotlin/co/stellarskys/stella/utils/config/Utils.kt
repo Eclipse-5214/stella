@@ -23,7 +23,8 @@ fun drawTexture(
     //#if MC >= 1.21.5
     sprite: Identifier,
     //#elseif MC == 1.8.9
-    //$$ sprite: ResourceLocation
+    //$$ sprite: ResourceLocation,
+    //#endif
     x: Double,
     y: Double,
     drawWidth: Double,
@@ -40,6 +41,8 @@ fun drawTexture(
     UGraphics.bindTexture(0, sprite)
     //#if MC >= 1.21.5
     val texture = Stella.mc.textureManager.getTexture(sprite)
+    texture.setFilter(false, false)
+    val glTexture = texture.glTexture as GlTexture
     //#elseif MC == 1.8.9
     //$$ val textureManager = Stella.mc.textureManager
     //$$ val texture = textureManager.getTexture(sprite) ?: run {
@@ -47,14 +50,8 @@ fun drawTexture(
     //$$     textureManager.loadTexture(sprite, simple)
     //$$     simple
     //$$ }
-    //#endif
-
-    texture.setFilter(false, false)
-
-    //#if MC >= 1.21.5
-    val glTexture = texture.glTexture as GlTexture
-    //#elseif MC == 1.8.9
     //$$ val glId = (texture as? AbstractTexture)?.glTextureId ?:0
+    //#endif
 
     val x2 = x + drawWidth
     val y2 = y + drawHeight
@@ -74,6 +71,7 @@ fun drawTexture(
         texture(0, glTexture.glId)
         //#elseif MC == 1.8.9
         //$$ texture(0, glId)
+        //#endif
     }
 }
 

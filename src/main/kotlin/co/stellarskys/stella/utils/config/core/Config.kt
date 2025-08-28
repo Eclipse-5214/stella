@@ -22,12 +22,20 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.elementa.markdown.MarkdownComponent
 import gg.essential.universal.UMatrixStack
-import net.minecraft.client.util.DefaultSkinHelper
-import net.minecraft.entity.player.PlayerModelPart
 import java.awt.Color
 import java.io.File
 
-//TODO Use gradient for the Slider
+//#if MC >= 1.21.5
+import net.minecraft.client.util.DefaultSkinHelper
+import net.minecraft.entity.player.PlayerModelPart
+//#elseif MC == 1.8.9
+//$$ import net.minecraft.client.entity.AbstractClientPlayer
+//$$ import net.minecraft.util.ResourceLocation
+//$$ import net.minecraft.client.renderer.entity.layers.LayerRenderer
+//$$ import net.minecraft.entity.player.EnumPlayerModelParts
+//$$ import net.minecraft.client.resources.DefaultPlayerSkin
+//#endif
+
 
 //Main config Shananagens
 class Config(
@@ -234,10 +242,22 @@ class Config(
             override fun onDrawScreen(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
                 super.onDrawScreen(matrixStack, mouseX, mouseY, partialTicks)
 
-                val player = Stella.mc.player ?: return
+                val player =
+                    //#if MC >= 1.21.5
+                    Stella.mc.player
+                    //#elseif MC == 1.8.9
+                    //$$ Stella.mc.thePlayer
+                    //#endif
+                        ?: return
+
+                //#if MC >= 1.21.5
                 val entry = Stella.mc.networkHandler?.getPlayerListEntry(player.uuid)
-                val skin = entry?.skinTextures?.comp_1626  ?: DefaultSkinHelper.getTexture()
+                val skin = entry?.skinTextures?.comp_1626 ?: DefaultSkinHelper.getTexture()
                 val hasHat = player.isPartVisible(PlayerModelPart.HAT)
+                //#elseif MC == 1.8.9
+                //$$ val skin = (player as? AbstractClientPlayer)?.locationSkin ?: DefaultPlayerSkin.getDefaultSkinLegacy()
+                //$$ val hasHat = player.isWearing(EnumPlayerModelParts.HAT)
+                //#endif
 
                 val x = head.getLeft().toDouble()
                 val y = head.getTop().toDouble()
@@ -249,6 +269,7 @@ class Config(
                     drawTexture(matrixStack, UCRenderPipelines.guiTexturePipeline, skin, x, y, size, size, 40.0, 8.0, 8.0, 8.0)
                 }
             }
+
         }
     }
 
