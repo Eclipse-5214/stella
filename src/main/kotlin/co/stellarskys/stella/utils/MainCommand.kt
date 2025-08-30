@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.hud.HUDEditor
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
@@ -22,7 +23,7 @@ object MainCommand : CommandUtils(
                 .executes { _ ->
                     TickUtils.schedule(1) {
                         Stella.mc.execute {
-                            //Stella.mc.setScreen(HUDEditor())
+                            Stella.mc.setScreen(HUDEditor())
                         }
                     }
                     1
