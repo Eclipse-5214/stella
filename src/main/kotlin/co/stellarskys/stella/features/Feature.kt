@@ -4,7 +4,7 @@ package co.stellarskys.stella.features
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.Event
 import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.utils.LocationUtils
+import co.stellarskys.stella.utils.skyblock.LocationUtils
 import co.stellarskys.stella.utils.LoopUtils
 import co.stellarskys.stella.utils.TickUtils
 import co.stellarskys.stella.utils.config
@@ -44,13 +44,11 @@ open class Feature(
     }
 
     init {
-        initialize()
-        configName?.let { Stella.registerListener(it, this) }
         Stella.addFeature(this)
-        update()
     }
 
     private val configValue: () -> Boolean = {
+        println("getting config value")
         configName?.let { config.getValue<Boolean>(it) } ?: true
     }
 
@@ -94,14 +92,18 @@ open class Feature(
     open fun onToggle(state: Boolean) {
         if (state == isRegistered) return
 
+        println("[Feature] Feature $configName updating")
+
         if (state) {
             events.forEach { it.register() }
             onRegister()
             isRegistered = true
+            println("[Feature] Enabled")
         } else {
             events.forEach { it.unregister() }
             onUnregister()
             isRegistered = false
+            println("[Feature] Disabled")
         }
     }
 

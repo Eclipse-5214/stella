@@ -6,6 +6,9 @@ import co.stellarskys.stella.features.FeatureLoader
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.TickUtils
 import co.stellarskys.stella.utils.config
+import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
+import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner
+import co.stellarskys.stella.utils.skyblock.dungeons.RoomRegistry
 import java.util.concurrent.ConcurrentHashMap
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
@@ -27,6 +30,8 @@ class Stella
     fun onInitializeClient() {
         init()
         FeatureLoader.init()
+        RoomRegistry.loadFromRemote()
+        DungeonScanner.init()
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             if (shown) return@register
@@ -35,6 +40,8 @@ class Stella
                 "$PREFIX §fMod loaded.",
                 "§c${FeatureLoader.getFeatCount()} modules §8- §c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands"
             )
+
+            shown = true
         }
 
         config.registerListener{ name, value ->
@@ -68,6 +75,7 @@ class Stella
     }
 
     companion object {
+        private val pendingFeatures = mutableListOf<Feature>()
         private val features = mutableListOf<Feature>()
         private val configListeners = ConcurrentHashMap<String, MutableList<Feature>>()
         private val ConfigCallback = ConcurrentHashMap<String, MutableList<() -> Unit>>()
@@ -82,11 +90,18 @@ class Stella
 
         var isInInventory = false
 
-        fun addFeature(feature: Feature) {
-            features.add(feature)
+        fun addFeature(feature: Feature) = pendingFeatures.add(feature)
 
-            if (feature.hasAreas()) areaFeatures.add(feature)
-            if (feature.hasSubareas()) subareaFeatures.add(feature)
+        fun initializeFeatures() {
+            pendingFeatures.forEach { feature ->
+                features.add(feature)
+                if (feature.hasAreas()) areaFeatures.add(feature)
+                if (feature.hasSubareas()) subareaFeatures.add(feature)
+                feature.initialize()
+                feature.configName?.let { registerListener(it, feature) }
+                feature.update()
+            }
+            pendingFeatures.clear()
         }
 
         fun registerListener(configName: String, feature: Feature) {
@@ -95,10 +110,6 @@ class Stella
 
         fun registerListener(configName: String, callback: () -> Unit) {
             ConfigCallback.getOrPut(configName) { mutableListOf() }.add(callback)
-        }
-
-        fun updateFeatures() {
-            features.forEach { it.update() }
         }
 
         //fun getResource(path: String) = Identifier.of(NAMESPACE, path)

@@ -1,4 +1,4 @@
-package co.stellarskys.stella.utils
+package co.stellarskys.stella.utils.skyblock
 
 import co.stellarskys.stella.events.AreaEvent
 import co.stellarskys.stella.events.EventBus

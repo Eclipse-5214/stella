@@ -1,8 +1,10 @@
-package co.stellarskys.stella.utils
+package co.stellarskys.stella.utils.skyblock
 
 import co.stellarskys.stella.events.AreaEvent
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.PacketEvent
+import co.stellarskys.stella.utils.clearCodes
+import co.stellarskys.stella.utils.removeEmotes
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket
 

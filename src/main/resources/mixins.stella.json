@@ -8,6 +8,9 @@
     "mixins": [
     ],
     "client": [
-        "MixinNetworkManager"
+      "MixinNetworkManager",
+      "MixinGameRenderer",
+      "accessors.AccessorMapState",
+      "accessors.AccessorNetHandlerPlayClient"
     ]
 }

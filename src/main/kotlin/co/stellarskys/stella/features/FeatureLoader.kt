@@ -22,7 +22,7 @@ object FeatureLoader {
         val features = reflections.getTypesAnnotatedWith(Stella.Module::class.java)
         val starttime = TimeUtils.now
         //val categoryOrder = listOf("dungeons", "stellanav", "msc")
-        val categoryOrder = listOf<String>()
+        val categoryOrder = listOf("dungeons")
 
         features.sortedWith(compareBy<Class<*>> { clazz ->
             val packageName = clazz.`package`.name
@@ -64,6 +64,7 @@ object FeatureLoader {
         //$$ }
         //#endif
 
+        Stella.initializeFeatures()
         loadtime = starttime.since.millis
     }
 

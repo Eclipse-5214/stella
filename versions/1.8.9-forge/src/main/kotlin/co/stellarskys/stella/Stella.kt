@@ -80,6 +80,7 @@ class Stella {
 
 
     companion object {
+        private val pendingFeatures = mutableListOf<Feature>()
         private val features = mutableListOf<Feature>()
         private val configListeners = ConcurrentHashMap<String, MutableList<Feature>>()
         private val ConfigCallback = ConcurrentHashMap<String, MutableList<() -> Unit>>()
@@ -94,11 +95,18 @@ class Stella {
 
         var isInInventory = false
 
-        fun addFeature(feature: Feature) {
-            features.add(feature)
+        fun addFeature(feature: Feature) = pendingFeatures.add(feature)
 
-            if (feature.hasAreas()) areaFeatures.add(feature)
-            if (feature.hasSubareas()) subareaFeatures.add(feature)
+        fun initializeFeatures() {
+            pendingFeatures.forEach { feature ->
+                features.add(feature)
+                if (feature.hasAreas()) areaFeatures.add(feature)
+                if (feature.hasSubareas()) subareaFeatures.add(feature)
+                feature.initialize()
+                feature.configName?.let { registerListener(it, feature) }
+                feature.update()
+            }
+            pendingFeatures.clear()
         }
 
         fun registerListener(configName: String, feature: Feature) {
