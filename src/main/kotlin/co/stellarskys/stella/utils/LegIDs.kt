@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils
 
+//#if MC >= 1.21.5
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.registry.Registries
@@ -567,3 +568,4 @@ object LegIDs {
     }
 
 }
+//#endif

@@ -4,7 +4,7 @@ import co.stellarskys.stella.utils.WorldUtils
 //#if MC >= 1.21.5
 import net.minecraft.block.Blocks
 //#elseif MC == 1.8.9
-//$$ import net.minecraft.block.Block
+//$$ import net.minecraft.init.Blocks
 //#endif
 
 data class RoomMetadata(

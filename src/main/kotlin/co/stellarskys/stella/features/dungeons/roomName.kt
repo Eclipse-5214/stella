@@ -1,23 +1,35 @@
 package co.stellarskys.stella.features.dungeons
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.events.GuiEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner
+//#if MC > 1.21.5
 import net.minecraft.client.gui.DrawContext
+import co.stellarskys.stella.events.GuiEvent
+//#elseif MC == 1.8.9
+//$$ import co.stellarskys.stella.events.RenderEvent
+//#endif
 
 @Stella.Module
 object roomName : Feature("showRoomName", area = "catacombs") {
     override fun initialize() {
         HUDManager.register("roomname", "No Room Found")
 
+        //#if MC > 1.21.5
         register<GuiEvent.HUD> { renderHUD(it.context)}
+        //#elseif MC == 1.8.9
+        //$$ register<RenderEvent.Text> { renderHUD() }
+        //#endif
     }
 
-    private fun renderHUD(context: DrawContext) {
+    private fun renderHUD(
+        //#if MC >= 1.21.5
+        context: DrawContext
+        //#endif
+    ) {
         if (!HUDManager.isEnabled("roomname")) return
         if (Dungeon.inBoss()) return
 
@@ -26,6 +38,10 @@ object roomName : Feature("showRoomName", area = "catacombs") {
         val y = HUDManager.getY("roomname") + 5f
         val scale = HUDManager.getScale("roomname")
 
-        Render2D.drawString(context, text, x.toInt(), y.toInt(), scale, false)
+        Render2D.drawString(
+            //#if MC >= 1.21.5
+            context,
+            //#endif
+            text, x.toInt(), y.toInt(), scale, false)
     }
 }

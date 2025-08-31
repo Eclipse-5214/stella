@@ -1,14 +1,7 @@
 package co.stellarskys.stella.utils.skyblock.dungeons
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.events.AreaEvent
-import co.stellarskys.stella.events.ChatEvent
-import co.stellarskys.stella.events.EntityEvent
-import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.GameEvent
-import co.stellarskys.stella.events.PacketEvent
-import co.stellarskys.stella.events.TablistEvent
-import co.stellarskys.stella.events.TickEvent
+import co.stellarskys.stella.events.*
 import co.stellarskys.stella.mixins.accessors.AccessorMapState
 import co.stellarskys.stella.mixins.accessors.AccessorNetHandlerPlayClient
 import co.stellarskys.stella.utils.TickUtils
@@ -16,7 +9,6 @@ import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.LocationUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner.currentRoom
-import co.stellarskys.stella.utils.stripControlCodes
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.item.FilledMapItem
@@ -200,7 +192,7 @@ object Dungeon {
                 val team = event.packet.team.getOrNull() ?: return@register
 
                 val formatted = team.prefix.string + team.suffix.string
-                val unformatted = formatted.stripControlCodes()
+                val unformatted = formatted.clearCodes()
                 val clear = unformatted.toCharArray().filter { it.code in 32..126 }.joinToString(separator = "")
 
                 val msg  = clear.trim()
@@ -237,7 +229,7 @@ object Dungeon {
 
 
                     val formatted = name!!.string
-                    val unformatted = formatted.stripControlCodes()
+                    val unformatted = formatted.clearCodes()
 
                     val old = (Stella.mc.networkHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.comp_1106]
                     val idx = playerEntryNames[old?.profile?.name ?: entry.profile?.name] ?: -1
