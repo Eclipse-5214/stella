@@ -9,18 +9,23 @@ import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.LocationUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner.currentRoom
+import kotlin.jvm.optionals.getOrNull
+import kotlin.math.ceil
+import kotlin.math.floor
+
+//#if MC >= 1.21.5
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.item.FilledMapItem
 import net.minecraft.item.map.MapDecoration
 import net.minecraft.item.map.MapDecorationTypes
 import net.minecraft.item.map.MapState
-import net.minecraft.network.packet.s2c.play.MapUpdateS2CPacket
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
-import net.minecraft.network.packet.s2c.play.TeamS2CPacket
-import kotlin.jvm.optionals.getOrNull
-import kotlin.math.ceil
-import kotlin.math.floor
+import net.minecraft.network.packet.s2c.play.*
+//#elseif MC == 1.8.9
+//$$ import net.minecraft.network.play.server.*
+//$$ import net.minecraft.world.storage.MapData
+//$$ import net.minecraft.entity.monster.EntityZombie
+//#endif
 
 val puzzleEnums = mapOf(
     "✦" to 0,
@@ -98,10 +103,11 @@ object Dungeon {
     var floor: String? = null
     var floorNumber: Int? = null
 
-    // map
+    //#if MC >= 1.21.5
     val MapDecoration.mapX get() = (this.comp_1843() + 128) shr 1
     val MapDecoration.mapZ get() = (this.z + 128) shr 1
     val MapDecoration.yaw get() = this.rotation * 22.5f
+    //#endif
 
     //Map
     var mapCorners = Pair(5, 5)
@@ -145,16 +151,33 @@ object Dungeon {
     var hasPaul = false
 
     // Mimic
+    //#if MC >= 1.21.5
     val MimicTrigger: EventBus.EventCall = EventBus.register<EntityEvent.Death>({ event ->
+        //#elseif MC == 1.8.9
+        //$$ val MimicTrigger: EventBus.EventCall = EventBus.register<EntityEvent.Leave>({ event ->
+        //#endif
+
         val mcEntity = event.entity
-        if (mcEntity !is ZombieEntity) return@register
         if (floorNumber !in listOf(6, 7) || mimicDead) return@register
+
+        //#if MC >= 1.21.5
+        if (mcEntity !is ZombieEntity) return@register
         if (
             !mcEntity.isBaby ||
             EquipmentSlot.entries
                 .filter { it.type == EquipmentSlot.Type.HUMANOID_ARMOR }
                 .any { slot -> mcEntity.getEquippedStack(slot).isEmpty }
         ) return@register
+
+        //#elseif MC == 1.8.9
+        //$$ if (mcEntity !is EntityZombie) return@register
+        //$$ if (!mcEntity.isChild) return@register
+        //$$ for (i in 0..3) {
+        //$$     val armor = mcEntity.getCurrentArmor(i)
+        //$$     if (armor == null || armor.stackSize == 0) return@register
+        //$$ }
+        //#endif
+
         mimicDead = true
     }, false)
 
@@ -175,6 +198,7 @@ object Dungeon {
         })
 
         EventBus.register<PacketEvent.Received>({ event ->
+            //#if MC >= 1.21.5
             if (event.packet is MapUpdateS2CPacket && mapData == null) {
                 val world = Stella.mc.world ?: return@register
                 val id = event.packet.comp_2270().comp_2315
@@ -185,7 +209,20 @@ object Dungeon {
                     }
                 }
             }
+            //#elseif MC == 1.8.9
+            //$$ if (event.packet is S34PacketMaps) {
+            //$$    val world = Stella.mc.theWorld ?: return@register
+            //$$    val id = event.packet.mapId
+            //$$    if (id and 1000 == 0) {
+            //$$        val guess = world.mapStorage.loadData(MapData::class.java, "map_$id") as MapData? ?: return@register
+            //$$        if(guess.mapDecorations.any {it.value.func_176110_a() == 1.toByte() }) {
+            //$$            guessMapData = guess
+            //$$        }
+            //$$    }
+            //$$ }
+            //#endif
 
+            //#if MC >= 1.21.5
             if (event.packet is TeamS2CPacket) {
                 val teamStr = event.packet.teamName
                 Regex("^team_(\\d+)$").matchEntire(teamStr) ?: return@register
@@ -194,6 +231,16 @@ object Dungeon {
                 val formatted = team.prefix.string + team.suffix.string
                 val unformatted = formatted.clearCodes()
                 val clear = unformatted.toCharArray().filter { it.code in 32..126 }.joinToString(separator = "")
+                //#elseif MC == 1.8.9
+                //$$ if (event.packet is S3EPacketTeams) {
+                //$$    if (event.packet.action != 2) return@register
+                //$$    val teamStr = event.packet.name
+                //$$    Regex("^team_(\\d+)$").matchEntire(teamStr) ?: return@register
+                //$$
+                //$$    val formatted = event.packet.prefix + event.packet.suffix
+                //$$    val unformatted =  formatted.clearCodes()
+                //$$    val clear = unformatted.toCharArray().filter { it.code in 32..126 }.joinToString(separator = "")
+                //#endif
 
                 val msg  = clear.trim()
                 val percentMatch = regexes["ClearedPercent"]!!.find(msg)
@@ -212,6 +259,7 @@ object Dungeon {
                 MimicTrigger.register()
             }
 
+            //#if MC >= 1.21.5
             if (event.packet is PlayerListS2CPacket) {
                 val action = event.packet.actions
                 val entries = event.packet.entries
@@ -233,6 +281,29 @@ object Dungeon {
 
                     val old = (Stella.mc.networkHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.comp_1106]
                     val idx = playerEntryNames[old?.profile?.name ?: entry.profile?.name] ?: -1
+
+                    //#elseif MC == 1.8.9
+                    //$$ if (event.packet is S38PacketPlayerListItem) {
+                    //$$    val action = event.packet.action
+                    //$$    val entries = event.packet.entries
+                    //$$
+                    //$$    if(action != S38PacketPlayerListItem.Action.ADD_PLAYER && action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME) return@register
+                    //$$
+                    //$$    for (entry in entries) {
+                    //$$        val name = entry.displayName
+                    //$$        val profile = entry.profile
+                    //$$
+                    //$$        if (name == null && profile == null){
+                    //$$            //println("[EB] entry has no name or profile: $entry")
+                    //$$            continue
+                    //$$        }
+                    //$$
+                    //$$        val formatted = name!!.formattedText
+                    //$$        val unformatted = formatted.clearCodes()
+                    //$$
+                    //$$        val old = (Stella.mc.netHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.profile.id]
+                    //$$        val idx = playerEntryNames[old?.gameProfile?.name ?: entry.profile?.name] ?: -1
+                    //#endif
 
                     val msg = unformatted.trim()
                     if(msg == "") return@register
@@ -329,9 +400,8 @@ object Dungeon {
             if (floorNumber !in listOf(6, 7) || floor == null) return@register
 
             val msg = event.message.string.clearCodes()
-            val match = regexes["Mimic"]!!.matchEntire(msg)
+            val match = regexes["Mimic"]!!.matchEntire(msg) ?: return@register
 
-            if (match == null) return@register
             if (mimicMessages.none { it == match.groupValues[1].lowercase() }) return@register
             mimicDead = true
         })
@@ -339,8 +409,7 @@ object Dungeon {
         EventBus.register<GameEvent.ActionBar>({ event ->
             val room = currentRoom ?: return@register
 
-            val match = regexes["RoomSecrets"]!!.find(event.message.string.clearCodes())
-            if (match == null) return@register
+            val match = regexes["RoomSecrets"]!!.find(event.message.string.clearCodes()) ?: return@register
 
             val (found, total) = match.destructured
 
