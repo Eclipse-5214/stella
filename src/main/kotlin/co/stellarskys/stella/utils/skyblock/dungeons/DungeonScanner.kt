@@ -9,18 +9,21 @@ import co.stellarskys.stella.utils.CommandUtils
 import co.stellarskys.stella.utils.TickUtils
 import co.stellarskys.stella.utils.WorldUtils
 import co.stellarskys.stella.utils.skyblock.LocationUtils
+//#if MC >= 1.21.5
 import com.mojang.brigadier.context.CommandContext
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
-//#if MC >= 1.21.5
 import net.minecraft.client.util.DefaultSkinHelper
 import net.minecraft.entity.player.PlayerModelPart
+import net.minecraft.item.map.MapState
 //#elseif MC == 1.8.9
+//$$ import co.stellarskys.stella.utils.CompatHelpers.*
 //$$ import net.minecraft.client.entity.AbstractClientPlayer
 //$$ import net.minecraft.client.renderer.entity.layers.LayerRenderer
 //$$ import net.minecraft.entity.player.EnumPlayerModelParts
 //$$ import net.minecraft.client.resources.DefaultPlayerSkin
+//$$ import net.minecraft.world.storage.MapData
 //#endif
-import net.minecraft.item.map.MapState
+
 import java.util.UUID
 
 object DungeonScanner {
@@ -317,10 +320,18 @@ object DungeonScanner {
         // Sync missing players before comparison
         for (v in Dungeon.partyMembers) {
             val isAlreadyTracked = players.any { it.name == v }
+
+            //#if MC >= 1.21.5
             val playerObj = world.players.firstOrNull { it.name.string == v }
             val entry = Stella.mc.networkHandler?.getPlayerListEntry(playerObj?.uuid ?: UUID(0, 0))
             val ping = entry?.latency ?: -1
             val skinTexture = entry?.skinTextures?.comp_1626 ?: DefaultSkinHelper.getTexture()
+            //#elseif MC == 1.8.9
+            //$$ val playerObj = world.playerEntities.firstOrNull { it.name == v }
+            //$$ val entry = Stella.mc.netHandler?.getPlayerInfo(v)
+            //$$ val ping = entry?.responseTime ?: -1
+            //$$ val skinTexture = entry?.locationSkin ?: DefaultPlayerSkin.getDefaultSkinLegacy()
+            //#endif
 
             if (isAlreadyTracked || ping == -1) continue
 
@@ -330,13 +341,17 @@ object DungeonScanner {
         if (players.size != Dungeon.partyMembers.size) return
 
         for (v in players) {
+            //#if MC >= 1.21.5
             val p = world.players.find { it.name.string == v.name }
-
             val hasHat = p?.isPartVisible(PlayerModelPart.HAT) ?: v.hat
+            val ping = Stella.mc.networkHandler?.getPlayerListEntry(p?.uuid ?: UUID(0, 0))?.latency ?: -1
+            //#elseif MC == 1.8.9
+            //$$ val p = world.playerEntities.firstOrNull { it.name == v.name }
+            //$$ val hasHat = p?.isWearing(EnumPlayerModelParts.HAT) ?: v.hat
+            //$$ val ping = Stella.mc.netHandler?.getPlayerInfo(v.name)?.responseTime ?: -1
+            //#endif
 
             v.hat = hasHat
-
-            val ping = Stella.mc.networkHandler?.getPlayerListEntry(p?.uuid ?: UUID(0, 0))?.latency ?: -1
 
             if (ping != -1 && p != null) {
                 v.inRender = true
@@ -385,7 +400,13 @@ object DungeonScanner {
         }
     }
 
-    fun scanFromMap(state: MapState) {
+    fun scanFromMap(
+        //#if MC >= 1.21.5
+        state: MapState
+        //#elseif MC == 1.8.9
+        //$$ state: MapData
+        //#endif
+    ) {
         val colors = state.colors
 
         var cx = -1

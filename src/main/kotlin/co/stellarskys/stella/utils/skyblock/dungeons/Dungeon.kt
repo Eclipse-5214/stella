@@ -22,10 +22,10 @@ import net.minecraft.item.map.MapDecorationTypes
 import net.minecraft.item.map.MapState
 import net.minecraft.network.packet.s2c.play.*
 //#elseif MC == 1.8.9
+//$$ import co.stellarskys.stella.utils.CompatHelpers.*
 //$$ import net.minecraft.network.play.server.*
 //$$ import net.minecraft.world.storage.MapData
 //$$ import net.minecraft.entity.monster.EntityZombie
-//$$ import co.stellarskys.stella.utils.CompatHelpers.*
 //$$ import net.minecraft.item.ItemMap
 //$$ import net.minecraft.util.Vec4b
 //#endif

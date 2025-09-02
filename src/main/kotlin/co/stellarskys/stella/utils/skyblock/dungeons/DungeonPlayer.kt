@@ -20,7 +20,7 @@ class DungeonPlayer(val name: String) {
     //#if MC >= 1.21.5
     var skin: Identifier = DefaultSkinHelper.getTexture()
     //#elseif MC == 1.8.9
-    //$$ val skin: ResourceLocation = DefaultPlayerSkin.getDefaultSkinLegacy()
+    //$$ var skin: ResourceLocation = DefaultPlayerSkin.getDefaultSkinLegacy()
     //#endif
 
     var hat: Boolean = false
