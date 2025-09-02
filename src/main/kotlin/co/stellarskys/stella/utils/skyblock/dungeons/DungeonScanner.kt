@@ -549,6 +549,7 @@ object DungeonScanner {
     }
 }
 
+//#if MC >= 1.21.5
 @Stella.Command
 object DsDebug : CommandUtils(
     "sadb"
@@ -571,3 +572,4 @@ object DsDebug : CommandUtils(
         return 1
     }
 }
+//#endif
