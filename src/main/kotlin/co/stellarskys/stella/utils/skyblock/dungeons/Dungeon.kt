@@ -26,6 +26,8 @@ import net.minecraft.network.packet.s2c.play.*
 //$$ import net.minecraft.world.storage.MapData
 //$$ import net.minecraft.entity.monster.EntityZombie
 //$$ import co.stellarskys.stella.utils.CompatHelpers.*
+//$$ import net.minecraft.item.ItemMap
+//$$ import net.minecraft.util.Vec4b
 //#endif
 
 val puzzleEnums = mapOf(
@@ -108,6 +110,10 @@ object Dungeon {
     val MapDecoration.mapX get() = (this.comp_1843() + 128) shr 1
     val MapDecoration.mapZ get() = (this.z + 128) shr 1
     val MapDecoration.yaw get() = this.rotation * 22.5f
+    //#elseif MC == 1.8.9
+    //$$ val Vec4b.mapX get() = (this.func_176112_b() + 128) shr 1
+    //$$ val Vec4b.mapZ get() = (this.func_176113_c() + 128) shr 1
+    //$$ val Vec4b.yaw get() = this.func_176111_d() * 22.5f
     //#endif
 
     //Map
@@ -604,11 +610,19 @@ object Dungeon {
 
 
     // map stuff
+    //#if MC >= 1.21.5
     fun getCurrentMapState(): MapState? {
         val stack = Stella.mc.player?.inventory?.getStack(8) ?: return null
         if (stack.item !is FilledMapItem || !stack.name.string.contains("Magical Map")) return null
         return FilledMapItem.getMapState(stack, Stella.mc.world!!)
     }
+    //#elseif MC == 1.8.9
+    //$$ fun getCurrentMapState(): MapData? {
+    //$$    val map = Stella.mc.thePlayer?.inventory?.getStackInSlot(8) ?: return null
+    //$$    if (map.item !is ItemMap || !map.displayName.contains("Magical Map")) return null
+    //$$    return (map.item as ItemMap).getMapData(map, Stella.mc.theWorld)
+    //$$ }
+    //#endif
 
     fun calibrateDungeonMap(): Boolean {
         val mapState = getCurrentMapState() ?: return false
@@ -650,6 +664,7 @@ object Dungeon {
         return null
     }
 
+    //#if MC >= 1.21.5
     fun updatePlayersFromMap(state: MapState) {
         state as AccessorMapState
         players.forEach { (name, player) ->
@@ -665,8 +680,29 @@ object Dungeon {
 
         DungeonScanner.updatePlayersFromMap()
     }
+    //#elseif MC == 1.8.9
+    //$$ fun updatePlayersFromMap(state: MapData) {
+    //$$    val decor = state.mapDecorations
+    //$$    players.forEach { (name, player) ->
+    //$$        decor.entries.find { (icon, _) -> icon == player.icon }?.let { (_, decoration) ->
+    //$$            icons[player.icon] = Icon(
+    //$$                x = decoration.mapX,
+    //$$                y = decoration.mapZ,
+    //$$                yaw = decoration.yaw + 180f,
+    //$$                player = player.name
+    //$$            )
+    //$$        }
+    //$$    }
+    //$$ }
+    //#endif
 
-    fun checkBloodDone(state: MapState) {
+    fun checkBloodDone(
+        //#if MC >= 1.21.5
+        state: MapState
+        //#elseif MC == 1.8.9
+        //$$ state: MapData
+        //#endif
+    ) {
         if (bloodDone) return
 
         val startX = mapCorners.first + (mapRoomSize / 2)
