@@ -7,8 +7,6 @@ import net.minecraft.client.renderer.GlStateManager
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
 
-
-
     fun drawString(str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
         if (scale != 1f) {
             GlStateManager.pushMatrix()

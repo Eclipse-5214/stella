@@ -25,6 +25,7 @@ import net.minecraft.network.packet.s2c.play.*
 //$$ import net.minecraft.network.play.server.*
 //$$ import net.minecraft.world.storage.MapData
 //$$ import net.minecraft.entity.monster.EntityZombie
+//$$ import co.stellarskys.stella.utils.CompatHelpers.*
 //#endif
 
 val puzzleEnums = mapOf(
@@ -116,9 +117,15 @@ object Dungeon {
     var mapLine1 = ""
     var mapLine2 = ""
     var coordMultiplier = 0.625
+    var calibrated = false
+
+    //#if MC >= 1.21.5
     var mapData: MapState? = null
     var guessMapData: MapState? = null
-    var calibrated = false
+    //#elseif MC == 1.8.9
+    //$$ var mapData: MapData? = null
+    //$$ var guessMapData: MapData? = null
+    //#endif
 
     // dungeon
     var secretsFound: Int = 0
@@ -182,12 +189,17 @@ object Dungeon {
     }, false)
 
     init {
-        EventBus.register<TablistEvent.Update>({
+        //#if MC >= 1.21.5
+        EventBus.register<TablistEvent.Update> {
+            //#elseif MC == 1.8.9
+            //$$ EventBus.register<TablistEvent> {
+            //#endif
+
             TickUtils.schedule(1) {
                 val self = players[Stella.mc.player?.name?.string]
                 val alives = players.values
                     .filterNot { it.isDead || it == self }
-                    .sortedBy { it.tabIndex}
+                    .sortedBy { it.tabIndex }
 
                 alives.forEachIndexed { index, player ->
                     player.icon = "icon-$index"
@@ -195,7 +207,7 @@ object Dungeon {
 
                 self?.icon = "icon${alives.size}"
             }
-        })
+        }
 
         EventBus.register<PacketEvent.Received>({ event ->
             //#if MC >= 1.21.5

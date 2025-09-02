@@ -1,5 +1,6 @@
 package co.stellarskys.stella.events
 
+import co.stellarskys.stella.utils.clearCodes
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiContainer
@@ -14,6 +15,7 @@ import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.util.BlockPos
+import net.minecraft.util.IChatComponent
 import net.minecraft.world.World
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.EntityViewRenderEvent
@@ -98,7 +100,16 @@ abstract class GuiEvent {
 }
 
 abstract class ChatEvent {
-    class Receive(val event: ClientChatReceivedEvent) : CancellableEvent()
+    // Added 1.21 parity helpers
+    class Receive(val event: ClientChatReceivedEvent) : CancellableEvent() {
+        val message: MessageWrapper = MessageWrapper(event.message)
+    }
+
+    class MessageWrapper(private val component: IChatComponent) {
+        val string: String
+            get() = component.unformattedText.clearCodes()
+    }
+
     class Send(val message: String) : CancellableEvent()
     class Packet(val packet: S02PacketChat) : CancellableEvent()
 }
@@ -117,7 +128,16 @@ abstract class WorldEvent {
 abstract class GameEvent {
     class Load() : Event()
     class Unload() : Event()
-    class ActionBar(val event: ClientChatReceivedEvent) : CancellableEvent()
+    
+    // Added 1.21 parity helpers
+    class ActionBar(val event: ClientChatReceivedEvent) : CancellableEvent() {
+        val message: MessageWrapper = MessageWrapper(event.message)
+    }
+
+    class MessageWrapper(private val component: IChatComponent) {
+        val string: String
+            get() = component.unformattedText.clearCodes()
+    }
 }
 
 abstract class AreaEvent {
