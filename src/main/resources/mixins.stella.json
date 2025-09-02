@@ -2,7 +2,6 @@
     "required": true,
     "package": "co.stellarskys.stella.mixins",
     "compatibilityLevel": "${java_version}",
-    "plugin": "co.stellarskys.stella.mixins.StellaMixinPlugin",
     "injectors": {
         "defaultRequire": 1
     },
