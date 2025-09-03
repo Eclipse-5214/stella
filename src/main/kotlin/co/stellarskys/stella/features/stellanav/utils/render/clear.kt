@@ -8,9 +8,14 @@ import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.*
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.util.math.RotationAxis
 import java.awt.Color
+//#if MC >= 1.21.5
+import co.stellarskys.stella.utils.render.popMatrix
+import co.stellarskys.stella.utils.render.pushMatrix
+import co.stellarskys.stella.utils.render.rotate
+//#elseif MC == 1.8.9
+//$$ import co.stellarskys.stella.utils.CompatHelpers.*
+//#endif
 
 object clear{
     // constants
@@ -23,7 +28,7 @@ object clear{
         val mapOffset = if (Dungeon.floorNumber == 1) 10.6f else 0f
         val mapScale = oscale(Dungeon.floorNumber)
 
-        matrix.push()
+        matrix.pushMatrix()
         matrix.translate(5f,5f, 0f)
         matrix.translate(mapOffset, 0f, 0f)
         matrix.scale(mapScale, mapScale, 1f)
@@ -34,7 +39,7 @@ object clear{
         renderRoomNames(context)
         renderPlayers(context)
 
-        matrix.pop()
+        matrix.popMatrix()
     }
 
     // room rendering
@@ -99,13 +104,13 @@ object clear{
             val x = room.x * spacing - w / 2 + roomSize / 2
             val y = room.z * spacing - h / 2 + roomSize / 2
 
-            matrix.push()
+            matrix.pushMatrix()
             matrix.translate(x.toFloat(), y.toFloat(), 0f)
             matrix.scale(scale, scale, 1f)
 
-            context.drawGuiTexture(RenderLayer::getGuiTextured , questionMark, 0, 0, w, h)
+            Render2D.drawImage(context, questionMark, 0, 0, w, h)
 
-            matrix.pop()
+            matrix.popMatrix()
         }
 
         DungeonScanner.uniqueRooms.forEach { room ->
@@ -140,13 +145,13 @@ object clear{
             val x = (location.first * spacing).toInt() - w / 2 + roomSize / 2
             val y = (location.second * spacing).toInt() - h / 2 + roomSize / 2
 
-            matrix.push()
+            matrix.pushMatrix()
             matrix.translate(x.toFloat(), y.toFloat(), 0f)
             matrix.scale(scale, scale, 1f)
 
             Render2D.drawImage(context, checkmark, 0, 0, w, h)
 
-            matrix.pop()
+            matrix.popMatrix()
         }
     }
 
@@ -195,7 +200,7 @@ object clear{
             val x = (location.first * spacing).toInt() + roomSize / 2
             val y = (location.second * spacing).toInt() + roomSize / 2
 
-            matrix.push()
+            matrix.pushMatrix()
             matrix.translate(x.toFloat(), y.toFloat(), 0f)
             matrix.scale(scale,scale,1f)
 
@@ -214,17 +219,17 @@ object clear{
                 )
 
                 for ((dx, dy) in offsets) {
-                    matrix.push()
+                    matrix.pushMatrix()
                     matrix.translate(dx, dy, 0f)
                     Render2D.drawString(context, "§0$line", drawX, drawY)
-                    matrix.pop()
+                    matrix.popMatrix()
                 }
 
                 Render2D.drawString(context, textColor + line, drawX, drawY)
                 i++
             }
 
-            matrix.pop()
+            matrix.popMatrix()
         }
     }
 
@@ -271,7 +276,7 @@ object clear{
             val x = (location.first * spacing).toInt() + roomSize / 2
             val y = (location.second * spacing).toInt() + roomSize / 2
 
-            matrix.push()
+            matrix.pushMatrix()
             matrix.translate(x.toFloat(), y.toFloat(), 0f)
             matrix.scale(scale,scale,1f)
 
@@ -290,17 +295,17 @@ object clear{
                 )
 
                 for ((dx, dy) in offsets) {
-                    matrix.push()
+                    matrix.pushMatrix()
                     matrix.translate(dx, dy, 0f)
                     Render2D.drawString(context, "§0$line", drawX, drawY)
-                    matrix.pop()
+                    matrix.popMatrix()
                 }
 
                 Render2D.drawString(context, textColor + line, drawX, drawY)
                 i++
             }
 
-            matrix.pop()
+            matrix.popMatrix()
         }
     }
 
@@ -320,9 +325,9 @@ object clear{
 
             val matrix = context.matrices
 
-            matrix.push()
+            matrix.pushMatrix()
             matrix.translate(x.toFloat(), y.toFloat(), 1f)
-            matrix.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotation))
+            matrix.rotate(rotation, 0f, 0f, 1f)
             matrix.scale(mapConfig.iconScale, mapConfig.iconScale, 1f)
 
             if (mapConfig.showPlayerHead) {
@@ -331,15 +336,14 @@ object clear{
 
                 val borderColor = if (mapConfig.iconClassColors) getClassColor(v.className) else mapConfig.iconBorderColor
 
-
                 Render2D.drawRect(context, (-w.toDouble() / 2.0).toInt(), (-h.toDouble() / 2.0).toInt(), w, h, borderColor)
 
                 val scale = 1f - mapConfig.iconBorderWidth
 
                 matrix.scale(scale, scale, 1f)
 
-                context.drawTexture(
-                    RenderLayer::getGuiTextured,                         // render layer provider
+                Render2D.drawTexture(
+                    context,
                     player.skin,
                     (-w.toDouble() / 2.0).toInt(),
                     (-h.toDouble() / 2.0).toInt(),
@@ -354,8 +358,8 @@ object clear{
                 )
 
                 if (player.hat) {
-                    context.drawTexture(
-                        RenderLayer::getGuiTextured,                         // render layer provider
+                    Render2D.drawTexture(
+                        context,
                         player.skin,
                         (-w.toDouble() / 2.0).toInt(),
                         (-h.toDouble() / 2.0).toInt(),
@@ -374,8 +378,8 @@ object clear{
                 val h = 10
                 val head = if (v.name == you.name.string) GreenMarker else WhiteMarker
 
-                context.drawGuiTexture(
-                    RenderLayer::getGuiTextured,
+                Render2D.drawImage(
+                    context,
                     head,
                     (-w.toDouble() / 2.0).toInt(),
                     (-h.toDouble() / 2.0).toInt(),
@@ -384,7 +388,7 @@ object clear{
                 )
             }
 
-            matrix.pop()
+            matrix.popMatrix()
         }
     }
 

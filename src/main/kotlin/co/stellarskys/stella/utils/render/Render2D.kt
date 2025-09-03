@@ -8,6 +8,9 @@ import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
+import net.minecraft.util.math.RotationAxis
+import net.minecraft.util.math.Vec3d
+import org.joml.Vector3f
 import java.awt.Color
 
 
@@ -17,6 +20,37 @@ object Render2D {
     fun drawImage(ctx: DrawContext, image: Identifier, x: Int, y: Int, width: Int, height: Int) {
         ctx.drawGuiTexture(RenderLayer::getGuiTextured, image, x, y, width, height)
     }
+
+    fun drawTexture(
+        ctx: DrawContext,
+        image: Identifier,
+        x: Int,
+        y: Int,
+        u: Float,
+        v: Float,
+        width: Int,
+        height: Int,
+        regionWidth: Int,
+        regionHeight: Int,
+        textureWidth: Int = 256,
+        textureHeight: Int = 256
+    ) {
+        ctx.drawTexture(
+            RenderLayer::getGuiTextured, // or your custom layer provider
+            image,
+            x,
+            y,
+            u,
+            v,
+            width,
+            height,
+            regionWidth,
+            regionHeight,
+            textureWidth,
+            textureHeight
+        )
+    }
+
 
     @JvmOverloads
     fun drawRect(ctx: DrawContext, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
@@ -57,3 +91,8 @@ object Render2D {
 
 fun MatrixStack.pushMatrix() = this.push()
 fun MatrixStack.popMatrix() = this.pop()
+
+fun MatrixStack.rotate(angle: Float, x: Float, y: Float, z: Float) {
+    val axis = RotationAxis.of(Vector3f(x, y, z))
+    this.multiply(axis.rotationDegrees(angle))
+}

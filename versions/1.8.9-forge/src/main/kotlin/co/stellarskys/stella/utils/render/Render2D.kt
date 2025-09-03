@@ -14,6 +14,43 @@ import java.awt.Color
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
 
+    fun drawTexture(
+        ctx: DrawContext,
+        image: ResourceLocation,
+        x: Int,
+        y: Int,
+        u: Float,
+        v: Float,
+        width: Int,
+        height: Int,
+        regionWidth: Int,
+        regionHeight: Int,
+        textureWidth: Int = 256,
+        textureHeight: Int = 256
+    ) {
+        mc.textureManager.bindTexture(image)
+
+        val uScale = 1f / textureWidth
+        val vScale = 1f / textureHeight
+
+        val u1 = u * uScale
+        val v1 = v * vScale
+        val u2 = (u + regionWidth) * uScale
+        val v2 = (v + regionHeight) * vScale
+
+        val zLevel = 0f
+        val tessellator = Tessellator.getInstance()
+        val buffer = tessellator.worldRenderer
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
+        buffer.pos(x.toDouble(),         (y + height).toDouble(), zLevel.toDouble()).tex(u1.toDouble(), v2.toDouble()).endVertex()
+        buffer.pos((x + width).toDouble(), (y + height).toDouble(), zLevel.toDouble()).tex(u2.toDouble(), v2.toDouble()).endVertex()
+        buffer.pos((x + width).toDouble(), y.toDouble(),           zLevel.toDouble()).tex(u2.toDouble(), v1.toDouble()).endVertex()
+        buffer.pos(x.toDouble(),         y.toDouble(),           zLevel.toDouble()).tex(u1.toDouble(), v1.toDouble()).endVertex()
+        tessellator.draw()
+    }
+
+
     fun drawImage(ctx: DrawContext, image: ResourceLocation, x: Int, y: Int, width: Int, height: Int) {
         mc.textureManager.bindTexture(image)
 
