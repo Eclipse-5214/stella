@@ -5,10 +5,30 @@ import co.stellarskys.stella.utils.CompatHelpers.DrawContext
 import co.stellarskys.stella.utils.clearCodes
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.util.ResourceLocation
+import org.lwjgl.opengl.GL11
 import java.awt.Color
 
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
+
+    fun drawImage(ctx: DrawContext, image: ResourceLocation, x: Int, y: Int, width: Int, height: Int) {
+        mc.textureManager.bindTexture(image)
+
+        val zLevel = 0f
+        val tessellator = Tessellator.getInstance()
+        val buffer = tessellator.worldRenderer
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
+        buffer.pos(x.toDouble(),         (y + height).toDouble(), zLevel.toDouble()).tex(0.0, 1.0).endVertex()
+        buffer.pos((x + width).toDouble(), (y + height).toDouble(), zLevel.toDouble()).tex(1.0, 1.0).endVertex()
+        buffer.pos((x + width).toDouble(), y.toDouble(),           zLevel.toDouble()).tex(1.0, 0.0).endVertex()
+        buffer.pos(x.toDouble(),         y.toDouble(),           zLevel.toDouble()).tex(0.0, 0.0).endVertex()
+        tessellator.draw()
+    }
+
 
     fun drawRect(ctx: DrawContext, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
         drawRect(x, y, width, height, color)

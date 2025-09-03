@@ -615,6 +615,7 @@ class Config(
     }
 
     fun save() {
+        println("[Stella] Saving")
         try {
             val target = resolvedFile
             target.parentFile?.mkdirs()
@@ -628,6 +629,7 @@ class Config(
             println("Failed to save config for '$mod': ${e.message}")
             e.printStackTrace()
         }
+        println("[Stella] Saved")
     }
 
     fun load() {

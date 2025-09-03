@@ -7,7 +7,6 @@ import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import net.minecraft.client.render.RenderLayer
 //#if MC >= 1.21.5
 import co.stellarskys.stella.utils.render.popMatrix
 import co.stellarskys.stella.utils.render.pushMatrix
@@ -26,7 +25,7 @@ object mapRender {
 
         if(!Dungeon.inBoss() && !Dungeon.complete) {
             renderMapBackground(context)
-            //clear.renderMap(context)
+            clear.renderMap(context)
             if (mapInfoUnder) renderInfoUnder(context, false)
             if (mapConfig.mapBorder) renderMapBorder(context)
         } else if (!Dungeon.complete && mapConfig.bossMapEnabled) {
@@ -53,7 +52,8 @@ object mapRender {
         matrix.translate(x, y, 0f)
 
         renderMapBackground(context)
-        context.drawGuiTexture(RenderLayer::getGuiTextured, prevewMap, 5, 5, 128, 128)
+
+        Render2D.drawImage(context, prevewMap, 5,5,128,128)
 
         if (mapInfoUnder) renderInfoUnder(context, true)
 
