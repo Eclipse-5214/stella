@@ -3,11 +3,19 @@ package co.stellarskys.stella.utils.render
 import co.stellarskys.stella.Stella.Companion.mc
 import co.stellarskys.stella.utils.clearCodes
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Formatting
+import java.awt.Color
 
 
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
+
+    @JvmOverloads
+    fun drawRect(ctx: DrawContext, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
+        ctx.fill(RenderLayer.getGui(), x, y, x + width, y + height, color.rgb)
+    }
 
     @JvmOverloads
     fun drawString(ctx: DrawContext, str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
@@ -40,3 +48,6 @@ object Render2D {
         return mc.textRenderer.fontHeight * lineCount
     }
 }
+
+fun MatrixStack.pushMatrix() = this.push()
+fun MatrixStack.popMatrix() = this.pop()

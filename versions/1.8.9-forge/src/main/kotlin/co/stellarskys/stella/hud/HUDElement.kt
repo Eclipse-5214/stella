@@ -1,6 +1,7 @@
 package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.Stella.Companion.mc
+import co.stellarskys.stella.utils.CompatHelpers.DrawContext
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.TimeUtils.millis
 import net.minecraft.client.gui.Gui.drawRect
@@ -70,7 +71,7 @@ class HUDElement(
             val customDims = HUDManager.getCustomDimensions(name)
             val renderWidth = customDims?.first ?: width
             val renderHeight = customDims?.second ?: height
-            customRenderer.invoke(0f, 0f, renderWidth, renderHeight, scale, partialTicks, previewMode)
+            customRenderer.invoke(DrawContext() ,0f, 0f, renderWidth, renderHeight, scale, partialTicks, previewMode)
         } else {
             renderDefault(previewMode, isHovered)
         }

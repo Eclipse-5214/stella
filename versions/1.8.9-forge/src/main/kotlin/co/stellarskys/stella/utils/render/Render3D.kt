@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.utils.CompatHelpers.DrawContext
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -10,6 +11,10 @@ import java.awt.Color
 
 object Render3D {
     private val renderManager = Stella.mc.renderManager
+
+    fun renderBox(ctx: DrawContext, x: Double, y: Double, z: Double, width: Double, height: Double, color: Color, phaze: Boolean = false, lineWidth: Double = 1.0) {
+        renderBox(x, y, z, width, height, color, phaze, lineWidth)
+    }
 
     fun renderBox(
         x: Double,

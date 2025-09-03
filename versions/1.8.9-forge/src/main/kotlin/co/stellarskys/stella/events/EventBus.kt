@@ -1,5 +1,6 @@
 package co.stellarskys.stella.events
 
+import co.stellarskys.stella.utils.CompatHelpers.DrawContext
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.network.Packet
 import net.minecraft.network.play.client.C01PacketChatMessage
@@ -68,8 +69,8 @@ object EventBus {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderGameOverlay(event: RenderGameOverlayEvent.Pre) {
         event.isCanceled = when {
-            post(RenderEvent.HUD(event.type, event.partialTicks, event.resolution)) -> true
-            event.type == RenderGameOverlayEvent.ElementType.TEXT && post(RenderEvent.Text(event.partialTicks, event.resolution)) -> true
+            post(RenderEvent.HUD(event.type, event.partialTicks, event.resolution, DrawContext() )) -> true
+            event.type == RenderGameOverlayEvent.ElementType.TEXT && post(RenderEvent.Text(event.partialTicks, event.resolution, DrawContext() )) -> true
             else -> false
         }
     }

@@ -1,11 +1,26 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.Stella.Companion.mc
+import co.stellarskys.stella.utils.CompatHelpers.DrawContext
 import co.stellarskys.stella.utils.clearCodes
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
+import java.awt.Color
 
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
+
+    fun drawRect(ctx: DrawContext, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
+        drawRect(x, y, width, height, color)
+    }
+
+    fun drawRect(x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
+        Gui.drawRect(x, y, x + width, y + height, color.rgb)
+    }
+
+    fun drawString(context: DrawContext, str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
+        drawString(str, x, y, scale, shadow)
+    }
 
     fun drawString(str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
         if (scale != 1f) {

@@ -11,6 +11,7 @@ import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 
 object ChatUtils {
+
     private var nextAvailableTime = TimeUtils.zero
 
     private fun schedule(action: () -> Unit) {
@@ -21,7 +22,6 @@ object ChatUtils {
         TickUtils.schedule(ceil(delay).toLong()) {
             action()
         }
-
         nextAvailableTime += 100.milliseconds
     }
 
