@@ -6,6 +6,8 @@ import co.stellarskys.stella.utils.clearCodes
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.texture.SimpleTexture
+import net.minecraft.client.renderer.texture.TextureManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
@@ -40,7 +42,18 @@ object Render2D {
 
 
     fun drawImage(ctx: DrawContext, image: ResourceLocation, x: Int, y: Int, width: Int, height: Int) {
-        mc.textureManager.bindTexture(image)
+        val imageNew = ResourceLocation(image.resourceDomain, "textures/gui/sprites/${image.resourcePath}.png")
+
+        ensureTextureLoaded(mc.textureManager, imageNew)
+
+        val texture = mc.textureManager.getTexture(imageNew)
+
+        if (texture == null) {
+            println("⚠️ Error: Texture not found at $imageNew")
+            return
+        }
+
+        mc.textureManager.bindTexture(imageNew)
         Gui.drawScaledCustomSizeModalRect(
             x, y,
             0f, 0f,
@@ -90,5 +103,12 @@ object Render2D {
     fun String.height(): Int {
         val lineCount = count { it == '\n' } + 1
         return mc.fontRendererObj.FONT_HEIGHT * lineCount
+    }
+
+    fun ensureTextureLoaded(textureManager: TextureManager, location: ResourceLocation) {
+        if (textureManager.getTexture(location) == null) {
+            println("🔄 Loading texture: $location")
+            textureManager.loadTexture(location, SimpleTexture(location))
+        }
     }
 }

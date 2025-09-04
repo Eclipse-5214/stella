@@ -316,7 +316,7 @@ object Dungeon {
                     //$$            continue
                     //$$        }
                     //$$
-                    //$$        val formatted = name!!.formattedText
+                    //$$        val formatted = name.formattedText ?: continue
                     //$$        val unformatted = formatted.clearCodes()
                     //$$
                     //$$        val old = (Stella.mc.netHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.profile.id]
