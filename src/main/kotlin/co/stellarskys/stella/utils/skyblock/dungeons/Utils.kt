@@ -28,6 +28,7 @@ object RoomRegistry {
             },
             onError = { error ->
                 println("RoomRegistry: Failed to load room data — ${error.message}")
+                loadFromLocal()
             }
         )
     }

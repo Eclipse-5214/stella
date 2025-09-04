@@ -42,18 +42,7 @@ object Render2D {
 
 
     fun drawImage(ctx: DrawContext, image: ResourceLocation, x: Int, y: Int, width: Int, height: Int) {
-        val imageNew = ResourceLocation(image.resourceDomain, "textures/gui/sprites/${image.resourcePath}.png")
-
-        ensureTextureLoaded(mc.textureManager, imageNew)
-
-        val texture = mc.textureManager.getTexture(imageNew)
-
-        if (texture == null) {
-            println("⚠️ Error: Texture not found at $imageNew")
-            return
-        }
-
-        mc.textureManager.bindTexture(imageNew)
+        mc.textureManager.bindTexture(image)
         Gui.drawScaledCustomSizeModalRect(
             x, y,
             0f, 0f,

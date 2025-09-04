@@ -36,6 +36,22 @@ toolkitLoomHelper {
     }
 }
 
+loom {
+    if (mcData.isFabric && mcData.version >= MinecraftVersions.VERSION_1_16_5) {
+        accessWidenerPath.set(rootProject.file("src/main/resources/stella.accesswidener"))
+    }
+}
+
+sourceSets {
+    named("main") {
+        resources {
+            srcDir("src/main/resources")
+            // ⚠️ Avoid filtering unless you have a specific reason
+            // Don't do: include("**/*.png")
+        }
+    }
+}
+
 dependencies {
     modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
     modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)

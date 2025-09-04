@@ -15,9 +15,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 
-class Stella
-    : ClientModInitializer
-{
+class Stella: ClientModInitializer {
     private var shown = false
 
     @Target(AnnotationTarget.CLASS)

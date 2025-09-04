@@ -23,7 +23,7 @@ fun oscale(floor: Int?): Float {
     }
 }
 
-val prevewMap = ResourceLocation(Stella.NAMESPACE, "stellanav/defaultmap")
+val prevewMap = ResourceLocation(Stella.NAMESPACE, "textures/gui/sprites/stellanav/defaultmap.png")
 val greenCheck = ResourceLocation(Stella.NAMESPACE, "stellanav/clear/bloommapgreencheck")
 val whiteCheck =ResourceLocation(Stella.NAMESPACE, "stellanav/clear/bloommapwhitecheck")
 val failedRoom = ResourceLocation(Stella.NAMESPACE, "stellanav/clear/bloommapfailedroom")

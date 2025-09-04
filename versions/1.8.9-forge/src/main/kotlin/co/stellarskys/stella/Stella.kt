@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.entity.RenderPlayer
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent
+import java.io.File
 
 @Mod(modid = "stella", version = "1.0.0", useMetadata = true, clientSideOnly = true)
 class Stella {
@@ -77,6 +78,8 @@ class Stella {
                 subareaFeatures.forEach { it.update() }
             }
         })
+
+        printDiscoveredSprites()
     }
 
 
@@ -120,6 +123,23 @@ class Stella {
 
         fun updateFeatures() {
             features.forEach { it.update() }
+        }
+
+        fun listSpriteResources(): List<String> {
+            val path = "assets/stella/textures/gui/sprites/stellanav"
+            val loader = Stella::class.java.classLoader
+            val url = loader.getResource(path) ?: return emptyList()
+
+            return File(url.toURI()).listFiles()
+                ?.filter { it.extension == "png" }
+                ?.map { it.name }
+                ?: emptyList()
+        }
+
+        fun printDiscoveredSprites() {
+            val sprites = listSpriteResources() // or listSpriteResources() in dev
+            println("Discovered ${sprites.size} sprite(s):")
+            sprites.forEach { println("- $it") }
         }
 
         //fun getResource(path: String) = Identifier.of(NAMESPACE, path)
