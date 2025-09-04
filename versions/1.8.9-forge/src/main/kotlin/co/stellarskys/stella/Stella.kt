@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.Mod.EventHandler
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.AbstractClientPlayer
+import net.minecraft.client.gui.GuiMainMenu
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.renderer.entity.RenderPlayer
 import net.minecraft.client.resources.DefaultPlayerSkin
@@ -37,7 +38,7 @@ class Stella {
 
         init()
         FeatureLoader.init()
-        RoomRegistry.loadFromLocal()
+        RoomRegistry.loadFromRemote()
         DungeonScanner.init()
 
         eventCall = EventBus.register<EntityEvent.Join> ({ event ->
@@ -58,6 +59,7 @@ class Stella {
 
         EventBus.register<GuiEvent.Open> ({ event ->
             if (event.screen is GuiInventory) isInInventory = true
+            if (event.screen is GuiMainMenu && !shown) EventBus.post(GameEvent.Unload())
         })
 
         EventBus.register<GuiEvent.Close> ({
@@ -75,11 +77,6 @@ class Stella {
                 subareaFeatures.forEach { it.update() }
             }
         })
-    }
-
-    @EventHandler
-    fun stop(event: FMLServerStoppingEvent) {
-        EventBus.post(GameEvent.Unload())
     }
 
 

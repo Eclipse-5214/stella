@@ -29,42 +29,27 @@ object Render2D {
         textureHeight: Int = 256
     ) {
         mc.textureManager.bindTexture(image)
-
-        val uScale = 1f / textureWidth
-        val vScale = 1f / textureHeight
-
-        val u1 = u * uScale
-        val v1 = v * vScale
-        val u2 = (u + regionWidth) * uScale
-        val v2 = (v + regionHeight) * vScale
-
-        val zLevel = 0f
-        val tessellator = Tessellator.getInstance()
-        val buffer = tessellator.worldRenderer
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
-        buffer.pos(x.toDouble(),         (y + height).toDouble(), zLevel.toDouble()).tex(u1.toDouble(), v2.toDouble()).endVertex()
-        buffer.pos((x + width).toDouble(), (y + height).toDouble(), zLevel.toDouble()).tex(u2.toDouble(), v2.toDouble()).endVertex()
-        buffer.pos((x + width).toDouble(), y.toDouble(),           zLevel.toDouble()).tex(u2.toDouble(), v1.toDouble()).endVertex()
-        buffer.pos(x.toDouble(),         y.toDouble(),           zLevel.toDouble()).tex(u1.toDouble(), v1.toDouble()).endVertex()
-        tessellator.draw()
+        Gui.drawScaledCustomSizeModalRect(
+            x, y,
+            u, v,
+            regionWidth, regionHeight,
+            width, height,
+            textureWidth.toFloat(), textureHeight.toFloat()
+        )
     }
 
 
     fun drawImage(ctx: DrawContext, image: ResourceLocation, x: Int, y: Int, width: Int, height: Int) {
         mc.textureManager.bindTexture(image)
-
-        val zLevel = 0f
-        val tessellator = Tessellator.getInstance()
-        val buffer = tessellator.worldRenderer
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX)
-        buffer.pos(x.toDouble(),         (y + height).toDouble(), zLevel.toDouble()).tex(0.0, 1.0).endVertex()
-        buffer.pos((x + width).toDouble(), (y + height).toDouble(), zLevel.toDouble()).tex(1.0, 1.0).endVertex()
-        buffer.pos((x + width).toDouble(), y.toDouble(),           zLevel.toDouble()).tex(1.0, 0.0).endVertex()
-        buffer.pos(x.toDouble(),         y.toDouble(),           zLevel.toDouble()).tex(0.0, 0.0).endVertex()
-        tessellator.draw()
+        Gui.drawScaledCustomSizeModalRect(
+            x, y,
+            0f, 0f,
+            256, 256, // assuming full texture region
+            width, height,
+            256f, 256f
+        )
     }
+
 
 
     fun drawRect(ctx: DrawContext, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {

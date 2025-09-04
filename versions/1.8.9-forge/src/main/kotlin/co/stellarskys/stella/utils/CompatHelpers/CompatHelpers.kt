@@ -19,7 +19,7 @@ val EntityPlayerSP.z: Double
     get() = this.posZ
 
 val EntityPlayerSP.yaw: Float
-    get() = this.cameraYaw
+    get() = this.rotationYaw
 
 val EntityPlayer.x: Double
     get() = this.posX
@@ -31,4 +31,4 @@ val EntityPlayer.z: Double
     get() = this.posZ
 
 val EntityPlayer.yaw: Float
-    get() = this.cameraYaw
+    get() = this.rotationYaw
