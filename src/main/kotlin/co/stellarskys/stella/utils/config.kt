@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils
-import co.stellarskys.stella.Stella
-//import co.stellarskys.stella.hud.HUDEditor
+
 import co.stellarskys.stella.utils.config.core.Config
 
 val config = Config("Stella", "stella") {
