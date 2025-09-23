@@ -64,6 +64,11 @@ dependencies {
         if (mcData.version >= MinecraftVersions.VERSION_1_21_5) {
             modImplementation(includeOrShade("gg.essential:elementa:710")!!)
             modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
+            modImplementation(includeOrShade("org.lwjgl:lwjgl-nanovg:3.3.3")!!)
+
+            listOf("windows", "linux", "macos", "macos-arm64").forEach { v ->
+                modImplementation(includeOrShade("org.lwjgl:lwjgl-nanovg:3.3.3:natives-$v")!!)
+            }
         }
 
     } else if (mcData.version <= MinecraftVersions.VERSION_1_12_2) {

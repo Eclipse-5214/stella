@@ -8,11 +8,6 @@ import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.FileNotFoundException
 
-//#if MC == 1.8.9
-//$$ import net.minecraft.util.BlockPos
-//#endif
-
-
 object RoomRegistry {
     private val byCore = mutableMapOf<Int, RoomMetadata>()
     private val allRooms = mutableListOf<RoomMetadata>()
@@ -90,11 +85,7 @@ val blacklist = setOf(5, 54, 146)
 
 fun getCore(x: Int, z: Int): Int {
     val sb = StringBuilder(150)
-    //#if MC >= 1.21.5
     val chunk = Stella.mc.world!!.getChunk(x shr 4, z shr 4)
-    //#elseif MC == 1.8.9
-    //$$ val chunk = Stella.mc.theWorld.getChunkFromChunkCoords(x shr 4, z shr 4)
-    //#endif
     val height = getHighestY(x, z)?.coerceIn(11..140) ?: 140 .coerceIn(11..140)
 
     sb.append(CharArray(140 - height) { '0' })
@@ -208,16 +199,10 @@ fun getScanCoords(): List<Triple<Int, Int, Pair<Int, Int>>> {
 }
 
 fun isChunkLoaded(x: Int, y: Int, z: Int): Boolean {
-//#if MC >= 1.20.5
     val world = Stella.mc.world ?: return false
     val chunkX = x shr 4
     val chunkZ = z shr 4
     return world.chunkManager.isChunkLoaded(chunkX, chunkZ)
-//#elseif MC == 1.8.9
-//$$ val world = Stella.mc.theWorld ?: return false
-//$$ val pos = BlockPos(x, y, z)
-//$$ return world.isBlockLoaded(pos)
-//#endif
 }
 
 fun decodeRoman(roman: String): Int {

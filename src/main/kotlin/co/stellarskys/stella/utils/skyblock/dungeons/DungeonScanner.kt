@@ -4,25 +4,18 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.AreaEvent
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.TickEvent
+import co.stellarskys.stella.events.WorldEvent
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.CommandUtils
 import co.stellarskys.stella.utils.TickUtils
 import co.stellarskys.stella.utils.WorldUtils
+import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.LocationUtils
-//#if MC >= 1.21.5
 import com.mojang.brigadier.context.CommandContext
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.util.DefaultSkinHelper
 import net.minecraft.entity.player.PlayerModelPart
 import net.minecraft.item.map.MapState
-//#elseif MC == 1.8.9
-//$$ import co.stellarskys.stella.utils.CompatHelpers.*
-//$$ import net.minecraft.client.entity.AbstractClientPlayer
-//$$ import net.minecraft.client.renderer.entity.layers.LayerRenderer
-//$$ import net.minecraft.entity.player.EnumPlayerModelParts
-//$$ import net.minecraft.client.resources.DefaultPlayerSkin
-//$$ import net.minecraft.world.storage.MapData
-//#endif
 
 import java.util.UUID
 
@@ -48,7 +41,6 @@ object DungeonScanner {
 
         // checking player states
         checkPlayerState()
-
 
         val (x, z) = realCoordToComponent(player.x.toInt(), player.z.toInt())
         val idx = 6 * z + x
@@ -100,17 +92,16 @@ object DungeonScanner {
     )
 
     fun init() {
-        println("[Dungeon Scanner] Initilizing")
         EventBus.register<AreaEvent.Main> ({
             TickUtils.schedule(2) {
                 if (LocationUtils.area != "catacombs") {
-                    println("resetting")
                     reset()
                 }
-                println("reregistering")
                 tickRegister.register()
             }
         })
+
+        EventBus.register<WorldEvent.Change> { reset() }
     }
 
     fun onPlayerMove(entity: DungeonPlayer?, x: Double, z: Double, yaw: Float) {
@@ -296,12 +287,18 @@ object DungeonScanner {
     fun roomCleared(room: Room, check: Checkmark) {
         val players = room.players
         val isGreen = check == Checkmark.GREEN
+        val roomKey = room.name ?: "unknown"
 
-        players.forEach {
-            val v = it
+        players.forEach { player ->
+            val alreadyCleared = player.getWhiteChecks().containsKey(roomKey) || player.getGreenChecks().containsKey(roomKey)
+
+            if (!alreadyCleared) {
+                if (players.size == 1) player.minRooms++
+                player.maxRooms++
+            }
 
             val colorKey = if (isGreen) "GREEN" else "WHITE"
-            val clearedMap = v.clearedRooms[colorKey]
+            val clearedMap = player.clearedRooms[colorKey]
 
             clearedMap?.putIfAbsent(
                 room.name ?: "unknown",
@@ -321,37 +318,42 @@ object DungeonScanner {
         for (v in Dungeon.partyMembers) {
             val isAlreadyTracked = players.any { it.name == v }
 
-            //#if MC >= 1.21.5
             val playerObj = world.players.firstOrNull { it.name.string == v }
             val entry = Stella.mc.networkHandler?.getPlayerListEntry(playerObj?.uuid ?: UUID(0, 0))
             val ping = entry?.latency ?: -1
             val skinTexture = entry?.skinTextures?.comp_1626 ?: DefaultSkinHelper.getTexture()
-            //#elseif MC == 1.8.9
-            //$$ val playerObj = world.playerEntities.firstOrNull { it.name == v }
-            //$$ val entry = Stella.mc.netHandler?.getPlayerInfo(v)
-            //$$ val ping = entry?.responseTime ?: -1
-            //$$ val skinTexture = entry?.locationSkin ?: DefaultPlayerSkin.getDefaultSkinLegacy()
-            //#endif
+            val uuid = entry?.profile?.id.toString()
 
             if (isAlreadyTracked || ping == -1) continue
 
-            players.add(DungeonPlayer(v).apply { skin = skinTexture })
+            players.add(DungeonPlayer(v).apply {
+                skin = skinTexture
+                this.uuid = uuid
+            })
         }
 
         if (players.size != Dungeon.partyMembers.size) return
 
         for (v in players) {
-            //#if MC >= 1.21.5
             val p = world.players.find { it.name.string == v.name }
             val hasHat = p?.isPartVisible(PlayerModelPart.HAT) ?: v.hat
-            val ping = Stella.mc.networkHandler?.getPlayerListEntry(p?.uuid ?: UUID(0, 0))?.latency ?: -1
-            //#elseif MC == 1.8.9
-            //$$ val p = world.playerEntities.firstOrNull { it.name == v.name }
-            //$$ val hasHat = p?.isWearing(EnumPlayerModelParts.HAT) ?: v.hat
-            //$$ val ping = Stella.mc.netHandler?.getPlayerInfo(v.name)?.responseTime ?: -1
-            //#endif
+            val entry = Stella.mc.networkHandler?.getPlayerListEntry(p?.uuid ?: UUID(0, 0))
+            val ping = entry?.latency ?: -1
+            val skinTexture = entry?.skinTextures?.comp_1626 ?: DefaultSkinHelper.getTexture()
+            val uuid = entry?.profile?.id.toString()
 
             v.hat = hasHat
+
+            if (uuid != null) {
+                v.uuid = uuid
+
+                if (v.initSecrets == null) {
+                    HypixelApi.fetchSecrets(uuid, cacheMs = 120_000) { secrets ->
+                        v.initSecrets = secrets
+                        v.currSecrets = secrets
+                    }
+                }
+            }
 
             if (ping != -1 && p != null) {
                 v.inRender = true
@@ -400,13 +402,7 @@ object DungeonScanner {
         }
     }
 
-    fun scanFromMap(
-        //#if MC >= 1.21.5
-        state: MapState
-        //#elseif MC == 1.8.9
-        //$$ state: MapData
-        //#endif
-    ) {
+    fun scanFromMap(state: MapState) {
         val colors = state.colors
 
         var cx = -1
@@ -424,56 +420,49 @@ object DungeonScanner {
                     val rmx = cx / 2
                     val rmz = cz / 2
                     val roomIdx = getRoomIdx(rmx to rmz)
-                    val room = rooms[roomIdx] ?: Room(rmx to rmz).also {newRoom ->
-                        rooms[roomIdx] = newRoom
-                        uniqueRooms.add(newRoom)
 
-                        for ((dx, dz) in mapDirections) {
-                            val doorCx = cx + dx
-                            val doorCz = cz + dz
+                    val room = rooms[roomIdx] ?: Room(rmx to rmz).also {
+                        rooms[roomIdx] = it
+                        uniqueRooms.add(it)
+                    }
 
-                            // Only scan odd coordinates (door space)
-                            if (doorCx % 2 == 0 && doorCz % 2 == 0) {
-                                println("Not odd")
-                                continue
-                            }
+                    for ((dx, dz) in mapDirections) {
+                        val doorCx = cx + dx
+                        val doorCz = cz + dz
+                        if (doorCx % 2 == 0 && doorCz % 2 == 0) continue
 
-                            val doorX = x + dx * Dungeon.mapGapSize / 2
-                            val doorZ = z + dz * Dungeon.mapGapSize / 2
-                            val doorIdx = doorX + doorZ * 128
-                            val center = colors.getOrNull(doorIdx)
+                        val doorX = x + dx * Dungeon.mapGapSize / 2
+                        val doorZ = z + dz * Dungeon.mapGapSize / 2
+                        val doorIdx = doorX + doorZ * 128
+                        val center = colors.getOrNull(doorIdx)
 
-                            // If there's a pixel, and it's a door, skip merging
-                            val isGap = center == null || center == 0.toByte()
-                            val isDoor = if (!isGap) {
-                                val horiz = listOf(
-                                    colors.getOrNull(doorIdx - 128 - 4) ?: 0,
-                                    colors.getOrNull(doorIdx - 128 + 4) ?: 0
-                                )
-                                val vert = listOf(
-                                    colors.getOrNull(doorIdx - 128 * 5) ?: 0,
-                                    colors.getOrNull(doorIdx + 128 * 3) ?: 0
-                                )
-                                horiz.all { it == 0.toByte() } || vert.all { it == 0.toByte() }
-                            } else false
+                        val isGap = center == null || center == 0.toByte()
+                        val isDoor = if (!isGap) {
+                            val horiz = listOf(
+                                colors.getOrNull(doorIdx - 128 - 4) ?: 0,
+                                colors.getOrNull(doorIdx - 128 + 4) ?: 0
+                            )
+                            val vert = listOf(
+                                colors.getOrNull(doorIdx - 128 * 5) ?: 0,
+                                colors.getOrNull(doorIdx + 128 * 3) ?: 0
+                            )
+                            horiz.all { it == 0.toByte() } || vert.all { it == 0.toByte() }
+                        } else false
 
-                            if (isGap || isDoor) continue // skip if there's a gap or a door
+                        if (isGap || isDoor) continue
 
-                            val neighborCx = cx + dx * 2
-                            val neighborCz = cz + dz * 2
-                            val neighborComp = neighborCx / 2 to neighborCz / 2
-                            val neighborIdx = getRoomIdx(neighborComp)
-                            if (neighborIdx !in rooms.indices) continue
+                        val neighborCx = cx + dx * 2
+                        val neighborCz = cz + dz * 2
+                        val neighborComp = neighborCx / 2 to neighborCz / 2
+                        val neighborIdx = getRoomIdx(neighborComp)
+                        if (neighborIdx !in rooms.indices) continue
 
-                            val neighborRoom = rooms[neighborIdx]
-                            if (neighborRoom == null) {
-                                newRoom.addComponent(neighborComp)
-                                rooms[neighborIdx] = newRoom
-                                println("Room at $rmx/$rmz is taking over comp at ${neighborComp.first}/${neighborComp.second}")
-                            } else if (neighborRoom != newRoom && neighborRoom.type != RoomType.ENTRANCE) {
-                                mergeRooms(neighborRoom, newRoom)
-                                println("Merged room at $rmx/$rmz with neighbor at ${neighborComp.first}/${neighborComp.second}")
-                            }
+                        val neighborRoom = rooms[neighborIdx]
+                        if (neighborRoom == null) {
+                            room.addComponent(neighborComp)
+                            rooms[neighborIdx] = room
+                        } else if (neighborRoom != room && neighborRoom.type != RoomType.ENTRANCE) {
+                            mergeRooms(neighborRoom, room)
                         }
                     }
 
@@ -570,7 +559,6 @@ object DungeonScanner {
     }
 }
 
-//#if MC >= 1.21.5
 @Stella.Command
 object DsDebug : CommandUtils(
     "sadb"
@@ -593,4 +581,3 @@ object DsDebug : CommandUtils(
         return 1
     }
 }
-//#endif

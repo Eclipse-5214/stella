@@ -2,7 +2,7 @@ package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.utils.config.core.Config
 
-val config = Config("Stella", "stella") {
+val config = Config("Stella", "Stella") {
     category("General"){
         subcategory("info") {
             textparagraph {
@@ -25,6 +25,105 @@ val config = Config("Stella", "stella") {
                 configName = "showRoomName"
                 name = "Show Room Name"
                 description = "Shows the current dungeon rooms name in a hud"
+            }
+        }
+
+        subcategory("Terminals") {
+            toggle {
+                configName = "termNumbers"
+                name = "Terminal Numbers"
+                description = "Number the terminals in dungeons (for calling terms)"
+                default = false
+            }
+
+            dropdown {
+                configName = "termNumber"
+                name = "Number"
+                description = "What terminal number you want to call"
+                options = listOf("1", "2", "3", "4", "All")
+                default = 4
+                shouldShow { settings -> settings["termNumbers"] as Boolean }
+            }
+
+            toggle {
+                configName = "highlightTerms"
+                name = "Highlight Terms"
+                description = "Highlights the terminals"
+                default = false
+                shouldShow { settings -> settings["termNumbers"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "termColor"
+                name = "Highlight Color"
+                description = "The color to highlight the terminals"
+                default = rgba(0, 255, 255, 255)
+                shouldShow { settings ->
+                    (settings["termNumbers"] as Boolean) &&
+                            (settings["highlightTerms"] as Boolean)
+                }
+            }
+
+            toggle {
+                configName = "showTermClass"
+                name = "Show Class"
+                description = "Displays related class"
+                default = false
+                shouldShow { settings -> settings["termNumbers"] as Boolean }
+            }
+
+            toggle {
+                configName = "classColor"
+                name = "Highlight Class Color"
+                description = "Highlights the terminals the color of the class"
+                default = false
+                shouldShow { settings ->
+                    (settings["termNumbers"] as Boolean) &&
+                            (settings["highlightTerms"] as Boolean) &&
+                            (settings["showTermClass"] as Boolean)
+                }
+            }
+
+            toggle {
+                configName = "hideNumber"
+                name = "Hide Number"
+                description = "Hides the terminal number"
+                default = false
+                shouldShow { settings ->
+                    (settings["termNumbers"] as Boolean) &&
+                            (settings["showTermClass"] as Boolean)
+                }
+            }
+
+            toggle {
+                configName = "m7Roles"
+                name = "M7 Roles"
+                description = "Displays M7 roles instead"
+                default = false
+                shouldShow { settings ->
+                    (settings["termNumbers"] as Boolean) &&
+                            (settings["showTermClass"] as Boolean)
+                }
+            }
+
+            dropdown {
+                configName = "termClass"
+                name = "M7 Class"
+                description = "What class you are playing"
+                options = listOf("Tank", "Mage", "Bers", "Arch", "All")
+                default = 4
+                shouldShow { settings ->
+                    (settings["termNumbers"] as Boolean) &&
+                            (settings["showTermClass"] as Boolean) &&
+                            (settings["m7Roles"] as Boolean)
+                }
+            }
+
+            toggle {
+                configName = "termTracker"
+                name = "Terminal Tracker"
+                description = "Tracks terminals, devices, and levers"
+                default = false
             }
         }
 
@@ -217,6 +316,20 @@ val config = Config("Stella", "stella") {
                 description = "Use the color for the players class for the icon border"
                 default = false
             }
+
+            toggle {
+                configName = "showNames"
+                name = "Show Player Names"
+                description = "Render player names under map icons"
+            }
+
+            toggle {
+                configName = "dontShowOwn"
+                name = "Hide Own Name"
+                description = "Hides your name on the map"
+                shouldShow { settings -> settings["showNames"] as Boolean }
+            }
+
         }
 
         subcategory("Room Colors") {
@@ -324,8 +437,8 @@ val config = Config("Stella", "stella") {
 
             toggle {
                 configName = "dungeonBreakdown"
-                name = "Box Wither Doors"
-                description = "Renders a box around wither doors"
+                name = "Dungeon Breakdown"
+                description = "Sends dungeon info after run"
                 default = false
             }
         }

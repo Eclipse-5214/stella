@@ -1,11 +1,7 @@
 package co.stellarskys.stella.utils.skyblock.dungeons
 
 import co.stellarskys.stella.utils.WorldUtils
-//#if MC >= 1.21.5
 import net.minecraft.block.Blocks
-//#elseif MC == 1.8.9
-//$$ import net.minecraft.init.Blocks
-//#endif
 
 data class RoomMetadata(
     val name: String,
@@ -127,11 +123,7 @@ class Room(
 
                 if (!isChunkLoaded(nx, height!!, nz)) continue
                 val state = WorldUtils.getBlockStateAt(nx, height!!, nz) ?: continue
-                //#if MC >= 1.21.5
                 if (state.isOf(Blocks.BLUE_TERRACOTTA)) {
-                    //#elseif MC == 1.8.9
-                    //$$  if (state.block == Blocks.stained_hardened_clay && state.block.getMetaFromState(state) == 11) {
-                    //#endif
                     rotation = jdx * 90
                     corner = Triple(nx + 0.5, height!!.toDouble(), nz + 0.5)
                     return this

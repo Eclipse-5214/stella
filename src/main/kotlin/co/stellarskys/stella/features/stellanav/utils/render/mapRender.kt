@@ -7,10 +7,8 @@ import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-//#if MC >= 1.21.5
 import co.stellarskys.stella.utils.render.popMatrix
 import co.stellarskys.stella.utils.render.pushMatrix
-//#endif
 
 object mapRender {
     private val defaultMapSize = Pair(138, 138)
@@ -30,13 +28,13 @@ object mapRender {
             if (mapConfig.mapBorder) renderMapBorder(context)
         } else if (!Dungeon.complete && mapConfig.bossMapEnabled) {
             renderMapBackground(context)
-            //boss.renderMap(context)
+            boss.renderMap(context)
 
             if (mapInfoUnder) renderInfoUnder(context, false)
             if (mapConfig.mapBorder) renderMapBorder(context)
         } else if (Dungeon.complete && mapConfig.scoreMapEnabled) {
             renderMapBackground(context)
-            //score.render(context)
+            score.render(context)
 
             if (mapInfoUnder) renderInfoUnder(context, false)
             if (mapConfig.mapBorder) renderMapBorder(context)

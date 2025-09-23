@@ -9,13 +9,9 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.*
 import java.awt.Color
-//#if MC >= 1.21.5
 import co.stellarskys.stella.utils.render.popMatrix
 import co.stellarskys.stella.utils.render.pushMatrix
 import co.stellarskys.stella.utils.render.rotate
-//#elseif MC == 1.8.9
-//$$ import co.stellarskys.stella.utils.CompatHelpers.*
-//#endif
 
 object clear{
     // constants
@@ -324,6 +320,17 @@ object clear{
             val y = (iconY / 125.0 * 128.0)
 
             val matrix = context.matrices
+
+            val ownName = mapConfig.dontShowOwn && v.name == you.name.string
+
+            if (Dungeon.holdingLeaps && mapConfig.showNames && !ownName) {
+                matrix.pushMatrix()
+                matrix.translate(x.toFloat(), y.toFloat(), 1f)
+
+                val scale = mapConfig.iconScale / 1.3f
+                renderNametag(context, v.name, scale)
+                matrix.popMatrix()
+            }
 
             matrix.pushMatrix()
             matrix.translate(x.toFloat(), y.toFloat(), 1f)

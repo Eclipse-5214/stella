@@ -12,8 +12,6 @@ import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner.currentRoom
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.ceil
 import kotlin.math.floor
-
-//#if MC >= 1.21.5
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.item.FilledMapItem
@@ -21,14 +19,6 @@ import net.minecraft.item.map.MapDecoration
 import net.minecraft.item.map.MapDecorationTypes
 import net.minecraft.item.map.MapState
 import net.minecraft.network.packet.s2c.play.*
-//#elseif MC == 1.8.9
-//$$ import co.stellarskys.stella.utils.CompatHelpers.*
-//$$ import net.minecraft.network.play.server.*
-//$$ import net.minecraft.world.storage.MapData
-//$$ import net.minecraft.entity.monster.EntityZombie
-//$$ import net.minecraft.item.ItemMap
-//$$ import net.minecraft.util.Vec4b
-//#endif
 
 val puzzleEnums = mapOf(
     "✦" to 0,
@@ -93,7 +83,8 @@ object Dungeon {
         "DungeonTime" to Regex("""^Time: (?:(\d+)h)?\s?(?:(\d+)m)?\s?(?:(\d+)s)?$"""),
         "Mimic" to Regex("""^Party > (?:\[[\w+]+] )?\w{1,16}: (.*)$"""),
         "DungeonComplete" to Regex("""^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$"""),
-        "WatcherDone" to Regex("""\[BOSS] The Watcher: That will be enough for now\.""")
+        "WatcherDone" to Regex("""\[BOSS] The Watcher: That will be enough for now\."""),
+        "PlayerDeath" to Regex("☠ (.*?) .*? and became a ghost")
     )
 
     private val playerEntryNames = mapOf("!A-b" to 1, "!A-f" to 5,"!A-j" to 9,"!A-n" to 13,"!A-r" to 17)
@@ -106,15 +97,9 @@ object Dungeon {
     var floor: String? = null
     var floorNumber: Int? = null
 
-    //#if MC >= 1.21.5
     val MapDecoration.mapX get() = (this.comp_1843() + 128) shr 1
     val MapDecoration.mapZ get() = (this.z + 128) shr 1
     val MapDecoration.yaw get() = this.rotation * 22.5f
-    //#elseif MC == 1.8.9
-    //$$ val Vec4b.mapX get() = (this.func_176112_b() + 128) shr 1
-    //$$ val Vec4b.mapZ get() = (this.func_176113_c() + 128) shr 1
-    //$$ val Vec4b.yaw get() = this.func_176111_d() * 22.5f
-    //#endif
 
     //Map
     var mapCorners = Pair(5, 5)
@@ -125,13 +110,8 @@ object Dungeon {
     var coordMultiplier = 0.625
     var calibrated = false
 
-    //#if MC >= 1.21.5
     var mapData: MapState? = null
     var guessMapData: MapState? = null
-    //#elseif MC == 1.8.9
-    //$$ var mapData: MapData? = null
-    //$$ var guessMapData: MapData? = null
-    //#endif
 
     // dungeon
     var secretsFound: Int = 0
@@ -149,8 +129,7 @@ object Dungeon {
     var currentClass: String? = null
     var currentLevel: Int = 0
     var puzzlesDone: Int = 0
-    var clearedPercent: Int = 0
-    var secretsPercentNeeded: Double = 1.0
+    var holdingLeaps: Boolean = false
 
     // score
     var scoreData = ScoreData()
@@ -159,21 +138,17 @@ object Dungeon {
     var dungeonSeconds: Int = 0
     var hasSpiritPet: Boolean = false
     var mimicDead: Boolean = false
+    var clearedPercent: Int = 0
+    var secretsPercentNeeded: Double = 1.0
     var has270Triggered: Boolean = false
     var has300Triggered: Boolean = false
     var hasPaul = false
 
     // Mimic
-    //#if MC >= 1.21.5
     val MimicTrigger: EventBus.EventCall = EventBus.register<EntityEvent.Death>({ event ->
-        //#elseif MC == 1.8.9
-        //$$ val MimicTrigger: EventBus.EventCall = EventBus.register<EntityEvent.Leave>({ event ->
-        //#endif
-
         val mcEntity = event.entity
         if (floorNumber !in listOf(6, 7) || mimicDead) return@register
 
-        //#if MC >= 1.21.5
         if (mcEntity !is ZombieEntity) return@register
         if (
             !mcEntity.isBaby ||
@@ -182,27 +157,14 @@ object Dungeon {
                 .any { slot -> mcEntity.getEquippedStack(slot).isEmpty }
         ) return@register
 
-        //#elseif MC == 1.8.9
-        //$$ if (mcEntity !is EntityZombie) return@register
-        //$$ if (!mcEntity.isChild) return@register
-        //$$ for (i in 0..3) {
-        //$$     val armor = mcEntity.getCurrentArmor(i)
-        //$$     if (armor == null || armor.stackSize == 0) return@register
-        //$$ }
-        //#endif
-
         mimicDead = true
     }, false)
 
     init {
-        //#if MC >= 1.21.5
         EventBus.register<TablistEvent.Update> {
-            //#elseif MC == 1.8.9
-            //$$ EventBus.register<TablistEvent> {
-            //#endif
-
             TickUtils.schedule(1) {
                 val self = players[Stella.mc.player?.name?.string]
+
                 val alives = players.values
                     .filterNot { it.isDead || it == self }
                     .sortedBy { it.tabIndex }
@@ -216,7 +178,6 @@ object Dungeon {
         }
 
         EventBus.register<PacketEvent.Received>({ event ->
-            //#if MC >= 1.21.5
             if (event.packet is MapUpdateS2CPacket && mapData == null) {
                 val world = Stella.mc.world ?: return@register
                 val id = event.packet.comp_2270().comp_2315
@@ -227,20 +188,7 @@ object Dungeon {
                     }
                 }
             }
-            //#elseif MC == 1.8.9
-            //$$ if (event.packet is S34PacketMaps) {
-            //$$    val world = Stella.mc.theWorld ?: return@register
-            //$$    val id = event.packet.mapId
-            //$$    if (id and 1000 == 0) {
-            //$$        val guess = world.mapStorage.loadData(MapData::class.java, "map_$id") as MapData? ?: return@register
-            //$$        if(guess.mapDecorations.any {it.value.func_176110_a() == 1.toByte() }) {
-            //$$            guessMapData = guess
-            //$$        }
-            //$$    }
-            //$$ }
-            //#endif
 
-            //#if MC >= 1.21.5
             if (event.packet is TeamS2CPacket) {
                 val teamStr = event.packet.teamName
                 Regex("^team_(\\d+)$").matchEntire(teamStr) ?: return@register
@@ -249,16 +197,6 @@ object Dungeon {
                 val formatted = team.prefix.string + team.suffix.string
                 val unformatted = formatted.clearCodes()
                 val clear = unformatted.toCharArray().filter { it.code in 32..126 }.joinToString(separator = "")
-                //#elseif MC == 1.8.9
-                //$$ if (event.packet is S3EPacketTeams) {
-                //$$    if (event.packet.action != 2) return@register
-                //$$    val teamStr = event.packet.name
-                //$$    Regex("^team_(\\d+)$").matchEntire(teamStr) ?: return@register
-                //$$
-                //$$    val formatted = event.packet.prefix + event.packet.suffix
-                //$$    val unformatted =  formatted.clearCodes()
-                //$$    val clear = unformatted.toCharArray().filter { it.code in 32..126 }.joinToString(separator = "")
-                //#endif
 
                 val msg  = clear.trim()
                 val percentMatch = regexes["ClearedPercent"]!!.find(msg)
@@ -277,7 +215,6 @@ object Dungeon {
                 MimicTrigger.register()
             }
 
-            //#if MC >= 1.21.5
             if (event.packet is PlayerListS2CPacket) {
                 val action = event.packet.actions
                 val entries = event.packet.entries
@@ -299,30 +236,6 @@ object Dungeon {
 
                     val old = (Stella.mc.networkHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.comp_1106]
                     val idx = playerEntryNames[old?.profile?.name ?: entry.profile?.name] ?: -1
-
-                    //#elseif MC == 1.8.9
-                    //$$ if (event.packet is S38PacketPlayerListItem) {
-                    //$$    val action = event.packet.action
-                    //$$    val entries = event.packet.entries
-                    //$$
-                    //$$    if(action != S38PacketPlayerListItem.Action.ADD_PLAYER && action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME) return@register
-                    //$$
-                    //$$    for (entry in entries) {
-                    //$$        val name = entry.displayName
-                    //$$        val profile = entry.profile
-                    //$$
-                    //$$        if (name == null && profile == null){
-                    //$$            //println("[EB] entry has no name or profile: $entry")
-                    //$$            continue
-                    //$$        }
-                    //$$
-                    //$$        val formatted = name.formattedText ?: continue
-                    //$$        val unformatted = formatted.clearCodes()
-                    //$$
-                    //$$        val old = (Stella.mc.netHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.profile.id]
-                    //$$        val idx = playerEntryNames[old?.gameProfile?.name ?: entry.profile?.name] ?: -1
-                    //#endif
-
                     val msg = unformatted.trim()
                     if(msg == "") return@register
 
@@ -412,6 +325,12 @@ object Dungeon {
 
             mapLine1 = "$dSecrets    $dCrypts    $dMimic".trim()
             mapLine2 = "$minSecrets    $dDeaths    $dScore".trim()
+
+            val player = Stella.mc.player ?: return@register
+            val heldItem = player.mainHandStack ?: return@register
+            val displayName = heldItem.itemName.string.clearCodes()
+
+            holdingLeaps = "leap" in displayName.lowercase()
         })
 
         EventBus.register<ChatEvent.Receive>( { event ->
@@ -451,6 +370,14 @@ object Dungeon {
 
             if (watcherMatch != null) {
                 bloodOpen = true
+                return@register
+            }
+
+            val deathMatch = regexes["PlayerDeath"]!!.find(msg)
+
+            if (deathMatch != null) {
+                val name = deathMatch.groups[1]?.value ?: return@register
+                DungeonScanner.players.find { it.name == name}?.apply { deaths ++ }
                 return@register
             }
         })
@@ -500,6 +427,7 @@ object Dungeon {
         secretsPercentNeeded = 1.0
         scoreData = ScoreData()
         bloodDone = false
+        bloodOpen = false
         dungeonSeconds = 0
         hasSpiritPet = false
         mimicDead = false
@@ -610,19 +538,11 @@ object Dungeon {
 
 
     // map stuff
-    //#if MC >= 1.21.5
     fun getCurrentMapState(): MapState? {
         val stack = Stella.mc.player?.inventory?.getStack(8) ?: return null
         if (stack.item !is FilledMapItem || !stack.name.string.contains("Magical Map")) return null
         return FilledMapItem.getMapState(stack, Stella.mc.world!!)
     }
-    //#elseif MC == 1.8.9
-    //$$ fun getCurrentMapState(): MapData? {
-    //$$    val map = Stella.mc.thePlayer?.inventory?.getStackInSlot(8) ?: return null
-    //$$    if (map.item !is ItemMap || !map.displayName.contains("Magical Map")) return null
-    //$$    return (map.item as ItemMap).getMapData(map, Stella.mc.theWorld)
-    //$$ }
-    //#endif
 
     fun calibrateDungeonMap(): Boolean {
         val mapState = getCurrentMapState() ?: return false
@@ -664,7 +584,6 @@ object Dungeon {
         return null
     }
 
-    //#if MC >= 1.21.5
     fun updatePlayersFromMap(state: MapState) {
         state as AccessorMapState
         players.forEach { (name, player) ->
@@ -680,29 +599,8 @@ object Dungeon {
 
         DungeonScanner.updatePlayersFromMap()
     }
-    //#elseif MC == 1.8.9
-    //$$ fun updatePlayersFromMap(state: MapData) {
-    //$$    val decor = state.mapDecorations
-    //$$    players.forEach { (name, player) ->
-    //$$        decor.entries.find { (icon, _) -> icon == player.icon }?.let { (_, decoration) ->
-    //$$            icons[player.icon] = Icon(
-    //$$                x = decoration.mapX,
-    //$$                y = decoration.mapZ,
-    //$$                yaw = decoration.yaw + 180f,
-    //$$                player = player.name
-    //$$            )
-    //$$        }
-    //$$    }
-    //$$ }
-    //#endif
 
-    fun checkBloodDone(
-        //#if MC >= 1.21.5
-        state: MapState
-        //#elseif MC == 1.8.9
-        //$$ state: MapData
-        //#endif
-    ) {
+    fun checkBloodDone(state: MapState) {
         if (bloodDone) return
 
         val startX = mapCorners.first + (mapRoomSize / 2)

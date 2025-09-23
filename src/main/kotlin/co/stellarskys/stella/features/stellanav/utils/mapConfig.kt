@@ -1,6 +1,7 @@
 package co.stellarskys.stella.features.stellanav.utils
 
 import co.stellarskys.stella.utils.config
+import co.stellarskys.stella.utils.config.RGBA
 import java.awt.Color
 
 object mapConfig {
@@ -15,41 +16,43 @@ object mapConfig {
 
     val mapInfoUnder: Boolean get() = config["mapInfoUnder"] as? Boolean ?: false
 
-    val noKey: Color get() = config["noKeyColor"] as? Color ?: Color.red
-    val key: Color get() = config["keyColor"] as? Color ?: Color.green
+    val noKey: Color get() = (config["noKeyColor"] as? RGBA)?.toColor() ?: Color.red
+    val key: Color get() = (config["keyColor"] as? RGBA)?.toColor() ?: Color.green
     val doorLW: Double get() = (config["doorLineWidth"] as? Int ?: 3).toDouble()
 
     // map colors
-    val NormalColor: Color get() = config["normalRoomColor"] as? Color ?: Color(107, 58, 17, 255)
-    val PuzzleColor: Color get() = config["puzzleRoomColor"] as? Color ?: Color(117, 0, 133, 255)
-    val TrapColor: Color get() = config["trapRoomColor"] as? Color ?: Color(216, 127, 51, 255)
-    val MinibossColor: Color get() = config["minibossRoomColor"] as? Color ?: Color(254, 223, 0, 255)
-    val BloodColor: Color get() = config["bloodRoomColor"] as? Color ?: Color(255, 0, 0, 255)
-    val FairyColor: Color get() = config["fairyRoomColor"] as? Color ?: Color(224, 0, 255, 255)
-    val EntranceColor: Color get() = config["entranceRoomColor"] as? Color ?: Color(20, 133, 0, 255)
+    val NormalColor: Color get() = (config["normalRoomColor"] as? RGBA)?.toColor() ?: Color(107, 58, 17, 255)
+    val PuzzleColor: Color get() = (config["puzzleRoomColor"] as? RGBA)?.toColor() ?: Color(117, 0, 133, 255)
+    val TrapColor: Color get() = (config["trapRoomColor"] as? RGBA)?.toColor() ?: Color(216, 127, 51, 255)
+    val MinibossColor: Color get() = (config["minibossRoomColor"] as? RGBA)?.toColor() ?: Color(254, 223, 0, 255)
+    val BloodColor: Color get() = (config["bloodRoomColor"] as? RGBA)?.toColor() ?: Color(255, 0, 0, 255)
+    val FairyColor: Color get() = (config["fairyRoomColor"] as? RGBA)?.toColor() ?: Color(224, 0, 255, 255)
+    val EntranceColor: Color get() = (config["entranceRoomColor"] as? RGBA)?.toColor() ?: Color(20, 133, 0, 255)
 
-    val NormalDoorColor: Color get() = config["normalDoorColor"] as? Color ?: Color(80, 40, 10, 255)
-    val WitherDoorColor: Color get() = config["witherDoorColor"] as? Color ?: Color(0, 0, 0, 255)
-    val BloodDoorColor: Color get() = config["bloodDoorColor"] as? Color ?: Color(255, 0, 0, 255)
-    val EntranceDoorColor: Color get() = config["entranceDoorColor"] as? Color ?: Color(0, 204, 0, 255)
+    val NormalDoorColor: Color get() = (config["normalDoorColor"] as? RGBA)?.toColor() ?: Color(80, 40, 10, 255)
+    val WitherDoorColor: Color get() = (config["witherDoorColor"] as? RGBA)?.toColor() ?: Color(0, 0, 0, 255)
+    val BloodDoorColor: Color get() = (config["bloodDoorColor"] as? RGBA)?.toColor() ?: Color(255, 0, 0, 255)
+    val EntranceDoorColor: Color get() = (config["entranceDoorColor"] as? RGBA)?.toColor() ?: Color(0, 204, 0, 255)
 
     // class Colors
-    val healerColor: Color get() = config["healerColor"] as? Color ?: Color(240, 70, 240, 255)
-    val mageColor: Color get() = config["mageColor"] as? Color ?: Color(70, 210, 210, 255)
-    val berzColor: Color get() = config["berzColor"] as? Color ?: Color(255, 0, 0, 255)
-    val archerColor: Color get() = config["archerColor"] as? Color ?: Color(254, 223, 0, 255)
-    val tankColor: Color get() = config["tankColor"] as? Color ?: Color(30, 170, 50, 255)
+    val healerColor: Color get() = (config["healerColor"] as? RGBA)?.toColor() ?: Color(240, 70, 240, 255)
+    val mageColor: Color get() = (config["mageColor"] as? RGBA)?.toColor() ?: Color(70, 210, 210, 255)
+    val berzColor: Color get() = (config["berzColor"] as? RGBA)?.toColor() ?: Color(255, 0, 0, 255)
+    val archerColor: Color get() = (config["archerColor"] as? RGBA)?.toColor() ?: Color(254, 223, 0, 255)
+    val tankColor: Color get() = (config["tankColor"] as? RGBA)?.toColor() ?: Color(30, 170, 50, 255)
 
     // icon settings
     val iconScale: Float get() = config["iconScale"] as? Float ?: 1f
     val showPlayerHead: Boolean get() = config["showPlayerHeads"] as? Boolean ?: false
     val iconBorderWidth: Float get() = config["iconBorderWidth"] as? Float ?: 0.2f
-    val iconBorderColor: Color get() = config["iconBorderColor"] as? Color ?: Color(0, 0, 0, 255)
+    val iconBorderColor: Color get() = (config["iconBorderColor"] as? RGBA)?.toColor() ?: Color(0, 0, 0, 255)
     val iconClassColors: Boolean get() = config["iconClassColors"] as? Boolean ?: false
+    val showNames: Boolean get() = config["showNames"] as? Boolean ?: false
+    val dontShowOwn: Boolean get() = config["dontShowOwn"] as? Boolean ?: false
 
     // other colors
-    val mapBgColor: Color get() = config["mapBgColor"] as? Color ?: Color(0, 0, 0, 100)
+    val mapBgColor: Color get() = (config["mapBgColor"] as? RGBA)?.toColor() ?: Color(0, 0, 0, 100)
+    val mapBdColor: Color get() = (config["mapBdColor"] as? RGBA)?.toColor() ?: Color(0, 0, 0, 255)
     val mapBorder: Boolean get() = config["mapBorder"] as? Boolean ?: true
-    val mapBdColor: Color get() = config["mapBdColor"] as? Color ?: Color(0, 0, 0, 255)
     val mapBdWidth: Int get() = config["mapBdWidth"] as? Int ?: 2
 }
