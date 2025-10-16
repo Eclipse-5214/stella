@@ -7,8 +7,6 @@ import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.render.popMatrix
-import co.stellarskys.stella.utils.render.pushMatrix
 
 object mapRender {
     private val defaultMapSize = Pair(138, 138)
@@ -17,9 +15,9 @@ object mapRender {
         val matrix = context.matrices
 
         matrix.pushMatrix()
-        matrix.translate(x, y,0f)
-        matrix.scale(scale, scale, 1f)
-        matrix.translate(5f,5f,0f)
+        matrix.translate(x, y)
+        matrix.scale(scale, scale)
+        matrix.translate(5f,5f)
 
         if(!Dungeon.inBoss() && !Dungeon.complete) {
             renderMapBackground(context)
@@ -47,7 +45,7 @@ object mapRender {
         val matrix = context.matrices
 
         matrix.pushMatrix()
-        matrix.translate(x, y, 0f)
+        matrix.translate(x, y)
 
         renderMapBackground(context)
 
@@ -73,8 +71,8 @@ object mapRender {
         val w2 = mapLine2.width()
 
         matrix.pushMatrix()
-        matrix.translate(138f / 2f, 135f, 0f)
-        matrix.scale(0.6f, 0.6f, 1f)
+        matrix.translate(138f / 2f, 135f)
+        matrix.scale(0.6f, 0.6f)
 
         Render2D.drawString(context, mapLine1, -w1 / 2, 0)
         Render2D.drawString(context, mapLine2, -w2 / 2, 10)

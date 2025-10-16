@@ -2,7 +2,6 @@ package co.stellarskys.stella.features.stellanav.utils.render
 
 import co.stellarskys.stella.Stella
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.render.MapRenderState
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.MapIdComponent
@@ -44,12 +43,12 @@ object score {
     fun render(context: DrawContext){
         val matrix = context.matrices
 
-        val consumer = Stella.mc.bufferBuilders.entityVertexConsumers
+        //val consumer = Stella.mc.bufferBuilders.entityVertexConsumers
         val renderState = getCurrentMapRender() ?: cashedRenderState
 
-        matrix.push()
-        matrix.translate(5f, 5f, 5f)
-        Stella.mc.mapRenderer.draw(renderState, matrix, consumer,true, LightmapTextureManager.MAX_LIGHT_COORDINATE)
-        matrix.pop()
+        matrix.pushMatrix()
+        matrix.translate(5f, 5f,)
+        context.drawMap(renderState)
+        matrix.popMatrix()
     }
 }

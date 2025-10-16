@@ -18,16 +18,9 @@ object map: Feature("mapEnabled", area = "catacombs") {
     override fun initialize() {
         HUDManager.registerCustom(name, 148, 148, this::HUDEditorRender)
 
-
-        //#if MC > 1.21.5
         register<GuiEvent.HUD> { event ->
             if (HUDManager.isEnabled(name)) RenderMap(event.context)
         }
-        //#elseif MC == 1.8.9
-        //$$ register<RenderEvent.Text> { event ->
-        //$$    if (HUDManager.isEnabled(name)) RenderMap(event.context)
-        //$$ }
-        //#endif
     }
 
     fun HUDEditorRender(context: UDrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean){

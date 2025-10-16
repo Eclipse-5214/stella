@@ -1,6 +1,5 @@
 package co.stellarskys.stella.events
 
-//#if MC != 1.16.5
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -225,4 +224,3 @@ object EventBus {
         fun register(): Boolean
     }
 }
-//#endif

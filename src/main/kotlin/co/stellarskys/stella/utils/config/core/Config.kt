@@ -138,12 +138,8 @@ class Config(
                     height = PixelConstraint(12f)
                 }.setChildOf(window)
 
-                //#if MC >= 1.21.5
-                val username = UIText(Stella.mc.player?.name?.string ?: "null", false)
-                    //#elseif MC == 1.8.9
-                    //$$ val username = UIText(Stella.mc.thePlayer?.name ?: "null", false)
-                    //#endif
 
+                val username = UIText(Stella.mc.player?.name?.string ?: "null", false)
                     .constrain {
                         x = RelativeConstraint() + 17.pixels()
                         y = CenterConstraint() + 2.pixels()
@@ -242,22 +238,12 @@ class Config(
             override fun onDrawScreen(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
                 super.onDrawScreen(matrixStack, mouseX, mouseY, partialTicks)
 
-                val player =
-                    //#if MC >= 1.21.5
-                    Stella.mc.player
-                    //#elseif MC == 1.8.9
-                    //$$ Stella.mc.thePlayer
-                    //#endif
-                        ?: return
+                val player = Stella.mc.player ?: return
 
-                //#if MC >= 1.21.5
+
                 val entry = Stella.mc.networkHandler?.getPlayerListEntry(player.uuid)
-                val skin = entry?.skinTextures?.comp_1626 ?: DefaultSkinHelper.getTexture()
+                val skin = entry?.skinTextures?.texture ?: DefaultSkinHelper.getTexture()
                 val hasHat = player.isPartVisible(PlayerModelPart.HAT)
-                //#elseif MC == 1.8.9
-                //$$ val skin = (player as? AbstractClientPlayer)?.locationSkin ?: DefaultPlayerSkin.getDefaultSkinLegacy()
-                //$$ val hasHat = player.isWearing(EnumPlayerModelParts.HAT)
-                //#endif
 
                 val x = head.getLeft().toDouble()
                 val y = head.getTop().toDouble()

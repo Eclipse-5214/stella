@@ -97,7 +97,7 @@ object Dungeon {
     var floor: String? = null
     var floorNumber: Int? = null
 
-    val MapDecoration.mapX get() = (this.comp_1843() + 128) shr 1
+    val MapDecoration.mapX get() = (this.x() + 128) shr 1
     val MapDecoration.mapZ get() = (this.z + 128) shr 1
     val MapDecoration.yaw get() = this.rotation * 22.5f
 
@@ -180,10 +180,10 @@ object Dungeon {
         EventBus.register<PacketEvent.Received>({ event ->
             if (event.packet is MapUpdateS2CPacket && mapData == null) {
                 val world = Stella.mc.world ?: return@register
-                val id = event.packet.comp_2270().comp_2315
+                val id = event.packet.mapId.id
                 if (id and 1000 == 0) {
-                    val guess = FilledMapItem.getMapState(event.packet.comp_2270(), world) ?: return@register
-                    if(guess.decorations.any {it.comp_1842 == MapDecorationTypes.FRAME }) {
+                    val guess = FilledMapItem.getMapState(event.packet.mapId, world) ?: return@register
+                    if(guess.decorations.any {it.type == MapDecorationTypes.FRAME }) {
                         guessMapData = guess
                     }
                 }
@@ -234,7 +234,7 @@ object Dungeon {
                     val formatted = name!!.string
                     val unformatted = formatted.clearCodes()
 
-                    val old = (Stella.mc.networkHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.comp_1106]
+                    val old = (Stella.mc.networkHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.profileId]
                     val idx = playerEntryNames[old?.profile?.name ?: entry.profile?.name] ?: -1
                     val msg = unformatted.trim()
                     if(msg == "") return@register

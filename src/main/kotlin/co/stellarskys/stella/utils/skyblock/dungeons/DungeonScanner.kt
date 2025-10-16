@@ -321,7 +321,7 @@ object DungeonScanner {
             val playerObj = world.players.firstOrNull { it.name.string == v }
             val entry = Stella.mc.networkHandler?.getPlayerListEntry(playerObj?.uuid ?: UUID(0, 0))
             val ping = entry?.latency ?: -1
-            val skinTexture = entry?.skinTextures?.comp_1626 ?: DefaultSkinHelper.getTexture()
+            val skinTexture = entry?.skinTextures?.texture ?: DefaultSkinHelper.getTexture()
             val uuid = entry?.profile?.id.toString()
 
             if (isAlreadyTracked || ping == -1) continue
@@ -339,7 +339,7 @@ object DungeonScanner {
             val hasHat = p?.isPartVisible(PlayerModelPart.HAT) ?: v.hat
             val entry = Stella.mc.networkHandler?.getPlayerListEntry(p?.uuid ?: UUID(0, 0))
             val ping = entry?.latency ?: -1
-            val skinTexture = entry?.skinTextures?.comp_1626 ?: DefaultSkinHelper.getTexture()
+            val skinTexture = entry?.skinTextures?.texture ?: DefaultSkinHelper.getTexture()
             val uuid = entry?.profile?.id.toString()
 
             v.hat = hasHat

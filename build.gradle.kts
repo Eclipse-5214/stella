@@ -42,47 +42,15 @@ loom {
     }
 }
 
-sourceSets {
-    named("main") {
-        resources {
-            srcDir("src/main/resources")
-            // ⚠️ Avoid filtering unless you have a specific reason
-            // Don't do: include("**/*.png")
-        }
-    }
-}
-
 dependencies {
     modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
     modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
+    modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
+    modImplementation(includeOrShade("gg.essential:elementa:710")!!)
+    modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:436")!!)
+
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
-
-    if (mcData.isFabric) {
-        modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
-        modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-
-        if (mcData.version >= MinecraftVersions.VERSION_1_21_5) {
-            modImplementation(includeOrShade("gg.essential:elementa:710")!!)
-            modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
-            modImplementation(includeOrShade("org.lwjgl:lwjgl-nanovg:3.3.3")!!)
-
-            listOf("windows", "linux", "macos", "macos-arm64").forEach { v ->
-                modImplementation(includeOrShade("org.lwjgl:lwjgl-nanovg:3.3.3:natives-$v")!!)
-            }
-        }
-
-    } else if (mcData.version <= MinecraftVersions.VERSION_1_12_2) {
-        implementation(includeOrShade(kotlin("stdlib-jdk8"))!!)
-        implementation(includeOrShade("org.jetbrains.kotlin:kotlin-reflect:1.6.10")!!)
-        implementation(includeOrShade("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")!!)
-        implementation(includeOrShade("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2")!!)
-
-        modImplementation(includeOrShade("org.spongepowered:mixin:0.7.11-SNAPSHOT")!!)
-        modImplementation(includeOrShade("gg.essential:elementa:710")!!)
-        modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
-
-        runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
-    }
 }
 
 tasks {

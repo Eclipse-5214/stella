@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.render
 import co.stellarskys.stella.Stella.Companion.mc
 import co.stellarskys.stella.features.stellanav.utils.prevewMap
 import co.stellarskys.stella.utils.clearCodes
+import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.util.math.MatrixStack
@@ -18,7 +19,7 @@ object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
 
     fun drawImage(ctx: DrawContext, image: Identifier, x: Int, y: Int, width: Int, height: Int) {
-        ctx.drawGuiTexture(RenderLayer::getGuiTextured, image, x, y, width, height)
+        ctx.drawGuiTexture(RenderPipelines.GUI_TEXTURED, image, x, y, width, height)
     }
 
     fun drawTexture(
@@ -36,7 +37,7 @@ object Render2D {
         textureHeight: Int = 256
     ) {
         ctx.drawTexture(
-            RenderLayer::getGuiTextured, // or your custom layer provider
+            RenderPipelines.GUI_TEXTURED, // or your custom layer provider
             image,
             x,
             y,
@@ -54,15 +55,15 @@ object Render2D {
 
     @JvmOverloads
     fun drawRect(ctx: DrawContext, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
-        ctx.fill(RenderLayer.getGui(), x, y, x + width, y + height, color.rgb)
+        ctx.fill(RenderPipelines.GUI, x, y, x + width, y + height, color.rgb)
     }
 
     @JvmOverloads
     fun drawString(ctx: DrawContext, str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
         val matrices = ctx.matrices
         if (scale != 1f) {
-            matrices.push()
-            matrices.scale(scale, scale, 1f)
+            matrices.pushMatrix()
+            matrices.scale(scale, scale)
         }
 
         ctx.drawText(
@@ -74,7 +75,7 @@ object Render2D {
             shadow
         )
 
-        if (scale != 1f) matrices.pop()
+        if (scale != 1f) matrices.popMatrix()
     }
 
 

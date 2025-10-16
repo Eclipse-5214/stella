@@ -286,7 +286,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         //#if MC >= 1.21.7
         //$$ context.matrices.pushMatrix()
         //#else
-        context.matrices.push()
+        context.matrices.pushMatrix()
         //#endif
         //#if MC == 1.21.5
         //$$ context.matrices.translate(0f, 0f, 300f)
@@ -334,11 +334,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         context.drawTextWithShadow(textRenderer, confirmText, confirmTextX, textY, Color.WHITE.rgb)
         context.drawTextWithShadow(textRenderer, cancelText, cancelTextX, textY, Color.WHITE.rgb)
 
-        //#if MC >= 1.21.7
-        //$$ context.matrices.popMatrix()
-        //#else
-        context.matrices.pop()
-        //#endif
+        context.matrices.popMatrix()
     }
 
     private fun drawTooltips(context: DrawContext) {

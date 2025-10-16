@@ -145,12 +145,12 @@ fun renderNametag(context: UDrawContext, name: String, scale: Float) {
     )
 
     matrix.pushMatrix()
-    matrix.scale(scale, scale, 1f)
-    matrix.translate(0f, 12f, 0f)
+    matrix.scale(scale, scale)
+    matrix.translate(0f, 12f)
 
     for ((dx, dy) in offsets) {
         matrix.pushMatrix()
-        matrix.translate(dx, dy, 0f)
+        matrix.translate(dx, dy)
         Render2D.drawString(context, "§0$name", drawX, drawY)
         matrix.popMatrix()
     }

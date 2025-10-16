@@ -9,9 +9,7 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.*
 import java.awt.Color
-import co.stellarskys.stella.utils.render.popMatrix
-import co.stellarskys.stella.utils.render.pushMatrix
-import co.stellarskys.stella.utils.render.rotate
+import kotlin.math.PI
 
 object clear{
     // constants
@@ -25,9 +23,9 @@ object clear{
         val mapScale = oscale(Dungeon.floorNumber)
 
         matrix.pushMatrix()
-        matrix.translate(5f,5f, 0f)
-        matrix.translate(mapOffset, 0f, 0f)
-        matrix.scale(mapScale, mapScale, 1f)
+        matrix.translate(5f,5f)
+        matrix.translate(mapOffset, 0f)
+        matrix.scale(mapScale, mapScale)
 
         renderRooms(context)
         renderCheckmarks(context)
@@ -101,8 +99,8 @@ object clear{
             val y = room.z * spacing - h / 2 + roomSize / 2
 
             matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat(), 0f)
-            matrix.scale(scale, scale, 1f)
+            matrix.translate(x.toFloat(), y.toFloat())
+            matrix.scale(scale, scale)
 
             Render2D.drawImage(context, questionMark, 0, 0, w, h)
 
@@ -142,8 +140,8 @@ object clear{
             val y = (location.second * spacing).toInt() - h / 2 + roomSize / 2
 
             matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat(), 0f)
-            matrix.scale(scale, scale, 1f)
+            matrix.translate(x.toFloat(), y.toFloat())
+            matrix.scale(scale, scale)
 
             Render2D.drawImage(context, checkmark, 0, 0, w, h)
 
@@ -197,8 +195,8 @@ object clear{
             val y = (location.second * spacing).toInt() + roomSize / 2
 
             matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat(), 0f)
-            matrix.scale(scale,scale,1f)
+            matrix.translate(x.toFloat(), y.toFloat())
+            matrix.scale(scale,scale)
 
             var i = 0
             for (line in final) {
@@ -216,7 +214,7 @@ object clear{
 
                 for ((dx, dy) in offsets) {
                     matrix.pushMatrix()
-                    matrix.translate(dx, dy, 0f)
+                    matrix.translate(dx, dy)
                     Render2D.drawString(context, "§0$line", drawX, drawY)
                     matrix.popMatrix()
                 }
@@ -273,8 +271,8 @@ object clear{
             val y = (location.second * spacing).toInt() + roomSize / 2
 
             matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat(), 0f)
-            matrix.scale(scale,scale,1f)
+            matrix.translate(x.toFloat(), y.toFloat())
+            matrix.scale(scale,scale)
 
             var i = 0
             for (line in final) {
@@ -292,7 +290,7 @@ object clear{
 
                 for ((dx, dy) in offsets) {
                     matrix.pushMatrix()
-                    matrix.translate(dx, dy, 0f)
+                    matrix.translate(dx, dy)
                     Render2D.drawString(context, "§0$line", drawX, drawY)
                     matrix.popMatrix()
                 }
@@ -325,7 +323,7 @@ object clear{
 
             if (Dungeon.holdingLeaps && mapConfig.showNames && !ownName) {
                 matrix.pushMatrix()
-                matrix.translate(x.toFloat(), y.toFloat(), 1f)
+                matrix.translate(x.toFloat(), y.toFloat())
 
                 val scale = mapConfig.iconScale / 1.3f
                 renderNametag(context, v.name, scale)
@@ -333,9 +331,9 @@ object clear{
             }
 
             matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat(), 1f)
-            matrix.rotate(rotation, 0f, 0f, 1f)
-            matrix.scale(mapConfig.iconScale, mapConfig.iconScale, 1f)
+            matrix.translate(x.toFloat(), y.toFloat())
+            matrix.rotate((rotation * (PI / 180)).toFloat() )
+            matrix.scale(mapConfig.iconScale, mapConfig.iconScale)
 
             if (mapConfig.showPlayerHead) {
                 val w = 12
@@ -347,7 +345,7 @@ object clear{
 
                 val scale = 1f - mapConfig.iconBorderWidth
 
-                matrix.scale(scale, scale, 1f)
+                matrix.scale(scale, scale)
 
                 Render2D.drawTexture(
                     context,

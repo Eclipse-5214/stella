@@ -3,15 +3,13 @@ package co.stellarskys.stella.features.stellanav.utils.render
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.features.stellanav.utils.*
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.render.popMatrix
-import co.stellarskys.stella.utils.render.pushMatrix
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner
+import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.render.RenderLayer
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
+import kotlin.math.PI
 
 object boss {
     fun renderMap(context: DrawContext) {
@@ -50,14 +48,14 @@ object boss {
         val h = (textureHeight * textureScale).toInt()
 
         // Apply transforms
-        matrix.push()
-        matrix.translate(5f,5f,0f)
+        matrix.pushMatrix()
+        matrix.translate(5f,5f)
 
         // Enable Scissor
         context.enableScissor(0, 0, size, size)
 
         context.drawGuiTexture(
-            RenderLayer::getGuiTextured,
+            RenderPipelines.GUI_TEXTURED,
             texture,
             (-topLeftHudLocX).toInt(),
             (-topLeftHudLocZ).toInt(),
@@ -66,13 +64,13 @@ object boss {
         )
 
         context.disableScissor()
-        matrix.pop()
+        matrix.popMatrix()
 
         // players
 
         // Apply transforms
-        matrix.push()
-        matrix.translate(5f,5f,0f)
+        matrix.pushMatrix()
+        matrix.translate(5f,5f)
 
         // Enable Scissor
         context.enableScissor(0, 0, size, size)
@@ -94,17 +92,17 @@ object boss {
 
             if (Dungeon.holdingLeaps && mapConfig.showNames && !ownName) {
                 matrix.pushMatrix()
-                matrix.translate(x.toFloat(), y.toFloat(), 1f)
+                matrix.translate(x.toFloat(), y.toFloat())
 
                 val scale = mapConfig.iconScale / 1.3f
                 renderNametag(context, v.name, scale)
                 matrix.popMatrix()
             }
 
-            matrix.push()
-            matrix.translate(x.toFloat(), y.toFloat(), 1f)
-            matrix.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotation))
-            matrix.scale(mapConfig.iconScale, mapConfig.iconScale, 1f)
+            matrix.pushMatrix()
+            matrix.translate(x.toFloat(), y.toFloat())
+            matrix.rotate((rotation * (PI / 180)).toFloat() )
+            matrix.scale(mapConfig.iconScale, mapConfig.iconScale)
 
             if (mapConfig.showPlayerHead) {
                 val w = 12
@@ -116,10 +114,10 @@ object boss {
 
                 val scale = 1f - 0.2f
 
-                matrix.scale(scale, scale, 1f)
+                matrix.scale(scale, scale)
 
                 context.drawTexture(
-                    RenderLayer::getGuiTextured,                         // render layer provider
+                    RenderPipelines.GUI_TEXTURED,                         // render layer provider
                     player.skin,
                     (-w.toDouble() / 2.0).toInt(),
                     (-h.toDouble() / 2.0).toInt(),
@@ -135,7 +133,7 @@ object boss {
 
                 if (player.hat) {
                     context.drawTexture(
-                        RenderLayer::getGuiTextured,                         // render layer provider
+                        RenderPipelines.GUI_TEXTURED,                         // render layer provider
                         player.skin,
                         (-w.toDouble() / 2.0).toInt(),
                         (-h.toDouble() / 2.0).toInt(),
@@ -155,7 +153,7 @@ object boss {
                 val head = if (v.name == you.name.string) GreenMarker else WhiteMarker
 
                 context.drawGuiTexture(
-                    RenderLayer::getGuiTextured,
+                    RenderPipelines.GUI_TEXTURED,
                     head,
                     (-w.toDouble() / 2.0).toInt(),
                     (-h.toDouble() / 2.0).toInt(),
@@ -164,10 +162,10 @@ object boss {
                 )
             }
 
-            matrix.pop()
+            matrix.popMatrix()
         }
 
         context.disableScissor()
-        matrix.pop()
+        matrix.popMatrix()
     }
 }

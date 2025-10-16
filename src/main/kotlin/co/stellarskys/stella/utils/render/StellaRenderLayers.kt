@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils.render
 
-//#if MC >= 1.21.5
 
 //import co.stellarskys.stella.utils.render.layers.ChromaRenderLayer
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap
@@ -116,7 +115,7 @@ object StellaRenderLayers {
         StellaRenderPipelines.BEACON_BEAM_OPAQUE,
         RenderLayer.MultiPhaseParameters
             .builder()
-            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE, TriState.FALSE, false))
+            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE,false))
             .build(false)
     )
 
@@ -125,7 +124,7 @@ object StellaRenderLayers {
         StellaRenderPipelines.BEACON_BEAM_OPAQUE_THROUGH_WALLS,
         RenderLayer.MultiPhaseParameters
             .builder()
-            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE, TriState.FALSE, false))
+            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE, false))
             .build(false)
     )
 
@@ -134,7 +133,7 @@ object StellaRenderLayers {
         StellaRenderPipelines.BEACON_BEAM_TRANSLUCENT,
         RenderLayer.MultiPhaseParameters
             .builder()
-            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE, TriState.FALSE, false))
+            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE, false))
             .build(false)
     )
 
@@ -143,7 +142,7 @@ object StellaRenderLayers {
         StellaRenderPipelines.BEACON_BEAM_TRANSLUCENT_THROUGH_WALLS,
         RenderLayer.MultiPhaseParameters
             .builder()
-            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE, TriState.FALSE, false))
+            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE,false))
             .build(false)
     )
 
@@ -160,5 +159,3 @@ object StellaRenderLayers {
     fun getChromaTextured(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
      */
 }
-
-//#endif

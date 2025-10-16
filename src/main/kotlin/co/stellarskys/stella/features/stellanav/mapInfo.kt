@@ -20,11 +20,7 @@ object mapInfo: Feature("separateMapInfo", "catacombs") {
     override fun initialize() {
         HUDManager.registerCustom(name, 200, 30,this::HUDEditorRender)
 
-        //#if MC >= 1.21.5
         register<GuiEvent.HUD> { event -> if (HUDManager.isEnabled(name)) RenderNormal(event.context) }
-        //#elseif MC == 1.8.9
-        //$$ register<RenderEvent.Text> { event -> if (HUDManager.isEnabled(name)) RenderNormal(event.context) }
-        //#endif
     }
 
     fun HUDEditorRender(
@@ -36,7 +32,7 @@ object mapInfo: Feature("separateMapInfo", "catacombs") {
         val matrix = context.matrices
 
         matrix.pushMatrix()
-        matrix.translate(x, y, 0f)
+        matrix.translate(x, y)
 
         RenderMapInfo(
             context,
@@ -54,8 +50,8 @@ object mapInfo: Feature("separateMapInfo", "catacombs") {
         val scale = HUDManager.getScale(name)
 
         matrix.pushMatrix()
-        matrix.translate(x, y,0f)
-        matrix.scale(scale, scale, 1f)
+        matrix.translate(x, y)
+        matrix.scale(scale, scale)
 
         RenderMapInfo(context, false)
 
@@ -76,7 +72,7 @@ object mapInfo: Feature("separateMapInfo", "catacombs") {
         val w2 = mapLine2.width()
 
         matrix.pushMatrix()
-        matrix.translate( 100f, 5f, 0f)
+        matrix.translate( 100f, 5f,)
 
         Render2D.drawString(context, mapLine1,-w1 / 2, 0)
         Render2D.drawString(context, mapLine2,-w2 / 2, 10)
