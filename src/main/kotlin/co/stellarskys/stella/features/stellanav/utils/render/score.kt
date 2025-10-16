@@ -37,13 +37,12 @@ object score {
         val state = getCurrentMapState(id) ?: return null
 
         Stella.mc.mapRenderer.update(id,state, renderState)
+        Stella.mc.mapRenderer.update(id,state, cashedRenderState)
         return renderState
     }
 
     fun render(context: DrawContext){
         val matrix = context.matrices
-
-        //val consumer = Stella.mc.bufferBuilders.entityVertexConsumers
         val renderState = getCurrentMapRender() ?: cashedRenderState
 
         matrix.pushMatrix()

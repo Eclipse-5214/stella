@@ -163,7 +163,12 @@ object Dungeon {
     init {
         EventBus.register<TablistEvent.Update> {
             TickUtils.schedule(1) {
-                val self = players[Stella.mc.player?.name?.string]
+                var playerName: String? = null
+
+                Stella.mc.player.let { playerName = it?.name?.string }
+
+                if (playerName == null) return@schedule
+                val self = players[playerName]
 
                 val alives = players.values
                     .filterNot { it.isDead || it == self }
@@ -328,7 +333,7 @@ object Dungeon {
 
             val player = Stella.mc.player ?: return@register
             val heldItem = player.mainHandStack ?: return@register
-            val displayName = heldItem.itemName.string.clearCodes()
+            val displayName = heldItem.name.string.clearCodes()
 
             holdingLeaps = "leap" in displayName.lowercase()
         })

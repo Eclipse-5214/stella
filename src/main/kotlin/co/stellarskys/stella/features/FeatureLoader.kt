@@ -39,7 +39,6 @@ object FeatureLoader {
 
         val commands = reflections.getTypesAnnotatedWith(Stella.Command::class.java)
 
-        //#if MC >= 1.21.5
         commandCount = commands.size
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             commands.forEach { commandClass ->
@@ -52,17 +51,6 @@ object FeatureLoader {
                 }
             }
         }
-        //#elseif MC == 1.8.9
-        //$$ commands.forEach { commandClass ->
-        //$$    try {
-        //$$        val commandInstance = commandClass.getDeclaredField("INSTANCE").get(null) as ICommand
-        //$$        ClientCommandHandler.instance.registerCommand(commandInstance)
-        //$$        commandCount++
-        //$$    } catch (e: Exception) {
-        //$$        e.printStackTrace()
-        //$$    }
-        //$$ }
-        //#endif
 
         Stella.initializeFeatures()
         loadtime = starttime.since.millis

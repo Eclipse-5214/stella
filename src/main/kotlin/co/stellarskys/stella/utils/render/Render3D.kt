@@ -1,7 +1,6 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.Stella
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.*
@@ -14,9 +13,14 @@ import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.sqrt
 
+//#if MC < 1.21.9
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+//#endif
+
 object Render3D {
     val camera: Camera = Stella.mc.gameRenderer.camera!!
 
+    //#if MC < 1.21.9
     /**
      * - Draws a filled shape
      * @param ctx The WorldRenderContext
@@ -241,12 +245,16 @@ object Render3D {
             .scale(toScale, -toScale, toScale)
 
         val consumer = Stella.mc.bufferBuilders.entityVertexConsumers
-        val offset = -textRenderer.getWidth(text) / 2f
         val textLayer = if (phase) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL
+        val lines = text.split("\n")
+        val maxWidth = lines.maxOf { textRenderer.getWidth(it) }
+        val offset = -maxWidth / 2f
 
         if (bgBox) {
+            val bgOpacity = (Stella.mc.options.getTextBackgroundOpacity(0.25f) * 255).toInt() shl 24
+            val boxHeight = lines.size * 9
             textRenderer.draw(
-                text,
+                "", // empty string, just draws box
                 offset,
                 0f,
                 0x20FFFFFF,
@@ -254,23 +262,29 @@ object Render3D {
                 matrices,
                 consumer,
                 textLayer,
-                (Stella.mc.options.getTextBackgroundOpacity(0.25f) * 255).toInt() shl 24,
+                bgOpacity,
                 LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE
             )
         }
 
-        textRenderer.draw(
-            text,
-            offset,
-            0f,
-            0xFFFFFFFF.toInt(),
-            true,
-            matrices,
-            consumer,
-            textLayer,
-            0,
-            LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE
-        )
+        for ((i, line) in lines.withIndex()) {
+            val lineWidth = textRenderer.getWidth(line)
+            val lineOffset = -lineWidth / 2f
+
+            textRenderer.draw(
+                line,
+                lineOffset,
+                i * 9f,
+                0xFFFFFFFF.toInt(),
+                true,
+                matrices,
+                consumer,
+                textLayer,
+                0,
+                LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE
+            )
+        }
+
         consumer.draw()
     }
 
@@ -396,4 +410,6 @@ object Render3D {
         vertices.vertex(matrix, x, y.toFloat(), z).color(color).texture(u, v).overlay(OverlayTexture.DEFAULT_UV)
             .light(15728880).normal(matrix, 0.0f, 1.0f, 0.0f)
     }
+
+    //#endif
 }

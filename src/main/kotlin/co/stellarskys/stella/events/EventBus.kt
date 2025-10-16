@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
@@ -22,6 +21,10 @@ import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.util.ActionResult
 import org.lwjgl.glfw.GLFW
 import java.util.concurrent.ConcurrentHashMap
+
+//#if MC < 1.21.9
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+//#endif
 
 object EventBus {
     val listeners = ConcurrentHashMap<Class<*>, MutableSet<PrioritizedCallback<*>>>()
@@ -65,6 +68,7 @@ object EventBus {
             }
         }
 
+        //#if MC < 1.21.9
         WorldRenderEvents.LAST.register { context ->
             post(RenderEvent.World(context))
         }
@@ -72,8 +76,23 @@ object EventBus {
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
             post(RenderEvent.WorldPostEntities(context))
         }
+        //#endif
 
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
+            //#if MC >= 1.21.9
+            //$$ ScreenMouseEvents.allowMouseClick(screen).register { _, click ->
+            //$$    !post(GuiEvent.Click(click.x, click.y, click.keycode, true, screen))
+            //$$ }
+            //$$
+            //$$ ScreenMouseEvents.allowMouseRelease(screen).register { _, click ->
+            //$$    !post(GuiEvent.Click(click.x, click.y, click.keycode, false, screen))
+            //$$ }
+            //$$
+            //$$ ScreenKeyboardEvents.allowKeyPress(screen).register { _, keyInput ->
+            //$$    val charTyped = GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode)?.firstOrNull() ?: '\u0000'
+            //$$    !post(GuiEvent.Key(GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode), keyInput.key, charTyped, keyInput.key, screen))
+            //$$ }
+            //#else
             ScreenMouseEvents.allowMouseClick(screen).register { _, mx, my, mbtn ->
                 !post(GuiEvent.Click(mx, my, mbtn, true, screen))
             }
@@ -82,9 +101,12 @@ object EventBus {
                 !post(GuiEvent.Click(mx, my, mbtn, false, screen))
             }
 
-            ScreenKeyboardEvents.allowKeyPress(screen).register { _, key, scancode, _ ->
-                !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, scancode, screen))
+            ScreenKeyboardEvents.allowKeyPress(screen).register { _, key, scancode, modifiers ->
+                val charTyped = GLFW.glfwGetKeyName(key, scancode)?.firstOrNull() ?: '\u0000'
+                !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, charTyped, scancode, screen))
             }
+            //#endif
+
             ScreenEvents.remove(screen).register { screen ->
                 post(GuiEvent.Close(screen))
             }
@@ -97,9 +119,11 @@ object EventBus {
             if (screen != null) post(GuiEvent.Open(screen))
         }
 
+        //#if MC < 1.21.9
         WorldRenderEvents.BLOCK_OUTLINE.register { worldContext, blockContext ->
             !post(RenderEvent.BlockOutline(worldContext, blockContext))
         }
+        //#endif
 
         ClientLifecycleEvents.CLIENT_STARTED.register { _ ->
             post(GameEvent.Load())

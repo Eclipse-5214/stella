@@ -7,6 +7,7 @@ import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.item.ItemStack
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.RotationAxis
@@ -78,6 +79,16 @@ object Render2D {
         if (scale != 1f) matrices.popMatrix()
     }
 
+    fun renderItem(context: DrawContext, item: ItemStack, x: Float, y: Float, scale: Float) {
+        context.matrices.pushMatrix()
+        context.matrices.translate(x, y)
+        context.matrices.scale(scale, scale)
+
+        context.drawItem(item, 0, 0)
+
+        context.matrices.popMatrix()
+    }
+
 
     fun String.width(): Int {
         val lines = split('\n')
@@ -88,12 +99,4 @@ object Render2D {
         val lineCount = count { it == '\n' } + 1
         return mc.textRenderer.fontHeight * lineCount
     }
-}
-
-fun MatrixStack.pushMatrix() = this.push()
-fun MatrixStack.popMatrix() = this.pop()
-
-fun MatrixStack.rotate(angle: Float, x: Float, y: Float, z: Float) {
-    val axis = RotationAxis.of(Vector3f(x, y, z))
-    this.multiply(axis.rotationDegrees(angle))
 }

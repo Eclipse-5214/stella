@@ -4,8 +4,6 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
-import co.stellarskys.stella.utils.render.popMatrix
-import co.stellarskys.stella.utils.render.pushMatrix
 import co.stellarskys.stella.utils.skyblock.dungeons.Checkmark
 import co.stellarskys.stella.utils.skyblock.dungeons.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.RoomType

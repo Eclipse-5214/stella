@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils.skyblock
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.NetworkUtils
 import com.google.gson.Gson
 
@@ -76,7 +77,7 @@ object HypixelApi {
                 onResult(secrets)
             },
             onError = { error ->
-                println("Failed to fetch secrets for $uuid: ${error.message}")
+                Stella.LOGGER.error("Failed to fetch secrets for $uuid: ${error.message}")
                 onResult(0)
             }
         )

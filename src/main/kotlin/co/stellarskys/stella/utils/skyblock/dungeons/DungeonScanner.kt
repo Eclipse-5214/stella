@@ -68,7 +68,7 @@ object DungeonScanner {
 
             if (prevRoom?.name != currRoom?.name) {
                 // _roomEnterListener.forEach { it(currRoom) }
-                println("Entered Room! ${currentRoom?.name}")
+                //println("Entered Room! ${currentRoom?.name}")
             }
 
             lastIdx = idx

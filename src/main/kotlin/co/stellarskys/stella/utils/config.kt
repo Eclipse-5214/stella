@@ -26,6 +26,12 @@ val config = Config("Stella", "Stella") {
                 name = "Show Room Name"
                 description = "Shows the current dungeon rooms name in a hud"
             }
+
+            toggle {
+                configName = "roomNameChroma"
+                name = "Chroma Room Name"
+                description = "Makes the room name chroma (Requires SBA or Skyhanni)"
+            }
         }
 
         subcategory("Terminals") {
@@ -124,6 +130,72 @@ val config = Config("Stella", "Stella") {
                 name = "Terminal Tracker"
                 description = "Tracks terminals, devices, and levers"
                 default = false
+            }
+        }
+
+        subcategory("Block Overlay") {
+            toggle {
+                configName = "enableDungBlockOverlay"
+                name = "Enable Block Overlay"
+                description = "Replaces dungeon block textures with colored overlays"
+                default = true
+            }
+
+            toggle {
+                configName = "dungeonBlocksEverywhere"
+                name = "Render Outside Dungeons"
+                description = "Shows block overlays even outside of dungeons"
+                default = false
+                shouldShow { settings -> settings["enableDungBlockOverlay"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "dungCrackedColour"
+                name = "Cracked Brick Color"
+                description = "Color used for cracked stone bricks"
+                default = rgba(255, 0, 255, 255)
+            }
+
+            colorpicker {
+                configName = "dungDispenserColour"
+                name = "Dispenser Color"
+                description = "Color used for dispensers"
+                default = rgba(255, 255, 0, 255)
+            }
+
+            colorpicker {
+                configName = "dungLeverColour"
+                name = "Lever Color"
+                description = "Color used for levers"
+                default = rgba(0, 255, 0, 255)
+            }
+
+            colorpicker {
+                configName = "dungTripWireColour"
+                name = "Tripwire Color"
+                description = "Color used for tripwires"
+                default = rgba(0, 255, 255, 255)
+            }
+
+            colorpicker {
+                configName = "dungBatColour"
+                name = "Bat Color"
+                description = "Color used for dungeon bats"
+                default = rgba(255, 100, 255, 255)
+            }
+
+            colorpicker {
+                configName = "dungChestColour"
+                name = "Chest Color"
+                description = "Color used for normal dungeon chests"
+                default = rgba(255, 150, 0, 255)
+            }
+
+            colorpicker {
+                configName = "dungTrappedChestColour"
+                name = "Trapped Chest Color"
+                description = "Color used for trapped dungeon chests"
+                default = rgba(255, 0, 0, 255)
             }
         }
 
@@ -504,6 +576,33 @@ val config = Config("Stella", "Stella") {
                 step = 1
                 default = 3
                 shouldShow { settings -> settings["overlayEnabled"] as Boolean }
+            }
+        }
+
+        subcategory("Inventory Buttons"){
+            toggle {
+                configName = "buttonsEnabled"
+                name = "Enabled"
+                description = "Enables the inventory buttons"
+            }
+
+            button {
+                configName = "buttonEdit"
+                name = "Inventory Button Editor"
+                description = "Opens the inventory button editor"
+                placeholder = "Open"
+
+                onclick {
+                    //Stella.mc.displayGuiScreen(ButtonLayoutEditor())
+                }
+            }
+        }
+
+        subcategory("Pet Display") {
+            toggle {
+                configName = "petDisplay"
+                name = "Enabled"
+                description = "Enables the pet display"
             }
         }
     }

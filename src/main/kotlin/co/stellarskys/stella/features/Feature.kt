@@ -8,13 +8,6 @@ import co.stellarskys.stella.utils.skyblock.LocationUtils
 import co.stellarskys.stella.utils.LoopUtils
 import co.stellarskys.stella.utils.TickUtils
 import co.stellarskys.stella.utils.config
-//#if MC == 1.8.9
-//$$ import net.minecraft.client.entity.EntityPlayerSP
-//$$ import net.minecraft.client.gui.FontRenderer
-//$$ import net.minecraft.client.gui.ScaledResolution
-//$$ import net.minecraft.client.multiplayer.WorldClient
-//$$ import org.lwjgl.input.Mouse
-//#endif
 
 /*
  * Modified from Devonian code
@@ -48,7 +41,6 @@ open class Feature(
     }
 
     private val configValue: () -> Boolean = {
-        println("getting config value")
         configName?.let { config.getValue<Boolean>(it) } ?: true
     }
 
@@ -92,18 +84,14 @@ open class Feature(
     open fun onToggle(state: Boolean) {
         if (state == isRegistered) return
 
-        println("[Feature] Feature $configName updating")
-
         if (state) {
             events.forEach { it.register() }
             onRegister()
             isRegistered = true
-            println("[Feature] Enabled")
         } else {
             events.forEach { it.unregister() }
             onUnregister()
             isRegistered = false
-            println("[Feature] Disabled")
         }
     }
 

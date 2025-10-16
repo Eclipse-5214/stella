@@ -7,15 +7,8 @@ import gg.essential.universal.render.URenderPipeline
 import gg.essential.universal.vertex.UBufferBuilder
 import gg.essential.universal.shader.BlendState
 import java.awt.Color
-
-//#if MC >= 1.21.5
 import net.minecraft.client.texture.GlTexture
 import net.minecraft.util.Identifier
-//#elseif MC == 1.8.9
-//$$ import net.minecraft.util.ResourceLocation
-//$$ import net.minecraft.client.renderer.texture.AbstractTexture
-//$$ import net.minecraft.client.renderer.texture.SimpleTexture
-//#endif
 
 fun drawTexture(
     matrices: UMatrixStack,
@@ -39,19 +32,10 @@ fun drawTexture(
 ) {
     val buffer = UBufferBuilder.create(UGraphics.DrawMode.QUADS, UGraphics.CommonVertexFormats.POSITION_TEXTURE_COLOR)
     UGraphics.bindTexture(0, sprite)
-    //#if MC >= 1.21.5
+
     val texture = Stella.mc.textureManager.getTexture(sprite)
     texture.setFilter(false, false)
     val glTexture = texture.glTexture as GlTexture
-    //#elseif MC == 1.8.9
-    //$$ val textureManager = Stella.mc.textureManager
-    //$$ val texture = textureManager.getTexture(sprite) ?: run {
-    //$$     val simple = SimpleTexture(sprite)
-    //$$     textureManager.loadTexture(sprite, simple)
-    //$$     simple
-    //$$ }
-    //$$ val glId = (texture as? AbstractTexture)?.glTextureId ?:0
-    //#endif
 
     val x2 = x + drawWidth
     val y2 = y + drawHeight
@@ -67,11 +51,7 @@ fun drawTexture(
     buffer.pos(matrices, x2, y, 0.0).tex(u2, v1).color(color).endVertex()
 
     buffer.build()?.drawAndClose(pipeline) {
-        //#if MC >= 1.21.5
         texture(0, glTexture.glId)
-        //#elseif MC == 1.8.9
-        //$$ texture(0, glId)
-        //#endif
     }
 }
 

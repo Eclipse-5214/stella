@@ -25,17 +25,8 @@ import gg.essential.universal.UMatrixStack
 import java.awt.Color
 import java.io.File
 
-//#if MC >= 1.21.5
 import net.minecraft.client.util.DefaultSkinHelper
 import net.minecraft.entity.player.PlayerModelPart
-//#elseif MC == 1.8.9
-//$$ import net.minecraft.client.entity.AbstractClientPlayer
-//$$ import net.minecraft.util.ResourceLocation
-//$$ import net.minecraft.client.renderer.entity.layers.LayerRenderer
-//$$ import net.minecraft.entity.player.EnumPlayerModelParts
-//$$ import net.minecraft.client.resources.DefaultPlayerSkin
-//#endif
-
 
 //Main config Shananagens
 class Config(
@@ -496,7 +487,6 @@ class Config(
     internal fun notifyListeners(configName: String, newValue: Any?) {
         listeners.forEach { it(configName, newValue) }
         updateConfig()
-        println("visibility update called")
     }
 
     private fun updateConfig() {
@@ -526,7 +516,7 @@ class Config(
                             is String -> JsonPrimitive(value)
                             is RGBA -> JsonPrimitive(value.toHex())
                             else -> {
-                                println("Unsupported type for $id: ${value::class.simpleName}")
+                                Stella.LOGGER.error("Unsupported type for $id: ${value::class.simpleName}")
                                 return@forEach
                             }
                         }
@@ -567,7 +557,7 @@ class Config(
                         is String -> jsonValue.asString
                         is RGBA -> RGBA.fromHex(jsonValue.asString)
                         else -> {
-                            println("Skipping unsupported load type for '$id': ${current?.let { it::class.simpleName } ?: "null"}")
+                            Stella.LOGGER.warn("Skipping unsupported load type for '$id': ${current?.let { it::class.simpleName } ?: "null"}")
                             null
                         }
                     }
@@ -601,7 +591,6 @@ class Config(
     }
 
     fun save() {
-        println("[Stella] Saving")
         try {
             val target = resolvedFile
             target.parentFile?.mkdirs()
@@ -612,10 +601,9 @@ class Config(
 
             target.writeText(jsonString)
         } catch (e: Exception) {
-            println("Failed to save config for '$mod': ${e.message}")
+            Stella.LOGGER.error("Failed to save config for '$mod': ${e.message}")
             e.printStackTrace()
         }
-        println("[Stella] Saved")
     }
 
     fun load() {
@@ -629,7 +617,7 @@ class Config(
 
             fromJson(loadedJson)
         } catch (e: Exception) {
-            println("Failed to load config for '$mod': ${e.message}")
+            Stella.LOGGER.error("Failed to load config for '$mod': ${e.message}")
             e.printStackTrace()
         }
     }

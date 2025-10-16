@@ -1,6 +1,5 @@
 package co.stellarskys.stella.events
 
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.ingame.HandledScreen
@@ -21,6 +20,11 @@ import net.minecraft.text.Text
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+
+//#if MC < 1.21.9
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+//#endif
+
 
 abstract class Event
 
@@ -56,13 +60,37 @@ abstract class GameEvent {
 class ItemTooltipEvent(val stack: ItemStack, val context: Item.TooltipContext, val type: TooltipType, val lines: MutableList<Text>) : Event()
 
 abstract class RenderEvent {
-    class World(val context: WorldRenderContext?) : Event()
-    class WorldPostEntities(val context: WorldRenderContext?) : Event()
-    class EntityPre(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : CancellableEvent()
-    class EntityPost(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : Event()
-    class PlayerPre(val entity: PlayerEntityRenderState, val matrices: MatrixStack) : CancellableEvent()
-    class BlockOutline(val worldContext: WorldRenderContext, val blockContext: WorldRenderContext.BlockOutlineContext) : CancellableEvent()
-    class EntityGlow(val entity: Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()
+    class World(
+        //#if MC < 1.21.9
+        val context: WorldRenderContext?
+        //#endif
+    ) : Event()
+
+    class WorldPostEntities(
+        //#if MC < 1.21.9
+        val context: WorldRenderContext?
+        //#endif
+    ) : Event()
+
+    class BlockOutline(
+        //#if MC < 1.21.9
+        val worldContext: WorldRenderContext,
+        val blockContext: WorldRenderContext.BlockOutlineContext
+        //#endif
+    ) : CancellableEvent()
+
+    class EntityGlow(val entity: net.minecraft.entity.Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()
+    class HUD(val context: DrawContext) : Event()
+    class GuardianLaser(val entity: net.minecraft.entity.Entity, val target: net.minecraft.entity.Entity?) : CancellableEvent()
+
+    abstract class Entity {
+        class Pre(val entity: net.minecraft.entity.Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider?, val light: Int) : CancellableEvent()
+        class Post(val entity: net.minecraft.entity.Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider?, val light: Int) : Event()
+    }
+
+    abstract class Player {
+        class Pre(val entity: PlayerEntityRenderState, val matrices: MatrixStack) : CancellableEvent()
+    }
 }
 
 abstract class EntityEvent {
@@ -82,7 +110,7 @@ abstract class GuiEvent {
     class Open(val screen: Screen) : Event()
     class Close(val screen: Screen) : Event()
     class Click(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
-    class Key(val keyName: String?, val key: Int, val scanCode: Int, val screen: Screen) : CancellableEvent()
+    class Key(val keyName: String?, val key: Int, val character: Char, val scanCode: Int, val screen: Screen) : CancellableEvent()
 
     abstract class Slot {
         class Click(val slot: net.minecraft.screen.slot.Slot?, val slotId: Int, val button: Int, val actionType: SlotActionType, val handler: ScreenHandler, val screen: HandledScreen<*>) : CancellableEvent()
