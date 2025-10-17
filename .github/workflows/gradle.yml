@@ -1,0 +1,48 @@
+name: Run Gradle Build
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  gradle:
+    runs-on: ubuntu-latest
+    outputs:
+      commit-number: ${{ steps.commit-count.outputs.commit-number }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0
+      - name: Calculate commit number
+        id: commit-count
+        run: echo "commit-number=$(git rev-list --count HEAD)" >> $GITHUB_OUTPUT
+      - name: Setup Java
+        uses: actions/setup-java@v4.0.0
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.12.1
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+      - name: Execute Gradle build
+        run: ./gradlew clean build
+      - name: Process built JARs
+        run: |
+          mkdir -p build/processed
+          for jar in build/versions/*.jar; do
+            if [[ ! "$jar" == *"dev"* ]]; then
+              filename=$(basename "$jar")
+              version=$(echo "$filename" | grep -o '1\.21\.[0-9]\+')
+              new_name="stella-${version}-fabric-nightly-${{ steps.commit-count.outputs.commit-number }}.jar"
+              cp "$jar" "build/processed/$new_name"
+            fi
+          done
+      - name: Upload built mod JARs
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          name: stella-fabric-nightly-${{ steps.commit-count.outputs.commit-number }}
+          path: build/processed/*.jar
