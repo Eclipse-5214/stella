@@ -2,18 +2,22 @@ package co.stellarskys.stella.utils.skyblock
 
 import co.stellarskys.stella.Stella
 import com.google.gson.*
-import com.mojang.serialization.JsonOps
+import com.mojang.serialization.Dynamic
+import net.minecraft.SharedConstants
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.LoreComponent
 import net.minecraft.component.type.NbtComponent
-import net.minecraft.registry.Registries
+import net.minecraft.datafixer.Schemas
+import net.minecraft.datafixer.TypeReferences
 import net.minecraft.util.Identifier
-import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtElement
 import net.minecraft.nbt.NbtOps
+import net.minecraft.nbt.StringNbtReader
+import net.minecraft.registry.BuiltinRegistries
+import net.minecraft.registry.RegistryOps
+import net.minecraft.registry.RegistryWrapper
 import net.minecraft.text.Text
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpHead
@@ -23,16 +27,21 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
+import kotlin.jvm.optionals.getOrNull
 
 object NEUApi {
     private val client: CloseableHttpClient = HttpClients.createDefault()
     private val neuRepoDir: File get() = File("config/Stella/neu-repo")
     private val etagFile = File("config/Stella/neu-repo/etag.txt")
     private var cachedItems: List<NEUItem> = emptyList()
+    private val cachedOverlays: MutableMap<String, NbtCompound> = mutableMapOf()
+    private val cashedStacks: MutableMap<String, ItemStack> = mutableMapOf()
+    val defaultRegistries: RegistryWrapper.WrapperLookup by lazy { BuiltinRegistries.createWrapperLookup() }
 
     fun init() {
         ensureNEURepoInstalled()
         loadAllItems()
+        loadAllOverlays()
         Stella.LOGGER.info("Repo Initialized!")
     }
 
@@ -54,8 +63,44 @@ object NEUApi {
         return items
     }
 
+    fun loadAllOverlays(): Map<String, NbtCompound> {
+        val overlayDir = File(neuRepoDir, "overlay")
+        if (!overlayDir.exists()) return emptyMap()
+
+        val overlays = overlayDir.listFiles { it.extension == "snbt" }?.mapNotNull { file ->
+            try {
+                val internalname = file.nameWithoutExtension
+                val raw = StringNbtReader.readCompound(file.readText())
+
+                val source = raw.getCompound("source")
+                val dataVersion = source.getOrNull()?.getInt("dataVersion")?.getOrNull() ?: return emptyMap()
+
+                val stripped = raw.copy().apply { remove("source") }
+
+                val fixed = Schemas.getFixer().update(
+                    TypeReferences.ITEM_STACK,
+                    Dynamic(NbtOps.INSTANCE, stripped),
+                    dataVersion,
+                    SharedConstants.getGameVersion().dataVersion().id
+                ).value as? NbtCompound ?: return@mapNotNull null
+
+                cachedOverlays[internalname] = fixed
+                internalname to fixed
+            } catch (e: Exception) {
+                Stella.LOGGER.warn("Failed to decode overlay: ${file.name}", e)
+                null
+            }
+        }?.toMap() ?: emptyMap()
+
+        return overlays
+    }
+
+    fun tryFindFromModernFormat(internalname: String): NbtCompound? {
+        return cachedOverlays[internalname]
+    }
+
     fun loadNEUItem(file: File): NEUItem {
-        val json = JsonParser().parse(file.readText()).asJsonObject
+        val json = JsonParser.parseString(file.readText()).asJsonObject
         return NEUItem(
             internalname = json["internalname"].asString,
             displayname = json["displayname"].asString,
@@ -122,6 +167,17 @@ object NEUApi {
         }
 
         itemsFolder.copyRecursively(targetItemsDir, overwrite = true)
+
+        val overlayFolder = File(extractedRoot, "itemsOverlay/4325")
+        val targetOverlayDir = File(repoDir, "overlay")
+
+        if (!overlayFolder.exists()) {
+            Stella.LOGGER.warn("NEU repo missing itemsOverlay/4325 folder — skipping overlay import.")
+            return
+        }
+
+        overlayFolder.copyRecursively(targetOverlayDir, overwrite = true)
+
         Stella.LOGGER.info("NEU repo installed to ${targetItemsDir.absolutePath}")
 
         newETag?.let {
@@ -139,7 +195,7 @@ object NEUApi {
         // 2. Try loading from disk
         val file = File(neuRepoDir, "items/$id.json")
         if (!file.exists()) {
-            Stella.LOGGER.warn("NEU item not found for Skyblock ID: $id")
+            Stella.LOGGER.debug("NEU item not found for Skyblock ID: $id")
             return null
         }
 
@@ -154,30 +210,74 @@ object NEUApi {
     }
 
     fun createDummyStack(item: NEUItem): ItemStack {
-        val baseItem = Registries.ITEM.get(Identifier.of(item.itemid)).takeIf { it != Items.AIR } ?: Items.BARRIER
-        val stack = ItemStack(baseItem)
-
-        stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(item.displayname))
-        stack.set(DataComponentTypes.LORE, LoreComponent(item.lore.map { Text.literal(it) }))
-
-        // Parse legacy NBT if available
-        item.nbttag?.let { raw ->
-            val legacyTag = try {
-                LegNBTParser.parse(raw)
-            } catch (e: Exception) {
-                Stella.LOGGER.error("Failed to parse legacy NEU tag", e)
-                null
-            }
-
-            legacyTag?.let { tag ->
-                // Inject ExtraAttributes if present
-                stack.se
-            }
+        return cashedStacks.getOrPut(item.internalname) {
+            createDummyStackNow(item)
         }
-
-        return stack
     }
 
+    fun createDummyStackNow(item: NEUItem): ItemStack {
+        try {
+            var modernTag = tryFindFromModernFormat(item.internalname)
+            val legacyTag = getLegacyItemTag(item)
+            var usedLegacy = false
+
+            if (modernTag == null) {
+                if (legacyTag == null) return ItemStack(Items.BARRIER)
+                usedLegacy = true
+                modernTag = convert189ToModern(legacyTag) ?: return ItemStack(Items.BARRIER)
+            }
+
+            val stack = decodeItemStack(modernTag) ?: return ItemStack(Items.BARRIER)
+
+            if (usedLegacy) injectLegacyExtras(stack, legacyTag!!)
+
+            stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(item.displayname))
+            stack.set(DataComponentTypes.LORE, LoreComponent(item.lore.map { Text.literal(it) }))
+
+            return stack
+        } catch (e: Exception) {
+            Stella.LOGGER.error("Failed to create dummy stack for ${item.internalname}", e)
+            return ItemStack(Items.BARRIER)
+        }
+    }
+
+
+    fun getLegacyItemTag(item: NEUItem): NbtCompound? = NbtCompound().apply {
+        if (item.nbttag == null) return null
+        put("tag", LegNBTParser.parse(item.nbttag))
+        putString("id", item.itemid)
+        putByte("Count", 1)
+        putShort("Damage", item.damage.toShort())
+    }
+
+    fun convert189ToModern(nbt: NbtCompound): NbtCompound? = try {
+        Schemas.getFixer().update(
+            TypeReferences.ITEM_STACK,
+            Dynamic(NbtOps.INSTANCE, nbt),
+            -1,
+            SharedConstants.getGameVersion().dataVersion().id
+        ).value as? NbtCompound
+    } catch (e: Exception) {
+        Stella.LOGGER.error("Failed to data-fix legacy NBT", e)
+        null
+    }
+
+    fun decodeItemStack(nbt: NbtCompound): ItemStack? {
+        return ItemStack.CODEC.decode(
+            RegistryOps.of(NbtOps.INSTANCE, NEUApi.defaultRegistries),
+            nbt
+        ).result().getOrNull()?.first
+    }
+
+    fun injectLegacyExtras(stack: ItemStack, legacyTag: NbtCompound) {
+        val tag = legacyTag.getCompound("tag")
+        tag.getOrNull()?.getCompound("ExtraAttributes")?.getOrNull()?.let {
+            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(it))
+        }
+        tag.getOrNull()?.getString("ItemModel")?.getOrNull()?.let {
+            stack.set(DataComponentTypes.ITEM_MODEL, Identifier.of(it))
+        }
+    }
 
     fun unzip(zipFile: File, outputDir: File) {
         ZipInputStream(FileInputStream(zipFile)).use { zip ->
@@ -198,19 +298,6 @@ object NEUApi {
                 entry = zip.nextEntry
             }
         }
-    }
-
-    fun sanitizeNEUNbtTag(raw: String): String {
-        return raw
-            // Fix array index notation: [0:"..."] → ["..."]
-            .replace(Regex("""\[(\d+):"""), "[")
-            // Quote keys: {key: → {"key":
-            .replace(Regex("""([{\[,])(\w+):"""), "$1\"$2\":")
-            // Unescape embedded quotes
-            .replace("\\\"", "\"")
-            // Fix stringified JSON inside petInfo
-            .replace("\"{", "{")
-            .replace("}\"", "}")
     }
 }
 

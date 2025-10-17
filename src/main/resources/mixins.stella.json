@@ -10,6 +10,8 @@
     "client": [
       "MixinNetworkManager",
       "MixinGameRenderer",
+      "MixinInGameHud",
+      "MixinStatusEffectsDisplay",
       "accessors.AccessorMapState",
       "accessors.AccessorNetHandlerPlayClient"
     ]

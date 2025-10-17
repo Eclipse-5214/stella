@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.hud.HUDEditor
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
@@ -24,6 +25,18 @@ object MainCommand : CommandUtils(
                     TickUtils.schedule(1) {
                         Stella.mc.execute {
                             Stella.mc.setScreen(HUDEditor())
+                        }
+                    }
+                    1
+                }
+        )
+
+        builder.then(
+            ClientCommandManager.literal("buttons")
+                .executes { _ ->
+                    TickUtils.schedule(1) {
+                        Stella.mc.execute {
+                            Stella.mc.setScreen(ButtonLayoutEditor())
                         }
                     }
                     1

@@ -37,7 +37,7 @@ object petDisplay: Feature("petDisplay") {
             val current = levels[petName]
             if (current == null || level != current) {
                 levels[petName] = level
-                Stella.LOGGER.info("Cached pet: $petName → Lvl $level")
+                //Stella.LOGGER.info("Cached pet: $petName → Lvl $level")
             }
             // also update last active
             lastActiveName = petName
@@ -59,7 +59,7 @@ object petDisplay: Feature("petDisplay") {
         getLastActivePet()?.let { (name, lvl) ->
             activePet = name
             activePetLvl = lvl
-            Stella.LOGGER.info("Restored last active pet from cache: $name Lvl $lvl")
+            //Stella.LOGGER.info("Restored last active pet from cache: $name Lvl $lvl")
         }
 
         register<ChatEvent.Receive> { event ->
@@ -70,7 +70,7 @@ object petDisplay: Feature("petDisplay") {
             if (summonMatch != null) {
                 val action = summonMatch.groupValues[1] // "summoned" or "despawned"
                 val petName = summonMatch.groupValues[2].trim()
-                Stella.LOGGER.info("Pet $action: $petName")
+                //Stella.LOGGER.info("Pet $action: $petName")
 
                 when (action) {
                     "summoned" -> {
@@ -92,7 +92,7 @@ object petDisplay: Feature("petDisplay") {
             if (autoMatch != null) {
                 val level = autoMatch.groupValues[1].toInt()
                 val petName = autoMatch.groupValues[2].trim()
-                Stella.LOGGER.info("Autopet equipped: Lvl $level $petName")
+                //Stella.LOGGER.info("Autopet equipped: Lvl $level $petName")
                 activePet = petName
                 activePetLvl = level
                 cachePet(petName, level)
@@ -109,7 +109,7 @@ object petDisplay: Feature("petDisplay") {
                 if (tabMatch != null) {
                     val level = tabMatch.groupValues[1].toInt()
                     val petName = tabMatch.groupValues[2].trim()
-                    Stella.LOGGER.info("tablist equipped: Lvl $level $petName")
+                    //Stella.LOGGER.info("tablist equipped: Lvl $level $petName")
                     activePet = petName
                     activePetLvl = level
                     cachePet(petName, level)
@@ -140,7 +140,7 @@ object petDisplay: Feature("petDisplay") {
         val neuItem = NEUApi.getItemBySkyblockId("ender_dragon;4") ?: return
         val stack = NEUApi.createDummyStack(neuItem)
 
-        Render2D.renderItem(context,stack, 0f, -5f, 2.5f)
+        Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
 
         matrix.popMatrix()
     }
@@ -163,7 +163,7 @@ object petDisplay: Feature("petDisplay") {
         val neuItem = NEUApi.getItemBySkyblockId("${activePet?.replace(" ", "_")};4") ?: return
         val stack = NEUApi.createDummyStack(neuItem)
 
-        Render2D.renderItem(context,stack, 0f, -5f, 2.5f)
+        Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
 
         matrix.popMatrix()
     }

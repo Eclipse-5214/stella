@@ -49,6 +49,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
     modImplementation(includeOrShade("gg.essential:elementa:710")!!)
     modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:436")!!)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:105")!!)
 
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 }
