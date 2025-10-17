@@ -3,9 +3,9 @@
     "id": "${mod_id}",
     "version": "${mod_version}",
     "name": "${mod_name}",
-    "description": "${mod_description}",
+    "description": "QOL / Dungeons skyblock mod",
     "authors": [
-        "Eclipse"
+        "Eclipse / NEXD_"
     ],
     "contact": {
         "issues": "https://github.com/Deftu/${mod_name}/issues",
