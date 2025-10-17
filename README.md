@@ -43,7 +43,7 @@
 
 <h2 align="center">Installation Steps</h2>
 
-1. Download Forge 1.8.9
+1. Download Fabric 1.21.7 - 1.21.8
 2. Download latest release from [here](https://github.com/Eclipse-5214/stella/releases)
 3. Put the jar in your mods folder
 4. Have fun!
