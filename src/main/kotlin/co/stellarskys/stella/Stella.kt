@@ -37,7 +37,7 @@ class Stella: ClientModInitializer {
             if (shown) return@register
 
             ChatUtils.addMessage(
-                "$PREFIX §fMod loaded.",
+                "$PREFIX §bMod loaded.",
                 "§b${FeatureLoader.getFeatCount()} §dmodules §8- §b${FeatureLoader.getLoadtime()}§dms §8- §b${FeatureLoader.getCommandCount()} §dcommands"
             )
 
