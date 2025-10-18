@@ -113,14 +113,6 @@ class Config(
                     .setColor(Color.black)
                     .setChildOf(window)
 
-                val title = UIText(fileName, false)
-                    .constrain {
-                        x = CenterConstraint() - 237.pixels()
-                        y = CenterConstraint() - 160.pixels()
-                    }
-                    .setTextScale(1.5f.pixels())
-                    .setChildOf(window)
-
                 head
                     .constrain {
                     x = CenterConstraint() - 235.pixels()
