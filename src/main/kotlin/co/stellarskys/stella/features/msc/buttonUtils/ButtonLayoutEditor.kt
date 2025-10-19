@@ -2,7 +2,6 @@ package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
-import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.util.Identifier
 import xyz.meowing.vexel.core.VexelScreen

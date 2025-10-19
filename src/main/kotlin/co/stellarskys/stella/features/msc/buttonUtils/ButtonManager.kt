@@ -50,7 +50,7 @@ object ButtonManager {
         buttons.clear()
     }
 
-    fun renderAll(context: DrawContext, invX: Int = 0, invY: Int = 0) {
+    fun renderAll(context: DrawContext, invX: Int = 0, invY: Int = 0, width: Float = this.width, height: Float = this.height) {
         NVGRenderer.beginFrame(width, height)
 
         buttons.forEach { renderButton(context,it, invX, invY) }
