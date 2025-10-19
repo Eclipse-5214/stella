@@ -127,10 +127,10 @@ class EditButtonPopup(window: VexelWindow) {
         }
 
         val res = Stella.mc.window
-        val scale = res.scaleFactor.toFloat() / 2
+        val scale = res.scaleFactor.toFloat()
 
-        val x = itemPreview.scaled.left * 2
-        val y = itemPreview.scaled.top * 2
+        val x = itemPreview.scaled.left
+        val y = itemPreview.scaled.top
 
         Render2D.renderItem( context,stack, x + 5, y + 5, 7f / scale)
     }
