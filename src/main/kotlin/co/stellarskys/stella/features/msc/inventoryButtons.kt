@@ -6,6 +6,7 @@ import co.stellarskys.stella.events.WorldEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonManager
 import co.stellarskys.stella.utils.TimeUtils
+import net.minecraft.client.gui.render.state.GuiRenderState
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -19,6 +20,9 @@ object inventoryButtons : Feature("buttonsEnabled") {
             if (event.screen is InventoryScreen) {
                 val invX = (event.screen.width - 176) / 2
                 val invY = (event.screen.height - 166) / 2
+
+                event.context.state.goUpLayer()
+
                 ButtonManager.renderAll(event.context, invX, invY)
             }
         }

@@ -24,8 +24,6 @@ class EditButtonPopup(window: VexelWindow) {
     private var command: String = ""
 
     //gui
-    val window = VexelWindow()
-
     val rect = Rectangle(
         Color.black.rgb,
         Palette.Purple.rgb,

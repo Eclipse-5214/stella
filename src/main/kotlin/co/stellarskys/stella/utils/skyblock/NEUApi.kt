@@ -216,38 +216,43 @@ object NEUApi {
     }
 
     fun createDummyStackNow(item: NEUItem): ItemStack {
-        try {
+        return try {
             var modernTag = tryFindFromModernFormat(item.internalname)
-            val legacyTag = getLegacyItemTag(item)
             var usedLegacy = false
 
             if (modernTag == null) {
-                if (legacyTag == null) return ItemStack(Items.BARRIER)
+                val legacyTag = getLegacyItemTag(item) ?: return ItemStack(Items.BARRIER)
                 usedLegacy = true
                 modernTag = convert189ToModern(legacyTag) ?: return ItemStack(Items.BARRIER)
             }
 
             val stack = decodeItemStack(modernTag) ?: return ItemStack(Items.BARRIER)
 
-            if (usedLegacy) injectLegacyExtras(stack, legacyTag!!)
+            if (usedLegacy) injectLegacyExtras(stack, modernTag)
 
             stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(item.displayname))
             stack.set(DataComponentTypes.LORE, LoreComponent(item.lore.map { Text.literal(it) }))
 
-            return stack
+            stack
         } catch (e: Exception) {
-            Stella.LOGGER.error("Failed to create dummy stack for ${item.internalname}", e)
+            Stella.LOGGER.error("Exception while creating dummy stack for ${item.internalname}", e)
             return ItemStack(Items.BARRIER)
         }
     }
 
-
-    fun getLegacyItemTag(item: NEUItem): NbtCompound? = NbtCompound().apply {
-        if (item.nbttag == null) return null
-        put("tag", LegNBTParser.parse(item.nbttag))
-        putString("id", item.itemid)
-        putByte("Count", 1)
-        putShort("Damage", item.damage.toShort())
+    fun getLegacyItemTag(item: NEUItem): NbtCompound? {
+        val raw = item.nbttag ?: return null
+        return try {
+            NbtCompound().apply {
+                put("tag", LegNBTParser.parse(raw)) // uses new parser
+                putString("id", item.itemid)
+                putByte("Count", 1)
+                putShort("Damage", item.damage.toShort())
+            }
+        } catch (e: Exception) {
+            Stella.LOGGER.error("Failed to parse legacy NBT for ${item.internalname}", e)
+            null
+        }
     }
 
     fun convert189ToModern(nbt: NbtCompound): NbtCompound? = try {

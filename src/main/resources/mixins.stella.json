@@ -11,7 +11,7 @@
       "MixinNetworkManager",
       "MixinGameRenderer",
       "MixinInGameHud",
-      "MixinStatusEffectsDisplay",
+       "MixinStatusEffectsDisplay",
       "accessors.AccessorMapState",
       "accessors.AccessorNetHandlerPlayClient"
     ]

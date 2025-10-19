@@ -13,6 +13,11 @@ import net.minecraft.nbt.NbtShort
 import net.minecraft.nbt.NbtString
 import java.util.Stack
 
+/*
+ * Adapted from Firmarment
+ * Under GPL 3.0 License
+ */
+
 object LegNBTParser {
     class TagParsingException(val base: String, val offset: Int, message: String) :
         Exception("$message at $offset in `$base`")
@@ -21,99 +26,152 @@ object LegNBTParser {
         var index = 0
         val stack = Stack<Int>()
 
+        fun pushState() = stack.push(index)
+        fun popState() = run { index = stack.pop() }
+        fun discardState() = stack.pop()
+
         fun peek(n: Int) = input.substring(index.coerceAtMost(input.length), (index + n).coerceAtMost(input.length))
-        fun consume(n: Int): String? = peek(n).takeIf { it.length == n }?.also { index += n }
-        fun tryConsume(s: String): Boolean = peek(s.length) == s && run { index += s.length; true }
-        fun consumeWhile(predicate: (Char) -> Boolean): String {
-            val start = index
-            while (index < input.length && predicate(input[index])) index++
-            return input.substring(start, index)
+        fun peekReq(n: Int) = peek(n).takeIf { it.length == n }
+        fun consume(n: Int) = peekReq(n)?.also { index += n }
+        fun tryConsume(s: String) = peek(s.length) == s && run { index += s.length; true }
+        fun consumeWhile(pred: (String) -> Boolean): String {
+            var acc = ""
+            while (!finished() && pred(acc + peek(1))) {
+                acc += consume(1)
+            }
+            return acc
         }
 
         fun expect(s: String, msg: String) {
-            if (!tryConsume(s)) throw TagParsingException(input, index, msg)
+            if (!tryConsume(s)) error(msg)
         }
 
+        fun error(msg: String): Nothing = throw TagParsingException(input, index, msg)
         fun finished() = index >= input.length
     }
 
-    fun parse(raw: String): NbtCompound {
+    fun parse(raw: String): NbtCompound = LegNBTParser(raw).baseTag
+
+    private class LegNBTParser(raw: String) {
         val racer = StringRacer(raw)
-        skipWhitespace(racer)
-        racer.expect("{", "Expected '{'")
-        val compound = NbtCompound()
-        while (!racer.tryConsume("}")) {
-            skipWhitespace(racer)
-            val key = parseIdentifier(racer)
-            skipWhitespace(racer)
-            racer.expect(":", "Expected ':' after key")
-            skipWhitespace(racer)
-            val value = parseValue(racer)
-            compound.put(key, value)
-            racer.tryConsume(",")
+        val baseTag = parseTag()
+
+        companion object {
+            val digitRange = "0123456789-"
+            object Patterns {
+                val DOUBLE = "([-+]?[0-9]*\\.?[0-9]+)[dD]".toRegex()
+                val FLOAT = "([-+]?[0-9]*\\.?[0-9]+)[fF]".toRegex()
+                val BYTE = "([-+]?[0-9]+)[bB]".toRegex()
+                val LONG = "([-+]?[0-9]+)[lL]".toRegex()
+                val SHORT = "([-+]?[0-9]+)[sS]".toRegex()
+                val INTEGER = "([-+]?[0-9]+)".toRegex()
+                val DOUBLE_UNTYPED = "([-+]?[0-9]*\\.?[0-9]+)".toRegex()
+                val ROUGH = "[-+]?[0-9]*\\.?[0-9]*[dDbBfFlLsS]?".toRegex()
+            }
         }
-        return compound
-    }
 
-    private fun skipWhitespace(r: StringRacer) {
-        r.consumeWhile { it.isWhitespace() }
-    }
+        private fun skipWhitespace() {
+            racer.consumeWhile { it.last().isWhitespace() }
+        }
 
-    private fun parseIdentifier(r: StringRacer): String {
-        return if (r.peek(1) == "\"") parseQuotedString(r) else r.consumeWhile { it != ':' && !it.isWhitespace() }
-    }
+        private fun parseTag(): NbtCompound {
+            skipWhitespace()
+            racer.expect("{", "Expected '{'")
+            val tag = NbtCompound()
+            while (!racer.tryConsume("}")) {
+                skipWhitespace()
+                val key = parseIdentifier()
+                skipWhitespace()
+                racer.expect(":", "Expected ':' after key")
+                skipWhitespace()
+                val value = parseAny()
+                tag.put(key, value)
+                racer.tryConsume(",")
+                skipWhitespace()
+            }
+            return tag
+        }
 
-    private fun parseQuotedString(r: StringRacer): String {
-        r.expect("\"", "Expected '\"'")
-        val sb = StringBuilder()
-        while (true) {
-            val c = r.consume(1) ?: throw TagParsingException(r.input, r.index, "Unterminated string")
-            when (c) {
-                "\"" -> break
-                "\\" -> {
-                    val esc = r.consume(1) ?: throw TagParsingException(r.input, r.index, "Unfinished escape")
-                    sb.append(esc)
+        private fun parseAny(): NbtElement {
+            skipWhitespace()
+            val c = racer.peekReq(1) ?: racer.error("Unexpected EOF")
+            return when {
+                c == "{" -> parseTag()
+                c == "[" -> parseList()
+                c == "\"" -> parseStringTag()
+                c.first() in digitRange -> parseNumericTag()
+                else -> racer.error("Unexpected token '$c'")
+            }
+        }
+
+        private fun parseList(): NbtList {
+            skipWhitespace()
+            racer.expect("[", "Expected '['")
+            val list = NbtList()
+            while (!racer.tryConsume("]")) {
+                skipWhitespace()
+                racer.pushState()
+                val prefix = racer.consumeWhile { it.all { ch -> ch in digitRange } }
+                skipWhitespace()
+                if (!racer.tryConsume(":") || prefix.isEmpty()) {
+                    racer.popState()
+                    list.add(parseAny())
+                } else {
+                    racer.discardState()
+                    skipWhitespace()
+                    list.add(parseAny())
                 }
-                else -> sb.append(c)
+                skipWhitespace()
+                racer.tryConsume(",")
+            }
+            return list
+        }
+
+        private fun parseQuotedString(): String {
+            skipWhitespace()
+            racer.expect("\"", "Expected '\"'")
+            val sb = StringBuilder()
+            while (true) {
+                val c = racer.consume(1) ?: racer.error("Unterminated string")
+                when (c) {
+                    "\"" -> break
+                    "\\" -> {
+                        val esc = racer.consume(1) ?: racer.error("Unfinished escape")
+                        if (esc != "\"" && esc != "\\") {
+                            racer.index--
+                            racer.error("Invalid escape '\\$esc'")
+                        }
+                        sb.append(esc)
+                    }
+                    else -> sb.append(c)
+                }
+            }
+            return sb.toString()
+        }
+
+        private fun parseStringTag(): NbtString = NbtString.of(parseQuotedString())
+
+        private fun parseNumericTag(): AbstractNbtNumber {
+            skipWhitespace()
+            val raw = racer.consumeWhile { Patterns.ROUGH.matchEntire(it) != null }
+            if (raw.isEmpty()) racer.error("Expected numeric value")
+
+            return when {
+                Patterns.FLOAT.matches(raw) -> NbtFloat.of(Patterns.FLOAT.matchEntire(raw)!!.groupValues[1].toFloat())
+                Patterns.BYTE.matches(raw) -> NbtByte.of(Patterns.BYTE.matchEntire(raw)!!.groupValues[1].toByte())
+                Patterns.LONG.matches(raw) -> NbtLong.of(Patterns.LONG.matchEntire(raw)!!.groupValues[1].toLong())
+                Patterns.SHORT.matches(raw) -> NbtShort.of(Patterns.SHORT.matchEntire(raw)!!.groupValues[1].toShort())
+                Patterns.INTEGER.matches(raw) -> NbtInt.of(Patterns.INTEGER.matchEntire(raw)!!.groupValues[1].toInt())
+                Patterns.DOUBLE.matches(raw) -> NbtDouble.of(Patterns.DOUBLE.matchEntire(raw)!!.groupValues[1].toDouble())
+                Patterns.DOUBLE_UNTYPED.matches(raw) -> NbtDouble.of(Patterns.DOUBLE_UNTYPED.matchEntire(raw)!!.groupValues[1].toDouble())
+                else -> racer.error("Unrecognized numeric format '$raw'")
             }
         }
-        return sb.toString()
-    }
 
-    private fun parseValue(r: StringRacer): NbtElement {
-        return when (val c = r.peek(1)) {
-            "{" -> parse(raw = r.input.substring(r.index))
-            "[" -> parseList(r)
-            "\"" -> NbtString.of(parseQuotedString(r))
-            else -> parseNumber(r)
-        }
-    }
-
-    private fun parseList(r: StringRacer): NbtList {
-        r.expect("[", "Expected '['")
-        val list = NbtList()
-        while (!r.tryConsume("]")) {
-            skipWhitespace(r)
-            val prefix = r.consumeWhile { it.isDigit() || it == '-' }
-            if (prefix.isNotEmpty() && r.tryConsume(":")) {
-                skipWhitespace(r)
-            }
-            list.add(parseValue(r))
-            r.tryConsume(",")
-        }
-        return list
-    }
-
-    private fun parseNumber(r: StringRacer): AbstractNbtNumber {
-        val raw = r.consumeWhile { it.isDigit() || it == '.' || it == '-' }
-        return when {
-            raw.endsWith("b", true) -> NbtByte.of(raw.dropLast(1).toByte())
-            raw.endsWith("s", true) -> NbtShort.of(raw.dropLast(1).toShort())
-            raw.endsWith("l", true) -> NbtLong.of(raw.dropLast(1).toLong())
-            raw.endsWith("f", true) -> NbtFloat.of(raw.dropLast(1).toFloat())
-            raw.endsWith("d", true) -> NbtDouble.of(raw.dropLast(1).toDouble())
-            raw.contains('.') -> NbtDouble.of(raw.toDouble())
-            else -> NbtInt.of(raw.toInt())
+        private fun parseIdentifier(): String {
+            skipWhitespace()
+            return if (racer.peek(1) == "\"") parseQuotedString()
+            else racer.consumeWhile { it.last() != ':' && !it.last().isWhitespace() }
         }
     }
 }
