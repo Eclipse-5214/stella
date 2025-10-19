@@ -21,8 +21,6 @@ object inventoryButtons : Feature("buttonsEnabled") {
                 val invX = (event.screen.width - 176) / 2
                 val invY = (event.screen.height - 166) / 2
 
-                event.context.state.goUpLayer()
-
                 ButtonManager.renderAll(event.context, invX, invY)
             }
         }
