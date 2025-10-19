@@ -393,6 +393,8 @@ object Dungeon {
             }
         })
 
+        EventBus.register<WorldEvent.Change> { reset() }
+
         HypixelApi.fetchElectionData(
             onResult = { data ->
                 hasPaul = (data?.mayorName?.lowercase() == "paul" && data.mayorPerks.any { it.first.lowercase() == "ezpz" }) ||
