@@ -8,7 +8,6 @@ import co.stellarskys.stella.features.stellanav.utils.typeToName
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.TickUtils
 import co.stellarskys.stella.utils.clearCodes
-import co.stellarskys.stella.utils.skyblock.dungeons.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner
 
 @Stella.Module
