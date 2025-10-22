@@ -38,7 +38,7 @@ object DungeonPlayerManager {
         for (i in 0 until 5) {
             val matcher = PlayerListUtils.regexAt(1 + i * 4, PLAYER_TAB_PATTERN)
             if (matcher == null ) {
-                players[i] == null
+                players[i] = null
                 continue
             }
 
