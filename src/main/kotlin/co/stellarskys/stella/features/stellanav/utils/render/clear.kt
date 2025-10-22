@@ -2,429 +2,263 @@ package co.stellarskys.stella.features.stellanav.utils.render
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.features.stellanav.utils.*
-import co.stellarskys.stella.features.stellanav.utils.mapConfig.puzzleCheckmarks
-import co.stellarskys.stella.features.stellanav.utils.mapConfig.roomCheckmarks
 import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
-import co.stellarskys.stella.utils.skyblock.dungeons.*
+import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
+import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
-import net.minecraft.client.gui.PlayerSkinDrawer
 import java.awt.Color
 import java.util.UUID
 import kotlin.math.PI
 
-object clear{
-    // constants
-    private val roomSize = 18
-    private val gapSize = 4
-    private val spacing = roomSize + gapSize // 18 + 4 = 22
+object clear {
+    // Constants
+    private const val roomSize = 18
+    private const val gapSize = 4
+    private const val spacing = roomSize + gapSize
 
+    /** Main render entry point */
     fun renderMap(context: UDrawContext) {
         val matrix = context.matrices
         val mapOffset = if (Dungeon.floorNumber == 1) 10.6f else 0f
         val mapScale = oscale(Dungeon.floorNumber)
 
         matrix.pushMatrix()
-        matrix.translate(5f,5f)
+        matrix.translate(5f, 5f)
         matrix.translate(mapOffset, 0f)
         matrix.scale(mapScale, mapScale)
 
         renderRooms(context)
         renderCheckmarks(context)
-        renderPuzzleNames(context)
-        renderRoomNames(context)
+        renderRoomLabels(context, RoomType.PUZZLE, mapConfig.puzzleCheckmarks, mapConfig.pcsize)
+        renderRoomLabels(context, RoomType.NORMAL, mapConfig.roomCheckmarks, mapConfig.rcsize)
         renderPlayers(context)
 
         matrix.popMatrix()
     }
 
-    // room rendering
+    /** Renders discovered and explored rooms, doors, and connectors */
     fun renderRooms(context: UDrawContext) {
-        Dungeon.discoveredRooms.forEach { (id, room) ->
-            val color = Color(65 / 255f, 65 / 255f, 65 / 255f, 1f)
-
-            val x = room.x * spacing
-            val y = room.z * spacing
-            val w = roomSize
-            val h = roomSize
-
-            Render2D.drawRect(context, x, y, w, h, color)
+        Dungeon.discoveredRooms.values.forEach { room ->
+            Render2D.drawRect(
+                context,
+                room.x * spacing,
+                room.z * spacing,
+                roomSize,
+                roomSize,
+                Color(65 / 255f, 65 / 255f, 65 / 255f, 1f)
+            )
         }
 
         Dungeon.uniqueRooms.forEach { room ->
-            if (room.explored) {
-                val color = roomTypeColors[room.type] ?: return@forEach
-
-                room.components.forEach { comp ->
-                    val x = comp.first * spacing
-                    val y = comp.second * spacing
-                    val w = roomSize
-                    val h = roomSize
-
-                    //println("${room.name}, (${comp.first},${comp.second})")
-
-                    Render2D.drawRect(context, x, y, w, h, color)
-                }
-
-                renderRoomConnectors(context, room)
+            if (!room.explored) return@forEach
+            val color = roomTypeColors[room.type] ?: return@forEach
+            room.components.forEach { (x, z) ->
+                Render2D.drawRect(context, x * spacing, z * spacing, roomSize, roomSize, color)
             }
+            renderRoomConnectors(context, room)
         }
 
-        Dungeon.doors.forEach { door ->
-            if (door?.state != DoorState.DISCOVERED) return@forEach
-
+        Dungeon.uniqueDoors.forEach { door ->
+            if (door.state != DoorState.DISCOVERED) return@forEach
             val type = if (door.opened) DoorType.NORMAL else door.type
             val color = doorTypeColors[type] ?: return@forEach
-            val comp = door.getComp()
-            val cx = comp.first / 2  * 22
-            val cy = comp.second / 2 * 22
-            val vert = 0 == door.rotation
-            val w = if (vert) 6 else 4
-            val h = if (vert) 4 else 6
-
-            val x = if (vert) cx + 6 else cx + 18
-            val y = if (vert) cy + 18 else cy + 6
-
+            val (cx, cy) = door.getComp().let { it.first / 2 * spacing to it.second / 2 * spacing }
+            val vert = door.rotation == 0
+            val (w, h) = if (vert) 6 to 4 else 4 to 6
+            val (x, y) = if (vert) cx + 6 to cy + 18 else cx + 18 to cy + 6
             Render2D.drawRect(context, x, y, w, h, color)
         }
     }
 
-    // checkmark rendering
+    /** Renders checkmarks for discovered and explored rooms */
     fun renderCheckmarks(context: UDrawContext) {
-        val matrix = context.matrices
         val scale = mapConfig.checkmarkScale
 
-        Dungeon.discoveredRooms.forEach { (id, room) ->
-            val w = 10
-            val h = 12
-            val x = room.x * spacing - w / 2 + roomSize / 2
-            val y = room.z * spacing - h / 2 + roomSize / 2
-
-            matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat())
-            matrix.scale(scale, scale)
-
-            Render2D.drawImage(context, questionMark, 0, 0, w, h)
-
-            matrix.popMatrix()
+        Dungeon.discoveredRooms.values.forEach { room ->
+            val x = room.x * spacing + roomSize / 2 - 5
+            val y = room.z * spacing + roomSize / 2 - 6
+            context.withMatrix {
+                context.matrices.translate(x.toFloat(), y.toFloat())
+                context.matrices.scale(scale, scale)
+                Render2D.drawImage(context, questionMark, 0, 0, 10, 12)
+            }
         }
 
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored) return@forEach
             val checkmark = getCheckmarks(room.checkmark) ?: return@forEach
+            if (mapConfig.roomCheckmarks > 0 && room.type in setOf(
+                    RoomType.NORMAL,
+                    RoomType.RARE
+                ) && room.secrets != 0
+            ) return@forEach
+            if ((mapConfig.puzzleCheckmarks > 0 && room.type == RoomType.PUZZLE) || room.type == RoomType.ENTRANCE) return@forEach
 
-            // Ts is horrible coding but if it works it works
-            if (roomCheckmarks > 0 && room.type in setOf(RoomType.NORMAL, RoomType.RARE) && room.secrets != 0) return@forEach
-            if ((puzzleCheckmarks > 0 && room.type == RoomType.PUZZLE) || room.type == RoomType.ENTRANCE) return@forEach
+            val (centerX, centerZ) = room.center()
+            val x = (centerX * spacing).toInt() + roomSize / 2 - 6
+            val y = (centerZ * spacing).toInt() + roomSize / 2 - 6
 
-            val minX = room.components.minOf { it.first }
-            val minZ = room.components.minOf { it.second }
-            val maxX = room.components.maxOf { it.first }
-            val maxZ = room.components.maxOf { it.second }
-
-            val roomWidth = maxX - minX
-            val roomHeight = maxZ - minZ
-
-            val centerX = minX + roomWidth / 2.0
-            var centerZ = minZ + roomHeight / 2.0
-
-            if (room.shape == "L") {
-                val topEdgeCount = room.components.count { it.second == minZ }
-                centerZ += if (topEdgeCount == 2) -roomHeight / 2.0 else roomHeight / 2.0
+            context.withMatrix {
+                context.matrices.translate(x.toFloat(), y.toFloat())
+                context.matrices.scale(scale, scale)
+                Render2D.drawImage(context, checkmark, 0, 0, 12, 12)
             }
-
-            val location = Pair(centerX, centerZ)
-
-            val w = 12
-            val h = 12
-
-            val x = (location.first * spacing).toInt() - w / 2 + roomSize / 2
-            val y = (location.second * spacing).toInt() - h / 2 + roomSize / 2
-
-            matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat())
-            matrix.scale(scale, scale)
-
-            Render2D.drawImage(context, checkmark, 0, 0, w, h)
-
-            matrix.popMatrix()
         }
     }
 
-    // name & secret rendering
-    fun renderPuzzleNames(context: UDrawContext){
+    /** Renders room names and secret counts */
+    fun renderRoomLabels(context: UDrawContext, type: RoomType, checkmarkMode: Int, scaleFactor: Float) {
         Dungeon.uniqueRooms.forEach { room ->
-            val matrix = context.matrices
-
-            if (!room.explored) return@forEach
-
-            if (puzzleCheckmarks < 1) return@forEach
-            if (room.type != RoomType.PUZZLE) return@forEach
+            if (!room.explored || room.type != type || checkmarkMode < 1) return@forEach
 
             val secrets = if (room.checkmark == Checkmark.GREEN) room.secrets else room.secretsFound
             val textColor = getTextColor(room.checkmark)
-
             val roomText = room.name ?: "???"
             val secretText = "$secrets/${room.secrets}"
 
-            val final = buildList {
-                if (puzzleCheckmarks in listOf(1, 3)) addAll(roomText.split(" "))
-                if (puzzleCheckmarks in listOf(2, 3) && room.secrets != 0) add(secretText)
+            val lines = buildList {
+                if (checkmarkMode in listOf(1, 3)) addAll(roomText.split(" "))
+                if (checkmarkMode in listOf(2, 3) && room.secrets != 0) add(secretText)
             }
 
+            val (centerX, centerZ) = room.center()
+            val x = (centerX * spacing).toInt() + roomSize / 2
+            val y = (centerZ * spacing).toInt() + roomSize / 2
+            val scale = 0.75f * scaleFactor
 
-            val minX = room.components.minOf { it.first }
-            val minZ = room.components.minOf { it.second }
-            val maxX = room.components.maxOf { it.first }
-            val maxZ = room.components.maxOf { it.second }
+            context.withMatrix {
+                context.matrices.translate(x.toFloat(), y.toFloat())
+                context.matrices.scale(scale, scale)
 
-            val roomWidth = maxX - minX
-            val roomHeight = maxZ - minZ
-
-            val centerX = minX + roomWidth / 2.0
-            var centerZ = minZ + roomHeight / 2.0
-
-            if (room.shape == "L") {
-                val topEdgeCount = room.components.count { it.second == minZ }
-                centerZ += if (topEdgeCount == 2) -roomHeight / 2.0 else roomHeight / 2.0
-            }
-
-            val location = Pair(centerX, centerZ)
-            val scale = 0.75f * mapConfig.pcsize
-
-
-            val x = (location.first * spacing).toInt() + roomSize / 2
-            val y = (location.second * spacing).toInt() + roomSize / 2
-
-            matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat())
-            matrix.scale(scale,scale)
-
-            var i = 0
-            for (line in final) {
-                val ly = (9 * i - (final.size * 9) / 2).toFloat()
-                val w = line.width().toFloat()
-
-                val drawX = (-w / 2).toInt()
-                val drawY = ly.toInt()
-
-                // Shadow
-                val offsets = listOf(
-                    Pair(scale, 0f), Pair(-scale, 0f),
-                    Pair(0f, scale), Pair(0f, -scale)
-                )
-
-                for ((dx, dy) in offsets) {
-                    matrix.pushMatrix()
-                    matrix.translate(dx, dy)
-                    Render2D.drawString(context, "§0$line", drawX, drawY)
-                    matrix.popMatrix()
+                lines.forEachIndexed { i, line ->
+                    val ly = (9 * i - (lines.size * 9) / 2).toFloat()
+                    val drawX = (-line.width() / 2).toInt()
+                    val drawY = ly.toInt()
+                    drawShadowedText(context, line, drawX, drawY, scale)
+                    Render2D.drawString(context, textColor + line, drawX, drawY)
                 }
-
-                Render2D.drawString(context, textColor + line, drawX, drawY)
-                i++
             }
-
-            matrix.popMatrix()
         }
     }
 
-    fun renderRoomNames(context: UDrawContext){
-        Dungeon.uniqueRooms.forEach { room ->
-            val matrix = context.matrices
-
-            if (!room.explored) return@forEach
-
-            if (roomCheckmarks < 1) return@forEach
-            if (room.type !in setOf(RoomType.NORMAL, RoomType.RARE)) return@forEach
-
-            val secrets = if (room.checkmark == Checkmark.GREEN) room.secrets else room.secretsFound
-            val textColor = getTextColor(room.checkmark)
-
-            val roomText = room.name ?: "???"
-            val secretText = "$secrets/${room.secrets}"
-
-            val final = buildList {
-                if (roomCheckmarks in listOf(1, 3)) addAll(roomText.split(" "))
-                if (roomCheckmarks in listOf(2, 3) && room.secrets != 0) add(secretText)
-            }
-
-            val minX = room.components.minOf { it.first }
-            val minZ = room.components.minOf { it.second }
-            val maxX = room.components.maxOf { it.first }
-            val maxZ = room.components.maxOf { it.second }
-
-            val roomWidth = maxX - minX
-            val roomHeight = maxZ - minZ
-
-            val centerX = minX + roomWidth / 2.0
-            var centerZ = minZ + roomHeight / 2.0
-
-            if (room.shape == "L") {
-                val topEdgeCount = room.components.count { it.second == minZ }
-                centerZ += if (topEdgeCount == 2) -roomHeight / 2.0 else roomHeight / 2.0
-            }
-
-            val location = Pair(centerX, centerZ)
-            val scale = 0.75f * mapConfig.rcsize
-
-
-            val x = (location.first * spacing).toInt() + roomSize / 2
-            val y = (location.second * spacing).toInt() + roomSize / 2
-
-            matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat())
-            matrix.scale(scale,scale)
-
-            var i = 0
-            for (line in final) {
-                val ly = (9 * i - (final.size * 9) / 2).toFloat()
-                val w = line.width().toFloat()
-
-                val drawX = (-w / 2).toInt()
-                val drawY = ly.toInt()
-
-                // Shadow
-                val offsets = listOf(
-                    Pair(scale, 0f), Pair(-scale, 0f),
-                    Pair(0f, scale), Pair(0f, -scale)
-                )
-
-                for ((dx, dy) in offsets) {
-                    matrix.pushMatrix()
-                    matrix.translate(dx, dy)
-                    Render2D.drawString(context, "§0$line", drawX, drawY)
-                    matrix.popMatrix()
-                }
-
-                Render2D.drawString(context, textColor + line, drawX, drawY)
-                i++
-            }
-
-            matrix.popMatrix()
-        }
-    }
-
-    // player rendering
+    /** Renders player icons and optional nametags */
     fun renderPlayers(context: UDrawContext) {
+        val you = Stella.mc.player ?: return
         for (player in DungeonPlayerManager.players) {
-            if (player == null) continue
-            val you = Stella.mc.player ?: continue
-            if (!player.alive && player.name != you.name.string) continue
+            if (player == null || (!player.alive && player.name != you.name.string)) continue
 
             val iconX = player.iconX ?: continue
             val iconY = player.iconZ ?: continue
             val rotation = player.yaw ?: continue
 
-            val x = (iconX / 125.0 * 128.0)
-            val y = (iconY / 125.0 * 128.0)
-
-            val matrix = context.matrices
-
+            val x = iconX / 125.0 * 128.0
+            val y = iconY / 125.0 * 128.0
             val ownName = mapConfig.dontShowOwn && player.name == you.name.string
 
             if (Dungeon.holdingLeaps && mapConfig.showNames && !ownName) {
-                matrix.pushMatrix()
-                matrix.translate(x.toFloat(), y.toFloat())
-
-                val scale = mapConfig.iconScale / 1.3f
-                renderNametag(context, player.name, scale)
-                matrix.popMatrix()
+                context.withMatrix {
+                    context.matrices.translate(x.toFloat(), y.toFloat())
+                    renderNametag(context, player.name, mapConfig.iconScale / 1.3f)
+                }
             }
 
-            matrix.pushMatrix()
-            matrix.translate(x.toFloat(), y.toFloat())
-            matrix.rotate((rotation * (PI / 180)).toFloat() )
-            matrix.scale(mapConfig.iconScale, mapConfig.iconScale)
-
-            if (mapConfig.showPlayerHead) {
-                val w = 12
-                val h = 12
-
-                val borderColor = if (mapConfig.iconClassColors) getClassColor(player.dclass.displayName) else mapConfig.iconBorderColor
-
-                Render2D.drawRect(context, (-w.toDouble() / 2.0).toInt(), (-h.toDouble() / 2.0).toInt(), w, h, borderColor)
-
-                val scale = 1f - mapConfig.iconBorderWidth
-
-                matrix.scale(scale, scale)
-
-                val uuid = player.uuid ?: UUID(0,0)
-                Render2D.drawPlayerHead(context, -6,-6,12, uuid)
-            } else {
-                val w = 7
-                val h = 10
-                val head = if (player.name == you.name.string) GreenMarker else WhiteMarker
-
-                Render2D.drawImage(
-                    context,
-                    head,
-                    (-w.toDouble() / 2.0).toInt(),
-                    (-h.toDouble() / 2.0).toInt(),
-                    w,
-                    h
-                )
-            }
-
-            matrix.popMatrix()
+            renderPlayerIcon(context, player, x, y, rotation)
         }
     }
 
+    /** Renders connectors between adjacent room components */
     fun renderRoomConnectors(context: UDrawContext, room: Room) {
-        val spacing = roomSize + gapSize
-        val connectorSize = gapSize
-
         val directions = listOf(Pair(1, 0), Pair(-1, 0), Pair(0, 1), Pair(0, -1))
 
         for ((x, z) in room.components) {
             for ((dx, dz) in directions) {
                 val nx = x + dx
                 val nz = z + dz
+                if (!room.hasComponent(nx, nz)) continue
 
-                //println("${room.name} component ($x,$z) checking at ($nx,$nz)")
-                //println("does this pass? ${room.hasComponent(nx,nz)}")
+                val cx = (x + nx) / 2 * spacing
+                val cy = (z + nz) / 2 * spacing
+                val isVertical = dx == 0
+                val w = if (isVertical) roomSize else gapSize
+                val h = if (isVertical) gapSize else roomSize
+                val drawX = if (isVertical) cx else cx + roomSize
+                val drawY = if (isVertical) cy + roomSize else cy
 
-                if (room.hasComponent(nx, nz)) {
-                    val cx = (x + nx) / 2 * spacing
-                    val cy = (z + nz) / 2 * spacing
-
-                    val isVertical = dx == 0 // Z direction means vertical connector
-                    val w = if (isVertical) roomSize else connectorSize
-                    val h = if (isVertical) connectorSize else roomSize
-
-                    val drawX = if (isVertical) cx else cx + roomSize
-                    val drawY = if (isVertical) cy + roomSize else cy
-
-                    Render2D.drawRect(
-                        context,
-                        drawX,
-                        drawY,
-                        w,
-                        h,
-                        roomTypeColors[room.type] ?: Color.GRAY
-                    )
-                }
+                Render2D.drawRect(context, drawX, drawY, w, h, roomTypeColors[room.type] ?: Color.GRAY)
             }
         }
 
+        // Special case: 2x2 room center connector
         if (room.components.size == 4 && room.shape == "2x2") {
             val x = room.components[0].first * spacing + roomSize
             val y = room.components[0].second * spacing + roomSize
-            val size = connectorSize
+            Render2D.drawRect(context, x, y, gapSize, gapSize, roomTypeColors[room.type] ?: Color.GRAY)
+        }
+    }
 
-            Render2D.drawRect(
-                context,
-                x, y,
-                size,
-                size,
-                roomTypeColors[room.type] ?: Color.GRAY
-            )
+    /** Calculates the center of a room, accounting for L-shapes */
+    fun Room.center(): Pair<Double, Double> {
+        val minX = components.minOf { it.first }
+        val minZ = components.minOf { it.second }
+        val maxX = components.maxOf { it.first }
+        val maxZ = components.maxOf { it.second }
+
+        val width = maxX - minX
+        val height = maxZ - minZ
+
+        var centerZ = minZ + height / 2.0
+        if (shape == "L") {
+            val topEdgeCount = components.count { it.second == minZ }
+            centerZ += if (topEdgeCount == 2) -height / 2.0 else height / 2.0
+        }
+
+        return Pair(minX + width / 2.0, centerZ)
+    }
+
+    /** Scoped matrix push/pop wrapper */
+    inline fun UDrawContext.withMatrix(block: () -> Unit) {
+        matrices.pushMatrix()
+        block()
+        matrices.popMatrix()
+    }
+
+    /** Renders a text string with a soft shadow */
+    fun drawShadowedText(context: UDrawContext, text: String, x: Int, y: Int, scale: Float) {
+        val offsets = listOf(Pair(scale, 0f), Pair(-scale, 0f), Pair(0f, scale), Pair(0f, -scale))
+        for ((dx, dy) in offsets) {
+            context.withMatrix {
+                context.matrices.translate(dx, dy)
+                Render2D.drawString(context, "§0$text", x, y)
+            }
+        }
+    }
+
+    /** Renders a player's icon (head or marker) */
+    fun renderPlayerIcon(context: UDrawContext, player: DungeonPlayer, x: Double, y: Double, rotation: Float) {
+        context.withMatrix {
+            val matrix = context.matrices
+            matrix.translate(x.toFloat(), y.toFloat())
+            matrix.rotate((rotation * (PI / 180)).toFloat())
+            matrix.scale(mapConfig.iconScale, mapConfig.iconScale)
+
+            if (mapConfig.showPlayerHead) {
+                val borderColor =
+                    if (mapConfig.iconClassColors) getClassColor(player.dclass.displayName) else mapConfig.iconBorderColor
+                Render2D.drawRect(context, -6, -6, 12, 12, borderColor)
+                matrix.scale(1f - mapConfig.iconBorderWidth, 1f - mapConfig.iconBorderWidth)
+                Render2D.drawPlayerHead(context, -6, -6, 12, player.uuid ?: UUID(0, 0))
+            } else {
+                val head = if (player.name == Stella.mc.player?.name?.string) GreenMarker else WhiteMarker
+                Render2D.drawImage(context, head, -4, -5, 7, 10)
+            }
         }
     }
 }
+

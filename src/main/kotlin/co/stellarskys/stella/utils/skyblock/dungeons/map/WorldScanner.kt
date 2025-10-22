@@ -139,10 +139,10 @@ object WorldScanner {
             val ping = entry?.latency ?: -1
 
             if (ping != -1 && entity != null) {
-                //player.inRender = true
-                //onPlayerMove(player, entity.x, entity.z, entity.yaw)
+                player.inRender = true
+                onPlayerMove(player, entity.x, entity.z, entity.yaw)
             } else {
-                //player.inRender = false
+                player.inRender = false
             }
 
             if (ping == -1) return@forEach

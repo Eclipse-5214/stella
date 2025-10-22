@@ -8,18 +8,16 @@ import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.mob.ZombieEntity
 
+/**
+ * Tracks whether the Mimic miniboss has been killed in F6/F7.
+ * Updates via chat messages or entity death detection.
+ */
 object MimicTrigger {
     val MIMIC_PATTERN = Regex("""^Party > (?:\[[\w+]+] )?\w{1,16}: (.*)$""")
 
     var mimicDead = false
 
-    val mimicMessages = listOf(
-        "mimic dead",
-        "mimic dead!",
-        "mimic killed",
-        "mimic killed!",
-        "\$skytils-dungeon-score-mimic$"
-    )
+    val mimicMessages = listOf("mimic dead", "mimic dead!", "mimic killed", "mimic killed!", "\$skytils-dungeon-score-mimic$")
 
     val updater: EventBus.EventCall = EventBus.register<EntityEvent.Death>({ event ->
         val mcEntity = event.entity

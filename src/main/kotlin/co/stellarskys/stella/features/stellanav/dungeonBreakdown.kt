@@ -34,7 +34,7 @@ object dungeonBreakdown: Feature("dungeonBreakdown", "catacombs") {
                     val deaths = player.deaths
                     val roomLore = buildRoomLore(player)
 
-                    ChatUtils.addMessage("§d| §b$name §fcleared §b$minmax §frooms | §b$secrets §fsecrets | §b$deaths §f deaths", roomLore)
+                    ChatUtils.addMessage("§d| §b$name §fcleared §b$minmax §frooms | §b$secrets §fsecrets | §b$deaths §fdeaths", roomLore)
                 }
             }
         }

@@ -1,129 +1,87 @@
 package co.stellarskys.stella.utils.skyblock.dungeons
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.events.AreaEvent
-import co.stellarskys.stella.events.ChatEvent
-import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.GameEvent
-import co.stellarskys.stella.events.TickEvent
-import co.stellarskys.stella.events.WorldEvent
-import co.stellarskys.stella.utils.TickUtils
-import co.stellarskys.stella.utils.clearCodes
+import co.stellarskys.stella.events.*
+import co.stellarskys.stella.utils.*
 import co.stellarskys.stella.utils.skyblock.LocationUtils
-import co.stellarskys.stella.utils.skyblock.dungeons.map.Door
-import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
-import co.stellarskys.stella.utils.skyblock.dungeons.map.WorldScanner
+import co.stellarskys.stella.utils.skyblock.dungeons.map.*
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
-import co.stellarskys.stella.utils.skyblock.dungeons.score.DungeonScore
-import co.stellarskys.stella.utils.skyblock.dungeons.score.MimicTrigger
-import co.stellarskys.stella.utils.skyblock.dungeons.score.ScoreData
-import co.stellarskys.stella.utils.skyblock.dungeons.utils.MapUtils
-import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomRegistry
-import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
+import co.stellarskys.stella.utils.skyblock.dungeons.score.*
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.*
 
+/**
+ * Central dungeon state manager.
+ * Basically one-stop shop for everything dungeons
+ */
 object Dungeon {
-    // Regex
-    val WATCHER_PATTERN = Regex("""\[BOSS] The Watcher: That will be enough for now\.""")
-    val DUNGEON_COMPLETE_PATTERN = Regex("""^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$""")
-    val ROOM_SECRETS_PATTERN = Regex("""\b([0-9]|10)/([0-9]|10)\s+Secrets\b""")
 
-    // Clear Map
+    // 🧩 Regex patterns for chat parsing
+    private val WATCHER_PATTERN = Regex("""\[BOSS] The Watcher: That will be enough for now\.""")
+    private val DUNGEON_COMPLETE_PATTERN = Regex("""^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$""")
+    private val ROOM_SECRETS_PATTERN = Regex("""\b([0-9]|10)/([0-9]|10)\s+Secrets\b""")
+
+    // Room and door data
     val rooms = Array<Room?>(36) { null }
     val doors = Array<Door?>(60) { null }
     val uniqueRooms = mutableSetOf<Room>()
     val uniqueDoors = mutableSetOf<Door>()
     val discoveredRooms = mutableMapOf<String, DiscoveredRoom>()
+
+    // Dungeon state
     var bloodClear = false
     var bloodDone = false
     var complete = false
-
-    // Player
     var currentRoom: Room? = null
-    var holdingLeaps: Boolean = false
+    var holdingLeaps = false
 
-    // floor
+    // Floor info
     val floor: String? get() = LocationUtils.dungeonFloor
     val floorNumber: Int? get() = LocationUtils.dungeonFloorNum
     var inDungeon = false
-    val inBoss get() = floor != null &&
-            Stella.mc.player?.let {
-                val (x, z) = WorldScanUtils.realCoordToComponent(it.x.toInt(), it.z.toInt())
-                6 * z + x > 35
-            } == true
+    val inBoss: Boolean
+        get() = floor != null && Stella.mc.player?.let {
+            val (x, z) = WorldScanUtils.realCoordToComponent(it.x.toInt(), it.z.toInt())
+            6 * z + x > 35
+        } == true
 
-    // else
+    // HUD lines
     var mapLine1 = ""
     var mapLine2 = ""
 
-    data class DiscoveredRoom(
-        val x: Int,
-        val z: Int,
-        val room: Room,
-    )
+    data class DiscoveredRoom(val x: Int, val z: Int, val room: Room)
 
+    /** Initializes all dungeon systems and event listeners */
     fun init() {
-        EventBus.register<AreaEvent.Main> ({
+        EventBus.register<AreaEvent.Main> {
             TickUtils.scheduleServer(1) {
-                if (LocationUtils.area != "catacombs") {
-                    reset()
-                }
-
                 inDungeon = LocationUtils.area == "catacombs"
+                if (!inDungeon) reset()
                 WorldScanner.updater.register()
             }
-        })
+        }
 
         EventBus.register<WorldEvent.Change> { reset() }
 
-        EventBus.register<ChatEvent.Receive>({ event ->
+        EventBus.register<ChatEvent.Receive> { event ->
             if (!inDungeon) return@register
             val msg = event.message.string.clearCodes()
-
-            val compleateMatch = DUNGEON_COMPLETE_PATTERN.find(msg)
-
-            if (compleateMatch != null) {
-                complete = true
-                return@register
-            }
-
-            val watcherMatch = WATCHER_PATTERN.find(msg)
-
-            if (watcherMatch != null) {
-                bloodClear = true
-                return@register
-            }
-        })
+            if (DUNGEON_COMPLETE_PATTERN.containsMatchIn(msg)) complete = true
+            if (WATCHER_PATTERN.containsMatchIn(msg)) bloodDone = true
+        }
 
         EventBus.register<GameEvent.ActionBar> { event ->
             if (!inDungeon) return@register
-
             val room = currentRoom ?: return@register
             val match = ROOM_SECRETS_PATTERN.find(event.message.string.clearCodes()) ?: return@register
-            val (found, total) = match.destructured
+            val (found, _) = match.destructured
             val secrets = found.toInt()
-
-            if (secrets == room.secretsFound) return@register
-            room.secretsFound = secrets
+            if (secrets != room.secretsFound) room.secretsFound = secrets
         }
 
         EventBus.register<TickEvent.Client> {
             if (!inDungeon) return@register
-
-            val dSecrets = "§7Secrets: " + "§b${DungeonScore.secretsFound}§8-§e${DungeonScore.scoreData.secretsRemaining}§8-§c${DungeonScore.scoreData.totalSecrets}"
-            val dCrypts = "§7Crypts: " + when {DungeonScore.crypts >= 5 -> "§a${DungeonScore.crypts}"; DungeonScore.crypts > 0 -> "§e${DungeonScore.crypts}"; else -> "§c0" }
-            val dMimic = if (floorNumber in listOf(6, 7)) { "§7Mimic: " + if (MimicTrigger.mimicDead) "§a✔" else "§c✘" } else { "" }
-            val minSecrets = "§7Min Secrets: " + if (DungeonScore.secretsFound == 0) { "§b?" } else if (DungeonScore.scoreData.minSecrets > DungeonScore.secretsFound) { "§e${DungeonScore.scoreData.minSecrets}" } else { "§a${DungeonScore.scoreData.minSecrets}" }
-            val dDeaths = "§7Deaths: " + if (DungeonScore.teamDeaths < 0) { "§c${DungeonScore.teamDeaths}" } else { "§a0" }
-            val dScore = "§7Score: " + when {DungeonScore.scoreData.score >= 300 -> "§a${DungeonScore.scoreData.score}"; DungeonScore.scoreData.score >= 270 -> "§e${DungeonScore.scoreData.score}"; else -> "§c${DungeonScore.scoreData.score}" } + if (DungeonScore.hasPaul) " §b★" else ""
-
-            mapLine1 = "$dSecrets    $dCrypts    $dMimic".trim()
-            mapLine2 = "$minSecrets    $dDeaths    $dScore".trim()
-
-            val player = Stella.mc.player ?: return@register
-            val heldItem = player.mainHandStack ?: return@register
-            val displayName = heldItem.name.string.clearCodes()
-
-            holdingLeaps = "leap" in displayName.lowercase()
+            updateHudLines()
+            updateHeldItem()
         }
 
         RoomRegistry.loadFromRemote()
@@ -132,6 +90,7 @@ object Dungeon {
         MapUtils.init()
     }
 
+    /** Clears all dungeon state */
     fun reset() {
         rooms.fill(null)
         doors.fill(null)
@@ -139,8 +98,8 @@ object Dungeon {
         uniqueDoors.clear()
         discoveredRooms.clear()
         currentRoom = null
-        bloodDone = false
         bloodClear = false
+        bloodDone = false
         holdingLeaps = false
         mapLine1 = ""
         mapLine2 = ""
@@ -150,50 +109,69 @@ object Dungeon {
         MapUtils.reset()
     }
 
-    fun getRoomAtIdx(idx: Int): Room? {
-        return if (idx in rooms.indices) rooms[idx] else null
+    /** Updates HUD lines for map overlay */
+    private fun updateHudLines() {
+        val run = DungeonScore.data
+
+        val dSecrets = "§7Secrets: §b${run.secretsFound}§8-§e${run.secretsRemaining}§8-§c${run.totalSecrets}"
+        val dCrypts = "§7Crypts: " + when {
+            run.crypts >= 5 -> "§a${run.crypts}"
+            run.crypts > 0  -> "§e${run.crypts}"
+            else            -> "§c0"
+        }
+        val dMimic = if (floorNumber in listOf(6, 7)) {
+            "§7Mimic: " + if (MimicTrigger.mimicDead) "§a✔" else "§c✘"
+        } else ""
+
+        val minSecrets = "§7Min Secrets: " + when {
+            run.secretsFound == 0 -> "§b?"
+            run.minSecrets > run.secretsFound -> "§e${run.minSecrets}"
+            else -> "§a${run.minSecrets}"
+        }
+
+        val dDeaths = "§7Deaths: " + if (run.teamDeaths < 0) "§c${run.teamDeaths}" else "§a0"
+        val dScore = "§7Score: " + when {
+            run.score >= 300 -> "§a${run.score}"
+            run.score >= 270 -> "§e${run.score}"
+            else             -> "§c${run.score}"
+        } + if (DungeonScore.hasPaul) " §b★" else ""
+
+        mapLine1 = "$dSecrets    $dCrypts    $dMimic".trim()
+        mapLine2 = "$minSecrets    $dDeaths    $dScore".trim()
     }
 
-    fun getRoomAtComp(comp: Pair<Int, Int>): Room? {
-        val idx = getRoomIdx(comp)
-        return if (idx in rooms.indices) rooms[idx] else null
+    /** Updates leap detection based on held item */
+    private fun updateHeldItem() {
+        val item = Stella.mc.player?.mainHandStack ?: return
+        holdingLeaps = "leap" in item.name.string.clearCodes().lowercase()
     }
 
-    fun getRoomAt(x: Int, z: Int): Room? {
-        val comp = WorldScanUtils.realCoordToComponent(x, z)
-        val idx = getRoomIdx(comp)
-        return if (idx in rooms.indices) rooms[idx] else null
-    }
+    // Room accessors
+    fun getRoomIdx(comp: Pair<Int, Int>) = 6 * comp.second + comp.first
+    fun getRoomAtIdx(idx: Int) = rooms.getOrNull(idx)
+    fun getRoomAtComp(comp: Pair<Int, Int>) = getRoomAtIdx(getRoomIdx(comp))
+    fun getRoomAt(x: Int, z: Int) = getRoomAtComp(WorldScanUtils.realCoordToComponent(x, z))
 
-    fun getRoomIdx(comp: Pair<Int, Int>): Int = 6 * comp.second + comp.first
-
+    // Door accessors
     fun getDoorIdx(comp: Pair<Int, Int>): Int {
         val base = ((comp.first - 1) shr 1) + 6 * comp.second
         return base - (base / 12)
     }
 
-    fun getDoorAtIdx(idx: Int): Door? {
-        return if (idx in doors.indices) doors[idx] else null
-    }
+    fun getDoorAtIdx(idx: Int) = doors.getOrNull(idx)
+    fun getDoorAtComp(comp: Pair<Int, Int>) = getDoorAtIdx(getDoorIdx(comp))
+    fun getDoorAt(x: Int, z: Int) = getDoorAtComp(WorldScanUtils.realCoordToComponent(x, z))
 
-    fun getDoorAtComp(comp: Pair<Int, Int>): Door? {
-        val idx = getDoorIdx(comp)
-        return getDoorAtIdx(idx)
-    }
-
-    fun getDoorAt(x: Int, z: Int): Door? {
-        val comp = WorldScanUtils.realCoordToComponent(x, z)
-        return getDoorAtComp(comp)
-    }
-
+    /** Adds a door to the map and tracks it as unique */
     fun addDoor(door: Door) {
         val idx = getDoorIdx(door.getComp())
-        if (idx !in doors.indices) return
-
-        doors[idx] = door
-        uniqueDoors += door
+        if (idx in doors.indices) {
+            doors[idx] = door
+            uniqueDoors += door
+        }
     }
 
+    /** Merges two rooms into one unified instance */
     fun mergeRooms(room1: Room, room2: Room) {
         uniqueRooms.remove(room2)
         for (comp in room2.components) {
@@ -207,6 +185,7 @@ object Dungeon {
         room1.update()
     }
 
+    /** Removes a room from the map grid */
     fun removeRoom(room: Room) {
         for (comp in room.components) {
             val idx = getRoomIdx(comp)

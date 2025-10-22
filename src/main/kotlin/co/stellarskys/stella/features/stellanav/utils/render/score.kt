@@ -37,7 +37,7 @@ object score {
         val state = getCurrentMapState(id) ?: return null
 
         Stella.mc.mapRenderer.update(id,state, renderState)
-        Stella.mc.mapRenderer.update(id,state, cashedRenderState)
+        cashedRenderState = renderState
         return renderState
     }
 
