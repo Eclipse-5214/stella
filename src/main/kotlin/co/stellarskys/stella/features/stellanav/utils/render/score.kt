@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.map.MapState
 
 object score {
-    var cashedRenderState = MapRenderState()
+    var cachedRenderState = MapRenderState()
 
     fun getCurrentMap(): ItemStack? {
         val stack = Stella.mc.player?.inventory?.getStack(8) ?: return null
@@ -43,7 +43,7 @@ object score {
 
     fun render(context: DrawContext){
         val matrix = context.matrices
-        val renderState = getCurrentMapRender() ?: cashedRenderState
+        val renderState = getCurrentMapRender() ?: cachedRenderState
 
         matrix.pushMatrix()
         matrix.translate(5f, 5f,)
