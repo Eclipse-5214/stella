@@ -5,11 +5,8 @@ import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.render.mapRender
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
-//#if MC > 1.21.5
 import co.stellarskys.stella.events.GuiEvent
-//#elseif MC == 1.8.9
-//$$ import co.stellarskys.stella.events.RenderEvent
-//#endif
+
 
 @Stella.Module
 object map: Feature("mapEnabled", area = "catacombs") {

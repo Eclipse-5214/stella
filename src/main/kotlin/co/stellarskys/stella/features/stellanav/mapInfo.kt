@@ -15,7 +15,7 @@ import co.stellarskys.stella.events.GuiEvent
 
 @Stella.Module
 object mapInfo: Feature("separateMapInfo", "catacombs") {
-    const val name = "Map Info"
+    const val name = "map Info"
 
     override fun initialize() {
         HUDManager.registerCustom(name, 200, 30,this::HUDEditorRender)

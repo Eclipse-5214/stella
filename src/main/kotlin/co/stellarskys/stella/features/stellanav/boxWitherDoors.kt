@@ -6,9 +6,9 @@ import co.stellarskys.stella.events.RenderEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.mapConfig
 import co.stellarskys.stella.utils.render.Render3D
-import co.stellarskys.stella.utils.skyblock.dungeons.DoorState
-import co.stellarskys.stella.utils.skyblock.dungeons.DoorType
-import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
+import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.clearCodes
 
 @Stella.Module
@@ -53,7 +53,7 @@ object boxWitherDoors: Feature("boxWitherDoors", "catacombs") {
 
             val color = if (keyObtained) mapConfig.key else mapConfig.noKey
 
-            DungeonScanner.doors.forEach { door ->
+            Dungeon.doors.forEach { door ->
                 if (door == null) return@forEach
                 if (door.state != DoorState.DISCOVERED) return@forEach
                 if (door.type == DoorType.BLOOD && door.opened) return@forEach
@@ -62,9 +62,7 @@ object boxWitherDoors: Feature("boxWitherDoors", "catacombs") {
                 val (x, y, z) = door.getPos()
 
                 Render3D.renderBox(
-                    //#if MC >= 1.21.5
                     event.context,
-                    //#endif
                     x.toDouble(), y.toDouble(), z.toDouble(),
                     3.0, 4.0,
                     color, true, mapConfig.doorLW

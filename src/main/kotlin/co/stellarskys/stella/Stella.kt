@@ -7,8 +7,7 @@ import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.TickUtils
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.skyblock.NEUApi
-import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner
-import co.stellarskys.stella.utils.skyblock.dungeons.RoomRegistry
+import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import java.util.concurrent.ConcurrentHashMap
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
@@ -29,8 +28,7 @@ class Stella: ClientModInitializer {
     fun onInitializeClient() {
         init()
         FeatureLoader.init()
-        RoomRegistry.loadFromRemote()
-        DungeonScanner.init()
+        Dungeon.init()
         NEUApi.init()
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->

@@ -8,7 +8,15 @@ import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.*
+import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
+import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
+import net.minecraft.client.gui.PlayerSkinDrawer
 import java.awt.Color
+import java.util.UUID
 import kotlin.math.PI
 
 object clear{
@@ -38,7 +46,7 @@ object clear{
 
     // room rendering
     fun renderRooms(context: UDrawContext) {
-        DungeonScanner.discoveredRooms.forEach { (id, room) ->
+        Dungeon.discoveredRooms.forEach { (id, room) ->
             val color = Color(65 / 255f, 65 / 255f, 65 / 255f, 1f)
 
             val x = room.x * spacing
@@ -49,7 +57,7 @@ object clear{
             Render2D.drawRect(context, x, y, w, h, color)
         }
 
-        DungeonScanner.uniqueRooms.forEach { room ->
+        Dungeon.uniqueRooms.forEach { room ->
             if (room.explored) {
                 val color = roomTypeColors[room.type] ?: return@forEach
 
@@ -68,7 +76,7 @@ object clear{
             }
         }
 
-        DungeonScanner.doors.forEach { door ->
+        Dungeon.doors.forEach { door ->
             if (door?.state != DoorState.DISCOVERED) return@forEach
 
             val type = if (door.opened) DoorType.NORMAL else door.type
@@ -92,7 +100,7 @@ object clear{
         val matrix = context.matrices
         val scale = mapConfig.checkmarkScale
 
-        DungeonScanner.discoveredRooms.forEach { (id, room) ->
+        Dungeon.discoveredRooms.forEach { (id, room) ->
             val w = 10
             val h = 12
             val x = room.x * spacing - w / 2 + roomSize / 2
@@ -107,7 +115,7 @@ object clear{
             matrix.popMatrix()
         }
 
-        DungeonScanner.uniqueRooms.forEach { room ->
+        Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored) return@forEach
             val checkmark = getCheckmarks(room.checkmark) ?: return@forEach
 
@@ -151,7 +159,7 @@ object clear{
 
     // name & secret rendering
     fun renderPuzzleNames(context: UDrawContext){
-        DungeonScanner.uniqueRooms.forEach { room ->
+        Dungeon.uniqueRooms.forEach { room ->
             val matrix = context.matrices
 
             if (!room.explored) return@forEach
@@ -228,7 +236,7 @@ object clear{
     }
 
     fun renderRoomNames(context: UDrawContext){
-        DungeonScanner.uniqueRooms.forEach { room ->
+        Dungeon.uniqueRooms.forEach { room ->
             val matrix = context.matrices
 
             if (!room.explored) return@forEach
@@ -305,28 +313,28 @@ object clear{
 
     // player rendering
     fun renderPlayers(context: UDrawContext) {
-        for ((k, v) in Dungeon.players) {
-            val player = DungeonScanner.players.find { it.name == v.name } ?: continue
+        for (player in DungeonPlayerManager.players) {
+            if (player == null) continue
             val you = Stella.mc.player ?: continue
-            if (v.isDead && v.name != you.name.string) continue
+            if (!player.alive && player.name != you.name.string) continue
 
             val iconX = player.iconX ?: continue
             val iconY = player.iconZ ?: continue
-            val rotation = player.rotation ?: continue
+            val rotation = player.yaw ?: continue
 
             val x = (iconX / 125.0 * 128.0)
             val y = (iconY / 125.0 * 128.0)
 
             val matrix = context.matrices
 
-            val ownName = mapConfig.dontShowOwn && v.name == you.name.string
+            val ownName = mapConfig.dontShowOwn && player.name == you.name.string
 
             if (Dungeon.holdingLeaps && mapConfig.showNames && !ownName) {
                 matrix.pushMatrix()
                 matrix.translate(x.toFloat(), y.toFloat())
 
                 val scale = mapConfig.iconScale / 1.3f
-                renderNametag(context, v.name, scale)
+                renderNametag(context, player.name, scale)
                 matrix.popMatrix()
             }
 
@@ -339,7 +347,7 @@ object clear{
                 val w = 12
                 val h = 12
 
-                val borderColor = if (mapConfig.iconClassColors) getClassColor(v.className) else mapConfig.iconBorderColor
+                val borderColor = if (mapConfig.iconClassColors) getClassColor(player.dclass.displayName) else mapConfig.iconBorderColor
 
                 Render2D.drawRect(context, (-w.toDouble() / 2.0).toInt(), (-h.toDouble() / 2.0).toInt(), w, h, borderColor)
 
@@ -347,41 +355,12 @@ object clear{
 
                 matrix.scale(scale, scale)
 
-                Render2D.drawTexture(
-                    context,
-                    player.skin,
-                    (-w.toDouble() / 2.0).toInt(),
-                    (-h.toDouble() / 2.0).toInt(),
-                    8f,
-                    8f,
-                    w,
-                    h,
-                    8,
-                    8,
-                    64,
-                    64,
-                )
-
-                if (player.hat) {
-                    Render2D.drawTexture(
-                        context,
-                        player.skin,
-                        (-w.toDouble() / 2.0).toInt(),
-                        (-h.toDouble() / 2.0).toInt(),
-                        40f,
-                        8f,
-                        w,
-                        h,
-                        8,
-                        8,
-                        64,
-                        64,
-                    )
-                }
+                val uuid = player.uuid ?: UUID(0,0)
+                Render2D.drawPlayerHead(context, -6,-6,12, uuid)
             } else {
                 val w = 7
                 val h = 10
-                val head = if (v.name == you.name.string) GreenMarker else WhiteMarker
+                val head = if (player.name == you.name.string) GreenMarker else WhiteMarker
 
                 Render2D.drawImage(
                     context,

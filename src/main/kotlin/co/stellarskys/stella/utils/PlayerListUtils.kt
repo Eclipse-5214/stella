@@ -6,6 +6,7 @@ import net.minecraft.client.network.PlayerListEntry
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+// Hevily Inspired by Skyvlocker
 object PlayerListUtils {
     var playerList = emptyList<PlayerListEntry>()
 
@@ -24,7 +25,7 @@ object PlayerListUtils {
     }
 
     fun strAt(idx: Int): String? {
-        if (playerList.isEmpty() || playerList.size < idx) return null
+        if (playerList.isEmpty() || idx !in playerList.indices) return null
         val txt = playerList[idx].displayName ?: return null
         val str = txt.string.trim()
 

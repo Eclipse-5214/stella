@@ -8,7 +8,9 @@ import co.stellarskys.stella.features.stellanav.utils.typeToName
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.TickUtils
 import co.stellarskys.stella.utils.clearCodes
-import co.stellarskys.stella.utils.skyblock.dungeons.DungeonScanner
+import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner
+import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
+import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
 
 @Stella.Module
 object dungeonBreakdown: Feature("dungeonBreakdown", "catacombs") {
@@ -23,9 +25,11 @@ object dungeonBreakdown: Feature("dungeonBreakdown", "catacombs") {
 
             TickUtils.schedule(3 * 20 ) {
                 ChatUtils.addMessage(Stella.PREFIX + " §bCleared room counts:")
-                DungeonScanner.players.forEach { player ->
+                DungeonPlayerManager.players.forEach { player ->
+                    if (player == null) return@forEach
+
                     val name = player.name
-                    val secrets = player.secrets
+                    val secrets = player.getSecrets()
                     val minmax = "${player.minRooms}-${player.maxRooms}"
                     val deaths = player.deaths
                     val roomLore = buildRoomLore(player)
@@ -43,7 +47,7 @@ object dungeonBreakdown: Feature("dungeonBreakdown", "catacombs") {
         val visitedGreenNames = mutableSetOf<String>()
         val lore = StringBuilder()
 
-        fun formatRoomInfo(info: DungeonScanner.RoomClearInfo, checkColor: String, isLast: Boolean = false): String {
+        fun formatRoomInfo(info: MapScanner.RoomClearInfo, checkColor: String, isLast: Boolean = false): String {
             val room = info.room
             val name = if (room.name == "Default") room.shape else room.name ?: room.shape
             val type = typeToName(room.type)
@@ -63,7 +67,7 @@ object dungeonBreakdown: Feature("dungeonBreakdown", "catacombs") {
             return if (isLast) line else "$line\n"
         }
 
-        val allRooms = mutableListOf<DungeonScanner.RoomClearInfo>()
+        val allRooms = mutableListOf<MapScanner.RoomClearInfo>()
 
         for ((_, info) in greenRooms) {
             allRooms += info
@@ -84,5 +88,4 @@ object dungeonBreakdown: Feature("dungeonBreakdown", "catacombs") {
 
         return lore.toString()
     }
-
 }

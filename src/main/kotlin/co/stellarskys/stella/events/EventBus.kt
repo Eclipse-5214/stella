@@ -1,5 +1,6 @@
 package co.stellarskys.stella.events
 
+import co.stellarskys.stella.utils.ScoreboardUtils
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -179,7 +180,8 @@ object EventBus {
                 post(EntityEvent.Spawn(packet))
             }
             is ScoreboardObjectiveUpdateS2CPacket, is ScoreboardScoreUpdateS2CPacket, is ScoreboardDisplayS2CPacket, is TeamS2CPacket -> {
-                post(ScoreboardEvent.Update(packet))
+                val lines = ScoreboardUtils.getSidebarLines()
+                post(SidebarUpdateEvent(lines))
             }
             is PlayerListS2CPacket -> {
                 when (packet.actions.firstOrNull()) {

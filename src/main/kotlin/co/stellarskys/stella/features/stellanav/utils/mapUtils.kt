@@ -4,9 +4,9 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
-import co.stellarskys.stella.utils.skyblock.dungeons.Checkmark
-import co.stellarskys.stella.utils.skyblock.dungeons.DoorType
-import co.stellarskys.stella.utils.skyblock.dungeons.RoomType
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import net.minecraft.resource.ResourceManager

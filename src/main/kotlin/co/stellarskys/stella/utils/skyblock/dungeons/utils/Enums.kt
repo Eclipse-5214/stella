@@ -1,4 +1,4 @@
-package co.stellarskys.stella.utils.skyblock.dungeons
+package co.stellarskys.stella.utils.skyblock.dungeons.utils
 
 enum class DungeonClass (val displayName: String) {
     UNKNOWN("Unknown"),
@@ -15,3 +15,8 @@ enum class DungeonClass (val displayName: String) {
         fun from(name: String): DungeonClass = classes[name] ?: UNKNOWN
     }
 }
+
+enum class DoorType { NORMAL, WITHER, BLOOD, ENTRANCE }
+enum class DoorState { UNDISCOVERED, DISCOVERED }
+enum class Checkmark { NONE, WHITE, GREEN, FAILED, UNEXPLORED, UNDISCOVERED }
+enum class RoomType { NORMAL, PUZZLE, TRAP, YELLOW, BLOOD, FAIRY, RARE, ENTRANCE, UNKNOWN; }

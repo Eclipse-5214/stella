@@ -132,9 +132,7 @@ abstract class PacketEvent {
     class Sent(val packet: Packet<*>) : Event()
 }
 
-abstract class ScoreboardEvent {
-    class Update(val packet: Packet<*>) : Event()
-}
+class SidebarUpdateEvent(val lines: List<String>) : Event()
 
 abstract class TablistEvent {
     class Update(val packet: PlayerListS2CPacket) : Event()
