@@ -503,7 +503,7 @@ val config = Config("Stella", "Stella") {
             toggle {
                 configName = "separateMapInfo"
                 name = "Separate map Info"
-                description = "Renders the map info separate from the map map"
+                description = "Renders the map info separate from the dungeon map"
                 default = false
             }
 
