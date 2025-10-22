@@ -100,6 +100,7 @@ object Dungeon {
         currentRoom = null
         bloodClear = false
         bloodDone = false
+        complete = false
         holdingLeaps = false
         mapLine1 = ""
         mapLine2 = ""
