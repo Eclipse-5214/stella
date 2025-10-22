@@ -6,7 +6,7 @@ import net.minecraft.client.network.PlayerListEntry
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-// Hevily Inspired by Skyvlocker
+// Heavily Inspired by Skyvlocker
 object PlayerListUtils {
     var playerList = emptyList<PlayerListEntry>()
 
