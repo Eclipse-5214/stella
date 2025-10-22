@@ -42,7 +42,7 @@ object termNumbers : Feature("termNumbers") {
 
     override fun initialize() {
         register<RenderEvent.World> { event ->
-            if (!Dungeon.inBoss() || Dungeon.floorNumber != 7) return@register
+            if (!Dungeon.inBoss || Dungeon.floorNumber != 7) return@register
 
             val player: ClientPlayerEntity = MinecraftClient.getInstance().player ?: return@register
             val playerPos = Triple(

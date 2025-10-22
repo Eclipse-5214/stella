@@ -3,9 +3,12 @@ package co.stellarskys.stella.utils.render
 import co.stellarskys.stella.Stella.Companion.mc
 import co.stellarskys.stella.features.stellanav.utils.prevewMap
 import co.stellarskys.stella.utils.clearCodes
+import net.minecraft.block.entity.SkullBlockEntity
 import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.PlayerSkinDrawer
 import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.util.DefaultSkinHelper
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Formatting
@@ -14,6 +17,8 @@ import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
 import org.joml.Vector3f
 import java.awt.Color
+import java.util.Optional
+import java.util.UUID
 
 
 object Render2D {
@@ -89,6 +94,14 @@ object Render2D {
         context.matrices.popMatrix()
     }
 
+    fun drawPlayerHead(context: DrawContext, x: Int, y: Int, size: Int, uuid: UUID) {
+        val textures = SkullBlockEntity.fetchProfileByUuid(uuid)
+            .getNow(Optional.empty())
+            .map(mc.skinProvider::getSkinTextures)
+            .orElseGet { DefaultSkinHelper.getSkinTextures(uuid) }
+
+        PlayerSkinDrawer.draw(context, textures, x, y, size)
+    }
 
     fun String.width(): Int {
         val lines = split('\n')

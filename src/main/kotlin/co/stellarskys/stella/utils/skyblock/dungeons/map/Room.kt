@@ -1,16 +1,15 @@
-package co.stellarskys.stella.utils.skyblock.dungeons
+package co.stellarskys.stella.utils.skyblock.dungeons.map
 
+import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.WorldUtils
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomMetadata
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomRegistry
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
+import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import net.minecraft.block.Blocks
-
-data class RoomMetadata(
-    val name: String,
-    val type: String,
-    val cores: List<Int>,
-    val secrets: Int = 0,
-    val crypts: Int = 0,
-    val trappedChests: Int = 0
-)
 
 class Room(
     initialComponent: Pair<Int, Int>,
@@ -33,6 +32,8 @@ class Room(
     var secrets: Int = 0
     var secretsFound: Int = 0
     var crypts: Int = 0
+
+    var clearTime = TimeUtils.zero
 
     init {
         addComponents(listOf(initialComponent))
@@ -57,17 +58,17 @@ class Room(
     fun update() {
         components.sortWith(compareBy({ it.first }, { it.second }))
         realComponents.clear()
-        realComponents += components.map { componentToRealCoords(it.first, it.second) }
+        realComponents += components.map { WorldScanUtils.componentToRealCoords(it.first, it.second) }
         scan()
-        shape = getRoomShape(components)
+        shape = WorldScanUtils.getRoomShape(components)
         corner = null
         rotation = null
     }
 
     fun scan(): Room {
         for ((x, z) in realComponents) {
-            if (height == null) height = getHighestY(x, z)
-            val core = getCore(x, z)
+            if (height == null) height = WorldScanUtils.getHighestY(x, z)
+            val core = WorldScanUtils.getCore(x, z)
             cores += core
             loadFromCore(core)
         }
@@ -83,13 +84,13 @@ class Room(
     fun loadFromData(data: RoomMetadata) {
         roomData = data
         name = data.name
-        type = roomTypeMap[data.type.lowercase()] ?: RoomType.NORMAL
+        type = ScanUtils.roomTypeMap[data.type.lowercase()] ?: RoomType.NORMAL
         secrets = data.secrets
         crypts = data.crypts
     }
 
     fun loadFromMapColor(color: Byte): Room {
-        type = mapColorToRoomType[color.toInt()] ?: RoomType.UNKNOWN
+        type = ScanUtils.mapColorToRoomType[color.toInt()] ?: RoomType.UNKNOWN
         when (type) {
             RoomType.BLOOD -> RoomRegistry.getAll().find { it.name == "Blood" }?.let { loadFromData(it) }
             RoomType.ENTRANCE -> RoomRegistry.getAll().find { it.name == "Entrance" }?.let { loadFromData(it) }
@@ -104,15 +105,15 @@ class Room(
         if (type == RoomType.FAIRY) {
             rotation = 0
             val (x, z) = realComponents.first()
-            corner = Triple(x - halfRoomSize + 0.5, height!!.toDouble(), z - halfRoomSize + 0.5)
+            corner = Triple(x - ScanUtils.halfRoomSize + 0.5, height!!.toDouble(), z - ScanUtils.halfRoomSize + 0.5)
             return this
         }
 
         val offsets = listOf(
-            Pair(-halfRoomSize, -halfRoomSize),
-            Pair(halfRoomSize, -halfRoomSize),
-            Pair(halfRoomSize, halfRoomSize),
-            Pair(-halfRoomSize, halfRoomSize)
+            Pair(-ScanUtils.halfRoomSize, -ScanUtils.halfRoomSize),
+            Pair(ScanUtils.halfRoomSize, -ScanUtils.halfRoomSize),
+            Pair(ScanUtils.halfRoomSize, ScanUtils.halfRoomSize),
+            Pair(-ScanUtils.halfRoomSize, ScanUtils.halfRoomSize)
         )
 
         for ((x, z) in realComponents) {
@@ -121,7 +122,7 @@ class Room(
                 val nx = x + dx
                 val nz = z + dz
 
-                if (!isChunkLoaded(nx, height!!, nz)) continue
+                if (!WorldScanUtils.isChunkLoaded(nx, height!!, nz)) continue
                 val state = WorldUtils.getBlockStateAt(nx, height!!, nz) ?: continue
                 if (state.isOf(Blocks.BLUE_TERRACOTTA)) {
                     rotation = jdx * 90
@@ -140,12 +141,12 @@ class Room(
             (pos.second - corner!!.second).toInt(),
             (pos.third - corner!!.third).toInt()
         )
-        return rotateCoords(rel, rotation!!)
+        return WorldScanUtils.rotateCoords(rel, rotation!!)
     }
 
     fun toWorldPos(local: Triple<Int, Int, Int>): Triple<Double, Double, Double>? {
         if (corner == null || rotation == null) return null
-        val rotated = rotateCoords(local, 360 - rotation!!)
+        val rotated = WorldScanUtils.rotateCoords(local, 360 - rotation!!)
         return Triple(
             rotated.first + corner!!.first,
             rotated.second + corner!!.second,

@@ -1,6 +1,9 @@
-package co.stellarskys.stella.utils.skyblock.dungeons
+package co.stellarskys.stella.utils.skyblock.dungeons.map
 
 import co.stellarskys.stella.utils.WorldUtils
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
 
 class Door(val worldPos: Pair<Int, Int>, val componentPos: Pair<Int, Int>) {
 
@@ -8,12 +11,6 @@ class Door(val worldPos: Pair<Int, Int>, val componentPos: Pair<Int, Int>) {
     var rotation: Int? = null
     var type: DoorType = DoorType.NORMAL
     var state = DoorState.UNDISCOVERED
-
-    init {
-        if (worldPos.first != 0 && worldPos.second != 0) {
-            checkType()
-        }
-    }
 
     fun getPos(): Triple<Int, Int, Int> {
         return Triple(worldPos.first, 69, worldPos.second)
@@ -35,27 +32,9 @@ class Door(val worldPos: Pair<Int, Int>, val componentPos: Pair<Int, Int>) {
 
     fun check() {
         val (x, y, z) = getPos()
-        if (!isChunkLoaded(x, y, z)) return
+        if (!WorldScanUtils.isChunkLoaded(x, y, z)) return
 
         val id = WorldUtils.getBlockNumericId(x, y, z)
         opened = (id == 0) && this.type != DoorType.WITHER
-    }
-
-    private fun checkType() {
-        val (x, y, z) = getPos()
-        if (!isChunkLoaded(x, y, z)) return
-
-        val id = WorldUtils.getBlockNumericId(x, y, z)
-
-        if (id == 0 || id == 166) return
-
-        type = when (id) {
-            97  -> DoorType.ENTRANCE
-            173 -> DoorType.WITHER
-            159 -> DoorType.BLOOD
-            else -> DoorType.NORMAL
-        }
-
-        opened = false
     }
 }

@@ -19,7 +19,7 @@ object mapRender {
         matrix.scale(scale, scale)
         matrix.translate(5f,5f)
 
-        if(!Dungeon.inBoss() && !Dungeon.complete) {
+        if(!Dungeon.inBoss && !Dungeon.complete) {
             renderMapBackground(context)
             clear.renderMap(context)
             if (mapInfoUnder) renderInfoUnder(context, false)

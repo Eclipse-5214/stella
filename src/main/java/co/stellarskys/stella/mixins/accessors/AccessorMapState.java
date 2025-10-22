@@ -10,5 +10,5 @@ import java.util.Map;
 @Mixin(MapState.class)
 public interface AccessorMapState {
     @Accessor("decorations")
-    Map<String, MapDecoration> getDecorationsMap();
+    Map<String, MapDecoration> getDecorations();
 }

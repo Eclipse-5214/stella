@@ -24,7 +24,7 @@ val config = Config("Stella", "Stella") {
             toggle {
                 configName = "showRoomName"
                 name = "Show Room Name"
-                description = "Shows the current dungeon rooms name in a hud"
+                description = "Shows the current map rooms name in a hud"
             }
 
             toggle {
@@ -137,7 +137,7 @@ val config = Config("Stella", "Stella") {
             toggle {
                 configName = "enableDungBlockOverlay"
                 name = "Enable Block Overlay"
-                description = "Replaces dungeon block textures with colored overlays"
+                description = "Replaces map block textures with colored overlays"
                 default = true
             }
 
@@ -180,21 +180,21 @@ val config = Config("Stella", "Stella") {
             colorpicker {
                 configName = "dungBatColour"
                 name = "Bat Color"
-                description = "Color used for dungeon bats"
+                description = "Color used for map bats"
                 default = rgba(255, 100, 255, 255)
             }
 
             colorpicker {
                 configName = "dungChestColour"
                 name = "Chest Color"
-                description = "Color used for normal dungeon chests"
+                description = "Color used for normal map chests"
                 default = rgba(255, 150, 0, 255)
             }
 
             colorpicker {
                 configName = "dungTrappedChestColour"
                 name = "Trapped Chest Color"
-                description = "Color used for trapped dungeon chests"
+                description = "Color used for trapped map chests"
                 default = rgba(255, 0, 0, 255)
             }
         }
@@ -241,30 +241,30 @@ val config = Config("Stella", "Stella") {
         subcategory("general") {
             toggle {
                 configName = "mapEnabled"
-                name = "Enable Map"
+                name = "Enable map"
                 description = "Enables the dungeon map"
                 default = false
             }
 
             toggle {
                 configName = "bossMapEnabled"
-                name = "Enable Boss Map"
-                description = "Enables the dungeon boss map"
+                name = "Enable Boss map"
+                description = "Enables the map boss map"
                 default = false
                 shouldShow { settings -> settings["mapEnabled"] as Boolean }
             }
 
             toggle {
                 configName = "scoreMapEnabled"
-                name = "Enable Score Map"
-                description = "Enables the dungeon score map"
+                name = "Enable Score map"
+                description = "Enables the map score map"
                 default = false
                 shouldShow { settings -> settings["mapEnabled"] as Boolean }
             }
 
             toggle {
                 configName = "mapInfoUnder"
-                name = "Map Info Under Map"
+                name = "map Info Under map"
                 description = "Renders map info below the map"
                 default = true
                 shouldShow { settings -> settings["mapEnabled"] as Boolean }
@@ -274,21 +274,21 @@ val config = Config("Stella", "Stella") {
         subcategory("Map") {
             colorpicker {
                 configName = "mapBgColor"
-                name = "Map Background Color"
+                name = "map Background Color"
                 description = "Background color of the map"
                 default = rgba(0, 0, 0, 100)
             }
 
             toggle {
                 configName = "mapBorder"
-                name = "Map Border"
+                name = "map Border"
                 description = "Renders a border around the map"
                 default = true
             }
 
             colorpicker {
                 configName = "mapBdColor"
-                name = "Map Border Color"
+                name = "map Border Color"
                 description = "Color of the map border"
                 default = rgba(0, 0, 0, 255)
                 shouldShow { settings -> settings["mapBorder"] as Boolean }
@@ -502,7 +502,7 @@ val config = Config("Stella", "Stella") {
 
             toggle {
                 configName = "separateMapInfo"
-                name = "Separate Map Info"
+                name = "Separate map Info"
                 description = "Renders the map info separate from the dungeon map"
                 default = false
             }
@@ -510,7 +510,7 @@ val config = Config("Stella", "Stella") {
             toggle {
                 configName = "dungeonBreakdown"
                 name = "Dungeon Breakdown"
-                description = "Sends dungeon info after run"
+                description = "Sends map info after run"
                 default = false
             }
         }
