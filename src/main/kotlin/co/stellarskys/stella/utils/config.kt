@@ -242,7 +242,7 @@ val config = Config("Stella", "Stella") {
             toggle {
                 configName = "mapEnabled"
                 name = "Enable map"
-                description = "Enables the map map"
+                description = "Enables the dungeon map"
                 default = false
             }
 
