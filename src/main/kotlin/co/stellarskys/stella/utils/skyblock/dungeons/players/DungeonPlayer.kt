@@ -66,7 +66,7 @@ class DungeonPlayer(val name: String) {
             currSecrets = secrets
         }
 
-        return initSecrets!! - currSecrets!!
+        return currSecrets!! - initSecrets!!
     }
 
     fun getGreenChecks(): MutableMap<String, RoomClearInfo> = clearedRooms["GREEN"] ?: mutableMapOf()
