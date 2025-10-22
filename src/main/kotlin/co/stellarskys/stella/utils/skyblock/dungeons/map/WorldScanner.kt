@@ -18,40 +18,43 @@ object WorldScanner {
     val availableComponents = ScanUtils.getScanCoords().toMutableList()
     var lastIdx: Int? = null
 
-    val updater: EventBus.EventCall = EventBus.register<TickEvent.Client>({
-        val player = Stella.mc.player ?: return@register
-        if (LocationUtils.area != "catacombs") return@register
+    fun init() {
+        EventBus.register<TickEvent.Client> {
+            if (Dungeon.complete) return@register
 
-        // checking player states
-        checkPlayerState()
+            val player = Stella.mc.player ?: return@register
+            if (LocationUtils.area != "catacombs") return@register
 
-        val (x, z) = WorldScanUtils.realCoordToComponent(player.x.toInt(), player.z.toInt())
-        val idx = 6 * z + x
+            // checking player states
+            checkPlayerState()
 
-        // Bounds check
-        if (idx < 35) {
-            // Scan dungeon
-            scan()
+            val (x, z) = WorldScanUtils.realCoordToComponent(player.x.toInt(), player.z.toInt())
+            val idx = 6 * z + x
 
-            // Rotation & door state updates
-            checkRoomState()
-            checkDoorState()
+            // Bounds check
+            if (idx < 35) {
+                // Scan dungeon
+                scan()
 
-            val prevRoom = lastIdx?.let { rooms[it] }
-            val currRoom = rooms.getOrNull(idx)
+                // Rotation & door state updates
+                checkRoomState()
+                checkDoorState()
 
-            if (lastIdx == idx) return@register
+                val prevRoom = lastIdx?.let { rooms[it] }
+                val currRoom = rooms.getOrNull(idx)
 
-            lastIdx = idx
-            Dungeon.currentRoom = Dungeon.getRoomAt(player.x.toInt(), player.z.toInt())
-            Dungeon.currentRoom?.explored = true
-            val (rmx, rmz) = Dungeon.currentRoom?.components?.firstOrNull() ?: return@register
-            Dungeon.discoveredRooms.remove("$rmx/$rmz")
+                if (lastIdx == idx) return@register
+
+                lastIdx = idx
+                Dungeon.currentRoom = Dungeon.getRoomAt(player.x.toInt(), player.z.toInt())
+                Dungeon.currentRoom?.explored = true
+                val (rmx, rmz) = Dungeon.currentRoom?.components?.firstOrNull() ?: return@register
+                Dungeon.discoveredRooms.remove("$rmx/$rmz")
+            }
         }
-    },false)
+    }
 
     fun reset() {
-        updater.unregister()
         availableComponents.clear()
         availableComponents += ScanUtils.getScanCoords()
         lastIdx = null

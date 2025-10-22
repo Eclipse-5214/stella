@@ -56,7 +56,6 @@ object Dungeon {
             TickUtils.scheduleServer(1) {
                 inDungeon = LocationUtils.area == "catacombs"
                 if (!inDungeon) reset()
-                WorldScanner.updater.register()
             }
         }
 
@@ -85,6 +84,7 @@ object Dungeon {
         }
 
         RoomRegistry.loadFromRemote()
+        WorldScanner.init()
         DungeonPlayerManager.init()
         DungeonScore.init()
         MapUtils.init()
