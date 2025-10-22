@@ -20,7 +20,7 @@ object WorldScanner {
 
     fun init() {
         EventBus.register<TickEvent.Client> {
-            if (Dungeon.complete) return@register
+            if (!Dungeon.inDungeon) return@register
 
             val player = Stella.mc.player ?: return@register
             if (LocationUtils.area != "catacombs") return@register
