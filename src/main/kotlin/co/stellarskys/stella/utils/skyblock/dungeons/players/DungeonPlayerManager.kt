@@ -79,6 +79,10 @@ object DungeonPlayerManager {
             .firstOrNull { it.name == name }
     }
 
+    fun updateAllSecrets() {
+        players.filterNotNull().forEach { it.updateSecrets() }
+    }
+
     fun reset() {
         players.fill(null)
     }

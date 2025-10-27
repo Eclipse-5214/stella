@@ -26,6 +26,7 @@ class DungeonPlayer(val name: String) {
 
     private var initSecrets: Int? = null
     private var currSecrets: Int? = null
+    val secrets get() = currSecrets!! - initSecrets!!
 
     // api
     var uuid: UUID? = null
@@ -59,14 +60,12 @@ class DungeonPlayer(val name: String) {
             ?.uuid
     }
 
-    fun getSecrets(): Int {
-        if (uuid == null || initSecrets == null) return -1
+    fun updateSecrets() {
+        if (uuid == null) return
 
-        HypixelApi.fetchSecrets(uuid.toString(), 0) { secrets->
+        HypixelApi.fetchSecrets(uuid.toString(), cacheMs = 0) { secrets ->
             currSecrets = secrets
         }
-
-        return currSecrets!! - initSecrets!!
     }
 
     fun getGreenChecks(): MutableMap<String, RoomClearInfo> = clearedRooms["GREEN"] ?: mutableMapOf()

@@ -29,7 +29,7 @@ object dungeonBreakdown: Feature("dungeonBreakdown", "catacombs") {
                     if (player == null) return@forEach
 
                     val name = player.name
-                    val secrets = player.getSecrets()
+                    val secrets = player.secrets
                     val minmax = "${player.minRooms}-${player.maxRooms}"
                     val deaths = player.deaths
                     val roomLore = buildRoomLore(player)

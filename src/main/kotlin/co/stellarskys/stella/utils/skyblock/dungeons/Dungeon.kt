@@ -48,6 +48,10 @@ object Dungeon {
     var mapLine1 = ""
     var mapLine2 = ""
 
+    // Shortcuts
+    val players get() = DungeonPlayerManager.players
+    val score get() = DungeonScore.score
+
     data class DiscoveredRoom(val x: Int, val z: Int, val room: Room)
 
     /** Initializes all dungeon systems and event listeners */
@@ -64,8 +68,11 @@ object Dungeon {
         EventBus.register<ChatEvent.Receive> { event ->
             if (!inDungeon) return@register
             val msg = event.message.string.clearCodes()
-            if (DUNGEON_COMPLETE_PATTERN.containsMatchIn(msg)) complete = true
             if (WATCHER_PATTERN.containsMatchIn(msg)) bloodDone = true
+            if (DUNGEON_COMPLETE_PATTERN.containsMatchIn(msg)) {
+                DungeonPlayerManager.updateAllSecrets()
+                complete = true
+            }
         }
 
         EventBus.register<GameEvent.ActionBar> { event ->
@@ -184,13 +191,5 @@ object Dungeon {
         }
         uniqueRooms += room1
         room1.update()
-    }
-
-    /** Removes a room from the map grid */
-    fun removeRoom(room: Room) {
-        for (comp in room.components) {
-            val idx = getRoomIdx(comp)
-            if (idx in rooms.indices) rooms[idx] = null
-        }
     }
 }
