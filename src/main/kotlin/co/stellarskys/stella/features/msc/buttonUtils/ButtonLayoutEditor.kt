@@ -12,13 +12,8 @@ class ButtonLayoutEditor : VexelScreen() {
     private val slotSize = 20
     private val popup = EditButtonPopup(window)
 
-    override fun afterInitialization() {
-        super.afterInitialization()
-    }
-
-    override fun render(context: DrawContext?, mouseX: Int, mouseY: Int, deltaTicks: Float) {
+    override fun onRender(context: DrawContext?, mouseX: Int, mouseY: Int, deltaTicks: Float) {
         if (context == null) return
-
 
         // Draw dummy inventory
         val invX = (width - 176) / 2
@@ -67,7 +62,7 @@ class ButtonLayoutEditor : VexelScreen() {
 
         NVGRenderer.endFrame()
 
-        super.render(context, mouseX, mouseY, deltaTicks)
+        super.onRender(context, mouseX, mouseY, deltaTicks)
 
         popup.renderPreviewItem(context)
     }

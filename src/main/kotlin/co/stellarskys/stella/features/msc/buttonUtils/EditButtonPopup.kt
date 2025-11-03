@@ -44,7 +44,7 @@ class EditButtonPopup(window: VexelWindow) {
         borderColor = Palette.Purple.rgb,
         fontSize = 24f
     )
-        .setPositioning(5f, Pos.ParentPixels, 5f, Pos.ParentPixels)
+        .setPositioning(-10f, Pos.ParentPixels, 10f, Pos.ParentPixels)
         .setSizing(40f, Size.Pixels, 40f, Size.Pixels)
         .alignRight()
         .onClick { _, _, _ ->
