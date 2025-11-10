@@ -6,6 +6,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner.RoomClearInf
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonClass
 import net.minecraft.entity.player.PlayerEntity
+import xyz.meowing.knit.api.KnitClient
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
@@ -29,7 +30,13 @@ class DungeonPlayer(val name: String) {
     val secrets get() = currSecrets!! - initSecrets!!
 
     // api
-    var uuid: UUID? = null
+    val entity: PlayerEntity? = KnitClient.world?.entities
+        ?.asSequence()
+        ?.filterIsInstance<PlayerEntity>()
+        ?.find { it.gameProfile.name == name }
+
+    val uuid: UUID? get() = entity?.uuid
+
     var inRender = false
 
     var currRoom: Room? = null
@@ -41,23 +48,10 @@ class DungeonPlayer(val name: String) {
     )
 
     init {
-        uuid = findPlayerUUID(name)
-
         HypixelApi.fetchSecrets(uuid.toString(), 120_000) { secrets ->
             initSecrets = secrets
             currSecrets = secrets
         }
-
-        CompletableFuture.runAsync { Stella.mc.sessionService.fetchProfile(uuid, false) }
-    }
-
-    private fun findPlayerUUID(name: String): UUID? {
-        val world = Stella.mc.world ?: return null
-        return world.entities
-            .asSequence()
-            .filterIsInstance<PlayerEntity>()
-            .find { it.gameProfile.name == name }
-            ?.uuid
     }
 
     fun updateSecrets() {

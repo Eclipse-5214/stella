@@ -2,8 +2,7 @@ package co.stellarskys.stella.utils.config.core
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.GameEvent
-import co.stellarskys.stella.utils.TickUtils
+import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
@@ -27,6 +26,9 @@ import java.io.File
 
 import net.minecraft.client.util.DefaultSkinHelper
 import net.minecraft.entity.player.PlayerModelPart
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitPlayer
+import xyz.meowing.knit.api.scheduler.TickScheduler
 
 //Main config Shananagens
 class Config(
@@ -65,7 +67,7 @@ class Config(
     init {
         this.builder()
         selectedCategory = categories.values.firstOrNull()
-        EventBus.register<GameEvent.Unload> { save() }
+        EventBus.register<GameEvent.Stop> { save() }
     }
 
     // DSL functions
@@ -122,7 +124,7 @@ class Config(
                 }.setChildOf(window)
 
 
-                val username = UIText(Stella.mc.player?.name?.string ?: "null", false)
+                val username = UIText(KnitPlayer.player?.name?.string ?: "null", false)
                     .constrain {
                         x = RelativeConstraint() + 17.pixels()
                         y = CenterConstraint() + 2.pixels()
@@ -221,10 +223,8 @@ class Config(
             override fun onDrawScreen(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
                 super.onDrawScreen(matrixStack, mouseX, mouseY, partialTicks)
 
-                val player = Stella.mc.player ?: return
-
-
-                val entry = Stella.mc.networkHandler?.getPlayerListEntry(player.uuid)
+                val player = KnitPlayer.player ?: return
+                val entry = KnitClient.client.networkHandler?.getPlayerListEntry(player.uuid)
                 val skin = entry?.skinTextures?.texture ?: DefaultSkinHelper.getTexture()
                 val hasHat = player.isPartVisible(PlayerModelPart.HAT)
 
@@ -384,12 +384,8 @@ class Config(
     // UI functions
     fun open() {
         buildIfNeeded()
-        TickUtils.schedule(1){
-            //#if MC > 1.21.5
-            Stella.mc.setScreen(configUI)
-            //#elseif MC == 1.8.9
-            //$$ Stella.mc.displayGuiScreen(configUI)
-            //#endif
+        TickScheduler.Client.post {
+            KnitClient.client.setScreen(configUI)
         }
     }
 

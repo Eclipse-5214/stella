@@ -3,15 +3,15 @@ package co.stellarskys.stella.features.stellanav.utils.render
 import co.stellarskys.stella.features.stellanav.utils.mapConfig
 import co.stellarskys.stella.features.stellanav.utils.mapConfig.mapInfoUnder
 import co.stellarskys.stella.features.stellanav.utils.prevewMap
-import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
+import net.minecraft.client.gui.DrawContext
 
 object mapRender {
     private val defaultMapSize = Pair(138, 138)
 
-    fun render(context: UDrawContext, x: Float, y: Float, scale: Float) {
+    fun render(context: DrawContext, x: Float, y: Float, scale: Float) {
         val matrix = context.matrices
 
         matrix.pushMatrix()
@@ -41,7 +41,7 @@ object mapRender {
         matrix.popMatrix()
     }
 
-    fun renderPreview(context: UDrawContext, x: Float, y: Float, scale: Float) {
+    fun renderPreview(context: DrawContext, x: Float, y: Float, scale: Float) {
         val matrix = context.matrices
 
         matrix.pushMatrix()
@@ -56,7 +56,7 @@ object mapRender {
         matrix.popMatrix()
     }
 
-    fun renderInfoUnder(context: UDrawContext, preview: Boolean) {
+    fun renderInfoUnder(context: DrawContext, preview: Boolean) {
         val matrix = context.matrices
 
         var mapLine1 = Dungeon.mapLine1
@@ -81,7 +81,7 @@ object mapRender {
     }
 
 
-    fun renderMapBackground(context: UDrawContext) {
+    fun renderMapBackground(context: DrawContext) {
         val w = defaultMapSize.first
         var h = defaultMapSize.second
         h += if (mapInfoUnder) 10 else 0
@@ -89,7 +89,7 @@ object mapRender {
         Render2D.drawRect(context, 0, 0, w, h, mapConfig.mapBgColor)
     }
 
-    fun renderMapBorder(context: UDrawContext) {
+    fun renderMapBorder(context: DrawContext) {
         val (w, baseH) = defaultMapSize
         val borderWidth = mapConfig.mapBdWidth
         val h = baseH + if (mapInfoUnder) 10 else 0

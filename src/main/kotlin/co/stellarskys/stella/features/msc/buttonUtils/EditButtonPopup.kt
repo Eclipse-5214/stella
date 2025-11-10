@@ -7,6 +7,7 @@ import co.stellarskys.stella.utils.skyblock.NEUApi
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.Items
 import net.minecraft.item.ItemStack
+import xyz.meowing.knit.api.render.KnitResolution
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.core.*
@@ -126,8 +127,7 @@ class EditButtonPopup(window: VexelWindow) {
             stack = NEUApi.createDummyStack(item)
         }
 
-        val res = Stella.mc.window
-        val scale = res.scaleFactor.toFloat()
+        val scale = KnitResolution.scaleFactor.toFloat()
 
         val x = itemPreview.scaled.left
         val y = itemPreview.scaled.top

@@ -1,8 +1,9 @@
 package co.stellarskys.stella.features.stellanav
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.events.ChatEvent
-import co.stellarskys.stella.events.RenderEvent
+import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.events.core.ChatEvent
+import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.mapConfig
 import co.stellarskys.stella.utils.render.Render3D
@@ -10,9 +11,10 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.clearCodes
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
 
-@Stella.Module
-object boxWitherDoors: Feature("boxWitherDoors", "catacombs") {
+@Module
+object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CATACOMBS) {
     var keyObtained = false
     var bloodOpen = false
 
@@ -44,11 +46,7 @@ object boxWitherDoors: Feature("boxWitherDoors", "catacombs") {
             }
         }
 
-        register<RenderEvent.World> { event ->
-            //#if MC >= 1.21.5
-            if (event.context == null) return@register
-            //#endif
-
+        register<RenderEvent.World.Last> { event ->
             if(bloodOpen) return@register
 
             val color = if (keyObtained) mapConfig.key else mapConfig.noKey

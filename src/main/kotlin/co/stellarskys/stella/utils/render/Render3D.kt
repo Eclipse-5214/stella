@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils.render
 
-import co.stellarskys.stella.Stella
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.*
@@ -10,17 +9,13 @@ import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.shape.VoxelShape
 import org.joml.Matrix4f
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitPlayer
+import xyz.meowing.knit.api.render.world.RenderContext
 import java.awt.Color
 import kotlin.math.sqrt
 
-//#if MC < 1.21.9
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
-//#endif
-
 object Render3D {
-    val camera: Camera = Stella.mc.gameRenderer.camera!!
-
-    //#if MC < 1.21.9
     /**
      * - Draws a filled shape
      * @param ctx The WorldRenderContext
@@ -32,7 +27,7 @@ object Render3D {
      * @param phase Whether to render through walls or not (`false` = no)
      */
     fun renderFilled(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         shape: VoxelShape,
         ox: Double,
         oy: Double,
@@ -40,7 +35,7 @@ object Render3D {
         color: Color,
         phase: Boolean = false
     ) {
-        val consumers = ctx.consumers() ?: return
+        val consumers = ctx.consumers()
         val matrices = ctx.matrixStack() ?: return
         val layer = if (phase) StellaRenderLayers.FILLEDTHROUGHWALLS else StellaRenderLayers.FILLED
 
@@ -68,7 +63,7 @@ object Render3D {
      * @param phase Whether to render through walls or not (`false` = no)
      */
     fun renderOutline(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         shape: VoxelShape,
         ox: Double,
         oy: Double,
@@ -76,7 +71,7 @@ object Render3D {
         color: Color,
         phase: Boolean = false
     ) {
-        val consumers = ctx.consumers() ?: return
+        val consumers = ctx.consumers()
         val matrices = ctx.matrixStack() ?: return
         val layer = if (phase) StellaRenderLayers.getLinesThroughWalls( 1.0) else StellaRenderLayers.getLines( 1.0)
 
@@ -91,17 +86,17 @@ object Render3D {
 
     @JvmOverloads
     fun renderBeam(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         x: Double,
         y: Double,
         z: Double,
         color: Color = Color.CYAN,
         phase: Boolean = false
     ) {
-        val consumers = ctx.consumers() ?: return
+        val consumers = ctx.consumers()
         val matrices = ctx.matrixStack() ?: return
         val partialTicks = MinecraftClient.getInstance().renderTickCounter.getTickProgress(true)
-        val cam = Stella.mc.gameRenderer.camera.pos
+        val cam = ctx.camera().pos
 
         matrices.push()
         matrices.translate(
@@ -124,7 +119,7 @@ object Render3D {
 
     @JvmOverloads
     fun renderBox(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         x: Double,
         y: Double,
         z: Double,
@@ -134,9 +129,9 @@ object Render3D {
         phase: Boolean = false,
         lineWidth: Double = 1.0
     ) {
-        val consumers = ctx.consumers() ?: return
+        val consumers = ctx.consumers()
         val matrices = ctx.matrixStack() ?: return
-        val cam = camera.pos.negate()
+        val cam = ctx.camera().pos.negate()
         val layer = if (phase) StellaRenderLayers.getLinesThroughWalls(lineWidth) else StellaRenderLayers.getLines(lineWidth)
         val cx = x + 0.5
         val cz = z + 0.5
@@ -158,7 +153,7 @@ object Render3D {
 
     @JvmOverloads
     fun renderFilledBox(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         x: Double,
         y: Double,
         z: Double,
@@ -167,9 +162,9 @@ object Render3D {
         color: Color = Color.CYAN,
         phase: Boolean = false
     ) {
-        val consumers = ctx.consumers() ?: return
+        val consumers = ctx.consumers()
         val matrices = ctx.matrixStack() ?: return
-        val cam = camera.pos.negate()
+        val cam = ctx.camera().pos.negate()
         val layer = if (phase) StellaRenderLayers.FILLEDTHROUGHWALLS else StellaRenderLayers.FILLED
         val cx = x + 0.5
         val cz = z + 0.5
@@ -191,7 +186,7 @@ object Render3D {
 
     @JvmOverloads
     fun renderWaypoint(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         x: Double,
         y: Double,
         z: Double,
@@ -200,7 +195,7 @@ object Render3D {
         increase: Boolean = false,
         phase: Boolean = false
     ) {
-        val pos = Stella.mc.player ?: return
+        val pos = KnitPlayer.player ?: return
         val dx = x - pos.x
         val dy = y + 5 - pos.y
         val dz = z - pos.z
@@ -232,7 +227,8 @@ object Render3D {
     ) {
         var toScale = scale
         val matrices = Matrix4f()
-        val textRenderer = Stella.mc.textRenderer
+        val textRenderer = KnitClient.client.textRenderer
+        val camera = KnitClient.client.gameRenderer.camera
         val dx = (x - camera.pos.x).toFloat()
         val dy = (y - camera.pos.y).toFloat()
         val dz = (z - camera.pos.z).toFloat()
@@ -244,14 +240,14 @@ object Render3D {
             .rotate(camera.rotation)
             .scale(toScale, -toScale, toScale)
 
-        val consumer = Stella.mc.bufferBuilders.entityVertexConsumers
+        val consumer = KnitClient.client.bufferBuilders.entityVertexConsumers
         val textLayer = if (phase) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL
         val lines = text.split("\n")
         val maxWidth = lines.maxOf { textRenderer.getWidth(it) }
         val offset = -maxWidth / 2f
 
         if (bgBox) {
-            val bgOpacity = (Stella.mc.options.getTextBackgroundOpacity(0.25f) * 255).toInt() shl 24
+            val bgOpacity = (KnitClient.client.options.getTextBackgroundOpacity(0.25f) * 255).toInt() shl 24
             val boxHeight = lines.size * 9
             textRenderer.draw(
                 "", // empty string, just draws box
@@ -410,6 +406,4 @@ object Render3D {
         vertices.vertex(matrix, x, y.toFloat(), z).color(color).texture(u, v).overlay(OverlayTexture.DEFAULT_UV)
             .light(15728880).normal(matrix, 0.0f, 1.0f, 0.0f)
     }
-
-    //#endif
 }

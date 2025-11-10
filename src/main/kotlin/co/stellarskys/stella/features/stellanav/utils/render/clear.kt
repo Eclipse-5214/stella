@@ -1,8 +1,6 @@
 package co.stellarskys.stella.features.stellanav.utils.render
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.features.stellanav.utils.*
-import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
@@ -13,6 +11,8 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
+import net.minecraft.client.gui.DrawContext
+import xyz.meowing.knit.api.KnitPlayer
 import java.awt.Color
 import java.util.UUID
 import kotlin.math.PI
@@ -24,7 +24,7 @@ object clear {
     private const val spacing = roomSize + gapSize
 
     /** Main render entry point */
-    fun renderMap(context: UDrawContext) {
+    fun renderMap(context: DrawContext) {
         val matrix = context.matrices
         val mapOffset = if (Dungeon.floorNumber == 1) 10.6f else 0f
         val mapScale = oscale(Dungeon.floorNumber)
@@ -44,7 +44,7 @@ object clear {
     }
 
     /** Renders discovered and explored rooms, doors, and connectors */
-    fun renderRooms(context: UDrawContext) {
+    fun renderRooms(context: DrawContext) {
         Dungeon.discoveredRooms.values.forEach { room ->
             Render2D.drawRect(
                 context,
@@ -78,7 +78,7 @@ object clear {
     }
 
     /** Renders checkmarks for discovered and explored rooms */
-    fun renderCheckmarks(context: UDrawContext) {
+    fun renderCheckmarks(context: DrawContext) {
         val scale = mapConfig.checkmarkScale
 
         Dungeon.discoveredRooms.values.forEach { room ->
@@ -114,7 +114,7 @@ object clear {
     }
 
     /** Renders room names and secret counts */
-    fun renderRoomLabels(context: UDrawContext, type: RoomType, checkmarkMode: Int, scaleFactor: Float) {
+    fun renderRoomLabels(context: DrawContext, type: RoomType, checkmarkMode: Int, scaleFactor: Float) {
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored || room.type != type || checkmarkMode < 1) return@forEach
 
@@ -149,8 +149,8 @@ object clear {
     }
 
     /** Renders player icons and optional nametags */
-    fun renderPlayers(context: UDrawContext) {
-        val you = Stella.mc.player ?: return
+    fun renderPlayers(context: DrawContext) {
+        val you = KnitPlayer.player ?: return
         for (player in DungeonPlayerManager.players) {
             if (player == null || (!player.alive && player.name != you.name.string)) continue
 
@@ -174,7 +174,7 @@ object clear {
     }
 
     /** Renders connectors between adjacent room components */
-    fun renderRoomConnectors(context: UDrawContext, room: Room) {
+    fun renderRoomConnectors(context: DrawContext, room: Room) {
         val directions = listOf(Pair(1, 0), Pair(-1, 0), Pair(0, 1), Pair(0, -1))
 
         for ((x, z) in room.components) {
@@ -223,14 +223,14 @@ object clear {
     }
 
     /** Scoped matrix push/pop wrapper */
-    inline fun UDrawContext.withMatrix(block: () -> Unit) {
+    inline fun DrawContext.withMatrix(block: () -> Unit) {
         matrices.pushMatrix()
         block()
         matrices.popMatrix()
     }
 
     /** Renders a text string with a soft shadow */
-    fun drawShadowedText(context: UDrawContext, text: String, x: Int, y: Int, scale: Float) {
+    fun drawShadowedText(context: DrawContext, text: String, x: Int, y: Int, scale: Float) {
         val offsets = listOf(Pair(scale, 0f), Pair(-scale, 0f), Pair(0f, scale), Pair(0f, -scale))
         for ((dx, dy) in offsets) {
             context.withMatrix {
@@ -241,7 +241,7 @@ object clear {
     }
 
     /** Renders a player's icon (head or marker) */
-    fun renderPlayerIcon(context: UDrawContext, player: DungeonPlayer, x: Double, y: Double, rotation: Float) {
+    fun renderPlayerIcon(context: DrawContext, player: DungeonPlayer, x: Double, y: Double, rotation: Float) {
         context.withMatrix {
             val matrix = context.matrices
             matrix.translate(x.toFloat(), y.toFloat())
@@ -255,7 +255,7 @@ object clear {
                 matrix.scale(1f - mapConfig.iconBorderWidth, 1f - mapConfig.iconBorderWidth)
                 Render2D.drawPlayerHead(context, -6, -6, 12, player.uuid ?: UUID(0, 0))
             } else {
-                val head = if (player.name == Stella.mc.player?.name?.string) GreenMarker else WhiteMarker
+                val head = if (player.name == KnitPlayer.player?.name?.string) GreenMarker else WhiteMarker
                 Render2D.drawImage(context, head, -4, -5, 7, 10)
             }
         }

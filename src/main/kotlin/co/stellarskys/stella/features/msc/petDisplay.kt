@@ -1,20 +1,19 @@
 package co.stellarskys.stella.features.msc
 
-import co.stellarskys.stella.Stella
-import co.stellarskys.stella.events.ChatEvent
-import co.stellarskys.stella.events.GuiEvent
-import co.stellarskys.stella.events.RenderEvent
-import co.stellarskys.stella.events.TablistEvent
+import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.events.core.ChatEvent
+import co.stellarskys.stella.events.core.GuiEvent
+import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
-import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.DataUtils
 import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
+import net.minecraft.client.gui.DrawContext
 
-@Stella.Module
-object petDisplay: Feature("petDisplay") {
+@Module
+object petDisplay: Feature("petDisplay", true) {
     const val name = "Pet Display"
 
     val petSummon = Regex("""You (summoned|despawned) your ([A-Za-z ]+)(?: ✦)?!""")
@@ -101,9 +100,9 @@ object petDisplay: Feature("petDisplay") {
             }
         }
 
-        register<TablistEvent.Update> { tabEvent ->
-            tabEvent.packet.entries.forEach { entry ->
-                val text = entry.displayName?.string?.clearCodes() ?: return@forEach
+        register<TablistEvent.Change> { tabEvent ->
+            tabEvent.new.flatten().forEach{ entry ->
+                val text = entry.string?.clearCodes() ?: return@forEach
 
                 val tabMatch = tab.find(text)
                 if (tabMatch != null) {
@@ -118,13 +117,13 @@ object petDisplay: Feature("petDisplay") {
             }
         }
 
-        register<GuiEvent.HUD> { event ->
+        register<GuiEvent.RenderHUD> { event ->
             if (HUDManager.isEnabled(name)) renderHud(event.context)
         }
     }
 
     fun HUDEditorRender(
-        context: UDrawContext,
+        context: DrawContext,
         x: Float, y: Float,
         width: Int, height: Int, scale: Float,
         partialTicks: Float, previewMode: Boolean
@@ -145,7 +144,7 @@ object petDisplay: Feature("petDisplay") {
         matrix.popMatrix()
     }
 
-    fun renderHud(context: UDrawContext) {
+    fun renderHud(context: DrawContext) {
         if (activePet == null) return
         val matrix = context.matrices
 

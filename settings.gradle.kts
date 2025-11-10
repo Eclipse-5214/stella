@@ -10,6 +10,8 @@ pluginManagement {
         maven("https://repo.essential.gg/repository/maven-public")
         maven("https://server.bbkr.space/artifactory/libs-release/")
         maven("https://jitpack.io/")
+        maven("https://maven.terraformersmc.com/")
+        maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 
         // Snapshots
         maven("https://maven.deftu.dev/snapshots")
@@ -22,7 +24,7 @@ pluginManagement {
 
     plugins {
         kotlin("jvm") version("2.2.0")
-        id("dev.deftu.gradle.multiversion-root") version("2.57.0")
+        id("dev.deftu.gradle.multiversion-root") version("2.62.0")
     }
 }
 
@@ -32,7 +34,7 @@ rootProject.name = projectName
 rootProject.buildFileName = "root.gradle.kts"
 
 listOf(
-    "1.21.7-fabric"//,
+    "1.21.8-fabric"//,
     //"1.21.9-fabric"
 ).forEach { version ->
     include(":$version")

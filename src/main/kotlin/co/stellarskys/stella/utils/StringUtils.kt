@@ -1,16 +1,10 @@
 package co.stellarskys.stella.utils
 
-//#if MC >= 1.21.5
 import net.minecraft.util.Formatting
-//#endif
-
 import org.apache.commons.lang3.StringUtils as ApacheStringUtils
 
 fun CharSequence?.countMatches(subString: CharSequence): Int = ApacheStringUtils.countMatches(this, subString)
-
-//#if MC >= 1.21.5
 fun String.stripControlCodes(): String = Formatting.strip(this)!!
-//#endif
 
 fun CharSequence?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
 fun CharSequence.startsWithAny(sequences: Iterable<CharSequence>): Boolean = sequences.any { startsWith(it) }

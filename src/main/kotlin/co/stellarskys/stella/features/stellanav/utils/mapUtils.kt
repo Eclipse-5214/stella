@@ -1,7 +1,6 @@
 package co.stellarskys.stella.features.stellanav.utils
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
@@ -9,9 +8,11 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import net.minecraft.client.gui.DrawContext
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.knit.api.KnitClient
 import java.awt.Color
 import java.io.InputStreamReader
 
@@ -100,7 +101,7 @@ object BossMapRegistry {
     private val bossMaps = mutableMapOf<String, List<BossMapData>>()
 
     init {
-        val resourceManager = Stella.mc.resourceManager
+        val resourceManager = KnitClient.client.resourceManager
         load(resourceManager)
     }
 
@@ -131,7 +132,7 @@ object BossMapRegistry {
     fun getAll(): Map<String, List<BossMapData>> = bossMaps
 }
 
-fun renderNametag(context: UDrawContext, name: String, scale: Float) {
+fun renderNametag(context: DrawContext, name: String, scale: Float) {
     val matrix = context.matrices
     val width = name.width().toFloat()
     val drawX = (-width / 2).toInt()

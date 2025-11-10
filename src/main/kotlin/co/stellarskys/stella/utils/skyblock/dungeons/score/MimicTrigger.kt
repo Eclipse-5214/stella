@@ -1,10 +1,11 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.score
 
-import co.stellarskys.stella.events.ChatEvent
-import co.stellarskys.stella.events.EntityEvent
 import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.ChatEvent
+import co.stellarskys.stella.events.core.EntityEvent
 import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.mob.ZombieEntity
 
@@ -19,29 +20,29 @@ object MimicTrigger {
 
     val mimicMessages = listOf("mimic dead", "mimic dead!", "mimic killed", "mimic killed!", "\$skytils-dungeon-score-mimic$")
 
-    val updater: EventBus.EventCall = EventBus.register<EntityEvent.Death>({ event ->
-        val mcEntity = event.entity
-        if (Dungeon.floorNumber !in listOf(6, 7) || mimicDead) return@register
-
-        if (mcEntity !is ZombieEntity) return@register
-        if (
-            !mcEntity.isBaby ||
-            EquipmentSlot.entries
-                .filter { it.type == EquipmentSlot.Type.HUMANOID_ARMOR }
-                .any { slot -> mcEntity.getEquippedStack(slot).isEmpty }
-        ) return@register
-
-        mimicDead = true
-    }, false)
-
     fun init() {
-        EventBus.register<ChatEvent.Receive> { event ->
-            if (Dungeon.floorNumber !in listOf(6, 7) || Dungeon.floor == null || !Dungeon.inDungeon) return@register
+        EventBus.registerIn<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (Dungeon.floorNumber !in listOf(6, 7) || Dungeon.floor == null) return@registerIn
 
             val msg = event.message.string.clearCodes()
-            val match = MIMIC_PATTERN.matchEntire(msg) ?: return@register
+            val match = MIMIC_PATTERN.matchEntire(msg) ?: return@registerIn
 
-            if (mimicMessages.none { it == match.groupValues[1].lowercase() }) return@register
+            if (mimicMessages.none { it == match.groupValues[1].lowercase() }) return@registerIn
+            mimicDead = true
+        }
+
+        EventBus.registerIn<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (Dungeon.floor?.floorNumber !in listOf(6, 7) || mimicDead) return@registerIn
+            val mcEntity = event.entity
+
+            if (mcEntity !is ZombieEntity) return@registerIn
+            if (
+                !mcEntity.isBaby ||
+                EquipmentSlot.entries
+                    .filter { it.type == EquipmentSlot.Type.HUMANOID_ARMOR }
+                    .any { slot -> mcEntity.getEquippedStack(slot).isEmpty }
+            ) return@registerIn
+
             mimicDead = true
         }
     }

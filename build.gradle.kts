@@ -15,6 +15,9 @@ plugins {
 
 repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven("https://repo.hypixel.net/repository/Hypixel/")
+    maven("https://api.modrinth.com/maven")
+    maven("https://maven.teamresourceful.com/repository/maven-public/")
 }
 
 toolkitMultiversion {
@@ -42,16 +45,46 @@ loom {
     }
 }
 
+val clocheAction: Action<ExternalModuleDependency> = Action {
+    attributes {
+        attribute(Attribute.of("earth.terrarium.cloche.modLoader", String::class.java), "fabric")
+        attribute(Attribute.of("earth.terrarium.cloche.minecraftVersion", String::class.java),
+            when (mcData.version) {
+                MinecraftVersions.VERSION_1_21_10 -> "1.21.9"
+                else -> mcData.toString().substringBefore("-")
+            }
+        )
+    }
+}
+
+
 dependencies {
+    implementation(include("io.github.classgraph:classgraph:4.8.184")!!)
     modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
     modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    modImplementation(includeOrShade("gg.essential:elementa:710")!!)
-    modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:436")!!)
-    modImplementation(include("xyz.meowing:vexel-${mcData}:119")!!)
-
+    modImplementation(include("xyz.meowing:vexel-${mcData}:121")!!)
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+    modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
+    modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
+    modImplementation(includeOrShade("gg.essential:elementa:710")!!)
+    modImplementation("me.owdding:item-data-fixer:1.0.5", clocheAction)
+    modImplementation("tech.thatgravyboat:skyblock-api:3.0.17") {
+        exclude("me.owdding")
+        clocheAction.execute(this)
+    }
+    include("tech.thatgravyboat:skyblock-api:3.0.17", clocheAction)
+
+    when (mcData.version) {
+        MinecraftVersions.VERSION_1_21_10 -> {
+            modImplementation(include("gg.essential:universalcraft-1.21.9-fabric:430")!!)
+        }
+        MinecraftVersions.VERSION_1_21_8 -> {
+            modImplementation(include("gg.essential:universalcraft-1.21.7-fabric:430")!!)
+        }
+        else -> {}
+    }
 }
 
 tasks {

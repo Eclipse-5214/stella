@@ -1,12 +1,14 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.score
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.SidebarUpdateEvent
-import co.stellarskys.stella.events.TablistEvent
+import co.stellarskys.stella.events.core.ScoreboardEvent
+import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -47,21 +49,12 @@ object DungeonScore {
 
     /** Registers event listeners for tablist and scoreboard updates */
     fun init() {
-        EventBus.register<TablistEvent.Update> { event ->
-            if (!Dungeon.inDungeon) return@register
-            event.packet.entries.forEach { entry ->
-                val msg = entry.displayName?.string?.clearCodes()?.trim() ?: return@forEach
-                parseTablist(msg)
-            }
+        EventBus.registerIn<TablistEvent.Change>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            event.new.flatten().forEach { parseTablist(it.stripped.trim()) }
         }
 
-        EventBus.register<SidebarUpdateEvent> { event ->
-            if (!Dungeon.inDungeon) return@register
-            MimicTrigger.updater.register()
-            event.lines.forEach { line ->
-                val msg = line.clearCodes().trim()
-                parseSidebar(msg)
-            }
+        EventBus.registerIn<ScoreboardEvent.Update>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            event.new.forEach { parseSidebar(it.stripColor().trim()) }
         }
 
         HypixelApi.fetchElectionData(
@@ -100,7 +93,7 @@ object DungeonScore {
         msg.match(CLEAR_PERCENT_PATTERN)?.let {
             clearedPercent = it.groupValues[1].toIntOrNull() ?: clearedPercent
         }
-        secretsPercentNeeded = floorSecrets[Dungeon.floor] ?: 1.0
+        secretsPercentNeeded = floorSecrets[Dungeon.floor?.name] ?: 1.0
     }
 
     /** Computes final score and all derived metrics */
@@ -125,8 +118,8 @@ object DungeonScore {
         secretsScore = (40 * ((secretsFoundPercent / 100.0) / secretsPercentNeeded)).coerceIn(0.0, 40.0)
         exploreScore = if (clearedPercent == 0) 0.0 else (60 * completionRatio + secretsScore).coerceIn(0.0, 100.0)
          bonusScore = crypts.coerceAtMost(5) + if (MimicTrigger.mimicDead) 2 else 0 + if (hasPaul) 10 else 0
-        val timeOffset = dungeonSeconds - (floorTimes[Dungeon.floor] ?: 0)
-        val speedScore = calculateSpeedScore(timeOffset, if (Dungeon.floor == "E") 0.7 else 1.0)
+        val timeOffset = dungeonSeconds - (floorTimes[Dungeon.floor?.name] ?: 0)
+        val speedScore = calculateSpeedScore(timeOffset, if (Dungeon.floor?.name == "E") 0.7 else 1.0)
 
         score = (skillScore + exploreScore + speedScore + bonusScore).toInt()
         maxSecrets = ceil(totalSecrets * secretsPercentNeeded).toInt()

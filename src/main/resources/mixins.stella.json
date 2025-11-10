@@ -12,6 +12,8 @@
       "MixinGameRenderer",
       "MixinInGameHud",
        "MixinStatusEffectsDisplay",
+      "MixinLivingEntity",
+      "MixinBlockRenderer",
       "accessors.AccessorMapState",
       "accessors.AccessorNetHandlerPlayClient",
       "accessors.AccessorPlayerList"

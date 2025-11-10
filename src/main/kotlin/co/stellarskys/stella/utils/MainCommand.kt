@@ -1,46 +1,33 @@
 package co.stellarskys.stella.utils
 
-import co.stellarskys.stella.Stella
+import co.stellarskys.stella.annotations.Command
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.hud.HUDEditor
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.context.CommandContext
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.knit.api.scheduler.TickScheduler
 
-@Stella.Command
-object MainCommand : CommandUtils(
-    "stella",
-    listOf("sa", "sta")
-) {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        config.open()
-        return 1
-    }
-
-    override fun buildCommand(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
-        builder.then(
-            ClientCommandManager.literal("hud")
-                .executes { _ ->
-                    TickUtils.schedule(1) {
-                        Stella.mc.execute {
-                            Stella.mc.setScreen(HUDEditor())
-                        }
-                    }
-                    1
+@Command
+object MainCommand : Commodore("stella", "sa", "sta") {
+    init {
+        literal("hud") {
+            runs {
+                TickScheduler.Client.post {
+                    KnitClient.client.setScreen(HUDEditor())
                 }
-        )
+            }
+        }
 
-        builder.then(
-            ClientCommandManager.literal("buttons")
-                .executes { _ ->
-                    TickUtils.schedule(1) {
-                        Stella.mc.execute {
-                            Stella.mc.setScreen(ButtonLayoutEditor())
-                        }
-                    }
-                    1
+        literal("buttons") {
+            runs {
+                TickScheduler.Client.post {
+                    KnitClient.client.setScreen(ButtonLayoutEditor())
                 }
-        )
+            }
+        }
+
+        runs {
+            config.open()
+        }
     }
 }

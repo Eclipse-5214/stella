@@ -1,30 +1,26 @@
 package co.stellarskys.stella.features.stellanav
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.events.ChatEvent
+import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.typeToColor
 import co.stellarskys.stella.features.stellanav.utils.typeToName
-import co.stellarskys.stella.utils.ChatUtils
-import co.stellarskys.stella.utils.TickUtils
-import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.scheduler.TickScheduler
+import xyz.meowing.knit.api.text.KnitText
 
-@Stella.Module
-object dungeonBreakdown: Feature("dungeonBreakdown", "catacombs") {
-    val completeRegex = Regex("""^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$""")
+@Module
+object dungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE_CATACOMBS) {
 
     override fun initialize() {
-
-        register<ChatEvent.Receive> { event ->
-            val msg = event.message.string.clearCodes()
-            val match = completeRegex.find(msg) ?: return@register
-            Stella.LOGGER.info("Match found $msg")
-
-            TickUtils.schedule(3 * 20 ) {
-                ChatUtils.addMessage(Stella.PREFIX + " §bCleared room counts:")
+        register<DungeonEvent.End> { event ->
+            TickScheduler.Client.schedule(3 * 20) {
+                KnitChat.fakeMessage(Stella.PREFIX + " §bCleared room counts:")
                 DungeonPlayerManager.players.forEach { player ->
                     if (player == null) return@forEach
 
@@ -34,7 +30,8 @@ object dungeonBreakdown: Feature("dungeonBreakdown", "catacombs") {
                     val deaths = player.deaths
                     val roomLore = buildRoomLore(player)
 
-                    ChatUtils.addMessage("§d| §b$name §fcleared §b$minmax §frooms | §b$secrets §fsecrets | §b$deaths §fdeaths", roomLore)
+                    val mesage = KnitText.literal("§d| §b$name §fcleared §b$minmax §frooms | §b$secrets §fsecrets | §b$deaths §fdeaths").onHover(roomLore)
+                    KnitChat.fakeMessage(mesage)
                 }
             }
         }

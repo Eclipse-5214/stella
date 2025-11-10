@@ -1,14 +1,15 @@
 package co.stellarskys.stella.features.dungeons
 
-import co.stellarskys.stella.Stella
-import co.stellarskys.stella.Stella.Companion.SHORTPREFIX
-import co.stellarskys.stella.events.ChatEvent
+import co.stellarskys.stella.Stella.SHORTPREFIX
+import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.clearCodes
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import xyz.meowing.knit.api.KnitChat
 
-@Stella.Module
-object termTracker : Feature("termTracker", "catacombs") {
+@Module
+object termTracker : Feature("termTracker", island = SkyBlockIsland.THE_CATACOMBS) {
     private lateinit var completed: MutableMap<String, MutableMap<String, Int>>
     private val pattern = Regex("""^(\w{1,16}) (?:activated|completed) a (\w+)! \(\d/\d\)$""")
 
@@ -21,7 +22,7 @@ object termTracker : Feature("termTracker", "catacombs") {
             when {
                 msg == "The Core entrance is opening!" -> {
                     completed.forEach { (user, data) ->
-                        ChatUtils.addMessage("$SHORTPREFIX §b$user §7completed §f${data["terminal"] ?: 0} §7 terms, §f${data["device"] ?: 0} §7devices, and §f${data["lever"] ?: 0} §7levers!")
+                        KnitChat.fakeMessage("$SHORTPREFIX §b$user §7completed §f${data["terminal"] ?: 0} §7 terms, §f${data["device"] ?: 0} §7devices, and §f${data["lever"] ?: 0} §7levers!")
                     }
                 }
                 pattern.matches(msg) -> {

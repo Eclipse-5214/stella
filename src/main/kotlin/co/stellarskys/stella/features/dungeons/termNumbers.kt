@@ -1,7 +1,8 @@
 package co.stellarskys.stella.features.dungeons
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.events.RenderEvent
+import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.mapConfig
 import co.stellarskys.stella.utils.Utils
@@ -16,13 +17,12 @@ import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.resource.Resource
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.BlockPos
 import java.awt.Color
 import java.io.IOException
 import java.io.InputStreamReader
 import kotlin.math.roundToInt
 
-@Stella.Module
+@Module
 object termNumbers : Feature("termNumbers") {
     val termLabelMap: Map<String, Pair<String, Color>> = mapOf(
         "T" to ("§7( §2Tank §7)" to mapConfig.tankColor),
@@ -41,7 +41,7 @@ object termNumbers : Feature("termNumbers") {
     )
 
     override fun initialize() {
-        register<RenderEvent.World> { event ->
+        register<RenderEvent.World.Last> { event ->
             if (!Dungeon.inBoss || Dungeon.floorNumber != 7) return@register
 
             val player: ClientPlayerEntity = MinecraftClient.getInstance().player ?: return@register

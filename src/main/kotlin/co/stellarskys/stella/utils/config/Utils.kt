@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils.config
 
-import co.stellarskys.stella.Stella
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.render.URenderPipeline
@@ -9,6 +8,7 @@ import gg.essential.universal.shader.BlendState
 import java.awt.Color
 import net.minecraft.client.texture.GlTexture
 import net.minecraft.util.Identifier
+import xyz.meowing.knit.api.KnitClient
 
 fun drawTexture(
     matrices: UMatrixStack,
@@ -33,7 +33,7 @@ fun drawTexture(
     val buffer = UBufferBuilder.create(UGraphics.DrawMode.QUADS, UGraphics.CommonVertexFormats.POSITION_TEXTURE_COLOR)
     UGraphics.bindTexture(0, sprite)
 
-    val texture = Stella.mc.textureManager.getTexture(sprite)
+    val texture = KnitClient.client.textureManager.getTexture(sprite)
     texture.setFilter(false, false)
     val glTexture = texture.glTexture as GlTexture
 

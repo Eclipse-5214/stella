@@ -1,30 +1,27 @@
 package co.stellarskys.stella.features.stellanav
 
-import co.stellarskys.stella.Stella
+import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.render.*
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
-//#if MC >= 1.21.5
-import co.stellarskys.stella.events.GuiEvent
-//#elseif MC == 1.8.9
-//$$ import co.stellarskys.stella.events.RenderEvent
-//#endif
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import net.minecraft.client.gui.DrawContext
 
-@Stella.Module
-object mapInfo: Feature("separateMapInfo", "catacombs") {
+@Module
+object mapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS) {
     const val name = "Map Info"
 
     override fun initialize() {
         HUDManager.registerCustom(name, 200, 30,this::HUDEditorRender)
 
-        register<GuiEvent.HUD> { event -> if (HUDManager.isEnabled(name)) RenderNormal(event.context) }
+        register<GuiEvent.RenderHUD> { event -> if (HUDManager.isEnabled(name)) RenderNormal(event.context) }
     }
 
     fun HUDEditorRender(
-        context: UDrawContext,
+        context: DrawContext,
         x: Float, y: Float,
         width: Int, height: Int, scale: Float,
         partialTicks: Float, previewMode: Boolean
@@ -42,7 +39,7 @@ object mapInfo: Feature("separateMapInfo", "catacombs") {
         matrix.popMatrix()
     }
 
-    fun RenderNormal(context: UDrawContext) {
+    fun RenderNormal(context: DrawContext) {
         val matrix = context.matrices
 
         val x = HUDManager.getX(name)
@@ -58,7 +55,7 @@ object mapInfo: Feature("separateMapInfo", "catacombs") {
         matrix.popMatrix()
     }
 
-    fun RenderMapInfo(context: UDrawContext, preview: Boolean) {
+    fun RenderMapInfo(context: DrawContext, preview: Boolean) {
         val matrix = context.matrices
 
         var mapLine1 = Dungeon.mapLine1

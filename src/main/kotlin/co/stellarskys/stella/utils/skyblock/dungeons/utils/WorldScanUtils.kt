@@ -2,12 +2,13 @@ package co.stellarskys.stella.utils.skyblock.dungeons.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.WorldUtils
+import xyz.meowing.knit.api.KnitClient
 
 object WorldScanUtils {
     val blacklist = setOf(5, 54, 146)
 
     fun isChunkLoaded(x: Int, y: Int, z: Int): Boolean {
-        val world = Stella.mc.world ?: return false
+        val world = KnitClient.world ?: return false
         val chunkX = x shr 4
         val chunkZ = z shr 4
         return world.chunkManager.isChunkLoaded(chunkX, chunkZ)
@@ -15,7 +16,7 @@ object WorldScanUtils {
 
     fun getCore(x: Int, z: Int): Int {
         val sb = StringBuilder(150)
-        val chunk = Stella.mc.world!!.getChunk(x shr 4, z shr 4)
+        val chunk = KnitClient.world!!.getChunk(x shr 4, z shr 4)
         val height = getHighestY(x, z)?.coerceIn(11..140) ?: 140 .coerceIn(11..140)
 
         sb.append(CharArray(140 - height) { '0' })

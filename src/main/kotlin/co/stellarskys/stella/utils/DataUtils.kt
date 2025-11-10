@@ -1,16 +1,15 @@
 package co.stellarskys.stella.utils
 
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.GameEvent
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonSerializer
-import com.google.gson.JsonPrimitive
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.GameEvent
 import co.stellarskys.stella.utils.TimeUtils.millis
 import net.fabricmc.loader.api.FabricLoader
 import java.awt.Color
@@ -76,9 +75,9 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
         dataFile.parentFile.mkdirs()
         autosave(5)
         startAutosaveLoop()
-        EventBus.register<GameEvent.Unload> ({
+        EventBus.register<GameEvent.Stop> {
             save()
-        })
+        }
     }
 
     private fun loadData(): T {

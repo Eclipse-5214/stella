@@ -2,17 +2,20 @@ package co.stellarskys.stella.utils.skyblock.dungeons.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.PacketEvent
-import co.stellarskys.stella.events.TickEvent
+import co.stellarskys.stella.events.core.PacketEvent
+import co.stellarskys.stella.events.core.TickEvent
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon.inBoss
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils.roomDoorCombinedSize
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
 import net.minecraft.item.FilledMapItem
 import net.minecraft.item.map.MapDecoration
 import net.minecraft.item.map.MapDecorationTypes
 import net.minecraft.item.map.MapState
 import net.minecraft.network.packet.s2c.play.MapUpdateS2CPacket
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitPlayer
 
 object MapUtils {
     val MapDecoration.mapX get() = (this.x() + 128) shr 1
@@ -29,14 +32,12 @@ object MapUtils {
     var guessMapData: MapState? = null
 
     fun init() {
-        EventBus.register<PacketEvent.Received> { event->
-            if (!Dungeon.inDungeon) return@register
-
+        EventBus.registerIn<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event->
             if (event.packet is MapUpdateS2CPacket && mapData == null) {
-                val world = Stella.mc.world ?: return@register
+                val world = KnitClient.world ?: return@registerIn
                 val id = event.packet.mapId.id
                 if (id and 1000 == 0) {
-                    val guess = FilledMapItem.getMapState(event.packet.mapId, world) ?: return@register
+                    val guess = FilledMapItem.getMapState(event.packet.mapId, world) ?: return@registerIn
                     if(guess.decorations.any {it.type == MapDecorationTypes.FRAME }) {
                         guessMapData = guess
                     }
@@ -44,9 +45,7 @@ object MapUtils {
             }
         }
 
-        EventBus.register<TickEvent.Client> {
-            if (!Dungeon.inDungeon) return@register
-
+        EventBus.registerIn<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
             if (!calibrated) {
                 if (mapData == null) {
                     mapData = getCurrentMapState()
@@ -64,9 +63,9 @@ object MapUtils {
     }
 
     fun getCurrentMapState(): MapState? {
-        val stack = Stella.mc.player?.inventory?.getStack(8) ?: return null
+        val stack = KnitPlayer.player?.inventory?.getStack(8) ?: return null
         if (stack.item !is FilledMapItem || !stack.name.string.contains("Magical Map")) return null
-        return FilledMapItem.getMapState(stack, Stella.mc.world!!)
+        return FilledMapItem.getMapState(stack, KnitClient.world!!)
     }
 
     fun calibrateDungeonMap(): Boolean {

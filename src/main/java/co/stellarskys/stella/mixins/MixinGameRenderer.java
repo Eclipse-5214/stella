@@ -1,7 +1,7 @@
 package co.stellarskys.stella.mixins;
 
-import co.stellarskys.stella.events.GuiEvent;
 import co.stellarskys.stella.events.EventBus;
+import co.stellarskys.stella.events.core.GuiEvent;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
@@ -15,6 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGameRenderer {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
     private void stella$afterHudRender(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext context) {
-        EventBus.INSTANCE.post(new GuiEvent.HUD(context));
+        EventBus.INSTANCE.post(new GuiEvent.RenderHUD(context));
     }
 }

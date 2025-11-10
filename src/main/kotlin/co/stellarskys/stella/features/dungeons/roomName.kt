@@ -1,23 +1,25 @@
 package co.stellarskys.stella.features.dungeons
 
-import co.stellarskys.stella.Stella
+import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
+import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.CompatHelpers.UDrawContext
-import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.events.GuiEvent
+import co.stellarskys.stella.events.core.GuiEvent
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import net.minecraft.client.gui.DrawContext
 
-@Stella.Module
-object roomName : Feature("showRoomName", area = "catacombs") {
+
+@Module
+object roomName : Feature("showRoomName", island = SkyBlockIsland.THE_CATACOMBS) {
     override fun initialize() {
         HUDManager.register("roomname", "No Room Found")
-        register<GuiEvent.HUD> { renderHUD(it.context)}
+        register<GuiEvent.RenderHUD> { renderHUD(it.context)}
     }
 
     private fun renderHUD(
-        context: UDrawContext
+        context: DrawContext
     ) {
         if (!HUDManager.isEnabled("roomname")) return
         if (Dungeon.inBoss) return

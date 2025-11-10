@@ -8,12 +8,14 @@ import net.minecraft.component.type.MapIdComponent
 import net.minecraft.item.FilledMapItem
 import net.minecraft.item.ItemStack
 import net.minecraft.item.map.MapState
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitPlayer
 
 object score {
     var cachedRenderState = MapRenderState()
 
     fun getCurrentMap(): ItemStack? {
-        val stack = Stella.mc.player?.inventory?.getStack(8) ?: return null
+        val stack = KnitPlayer.player?.inventory?.getStack(8) ?: return null
         if (stack.item !is FilledMapItem) return null
         return stack
     }
@@ -24,19 +26,19 @@ object score {
 
     fun getCurrentMapState(id: MapIdComponent?): MapState? {
         if (id == null) return null
-        return FilledMapItem.getMapState(id, Stella.mc.world!!)
+        return FilledMapItem.getMapState(id, KnitClient.world!!)
     }
 
     fun getCurrentMapRender(): MapRenderState? {
         val renderState = MapRenderState()
 
-        if (Stella.mc.player == null || Stella.mc.world == null) return null
+        if (KnitPlayer.player == null || KnitClient.world == null) return null
 
         val map = getCurrentMap()
         val id = getCurrentMapId(map) ?: return null
         val state = getCurrentMapState(id) ?: return null
 
-        Stella.mc.mapRenderer.update(id,state, renderState)
+        KnitClient.client.mapRenderer.update(id,state, renderState)
         cachedRenderState = renderState
         return renderState
     }

@@ -1,114 +1,34 @@
 package co.stellarskys.stella
 
-import co.stellarskys.stella.events.*
-import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.features.FeatureLoader
-import co.stellarskys.stella.utils.ChatUtils
-import co.stellarskys.stella.utils.TickUtils
-import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.utils.skyblock.NEUApi
-import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import java.util.concurrent.ConcurrentHashMap
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.ServerEvent
+import co.stellarskys.stella.managers.feature.FeatureManager
 import net.fabricmc.api.ClientModInitializer
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import org.apache.logging.log4j.LogManager
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.text.KnitText
 
-class Stella: ClientModInitializer {
+object Stella: ClientModInitializer {
     private var shown = false
 
-    @Target(AnnotationTarget.CLASS)
-    annotation class Module
+    @JvmStatic val LOGGER = LogManager.getLogger("stella")
+    @JvmStatic val NAMESPACE: String = "stella"
+    @JvmStatic val PREFIX: String = "§7[§dStella§7]"
+    @JvmStatic val SHORTPREFIX: String = "§d[SA]"
 
-    @Target(AnnotationTarget.CLASS)
-    annotation class Command
-
-    override
-    fun onInitializeClient() {
-        init()
-        FeatureLoader.init()
-        Dungeon.init()
-        NEUApi.init()
-
-        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
+    override fun onInitializeClient() {
+        FeatureManager.loadFeatures()
+        FeatureManager.initializeFeatures()
+        EventBus.register<ServerEvent.Connect> {
             if (shown) return@register
 
-            ChatUtils.addMessage(
-                "$PREFIX §bMod loaded.",
-                "§b${FeatureLoader.getFeatCount()} §dmodules §8- §b${FeatureLoader.getLoadtime()}§dms §8- §b${FeatureLoader.getCommandCount()} §dcommands"
-            )
+            val loadMessage = KnitText
+                .literal("$PREFIX §bMod loaded.")
+                .onHover("§b${FeatureManager.moduleCount} §dmodules §8- §b${FeatureManager.loadTime}§dms §8- §b${FeatureManager.commandCount} §dcommands")
+
+            KnitChat.fakeMessage(loadMessage)
 
             shown = true
         }
-
-        config.registerListener{ name, value ->
-            configListeners[name]?.forEach { it.update() }
-            ConfigCallback[name]?.forEach { it() }
-        }
-
-        EventBus.register<GuiEvent.Open> ({ event ->
-            if (event.screen is InventoryScreen) isInInventory = true
-        })
-
-        EventBus.register<GuiEvent.Close> ({
-            isInInventory = false
-        })
-
-        EventBus.register<AreaEvent.Main> ({
-            TickUtils.scheduleServer(1) {
-                areaFeatures.forEach { it.update() }
-            }
-        })
-
-        EventBus.register<AreaEvent.Sub> ({
-            TickUtils.scheduleServer(1) {
-                subareaFeatures.forEach { it.update() }
-            }
-        })
-    }
-
-    companion object {
-        private val pendingFeatures = mutableListOf<Feature>()
-        private val features = mutableListOf<Feature>()
-        private val configListeners = ConcurrentHashMap<String, MutableList<Feature>>()
-        private val ConfigCallback = ConcurrentHashMap<String, MutableList<() -> Unit>>()
-        private val areaFeatures = mutableListOf<Feature>()
-        private val subareaFeatures = mutableListOf<Feature>()
-
-        @JvmField val LOGGER = LogManager.getLogger("stella")
-        val mc = MinecraftClient.getInstance()
-        val NAMESPACE: String = "stella"
-        val INSTANCE: Stella? = null
-        val PREFIX: String = "§7[§dStella§7]"
-        val SHORTPREFIX: String = "§d[SA]"
-
-        var isInInventory = false
-
-        fun addFeature(feature: Feature) = pendingFeatures.add(feature)
-
-        fun initializeFeatures() {
-            pendingFeatures.forEach { feature ->
-                features.add(feature)
-                if (feature.hasAreas()) areaFeatures.add(feature)
-                if (feature.hasSubareas()) subareaFeatures.add(feature)
-                feature.initialize()
-                feature.configName?.let { registerListener(it, feature) }
-                feature.update()
-            }
-            pendingFeatures.clear()
-        }
-
-        fun registerListener(configName: String, feature: Feature) {
-            configListeners.getOrPut(configName) { mutableListOf() }.add(feature)
-        }
-
-        fun registerListener(configName: String, callback: () -> Unit) {
-            ConfigCallback.getOrPut(configName) { mutableListOf() }.add(callback)
-        }
-
-        //fun getResource(path: String) = Identifier.of(NAMESPACE, path)
-
-        fun init() {}
     }
 }

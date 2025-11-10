@@ -1,10 +1,9 @@
 package co.stellarskys.stella.hud
 
-
-import co.stellarskys.stella.Stella.Companion.mc
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.TimeUtils.millis
 import net.minecraft.client.gui.DrawContext
+import xyz.meowing.knit.api.KnitClient
 import java.awt.Color
 import kotlin.math.pow
 
@@ -107,8 +106,8 @@ class HUDElement(
         val textColor = Color(220, 240, 255, textAlpha).rgb
 
         lines.forEachIndexed { index, line ->
-            val textY = 5f + (index * mc.textRenderer.fontHeight)
-            context.drawTextWithShadow(mc.textRenderer, line, 5, textY.toInt(), textColor)
+            val textY = 5f + (index * KnitClient.client.textRenderer.fontHeight)
+            context.drawTextWithShadow(KnitClient.client.textRenderer, line, 5, textY.toInt(), textColor)
         }
     }
 

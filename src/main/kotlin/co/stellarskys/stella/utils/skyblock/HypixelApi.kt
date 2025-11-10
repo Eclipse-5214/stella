@@ -1,10 +1,40 @@
 package co.stellarskys.stella.utils.skyblock
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.utils.NetworkUtils
 import com.google.gson.Gson
+import net.hypixel.modapi.HypixelModAPI
+import net.hypixel.modapi.fabric.event.HypixelModAPICallback
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
+import kotlin.jvm.optionals.getOrNull
 
+@Module
 object HypixelApi {
+    init {
+        HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket::class.java)
+        HypixelModAPICallback.EVENT.register { event ->
+            when (event) {
+                is ClientboundLocationPacket -> {
+                    EventBus.post(LocationEvent.ServerChange(
+                        event.serverName,
+                        event.serverType.getOrNull(),
+                        event.lobbyName.getOrNull(),
+                        event.mode.getOrNull(),
+                        event.map.getOrNull(),
+                    ))
+                }
+
+                is ClientboundHelloPacket -> {
+                    EventBus.post(LocationEvent.HypixelJoin(event.environment))
+                }
+            }
+        }
+    }
+
     private val gson = Gson()
 
     fun fetchElectionData(

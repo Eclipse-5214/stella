@@ -1,21 +1,15 @@
 package co.stellarskys.stella.utils.render
 
-import co.stellarskys.stella.Stella.Companion.mc
-import co.stellarskys.stella.features.stellanav.utils.prevewMap
 import co.stellarskys.stella.utils.clearCodes
 import net.minecraft.block.entity.SkullBlockEntity
 import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.PlayerSkinDrawer
-import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.util.DefaultSkinHelper
-import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.RotationAxis
-import net.minecraft.util.math.Vec3d
-import org.joml.Vector3f
+import xyz.meowing.knit.api.KnitClient
 import java.awt.Color
 import java.util.Optional
 import java.util.UUID
@@ -23,6 +17,7 @@ import java.util.UUID
 
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
+    private val mc = KnitClient.client
 
     fun drawImage(ctx: DrawContext, image: Identifier, x: Int, y: Int, width: Int, height: Int) {
         ctx.drawGuiTexture(RenderPipelines.GUI_TEXTURED, image, x, y, width, height)

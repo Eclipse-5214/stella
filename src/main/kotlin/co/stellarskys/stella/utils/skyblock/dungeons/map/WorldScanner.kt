@@ -2,9 +2,8 @@ package co.stellarskys.stella.utils.skyblock.dungeons.map
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.TickEvent
+import co.stellarskys.stella.events.core.TickEvent
 import co.stellarskys.stella.utils.WorldUtils
-import co.stellarskys.stella.utils.skyblock.LocationUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
@@ -12,6 +11,9 @@ import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon.rooms
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitPlayer
 import java.util.UUID
 
 object WorldScanner {
@@ -19,11 +21,9 @@ object WorldScanner {
     var lastIdx: Int? = null
 
     fun init() {
-        EventBus.register<TickEvent.Client> {
-            if (!Dungeon.inDungeon) return@register
+        EventBus.registerIn<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
 
-            val player = Stella.mc.player ?: return@register
-            if (LocationUtils.area != "catacombs") return@register
+            val player = KnitPlayer.player ?: return@registerIn
 
             // checking player states
             checkPlayerState()
@@ -43,12 +43,12 @@ object WorldScanner {
                 val prevRoom = lastIdx?.let { rooms[it] }
                 val currRoom = rooms.getOrNull(idx)
 
-                if (lastIdx == idx) return@register
+                if (lastIdx == idx) return@registerIn
 
                 lastIdx = idx
                 Dungeon.currentRoom = Dungeon.getRoomAt(player.x.toInt(), player.z.toInt())
                 Dungeon.currentRoom?.explored = true
-                val (rmx, rmz) = Dungeon.currentRoom?.components?.firstOrNull() ?: return@register
+                val (rmx, rmz) = Dungeon.currentRoom?.components?.firstOrNull() ?: return@registerIn
                 Dungeon.discoveredRooms.remove("$rmx/$rmz")
             }
         }
@@ -131,14 +131,14 @@ object WorldScanner {
     }
 
     fun checkPlayerState() {
-        val world = Stella.mc.world ?: return
+        val world = KnitClient.world ?: return
 
         DungeonPlayerManager.players.forEach { player ->
             if (player == null) return@forEach
 
             val entity = world.players.find { it.name.string == player.name }
 
-            val entry = Stella.mc.networkHandler?.getPlayerListEntry(entity?.uuid ?: UUID(0, 0))
+            val entry = KnitClient.client.networkHandler?.getPlayerListEntry(entity?.uuid ?: UUID(0, 0))
             val ping = entry?.latency ?: -1
 
             if (ping != -1 && entity != null) {

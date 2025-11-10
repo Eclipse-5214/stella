@@ -2,8 +2,7 @@ package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.GameEvent
-import co.stellarskys.stella.utils.ChatUtils
+import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
 import com.google.gson.Gson
@@ -11,6 +10,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.render.KnitResolution
 import xyz.meowing.vexel.utils.render.NVGRenderer
 import java.io.File
 
@@ -19,14 +20,13 @@ object ButtonManager {
 
     private val buttonFile: File get() = File("config/Stella/buttons.json")
 
-    val window = Stella.mc.window
-    val width = window.scaledWidth.toFloat()
-    val height = window.scaledHeight.toFloat()
+    val width = KnitResolution.scaledWidth.toFloat()
+    val height = KnitResolution.scaledHeight.toFloat()
 
     init {
         load()
 
-        EventBus.register<GameEvent.Unload> {
+        EventBus.register<GameEvent.Stop> {
             save()
         }
     }
@@ -97,8 +97,7 @@ object ButtonManager {
                     command = "/$command"
                 }
 
-                ChatUtils.chat(command)
-
+                KnitChat.sendCommand(command)
                 return true
             }
         }
@@ -107,9 +106,9 @@ object ButtonManager {
     }
 
     fun resolveAnchorPosition(anchor: AnchorType, index: Int, invX: Int, invY: Int): Pair<Int, Int> {
-        val res = Stella.mc.window
-        val screenWidth = res.scaledWidth
-        val screenHeight = res.scaledHeight
+        val screenWidth = KnitResolution.scaledWidth
+        val screenHeight = KnitResolution.scaledHeight
+
         val spacing = 24
         val slotSize = 20
 

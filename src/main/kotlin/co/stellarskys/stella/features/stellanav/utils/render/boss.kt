@@ -9,6 +9,8 @@ import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitPlayer
 import java.util.UUID
 import kotlin.math.PI
 
@@ -16,12 +18,12 @@ object boss {
     fun renderMap(context: DrawContext) {
         val matrix = context.matrices
 
-        val player = Stella.mc.player ?: return
+        val player = KnitPlayer.player ?: return
         val playerPos = Vec3d(player.x, player.y, player.z)
         val bossMap = BossMapRegistry.getBossMap(Dungeon.floorNumber!!, playerPos) ?: return
 
         val texture = Identifier.of(Stella.NAMESPACE, "stellanav/boss/${bossMap.image}")
-        val sprite = Stella.mc.guiAtlasManager.getSprite(texture)
+        val sprite = KnitClient.client.guiAtlasManager.getSprite(texture)
         val size = 128
 
         val sizeInWorld = minOf(
@@ -77,7 +79,7 @@ object boss {
         context.enableScissor(0, 0, size, size)
         for (player in DungeonPlayerManager.players) {
             if (player == null) continue
-            val you = Stella.mc.player ?: continue
+            val you = KnitClient.player ?: continue
             if (!player.alive && player.name != you.name.string) continue
 
             val realX = player.realX ?: continue

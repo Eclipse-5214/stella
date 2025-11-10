@@ -1,24 +1,34 @@
 package co.stellarskys.stella.utils.skyblock.dungeons
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.events.*
+import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.ChatEvent
+import co.stellarskys.stella.events.core.DungeonEvent
+import co.stellarskys.stella.events.core.LocationEvent
+import co.stellarskys.stella.events.core.TickEvent
 import co.stellarskys.stella.utils.*
-import co.stellarskys.stella.utils.skyblock.LocationUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.map.*
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.utils.skyblock.dungeons.score.*
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.*
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.find
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+import xyz.meowing.knit.api.KnitPlayer
 
 /**
  * Central dungeon state manager.
  * Basically one-stop shop for everything dungeons
  */
+@Module
 object Dungeon {
 
-    // 🧩 Regex patterns for chat parsing
+    // Regex patterns for chat parsing
     private val WATCHER_PATTERN = Regex("""\[BOSS] The Watcher: That will be enough for now\.""")
     private val DUNGEON_COMPLETE_PATTERN = Regex("""^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$""")
     private val ROOM_SECRETS_PATTERN = Regex("""\b([0-9]|10)/([0-9]|10)\s+Secrets\b""")
+    private val DUNGEON_FLOOR_PATTERN = Regex("The Catacombs \\((?<floor>.+)\\)")
 
     // Room and door data
     val rooms = Array<Room?>(36) { null }
@@ -35,11 +45,11 @@ object Dungeon {
     var holdingLeaps = false
 
     // Floor info
-    val floor: String? get() = LocationUtils.dungeonFloor
-    val floorNumber: Int? get() = LocationUtils.dungeonFloorNum
+    var floor: DungeonFloor? = null
+    val floorNumber: Int? get() = floor?.floorNumber
     var inDungeon = false
     val inBoss: Boolean
-        get() = floor != null && Stella.mc.player?.let {
+        get() = floor != null && KnitPlayer.player?.let {
             val (x, z) = WorldScanUtils.realCoordToComponent(it.x.toInt(), it.z.toInt())
             6 * z + x > 35
         } == true
@@ -55,37 +65,38 @@ object Dungeon {
     data class DiscoveredRoom(val x: Int, val z: Int, val room: Room)
 
     /** Initializes all dungeon systems and event listeners */
-    fun init() {
-        EventBus.register<AreaEvent.Main> {
-            TickUtils.scheduleServer(1) {
-                inDungeon = LocationUtils.area == "catacombs"
-                if (!inDungeon) reset()
+    init {
+        EventBus.registerIn<LocationEvent.AreaChange>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            DUNGEON_FLOOR_PATTERN.find(event.new.name, "floor") { (f) ->
+                floor = DungeonFloor.getByName(f)
+                floor?.let { EventBus.post(DungeonEvent.Enter(it)) }
             }
         }
 
-        EventBus.register<WorldEvent.Change> { reset() }
+        EventBus.register<LocationEvent.IslandChange> { reset() }
 
-        EventBus.register<ChatEvent.Receive> { event ->
-            if (!inDungeon) return@register
+
+        EventBus.registerIn<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (!inDungeon) return@registerIn
             val msg = event.message.string.clearCodes()
             if (WATCHER_PATTERN.containsMatchIn(msg)) bloodDone = true
             if (DUNGEON_COMPLETE_PATTERN.containsMatchIn(msg)) {
                 DungeonPlayerManager.updateAllSecrets()
                 complete = true
+                floor?.let { EventBus.post(DungeonEvent.End(it)) }
             }
-        }
 
-        EventBus.register<GameEvent.ActionBar> { event ->
-            if (!inDungeon) return@register
-            val room = currentRoom ?: return@register
-            val match = ROOM_SECRETS_PATTERN.find(event.message.string.clearCodes()) ?: return@register
+            if (!event.isActionBar) return@registerIn
+
+            val room = currentRoom ?: return@registerIn
+            val match = ROOM_SECRETS_PATTERN.find(event.message.stripped) ?: return@registerIn
             val (found, _) = match.destructured
             val secrets = found.toInt()
             if (secrets != room.secretsFound) room.secretsFound = secrets
         }
 
-        EventBus.register<TickEvent.Client> {
-            if (!inDungeon) return@register
+
+        EventBus.registerIn<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
             updateHudLines()
             updateHeldItem()
         }
@@ -150,7 +161,7 @@ object Dungeon {
 
     /** Updates leap detection based on held item */
     private fun updateHeldItem() {
-        val item = Stella.mc.player?.mainHandStack ?: return
+        val item = KnitPlayer.player?.mainHandStack ?: return
         holdingLeaps = "leap" in item.name.string.clearCodes().lowercase()
     }
 
