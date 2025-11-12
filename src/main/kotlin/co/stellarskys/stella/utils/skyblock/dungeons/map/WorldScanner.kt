@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.map
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.TickEvent
 import co.stellarskys.stella.utils.WorldUtils
@@ -16,6 +15,7 @@ import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer
 import java.util.UUID
 
+// Very loosely based of Tska
 object WorldScanner {
     val availableComponents = ScanUtils.getScanCoords().toMutableList()
     var lastIdx: Int? = null

@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.skyblock
 import co.stellarskys.stella.Stella
 import com.google.gson.*
 import com.mojang.serialization.Dynamic
+import kotlinx.coroutines.launch
 import net.minecraft.SharedConstants
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.LoreComponent
@@ -39,10 +40,15 @@ object NEUApi {
     val defaultRegistries: RegistryWrapper.WrapperLookup by lazy { BuiltinRegistries.createWrapperLookup() }
 
     fun init() {
-        ensureNEURepoInstalled()
         loadAllItems()
         loadAllOverlays()
-        Stella.LOGGER.info("Repo Initialized!")
+
+        Stella.scope.launch {
+            ensureNEURepoInstalled()
+            loadAllItems()
+            loadAllOverlays()
+            Stella.LOGGER.info("Repo Initialized!")
+        }
     }
 
 

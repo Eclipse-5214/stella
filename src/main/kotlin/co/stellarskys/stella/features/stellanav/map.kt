@@ -21,7 +21,7 @@ object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     }
 
     fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean){
-        mapRender.renderPreview(context, x, y, scale)
+        mapRender.renderPreview(context, x + 5, y + 5, scale)
     }
 
     fun RenderMap(context: DrawContext) {

@@ -458,8 +458,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
                 newY = (newY / gridSize).roundToInt() * gridSize.toDouble()
             }
 
-            newX = newX.coerceIn(0.0, (width - element.width).toDouble())
-            newY = newY.coerceIn(0.0, (height - element.height).toDouble())
+            newX = newX.coerceIn(-20.0, (width - element.width).toDouble() + 20.0)
+            newY = newY.coerceIn(-20.0, (height - element.height).toDouble() + 20.0)
 
             element.setPosition(newX.toFloat(), newY.toFloat())
             dirty = true
@@ -525,8 +525,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         val newX = element.targetX + deltaX * moveAmount
         val newY = element.targetY + deltaY * moveAmount
 
-        val clampedX = newX.coerceIn(0f, (width - element.width).toFloat())
-        val clampedY = newY.coerceIn(0f, (height - element.height).toFloat())
+        val clampedX = newX.coerceIn(-20f, (width - element.width).toFloat() + 20f)
+        val clampedY = newY.coerceIn(-20f, (height - element.height).toFloat() + 20f)
 
         element.setPosition(clampedX, clampedY)
         dirty = true

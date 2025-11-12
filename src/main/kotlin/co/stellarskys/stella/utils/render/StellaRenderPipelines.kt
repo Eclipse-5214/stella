@@ -26,28 +26,6 @@ object StellaRenderPipelines {
             .build()
     )
 
-    val BEACON_BEAM_OPAQUE = RenderPipeline.builder(RenderPipelines.RENDERTYPE_BEACON_BEAM_SNIPPET)
-        .withLocation("stella/beacon_beam_opaque")
-        .build()
-
-    val BEACON_BEAM_OPAQUE_THROUGH_WALLS = RenderPipeline.builder(RenderPipelines.RENDERTYPE_BEACON_BEAM_SNIPPET)
-        .withLocation("stella/beacon_beam_opaque_through_walls")
-        .withDepthWrite(false)
-        .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-        .build()
-
-    val BEACON_BEAM_TRANSLUCENT = RenderPipeline.builder(RenderPipelines.RENDERTYPE_BEACON_BEAM_SNIPPET)
-        .withLocation("stella/beacon_beam_translucent")
-        .withDepthWrite(false)
-        .withBlend(BlendFunction.TRANSLUCENT)
-        .build()
-
-    val BEACON_BEAM_TRANSLUCENT_THROUGH_WALLS = RenderPipeline.builder(RenderPipelines.RENDERTYPE_BEACON_BEAM_SNIPPET)
-        .withLocation("stella/beacon_beam_translucent_through_walls")
-        .withDepthWrite(false)
-        .withBlend(BlendFunction.TRANSLUCENT)
-        .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-        .build()
 
     fun ShaderPath(SNAME: String) = Identifier.of(Stella.NAMESPACE, SNAME)
 }

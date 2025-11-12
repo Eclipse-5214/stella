@@ -110,42 +110,6 @@ object StellaRenderLayers {
             .build(false)
     )
 
-    val BEACON_BEAM_OPAQUE = RenderLayer.of(
-        "beacon_beam_opaque", 1536, false, true,
-        StellaRenderPipelines.BEACON_BEAM_OPAQUE,
-        RenderLayer.MultiPhaseParameters
-            .builder()
-            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE,false))
-            .build(false)
-    )
-
-    val BEACON_BEAM_OPAQUE_THROUGH_WALLS = RenderLayer.of(
-        "beacon_beam_opaque_through_walls", 1536, false, true,
-        StellaRenderPipelines.BEACON_BEAM_OPAQUE_THROUGH_WALLS,
-        RenderLayer.MultiPhaseParameters
-            .builder()
-            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE, false))
-            .build(false)
-    )
-
-    val BEACON_BEAM_TRANSLUCENT = RenderLayer.of(
-        "beacon_beam_translucent", 1536, false, true,
-        StellaRenderPipelines.BEACON_BEAM_TRANSLUCENT,
-        RenderLayer.MultiPhaseParameters
-            .builder()
-            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE, false))
-            .build(false)
-    )
-
-    val BEACON_BEAM_TRANSLUCENT_THROUGH_WALLS = RenderLayer.of(
-        "devonian_beacon_beam_translucent_esp",1536,false,true,
-        StellaRenderPipelines.BEACON_BEAM_TRANSLUCENT_THROUGH_WALLS,
-        RenderLayer.MultiPhaseParameters
-            .builder()
-            .texture(RenderPhase.Texture(BeaconBlockEntityRenderer.BEAM_TEXTURE,false))
-            .build(false)
-    )
-
     fun getLinesThroughWalls(width: Double): RenderLayer.MultiPhase =
         linesThroughWallsLayers.computeIfAbsent(width, LINES_THROUGH_WALLS)
 
