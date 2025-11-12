@@ -56,7 +56,7 @@
 - [SecretRoutes](https://github.com/yourboykyle/SecretRoutes/) - Insperation
 - [Zen](https://github.com/StellariumMC/zen) - Without Zen this mod would not be possible
 - [BetterMap](https://github.com/BetterMap/BetterMap/) - Map Insperation
-- [Doc](https://github.com/DocilElm/Doc/) - Item detection
+- [Doc](https://github.com/DocilElm/Doc/) - This project would also not be possible without insperation from docilems progects
 - [Amaterasu](https://github.com/DocilElm/Amaterasu/) - Config Isperation
 - [BadAddons](https://github.com/mehdii000/BadAddons/) - Read Me insperation
 - Dr Pepper - idk its just good
