@@ -8,8 +8,8 @@ import co.stellarskys.stella.utils.skyblock.NEUApi
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.Screen
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.render.KnitResolution
 import xyz.meowing.vexel.utils.render.NVGRenderer
@@ -50,7 +50,7 @@ object ButtonManager {
         buttons.clear()
     }
 
-    fun renderAll(context: DrawContext, invX: Int = 0, invY: Int = 0, width: Float = this.width, height: Float = this.height) {
+    fun renderAll(context: GuiGraphics, invX: Int = 0, invY: Int = 0, width: Float = this.width, height: Float = this.height) {
         NVGRenderer.beginFrame(width, height)
 
         buttons.forEach { renderButton(context,it, invX, invY) }
@@ -58,7 +58,7 @@ object ButtonManager {
         NVGRenderer.endFrame()
     }
 
-    private fun renderButton(context: DrawContext, button: StellaButton, invX: Int, invY: Int) {
+    private fun renderButton(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int) {
         val item = NEUApi.getItemBySkyblockId(button.iconId) ?: return
         val stack = NEUApi.createDummyStack(item)
 

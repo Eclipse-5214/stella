@@ -9,14 +9,14 @@ import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.pixels
 import gg.essential.universal.UMatrixStack
 import co.stellarskys.stella.hud.HUDManager.setPosition
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.text.Text
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.network.chat.Component
 import org.lwjgl.glfw.GLFW
 import java.awt.Color
 import kotlin.math.roundToInt
 
-class HUDEditor : Screen(Text.literal("HUD Editor")) {
+class HUDEditor : Screen(Component.literal("HUD Editor")) {
     private val elements = mutableListOf<HUDElement>()
     private var dragging: HUDElement? = null
     private var dragOffsetX = 0f
@@ -67,8 +67,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         setupToolbarIcons()
     }
 
-    override fun close() {
-        super.close()
+    override fun onClose() {
+        super.onClose()
         if (dirty) {
             elements.forEach { element ->
                 setPosition(element.name, element.targetX, element.targetY, element.scale, element.enabled)
@@ -118,13 +118,13 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private fun loadElements() {
         HUDManager.getElements().forEach { (name, text) ->
             val lines = text.split("\n")
-            val width = lines.maxOfOrNull { textRenderer.getWidth(it) } ?: 0
-            val height = lines.size * textRenderer.fontHeight + 10
+            val width = lines.maxOfOrNull { font.width(it) } ?: 0
+            val height = lines.size * font.lineHeight + 10
             elements.add(HUDElement(name, HUDManager.getX(name), HUDManager.getY(name), width + 10, height, text, HUDManager.getScale(name), HUDManager.isEnabled(name)))
         }
     }
 
-    override fun render(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
         renderBackground(context, mouseX, mouseY, delta)
 
         if (showGrid && !previewMode) drawGrid(context)
@@ -152,10 +152,10 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         super.render(context, mouseX, mouseY, delta)
     }
 
-    private fun drawToolbarTooltip(context: DrawContext, mouseX: Int, mouseY: Int, index: Int) {
+    private fun drawToolbarTooltip(context: GuiGraphics, mouseX: Int, mouseY: Int, index: Int) {
         val text = toolbarTooltips[index]
-        val textWidth = textRenderer.getWidth(text)
-        val textHeight = textRenderer.fontHeight
+        val textWidth = font.width(text)
+        val textHeight = font.lineHeight
         val padding = 4
         val tooltipWidth = textWidth + padding * 2
         val tooltipHeight = textHeight + padding * 2
@@ -168,40 +168,40 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
         context.fill(x, y, x + tooltipWidth, y + tooltipHeight, Color(30, 30, 40, 220).rgb)
         drawHollowRect(context, x, y, x + tooltipWidth, y + tooltipHeight, Color(100, 180, 255, 255).rgb)
-        context.drawTextWithShadow(textRenderer, text, x + padding, y + padding, Color.WHITE.rgb)
+        context.drawString(font, text, x + padding, y + padding, Color.WHITE.rgb, true)
     }
 
-    private fun drawGrid(context: DrawContext) {
+    private fun drawGrid(context: GuiGraphics) {
         val color = Color(60, 60, 80, 100).rgb
 
         for (x in 0 until width step gridSize) {
-            context.drawVerticalLine(x, 0, height - 1, color)
+            context.vLine(x, 0, height - 1, color)
         }
 
         for (y in 0 until height step gridSize) {
-            context.drawHorizontalLine(0, width - 1, y, color)
+            context.hLine(0, width - 1, y, color)
         }
     }
 
-    private fun drawPreviewHint(context: DrawContext) {
+    private fun drawPreviewHint(context: GuiGraphics) {
         val text = "Press P to exit preview mode"
-        val textWidth = textRenderer.getWidth(text)
+        val textWidth = font.width(text)
         val x = (width - textWidth) / 2
         val y = 10
         context.fill(x - 5, y - 3, x + textWidth + 5, y + 13, Color(0, 0, 0, 180).rgb)
-        context.drawTextWithShadow(textRenderer, text, x, y, Color.WHITE.rgb)
+        context.drawString(font, text, x, y, Color.WHITE.rgb, true)
     }
 
-    private fun drawToolbarToggleTooltip(context: DrawContext) {
+    private fun drawToolbarToggleTooltip(context: GuiGraphics) {
         val text = "Press T to toggle toolbar"
-        val textWidth = textRenderer.getWidth(text)
+        val textWidth = font.width(text)
         val x = 15
         val y = 10
         context.fill(x - 5, y - 3, x + textWidth + 5, y + 13, Color(0, 0, 0, 180).rgb)
-        context.drawTextWithShadow(textRenderer, text, x, y, Color(100, 180, 255).rgb)
+        context.drawString(font, text, x, y, Color(100, 180, 255).rgb, true)
     }
 
-    private fun drawToolbar(context: DrawContext) {
+    private fun drawToolbar(context: GuiGraphics) {
         val height = 30
         context.fill(0, 0, width, height, Color(20, 20, 30, 220).rgb)
         context.fill(0, height, width, height + 2, Color(70, 130, 180, 255).rgb)
@@ -209,10 +209,10 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         val toolbarStates = listOf(showGrid, snapToGrid, previewMode, showProperties, showElements, false)
 
         val title = "Stella - HUD Editor"
-        val textWidth = textRenderer.getWidth(title)
+        val textWidth = font.width(title)
         val titleX = width - textWidth - 15
 
-        context.drawTextWithShadow(textRenderer, title, titleX, 10, Color(100, 180, 255).rgb)
+        context.drawString(font, title, titleX, 10, Color(100, 180, 255).rgb, true)
 
         toolbarStates.forEachIndexed { index, isActive ->
             if (isActive) {
@@ -222,7 +222,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         }
     }
 
-    private fun drawElementList(context: DrawContext, mouseX: Int, mouseY: Int) {
+    private fun drawElementList(context: GuiGraphics, mouseX: Int, mouseY: Int) {
         val listWidth = 200
         val elementHeight = 16
         val headerHeight = 25
@@ -234,7 +234,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         context.fill(listX, listY, listX + listWidth, listY + listHeight, Color(20, 20, 30, 180).rgb)
         drawHollowRect(context, listX, listY, listX + listWidth, listY + listHeight, Color(70, 130, 180, 255).rgb)
 
-        context.drawTextWithShadow(textRenderer, "HUD Elements", listX + 10, listY + 8, Color(180, 220, 255).rgb)
+        context.drawString(font, "HUD Elements", listX + 10, listY + 8, Color(180, 220, 255).rgb, true)
 
         val scrollOffset = if (elements.size * elementHeight > listHeight - headerHeight - padding) {
             maxOf(0, elements.size * elementHeight - (listHeight - headerHeight - padding))
@@ -254,15 +254,15 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
             val nameColor = if (element.enabled) Color(220, 240, 255).rgb else Color(150, 150, 170).rgb
             val displayName = element.name.take(17) + if (element.name.length > 17) "..." else ""
-            context.drawText(textRenderer, displayName, listX + 10, elementY + 3, nameColor, false)
+            context.drawString(font, displayName, listX + 10, elementY + 3, nameColor, false)
 
             val toggleText = if (element.enabled) "ON" else "OFF"
             val toggleColor = if (element.enabled) Color(100, 220, 100).rgb else Color(220, 100, 100).rgb
-            context.drawText(textRenderer, toggleText, listX + listWidth - 30, elementY + 3, toggleColor, false)
+            context.drawString(font, toggleText, listX + listWidth - 30, elementY + 3, toggleColor, false)
         }
     }
 
-    private fun drawProperties(context: DrawContext, element: HUDElement) {
+    private fun drawProperties(context: GuiGraphics, element: HUDElement) {
         val width = 140
         val height = 75
         val x = 15
@@ -271,40 +271,33 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         context.fill(x, y, x + width, y + height, Color(20, 20, 30, 180).rgb)
         drawHollowRect(context, x, y, x + width, y + height, Color(70, 130, 180, 255).rgb)
 
-        context.drawTextWithShadow(textRenderer, "Properties", x + 10, y + 10, Color(100, 180, 255).rgb)
-        context.drawTextWithShadow(textRenderer, "Position: ${element.targetX.toInt()}, ${element.targetY.toInt()}", x + 15, y + 25, Color.WHITE.rgb)
-        context.drawTextWithShadow(textRenderer, "Scale: ${"%.1f".format(element.scale)}", x + 15, y + 40, Color.WHITE.rgb)
-        context.drawTextWithShadow(textRenderer, if (element.enabled) "§aEnabled" else "§cDisabled", x + 15, y + 55, Color.WHITE.rgb)
+        context.drawString(font, "Properties", x + 10, y + 10, Color(100, 180, 255).rgb)
+        context.drawString(font, "Position: ${element.targetX.toInt()}, ${element.targetY.toInt()}", x + 15, y + 25, Color.WHITE.rgb)
+        context.drawString(font, "Scale: ${"%.1f".format(element.scale)}", x + 15, y + 40, Color.WHITE.rgb)
+        context.drawString(font, if (element.enabled) "§aEnabled" else "§cDisabled", x + 15, y + 55, Color.WHITE.rgb)
     }
 
-    private fun drawResetConfirmation(context: DrawContext, mouseX: Int, mouseY: Int) {
+    private fun drawResetConfirmation(context: GuiGraphics, mouseX: Int, mouseY: Int) {
         val popupWidth = 280
         val popupHeight = 120
         val popupX = (width - popupWidth) / 2
         val popupY = (height - popupHeight) / 2
 
-        //#if MC >= 1.21.7
-        //$$ context.matrices.pushMatrix()
-        //#else
-        context.matrices.pushMatrix()
-        //#endif
-        //#if MC == 1.21.5
-        //$$ context.matrices.translate(0f, 0f, 300f)
-        //#endif
+        context.pose().pushMatrix()
         context.fill(0, 0, width, height, Color(0, 0, 0, 120).rgb)
         context.fill(popupX, popupY, popupX + popupWidth, popupY + popupHeight, Color(25, 25, 35, 240).rgb)
         drawHollowRect(context, popupX, popupY, popupX + popupWidth, popupY + popupHeight, Color(70, 130, 180, 255).rgb)
 
         val titleText = "Reset All Elements"
-        val titleX = popupX + (popupWidth - textRenderer.getWidth(titleText)) / 2
-        context.drawTextWithShadow(textRenderer, titleText, titleX, popupY + 15, Color(220, 100, 100).rgb)
+        val titleX = popupX + (popupWidth - font.width(titleText)) / 2
+        context.drawString(font, titleText, titleX, popupY + 15, Color(220, 100, 100).rgb)
 
         val messageText = "This will reset all HUD elements to"
         val messageText2 = "default positions and enable them."
-        val messageX = popupX + (popupWidth - textRenderer.getWidth(messageText)) / 2
-        val messageX2 = popupX + (popupWidth - textRenderer.getWidth(messageText2)) / 2
-        context.drawText(textRenderer, messageText, messageX, popupY + 40, Color(200, 200, 200).rgb, false)
-        context.drawText(textRenderer, messageText2, messageX2, popupY + 55, Color(200, 200, 200).rgb, false)
+        val messageX = popupX + (popupWidth - font.width(messageText)) / 2
+        val messageX2 = popupX + (popupWidth - font.width(messageText2)) / 2
+        context.drawString(font, messageText, messageX, popupY + 40, Color(200, 200, 200).rgb, false)
+        context.drawString(font, messageText2, messageX2, popupY + 55, Color(200, 200, 200).rgb, false)
 
         val buttonWidth = 80
         val buttonHeight = 20
@@ -327,27 +320,27 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
         val confirmText = "Reset"
         val cancelText = "Cancel"
-        val confirmTextX = confirmX + (buttonWidth - textRenderer.getWidth(confirmText)) / 2
-        val cancelTextX = cancelX + (buttonWidth - textRenderer.getWidth(cancelText)) / 2
+        val confirmTextX = confirmX + (buttonWidth - font.width(confirmText)) / 2
+        val cancelTextX = cancelX + (buttonWidth - font.width(cancelText)) / 2
         val textY = buttonY + 6
 
-        context.drawTextWithShadow(textRenderer, confirmText, confirmTextX, textY, Color.WHITE.rgb)
-        context.drawTextWithShadow(textRenderer, cancelText, cancelTextX, textY, Color.WHITE.rgb)
+        context.drawString(font, confirmText, confirmTextX, textY, Color.WHITE.rgb)
+        context.drawString(font, cancelText, cancelTextX, textY, Color.WHITE.rgb)
 
-        context.matrices.popMatrix()
+        context.pose().popMatrix()
     }
 
-    private fun drawTooltips(context: DrawContext) {
+    private fun drawTooltips(context: GuiGraphics) {
         val tooltip = when {
             selected != null -> "Scroll to scale, Arrow keys to move"
             else -> null
         }
 
         tooltip?.let { text ->
-            val x = (width - textRenderer.getWidth(text)) / 2
+            val x = (width - font.width(text)) / 2
             val y = height - 30
-            context.fill(x - 5, y - 3, x + textRenderer.getWidth(text) + 5, y + 13, Color(0, 0, 0, 180).rgb)
-            context.drawTextWithShadow(textRenderer, text, x, y, Color(100, 180, 255).rgb)
+            context.fill(x - 5, y - 3, x + font.width(text) + 5, y + 13, Color(0, 0, 0, 180).rgb)
+            context.drawString(font, text, x, y, Color(100, 180, 255).rgb)
         }
     }
 
@@ -493,7 +486,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         when (keyCode) {
             GLFW.GLFW_KEY_ESCAPE -> {
                 if (previewMode) previewMode = false
-                else close()
+                else onClose()
                 return true
             }
             GLFW.GLFW_KEY_G -> showGrid = !showGrid
@@ -583,13 +576,13 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         }
     }
 
-    private fun drawHollowRect(context: DrawContext, x1: Int, y1: Int, x2: Int, y2: Int, color: Int) {
+    private fun drawHollowRect(context: GuiGraphics, x1: Int, y1: Int, x2: Int, y2: Int, color: Int) {
         context.fill(x1, y1, x2, y1 + 1, color)
         context.fill(x1, y2 - 1, x2, y2, color)
         context.fill(x1, y1, x1 + 1, y2, color)
         context.fill(x2 - 1, y1, x2, y2, color)
     }
 
-    override fun shouldPause() = false
-    override fun renderBackground(context: DrawContext, mouseX: Int, mouseY: Int, delta: Float) {}
+    override fun isPauseScreen() = false
+    override fun renderBackground(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {}
 }

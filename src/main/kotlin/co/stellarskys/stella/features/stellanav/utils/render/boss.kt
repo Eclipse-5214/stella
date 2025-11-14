@@ -5,25 +5,25 @@ import co.stellarskys.stella.features.stellanav.utils.*
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
-import net.minecraft.client.gl.RenderPipelines
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.Vec3d
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.phys.Vec3
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer
 import java.util.UUID
 import kotlin.math.PI
 
 object boss {
-    fun renderMap(context: DrawContext) {
-        val matrix = context.matrices
+    fun renderMap(context: GuiGraphics) {
+        val matrix = context.pose()
 
         val player = KnitPlayer.player ?: return
-        val playerPos = Vec3d(player.x, player.y, player.z)
+        val playerPos = Vec3(player.x, player.y, player.z)
         val bossMap = BossMapRegistry.getBossMap(Dungeon.floorNumber!!, playerPos) ?: return
 
-        val texture = Identifier.of(Stella.NAMESPACE, "stellanav/boss/${bossMap.image}")
-        val sprite = KnitClient.client.guiAtlasManager.getSprite(texture)
+        val texture = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/boss/${bossMap.image}")
+        val sprite = KnitClient.client.guiSprites.getSprite(texture)
         val size = 128
 
         val sizeInWorld = minOf(
@@ -32,8 +32,8 @@ object boss {
             bossMap.renderSize ?: Int.MAX_VALUE
         )
 
-        val textureWidth = sprite.contents.width.toDouble() // Replace with actual texture size if available
-        val textureHeight = sprite.contents.height.toDouble()
+        val textureWidth = sprite.contents().width().toDouble() // Replace with actual texture size if available
+        val textureHeight = sprite.contents().height().toDouble()
 
         val pixelWidth = (textureWidth / bossMap.widthInWorld) * (bossMap.renderSize ?: bossMap.widthInWorld)
         val pixelHeight = (textureHeight / bossMap.heightInWorld) * (bossMap.renderSize ?: bossMap.heightInWorld)
@@ -57,7 +57,7 @@ object boss {
         // Enable Scissor
         context.enableScissor(0, 0, size, size)
 
-        context.drawGuiTexture(
+        context.blitSprite(
             RenderPipelines.GUI_TEXTURED,
             texture,
             (-topLeftHudLocX).toInt(),
@@ -89,7 +89,7 @@ object boss {
             val x = ((realX - bossMap.topLeftLocation[0]) / sizeInWorld) * size - topLeftHudLocX
             val y = ((realY - bossMap.topLeftLocation[1]) / sizeInWorld) * size - topLeftHudLocZ
 
-            val matrix = context.matrices
+            val matrix = context.pose()
 
             val ownName = mapConfig.dontShowOwn && player.name == you.name.string
 
@@ -126,7 +126,7 @@ object boss {
                 val h = 10
                 val head = if (player.name == you.name.string) GreenMarker else WhiteMarker
 
-                context.drawGuiTexture(
+                context.blitSprite(
                     RenderPipelines.GUI_TEXTURED,
                     head,
                     (-w.toDouble() / 2.0).toInt(),

@@ -5,8 +5,8 @@ import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonManager
 import co.stellarskys.stella.utils.TimeUtils
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import co.stellarskys.stella.events.core.GuiEvent
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import kotlin.time.Duration.Companion.milliseconds
 
 @Module

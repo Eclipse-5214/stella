@@ -1,23 +1,19 @@
 package co.stellarskys.stella.utils.config
 
+import com.mojang.blaze3d.opengl.GlTexture
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.render.URenderPipeline
 import gg.essential.universal.vertex.UBufferBuilder
 import gg.essential.universal.shader.BlendState
 import java.awt.Color
-import net.minecraft.client.texture.GlTexture
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
 import xyz.meowing.knit.api.KnitClient
 
 fun drawTexture(
     matrices: UMatrixStack,
     pipeline: URenderPipeline,
-    //#if MC >= 1.21.5
-    sprite: Identifier,
-    //#elseif MC == 1.8.9
-    //$$ sprite: ResourceLocation,
-    //#endif
+    sprite: ResourceLocation,
     x: Double,
     y: Double,
     drawWidth: Double,
@@ -35,7 +31,7 @@ fun drawTexture(
 
     val texture = KnitClient.client.textureManager.getTexture(sprite)
     texture.setFilter(false, false)
-    val glTexture = texture.glTexture as GlTexture
+    val glTexture = texture.texture as GlTexture
 
     val x2 = x + drawWidth
     val y2 = y + drawHeight
@@ -51,7 +47,7 @@ fun drawTexture(
     buffer.pos(matrices, x2, y, 0.0).tex(u2, v1).color(color).endVertex()
 
     buffer.build()?.drawAndClose(pipeline) {
-        texture(0, glTexture.glId)
+        texture(0, glTexture.glId())
     }
 }
 

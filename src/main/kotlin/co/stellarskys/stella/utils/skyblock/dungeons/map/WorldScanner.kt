@@ -136,14 +136,14 @@ object WorldScanner {
         DungeonPlayerManager.players.forEach { player ->
             if (player == null) return@forEach
 
-            val entity = world.players.find { it.name.string == player.name }
+            val entity = world.players().find { it.name.string == player.name }
 
-            val entry = KnitClient.client.networkHandler?.getPlayerListEntry(entity?.uuid ?: UUID(0, 0))
+            val entry = KnitClient.client.connection?.getPlayerInfo(entity?.uuid ?: UUID(0, 0))
             val ping = entry?.latency ?: -1
 
             if (ping != -1 && entity != null) {
                 player.inRender = true
-                onPlayerMove(player, entity.x, entity.z, entity.yaw)
+                onPlayerMove(player, entity.x, entity.z, entity.yRot)
             } else {
                 player.inRender = false
             }

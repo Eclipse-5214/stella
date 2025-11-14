@@ -6,9 +6,9 @@ import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.render.StellaRenderLayers
-import net.minecraft.block.ShapeContext
-import net.minecraft.client.render.VertexRendering
-import net.minecraft.world.EmptyBlockView
+import net.minecraft.client.renderer.ShapeRenderer
+import net.minecraft.world.level.EmptyBlockGetter
+import net.minecraft.world.phys.shapes.CollisionContext
 
 @Module
 object blockOverlay : Feature("overlayEnabled") {
@@ -18,10 +18,10 @@ object blockOverlay : Feature("overlayEnabled") {
             val mstack = event.context.matrixStack() ?: return@register
             val consumers = event.context.consumers()
             val camera = event.context.camera()
-            val blockShape = event.context.blockState()?.getOutlineShape(EmptyBlockView.INSTANCE, blockPos, ShapeContext.of(camera.focusedEntity)) ?: return@register
+            val blockShape = event.context.blockState()?.getShape(EmptyBlockGetter.INSTANCE, blockPos, CollisionContext.of(camera.entity)) ?: return@register
             if (blockShape.isEmpty) return@register
 
-            val camPos = camera.pos
+            val camPos = camera.position
 
             val chroma = config["chromaHighlight"] as Boolean
 
@@ -36,7 +36,7 @@ object blockOverlay : Feature("overlayEnabled") {
             val y = blockPos.y - camPos.y
             val z = blockPos.z - camPos.z
 
-            VertexRendering.drawOutline(
+            ShapeRenderer.renderShape(
                 mstack,
                 consumers.getBuffer(/* if(chroma) StellaRenderLayers.getChromaLines(5.0) else */ StellaRenderLayers.getLines(5.0)),
                 blockShape,
@@ -51,8 +51,8 @@ object blockOverlay : Feature("overlayEnabled") {
                 val b = bRaw / 255f
                 val a = aRaw / 255f
 
-                blockShape.forEachBox { minX, minY, minZ, maxX, maxY, maxZ ->
-                    VertexRendering.drawFilledBox(
+                blockShape.forAllBoxes { minX, minY, minZ, maxX, maxY, maxZ ->
+                    ShapeRenderer.addChainedFilledBoxVertices(
                         mstack,
                         consumers.getBuffer(/* if (chroma ) StellaRenderLayers.CHROMA_3D else */ StellaRenderLayers.FILLED),
                         x + minX, y + minY, z + minZ,

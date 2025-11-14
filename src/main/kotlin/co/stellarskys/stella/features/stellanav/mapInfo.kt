@@ -8,7 +8,7 @@ import co.stellarskys.stella.utils.render.*
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 
 @Module
 object mapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -21,12 +21,12 @@ object mapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS
     }
 
     fun HUDEditorRender(
-        context: DrawContext,
+        context: GuiGraphics,
         x: Float, y: Float,
         width: Int, height: Int, scale: Float,
         partialTicks: Float, previewMode: Boolean
     ){
-        val matrix = context.matrices
+        val matrix = context.pose()
 
         matrix.pushMatrix()
         matrix.translate(x, y)
@@ -39,8 +39,8 @@ object mapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS
         matrix.popMatrix()
     }
 
-    fun RenderNormal(context: DrawContext) {
-        val matrix = context.matrices
+    fun RenderNormal(context: GuiGraphics) {
+        val matrix = context.pose()
 
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)
@@ -55,8 +55,8 @@ object mapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS
         matrix.popMatrix()
     }
 
-    fun RenderMapInfo(context: DrawContext, preview: Boolean) {
-        val matrix = context.matrices
+    fun RenderMapInfo(context: GuiGraphics, preview: Boolean) {
+        val matrix = context.pose()
 
         var mapLine1 = Dungeon.mapLine1
         var mapLine2 = Dungeon.mapLine2

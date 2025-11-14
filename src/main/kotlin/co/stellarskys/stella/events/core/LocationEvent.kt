@@ -7,7 +7,6 @@ import net.hypixel.data.region.Environment
 import net.hypixel.data.type.ServerType
 import xyz.meowing.knit.api.events.Event
 
-
 sealed class LocationEvent {
     class ServerChange(
         val name: String,

@@ -1,13 +1,13 @@
 package co.stellarskys.stella.mixins.accessors;
 
-import net.minecraft.item.map.MapDecoration;
-import net.minecraft.item.map.MapState;
+import net.minecraft.world.level.saveddata.maps.MapDecoration;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.Map;
 
-@Mixin(MapState.class)
+@Mixin(MapItemSavedData.class)
 public interface AccessorMapState {
     @Accessor("decorations")
     Map<String, MapDecoration> getDecorations();

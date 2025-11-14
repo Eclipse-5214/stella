@@ -6,7 +6,7 @@ import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.render.mapRender
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 
 @Module
 object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -20,11 +20,11 @@ object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
         }
     }
 
-    fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean){
+    fun HUDEditorRender(context: GuiGraphics, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean){
         mapRender.renderPreview(context, x + 5, y + 5, scale)
     }
 
-    fun RenderMap(context: DrawContext) {
+    fun RenderMap(context: GuiGraphics) {
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)
         val scale = HUDManager.getScale(name)

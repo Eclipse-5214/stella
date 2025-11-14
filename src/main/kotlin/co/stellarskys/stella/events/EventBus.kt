@@ -11,7 +11,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
-import net.minecraft.network.packet.Packet
 import org.lwjgl.glfw.GLFW
 import xyz.meowing.knit.Knit
 import xyz.meowing.knit.api.events.Event
@@ -20,6 +19,7 @@ import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.knit.internal.events.TickEvent
 import xyz.meowing.knit.internal.events.WorldRenderEvent
 import co.stellarskys.stella.events.core.GuiEvent
+import net.minecraft.network.protocol.Packet
 
 @Module
 object EventBus : EventBus(true) {

@@ -8,7 +8,7 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 
 
 @Module
@@ -19,7 +19,7 @@ object roomName : Feature("showRoomName", island = SkyBlockIsland.THE_CATACOMBS)
     }
 
     private fun renderHUD(
-        context: DrawContext
+        context: GuiGraphics
     ) {
         if (!HUDManager.isEnabled("roomname")) return
         if (Dungeon.inBoss) return

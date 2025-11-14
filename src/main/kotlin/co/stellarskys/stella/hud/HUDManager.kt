@@ -1,14 +1,14 @@
 package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.utils.DataUtils
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 
 data class HUDPosition(var x: Float, var y: Float, var scale: Float = 1f, var enabled: Boolean = true)
 data class HUDPositions(val positions: MutableMap<String, HUDPosition> = mutableMapOf())
 
 object HUDManager {
     private val elements = mutableMapOf<String, String>()
-    private val customRenderers = mutableMapOf<String, (DrawContext, Float, Float, Int, Int, Float, Float, Boolean) -> Unit>()
+    private val customRenderers = mutableMapOf<String, (GuiGraphics, Float, Float, Int, Int, Float, Float, Boolean) -> Unit>()
     private val customDimensions = mutableMapOf<String, Pair<Int, Int>>()
     private val hudData = DataUtils("hud_positions", HUDPositions())
 
@@ -20,7 +20,7 @@ object HUDManager {
         name: String,
         width: Int,
         height: Int,
-        customRenderer: (DrawContext, Float, Float, Int, Int, Float, Float, Boolean) -> Unit
+        customRenderer: (GuiGraphics, Float, Float, Int, Int, Float, Float, Boolean) -> Unit
     ) {
         elements[name] = ""
         customRenderers[name] = customRenderer
@@ -29,7 +29,7 @@ object HUDManager {
 
     fun getElements(): Map<String, String> = elements
 
-    fun getCustomRenderer(name: String): ((DrawContext, Float, Float, Int, Int, Float, Float, Boolean) -> Unit)? = customRenderers[name]
+    fun getCustomRenderer(name: String): ((GuiGraphics, Float, Float, Int, Int, Float, Float, Boolean) -> Unit)? = customRenderers[name]
 
     fun getCustomDimensions(name: String): Pair<Int, Int>? = customDimensions[name]
 

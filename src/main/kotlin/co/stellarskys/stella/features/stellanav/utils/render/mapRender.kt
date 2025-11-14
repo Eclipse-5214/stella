@@ -6,13 +6,13 @@ import co.stellarskys.stella.features.stellanav.utils.prevewMap
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 
 object mapRender {
     private val defaultMapSize = Pair(138, 138)
 
-    fun render(context: DrawContext, x: Float, y: Float, scale: Float) {
-        val matrix = context.matrices
+    fun render(context: GuiGraphics, x: Float, y: Float, scale: Float) {
+        val matrix = context.pose()
 
         matrix.pushMatrix()
         matrix.translate(x, y)
@@ -41,8 +41,8 @@ object mapRender {
         matrix.popMatrix()
     }
 
-    fun renderPreview(context: DrawContext, x: Float, y: Float, scale: Float) {
-        val matrix = context.matrices
+    fun renderPreview(context: GuiGraphics, x: Float, y: Float, scale: Float) {
+        val matrix = context.pose()
 
         matrix.pushMatrix()
         matrix.translate(x, y)
@@ -56,8 +56,8 @@ object mapRender {
         matrix.popMatrix()
     }
 
-    fun renderInfoUnder(context: DrawContext, preview: Boolean) {
-        val matrix = context.matrices
+    fun renderInfoUnder(context: GuiGraphics, preview: Boolean) {
+        val matrix = context.pose()
 
         var mapLine1 = Dungeon.mapLine1
         var mapLine2 = Dungeon.mapLine2
@@ -81,7 +81,7 @@ object mapRender {
     }
 
 
-    fun renderMapBackground(context: DrawContext) {
+    fun renderMapBackground(context: GuiGraphics) {
         val w = defaultMapSize.first
         var h = defaultMapSize.second
         h += if (mapInfoUnder) 10 else 0
@@ -89,7 +89,7 @@ object mapRender {
         Render2D.drawRect(context, 0, 0, w, h, mapConfig.mapBgColor)
     }
 
-    fun renderMapBorder(context: DrawContext) {
+    fun renderMapBorder(context: GuiGraphics) {
         val (w, baseH) = defaultMapSize
         val borderWidth = mapConfig.mapBdWidth
         val h = baseH + if (mapInfoUnder) 10 else 0

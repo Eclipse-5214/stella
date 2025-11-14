@@ -16,9 +16,9 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.MapUtils.mapZ
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.MapUtils.yaw
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils
-import net.minecraft.item.map.MapDecoration
-import net.minecraft.item.map.MapDecorationTypes
-import net.minecraft.item.map.MapState
+import net.minecraft.world.level.saveddata.maps.MapDecoration
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData
 import kotlin.time.Duration
 
 
@@ -29,7 +29,7 @@ object MapScanner {
         val solo: Boolean
     )
 
-    fun updatePlayers(state: MapState) {
+    fun updatePlayers(state: MapItemSavedData) {
         var i = 1
 
         for ((key, mapDecoration) in (state as AccessorMapState).decorations) {
@@ -69,7 +69,7 @@ object MapScanner {
         }
     }
 
-    fun scan(state: MapState) {
+    fun scan(state: MapItemSavedData) {
         val colors = state.colors
 
         var cx = -1

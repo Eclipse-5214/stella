@@ -5,7 +5,7 @@ import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner.RoomClearInfo
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonClass
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.world.entity.player.Player
 import xyz.meowing.knit.api.KnitClient
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -30,11 +30,7 @@ class DungeonPlayer(val name: String) {
     val secrets get() = currSecrets!! - initSecrets!!
 
     // api
-    val entity: PlayerEntity? = KnitClient.world?.entities
-        ?.asSequence()
-        ?.filterIsInstance<PlayerEntity>()
-        ?.find { it.gameProfile.name == name }
-
+    val entity: Player? = KnitClient.world?.entitiesForRendering()?.filterIsInstance<Player>()?.find { it.gameProfile.name == name }
     val uuid: UUID? get() = entity?.uuid
 
     var inRender = false

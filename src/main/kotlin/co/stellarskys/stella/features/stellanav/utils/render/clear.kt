@@ -11,7 +11,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.knit.api.KnitPlayer
 import java.awt.Color
 import java.util.UUID
@@ -24,8 +24,8 @@ object clear {
     private const val spacing = roomSize + gapSize
 
     /** Main render entry point */
-    fun renderMap(context: DrawContext) {
-        val matrix = context.matrices
+    fun renderMap(context: GuiGraphics) {
+        val matrix = context.pose()
         val mapOffset = if (Dungeon.floorNumber == 1) 10.6f else 0f
         val mapScale = oscale(Dungeon.floorNumber)
 
@@ -44,7 +44,7 @@ object clear {
     }
 
     /** Renders discovered and explored rooms, doors, and connectors */
-    fun renderRooms(context: DrawContext) {
+    fun renderRooms(context: GuiGraphics) {
         Dungeon.discoveredRooms.values.forEach { room ->
             Render2D.drawRect(
                 context,
@@ -78,15 +78,15 @@ object clear {
     }
 
     /** Renders checkmarks for discovered and explored rooms */
-    fun renderCheckmarks(context: DrawContext) {
+    fun renderCheckmarks(context: GuiGraphics) {
         val scale = mapConfig.checkmarkScale
 
         Dungeon.discoveredRooms.values.forEach { room ->
             val x = room.x * spacing + roomSize / 2 - 5
             val y = room.z * spacing + roomSize / 2 - 6
             context.withMatrix {
-                context.matrices.translate(x.toFloat(), y.toFloat())
-                context.matrices.scale(scale, scale)
+                context.pose().translate(x.toFloat(), y.toFloat())
+                context.pose().scale(scale, scale)
                 Render2D.drawImage(context, questionMark, 0, 0, 10, 12)
             }
         }
@@ -106,15 +106,15 @@ object clear {
             val y = (centerZ * spacing).toInt() + roomSize / 2 - 6
 
             context.withMatrix {
-                context.matrices.translate(x.toFloat(), y.toFloat())
-                context.matrices.scale(scale, scale)
+                context.pose().translate(x.toFloat(), y.toFloat())
+                context.pose().scale(scale, scale)
                 Render2D.drawImage(context, checkmark, 0, 0, 12, 12)
             }
         }
     }
 
     /** Renders room names and secret counts */
-    fun renderRoomLabels(context: DrawContext, type: RoomType, checkmarkMode: Int, scaleFactor: Float) {
+    fun renderRoomLabels(context: GuiGraphics, type: RoomType, checkmarkMode: Int, scaleFactor: Float) {
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored || room.type != type || checkmarkMode < 1) return@forEach
 
@@ -134,8 +134,8 @@ object clear {
             val scale = 0.75f * scaleFactor
 
             context.withMatrix {
-                context.matrices.translate(x.toFloat(), y.toFloat())
-                context.matrices.scale(scale, scale)
+                context.pose().translate(x.toFloat(), y.toFloat())
+                context.pose().scale(scale, scale)
 
                 lines.forEachIndexed { i, line ->
                     val ly = (9 * i - (lines.size * 9) / 2).toFloat()
@@ -149,7 +149,7 @@ object clear {
     }
 
     /** Renders player icons and optional nametags */
-    fun renderPlayers(context: DrawContext) {
+    fun renderPlayers(context: GuiGraphics) {
         val you = KnitPlayer.player ?: return
         for (player in DungeonPlayerManager.players) {
             if (player == null || (!player.alive && player.name != you.name.string)) continue
@@ -164,7 +164,7 @@ object clear {
 
             if (Dungeon.holdingLeaps && mapConfig.showNames && !ownName) {
                 context.withMatrix {
-                    context.matrices.translate(x.toFloat(), y.toFloat())
+                    context.pose().translate(x.toFloat(), y.toFloat())
                     renderNametag(context, player.name, mapConfig.iconScale / 1.3f)
                 }
             }
@@ -174,7 +174,7 @@ object clear {
     }
 
     /** Renders connectors between adjacent room components */
-    fun renderRoomConnectors(context: DrawContext, room: Room) {
+    fun renderRoomConnectors(context: GuiGraphics, room: Room) {
         val directions = listOf(Pair(1, 0), Pair(-1, 0), Pair(0, 1), Pair(0, -1))
 
         for ((x, z) in room.components) {
@@ -223,27 +223,27 @@ object clear {
     }
 
     /** Scoped matrix push/pop wrapper */
-    inline fun DrawContext.withMatrix(block: () -> Unit) {
-        matrices.pushMatrix()
+    inline fun GuiGraphics.withMatrix(block: () -> Unit) {
+        pose().pushMatrix()
         block()
-        matrices.popMatrix()
+        pose().popMatrix()
     }
 
     /** Renders a text string with a soft shadow */
-    fun drawShadowedText(context: DrawContext, text: String, x: Int, y: Int, scale: Float) {
+    fun drawShadowedText(context: GuiGraphics, text: String, x: Int, y: Int, scale: Float) {
         val offsets = listOf(Pair(scale, 0f), Pair(-scale, 0f), Pair(0f, scale), Pair(0f, -scale))
         for ((dx, dy) in offsets) {
             context.withMatrix {
-                context.matrices.translate(dx, dy)
+                context.pose().translate(dx, dy)
                 Render2D.drawString(context, "§0$text", x, y)
             }
         }
     }
 
     /** Renders a player's icon (head or marker) */
-    fun renderPlayerIcon(context: DrawContext, player: DungeonPlayer, x: Double, y: Double, rotation: Float) {
+    fun renderPlayerIcon(context: GuiGraphics, player: DungeonPlayer, x: Double, y: Double, rotation: Float) {
         context.withMatrix {
-            val matrix = context.matrices
+            val matrix = context.pose()
             matrix.translate(x.toFloat(), y.toFloat())
             matrix.rotate((rotation * (PI / 180)).toFloat())
             matrix.scale(mapConfig.iconScale, mapConfig.iconScale)

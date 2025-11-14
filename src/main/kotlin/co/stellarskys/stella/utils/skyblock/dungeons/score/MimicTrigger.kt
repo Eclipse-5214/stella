@@ -6,8 +6,8 @@ import co.stellarskys.stella.events.core.EntityEvent
 import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
-import net.minecraft.entity.EquipmentSlot
-import net.minecraft.entity.mob.ZombieEntity
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.monster.Zombie
 
 /**
  * Tracks whether the Mimic miniboss has been killed in F6/F7.
@@ -35,12 +35,12 @@ object MimicTrigger {
             if (Dungeon.floor?.floorNumber !in listOf(6, 7) || mimicDead) return@registerIn
             val mcEntity = event.entity
 
-            if (mcEntity !is ZombieEntity) return@registerIn
+            if (mcEntity !is Zombie) return@registerIn
             if (
                 !mcEntity.isBaby ||
                 EquipmentSlot.entries
                     .filter { it.type == EquipmentSlot.Type.HUMANOID_ARMOR }
-                    .any { slot -> mcEntity.getEquippedStack(slot).isEmpty }
+                    .any { slot -> mcEntity.getItemBySlot(slot).isEmpty }
             ) return@registerIn
 
             mimicDead = true

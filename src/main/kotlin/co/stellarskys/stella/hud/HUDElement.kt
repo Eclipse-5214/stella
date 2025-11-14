@@ -2,7 +2,7 @@ package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.TimeUtils.millis
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.knit.api.KnitClient
 import java.awt.Color
 import kotlin.math.pow
@@ -45,15 +45,15 @@ class HUDElement(
 
     private fun easeOutCubic(t: Float) = 1f + (t - 1f).pow(3)
 
-    fun render(context: DrawContext, mouseX: Float, mouseY: Float, partialTicks: Float, previewMode: Boolean) {
+    fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, partialTicks: Float, previewMode: Boolean) {
         if (!enabled && previewMode) return
         val renderX = getRenderX()
         val renderY = getRenderY()
         val isHovered = isMouseOver(mouseX, mouseY)
 
-        context.matrices.pushMatrix()
-        context.matrices.translate(renderX, renderY)
-        context.matrices.scale(scale, scale)
+        context.pose().pushMatrix()
+        context.pose().translate(renderX, renderY)
+        context.pose().scale(scale, scale)
 
         val customRenderer = HUDManager.getCustomRenderer(name)
         if (customRenderer != null) {
@@ -69,10 +69,10 @@ class HUDElement(
         }
 
 
-        context.matrices.popMatrix()
+        context.pose().popMatrix()
     }
 
-    private fun renderCustomBackground(context: DrawContext, isHovered: Boolean, customWidth: Int, customHeight: Int) {
+    private fun renderCustomBackground(context: GuiGraphics, isHovered: Boolean, customWidth: Int, customHeight: Int) {
         val alpha = if (!enabled) 40 else if (isHovered) 140 else 90
         val borderColor = when {
             !enabled -> Color(200, 60, 60).rgb
@@ -84,7 +84,7 @@ class HUDElement(
         drawHollowRect(context, 0, 0, customWidth, customHeight, borderColor)
     }
 
-    private fun renderBackground(context: DrawContext, isHovered: Boolean) {
+    private fun renderBackground(context: GuiGraphics, isHovered: Boolean) {
         val alpha = if (!enabled) 40 else if (isHovered) 140 else 90
         val borderColor = when {
             !enabled -> Color(200, 60, 60).rgb
@@ -96,7 +96,7 @@ class HUDElement(
         drawHollowRect(context, 0, 0, width, height, borderColor)
     }
 
-    private fun renderDefault(context: DrawContext, previewMode: Boolean, isHovered: Boolean) {
+    private fun renderDefault(context: GuiGraphics, previewMode: Boolean, isHovered: Boolean) {
         if (!previewMode) {
             renderBackground(context, isHovered)
         }
@@ -106,8 +106,8 @@ class HUDElement(
         val textColor = Color(220, 240, 255, textAlpha).rgb
 
         lines.forEachIndexed { index, line ->
-            val textY = 5f + (index * KnitClient.client.textRenderer.fontHeight)
-            context.drawTextWithShadow(KnitClient.client.textRenderer, line, 5, textY.toInt(), textColor)
+            val textY = 5f + (index * KnitClient.client.font.lineHeight)
+            context.drawString(KnitClient.client.font, line, 5, textY.toInt(), textColor, true)
         }
     }
 
@@ -125,7 +125,7 @@ class HUDElement(
         return mouseX >= renderX && mouseX <= renderX + scaledWidth && mouseY >= renderY && mouseY <= renderY + scaledHeight
     }
 
-    private fun drawHollowRect(context: DrawContext, x1: Int, y1: Int, x2: Int, y2: Int, color: Int) {
+    private fun drawHollowRect(context: GuiGraphics, x1: Int, y1: Int, x2: Int, y2: Int, color: Int) {
         context.fill(x1, y1, x2, y1 + 1, color)
         context.fill(x1, y2 - 1, x2, y2, color)
         context.fill(x1, y1, x1 + 1, y2, color)

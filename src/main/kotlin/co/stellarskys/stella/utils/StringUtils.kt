@@ -1,10 +1,10 @@
 package co.stellarskys.stella.utils
 
-import net.minecraft.util.Formatting
+import net.minecraft.ChatFormatting
 import org.apache.commons.lang3.StringUtils as ApacheStringUtils
 
 fun CharSequence?.countMatches(subString: CharSequence): Int = ApacheStringUtils.countMatches(this, subString)
-fun String.stripControlCodes(): String = Formatting.strip(this)!!
+fun String.stripControlCodes(): String = ChatFormatting.stripFormatting(this)!!
 
 fun CharSequence?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
 fun CharSequence.startsWithAny(sequences: Iterable<CharSequence>): Boolean = sequences.any { startsWith(it) }

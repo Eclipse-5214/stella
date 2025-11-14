@@ -4,13 +4,10 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.TablistEvent
-import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonClass
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
-import net.minecraft.text.Text
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.knit.api.KnitPlayer
-import java.util.regex.Pattern
 
 object DungeonPlayerManager {
     /**

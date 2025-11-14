@@ -8,10 +8,10 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.resource.ResourceManager
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.Vec3d
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.packs.resources.ResourceManager
+import net.minecraft.world.phys.Vec3
 import xyz.meowing.knit.api.KnitClient
 import java.awt.Color
 import java.io.InputStreamReader
@@ -25,15 +25,15 @@ fun oscale(floor: Int?): Float {
     }
 }
 
-val prevewMap = Identifier.of(Stella.NAMESPACE, "stellanav/defaultmap")
-val greenCheck = Identifier.of(Stella.NAMESPACE, "stellanav/clear/bloommapgreencheck")
-val whiteCheck =Identifier.of(Stella.NAMESPACE, "stellanav/clear/bloommapwhitecheck")
-val failedRoom = Identifier.of(Stella.NAMESPACE, "stellanav/clear/bloommapfailedroom")
-val questionMark = Identifier.of(Stella.NAMESPACE, "stellanav/clear/bloommapquestionmark")
-val GreenMarker = Identifier.of(Stella.NAMESPACE, "stellanav/markerself")
-val WhiteMarker = Identifier.of(Stella.NAMESPACE, "stellanav/markerother")
+val prevewMap = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/defaultmap")
+val greenCheck = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/clear/bloommapgreencheck")
+val whiteCheck =ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/clear/bloommapwhitecheck")
+val failedRoom = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/clear/bloommapfailedroom")
+val questionMark = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/clear/bloommapquestionmark")
+val GreenMarker = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/markerself")
+val WhiteMarker = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/markerother")
 
-fun getCheckmarks(checkmark: Checkmark): Identifier? = when (checkmark) {
+fun getCheckmarks(checkmark: Checkmark): ResourceLocation? = when (checkmark) {
     Checkmark.GREEN -> greenCheck
     Checkmark.WHITE -> whiteCheck
     Checkmark.FAILED -> failedRoom
@@ -106,18 +106,18 @@ object BossMapRegistry {
     }
 
     fun load(resourceManager: ResourceManager) {
-        val id = Identifier.of(Stella.NAMESPACE, "dungeons/imagedata.json")
+        val id = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "dungeons/imagedata.json")
         val optional = resourceManager.getResource(id)
         val resource = optional.orElse(null) ?: return
 
-        val reader = InputStreamReader(resource.inputStream)
+        val reader = InputStreamReader(resource.open())
         val type = object : TypeToken<Map<String, List<BossMapData>>>() {}.type
         val parsed = gson.fromJson<Map<String, List<BossMapData>>>(reader, type)
 
         bossMaps.putAll(parsed)
     }
 
-    fun getBossMap(floor: Int, playerPos: Vec3d): BossMapData? {
+    fun getBossMap(floor: Int, playerPos: Vec3): BossMapData? {
         val maps = bossMaps[floor.toString()] ?: return null
         return maps.firstOrNull { map ->
             (0..2).all { axis ->
@@ -132,8 +132,8 @@ object BossMapRegistry {
     fun getAll(): Map<String, List<BossMapData>> = bossMaps
 }
 
-fun renderNametag(context: DrawContext, name: String, scale: Float) {
-    val matrix = context.matrices
+fun renderNametag(context: GuiGraphics, name: String, scale: Float) {
+    val matrix = context.pose()
     val width = name.width().toFloat()
     val drawX = (-width / 2).toInt()
     val drawY = 0

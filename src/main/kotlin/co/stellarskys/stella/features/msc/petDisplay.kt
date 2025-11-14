@@ -10,7 +10,7 @@ import co.stellarskys.stella.utils.DataUtils
 import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 
 @Module
 object petDisplay: Feature("petDisplay", true) {
@@ -123,12 +123,12 @@ object petDisplay: Feature("petDisplay", true) {
     }
 
     fun HUDEditorRender(
-        context: DrawContext,
+        context: GuiGraphics,
         x: Float, y: Float,
         width: Int, height: Int, scale: Float,
         partialTicks: Float, previewMode: Boolean
     ){
-        val matrix = context.matrices
+        val matrix = context.pose()
 
         matrix.pushMatrix()
         matrix.translate(x, y)
@@ -144,9 +144,9 @@ object petDisplay: Feature("petDisplay", true) {
         matrix.popMatrix()
     }
 
-    fun renderHud(context: DrawContext) {
+    fun renderHud(context: GuiGraphics) {
         if (activePet == null) return
-        val matrix = context.matrices
+        val matrix = context.pose()
 
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)

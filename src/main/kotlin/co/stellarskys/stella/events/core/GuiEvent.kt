@@ -2,17 +2,17 @@
 
 package co.stellarskys.stella.events.core
 
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.ingame.HandledScreen
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.screen.slot.SlotActionType
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ClickType
 import xyz.meowing.knit.api.events.CancellableEvent
 import xyz.meowing.knit.api.events.Event
 
 sealed class GuiEvent {
     class RenderHUD(
-        val context: DrawContext
+        val context: GuiGraphics
     ) : Event()
 
     class Open(
@@ -21,7 +21,7 @@ sealed class GuiEvent {
 
     class Close(
         val screen: Screen,
-        val handler: ScreenHandler
+        val handler: AbstractContainerMenu
     ) : CancellableEvent()
 
     class Click(
@@ -42,18 +42,18 @@ sealed class GuiEvent {
 
     sealed class Slot {
         class Click(
-            val slot: net.minecraft.screen.slot.Slot?,
+            val slot: net.minecraft.world.inventory.Slot?,
             val slotId: Int,
             val button: Int,
-            val actionType: SlotActionType,
-            val handler: ScreenHandler,
-            val screen: HandledScreen<*>
+            val actionType: ClickType,
+            val handler: AbstractContainerMenu,
+            val screen: AbstractContainerScreen<*>
         ) : CancellableEvent()
 
         class Render(
-            val context: DrawContext,
-            val slot: net.minecraft.screen.slot.Slot,
-            val screen: HandledScreen<ScreenHandler>
+            val context: GuiGraphics,
+            val slot: net.minecraft.world.inventory.Slot,
+            val screen: AbstractContainerScreen<AbstractContainerMenu>
         ) : Event()
     }
 

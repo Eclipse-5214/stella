@@ -2,17 +2,15 @@ package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.util.Identifier
+import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.vexel.core.VexelScreen
 import xyz.meowing.vexel.utils.render.NVGRenderer
 
 class ButtonLayoutEditor : VexelScreen() {
-    private val dummyInventoryTexture = Identifier.of("minecraft", "container/inventory")
     private val slotSize = 20
     private val popup = EditButtonPopup(window)
 
-    override fun onRender(context: DrawContext?, mouseX: Int, mouseY: Int, deltaTicks: Float) {
+    override fun onRender(context: GuiGraphics?, mouseX: Int, mouseY: Int, deltaTicks: Float) {
         if (context == null) return
 
         // Draw dummy inventory
@@ -86,5 +84,5 @@ class ButtonLayoutEditor : VexelScreen() {
         return super.mouseClicked(mouseX, mouseY, button)
     }
 
-    override fun renderBackground(context: DrawContext?, mouseX: Int, mouseY: Int, deltaTicks: Float) {}
+    override fun renderBackground(context: GuiGraphics, mouseX: Int, mouseY: Int, deltaTicks: Float) {}
 }

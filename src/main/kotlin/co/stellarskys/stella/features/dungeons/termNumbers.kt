@@ -12,11 +12,11 @@ import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.render.Render3D
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.network.ClientPlayerEntity
-import net.minecraft.resource.Resource
-import net.minecraft.resource.ResourceManager
-import net.minecraft.util.Identifier
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.packs.resources.Resource
+import net.minecraft.server.packs.resources.ResourceManager
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitPlayer
 import java.awt.Color
 import java.io.IOException
 import java.io.InputStreamReader
@@ -44,7 +44,7 @@ object termNumbers : Feature("termNumbers") {
         register<RenderEvent.World.Last> { event ->
             if (!Dungeon.inBoss || Dungeon.floorNumber != 7) return@register
 
-            val player: ClientPlayerEntity = MinecraftClient.getInstance().player ?: return@register
+            val player = KnitPlayer.player ?: return@register
             val playerPos = Triple(
                 (player.x + 0.25).roundToInt() - 1,
                 player.y.roundToInt(),
@@ -124,11 +124,11 @@ object TermRegistry {
     private val terms = mutableMapOf<String, List<TermEntry>>() // p1, p2, etc.
 
     init {
-        load(MinecraftClient.getInstance().resourceManager)
+        load(KnitClient.client.resourceManager)
     }
 
     fun load(resourceManager: ResourceManager) {
-        val id = Identifier.of(Stella.NAMESPACE, "dungeons/terms.json")
+        val id = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "dungeons/terms.json")
         val resource: Resource? = try {
             resourceManager.getResource(id).orElse(null)
         } catch (e: IOException) {
@@ -138,7 +138,7 @@ object TermRegistry {
 
         if (resource == null) return
 
-        resource.inputStream.use { stream ->
+        resource.open().use { stream ->
             InputStreamReader(stream).use { reader ->
                 // Parse as raw map first
                 val rawType = object : TypeToken<Map<String, List<List<Any>>>>() {}.type

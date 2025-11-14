@@ -9,7 +9,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomRegistry
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
-import net.minecraft.block.Blocks
+import net.minecraft.world.level.block.Blocks
 
 class Room(
     initialComponent: Pair<Int, Int>,
@@ -124,7 +124,7 @@ class Room(
 
                 if (!WorldScanUtils.isChunkLoaded(nx, height!!, nz)) continue
                 val state = WorldUtils.getBlockStateAt(nx, height!!, nz) ?: continue
-                if (state.isOf(Blocks.BLUE_TERRACOTTA)) {
+                if (state.`is`(Blocks.BLUE_TERRACOTTA)) {
                     rotation = jdx * 90
                     corner = Triple(nx + 0.5, height!!.toDouble(), nz + 0.5)
                     return this

@@ -1,8 +1,9 @@
 package co.stellarskys.stella.utils.render
 
-import net.minecraft.client.font.TextRenderer
-import net.minecraft.client.render.*
-import net.minecraft.util.shape.VoxelShape
+import net.minecraft.client.gui.Font
+import net.minecraft.client.renderer.LightTexture
+import net.minecraft.client.renderer.ShapeRenderer
+import net.minecraft.world.phys.shapes.VoxelShape
 import org.joml.Matrix4f
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.render.world.RenderContext
@@ -21,12 +22,12 @@ object Render3D {
     ) {
         val consumers = ctx.consumers()
         val matrices = ctx.matrixStack() ?: return
-        val layer = if (phase) StellaRenderLayers.FILLEDTHROUGHWALLS else StellaRenderLayers.FILLED
+        val layer = if (phase) StellaRenderLayers.FILLED_THROUGH_WALLS else StellaRenderLayers.FILLED
 
         // TODO: make this more efficient later on
         //  (this does way too many calls but shouldn't matter much as of right now)
-        shape.forEachBox { minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double ->
-            VertexRendering.drawFilledBox(
+        shape.forAllBoxes { minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double ->
+            ShapeRenderer.addChainedFilledBoxVertices(
                 matrices,
                 consumers.getBuffer(layer),
                 minX + ox, minY + oy, minZ + oz,
@@ -49,7 +50,7 @@ object Render3D {
         val matrices = ctx.matrixStack() ?: return
         val layer = if (phase) StellaRenderLayers.getLinesThroughWalls( 1.0) else StellaRenderLayers.getLines( 1.0)
 
-        VertexRendering.drawOutline(
+        ShapeRenderer.renderShape(
             matrices,
             consumers.getBuffer(layer),
             shape,
@@ -71,16 +72,16 @@ object Render3D {
     ) {
         val consumers = ctx.consumers()
         val matrices = ctx.matrixStack() ?: return
-        val cam = ctx.camera().pos.negate()
+        val cam = ctx.camera().position.reverse()
         val layer = if (phase) StellaRenderLayers.getLinesThroughWalls(lineWidth) else StellaRenderLayers.getLines(lineWidth)
         val cx = x + 0.5
         val cz = z + 0.5
         val halfWidth = width / 2
 
-        matrices.push()
+        matrices.popPose()
         matrices.translate(cam.x, cam.y, cam.z)
 
-        VertexRendering.drawBox(
+        ShapeRenderer.renderLineBox(
             matrices,
             consumers.getBuffer(layer),
             cx - halfWidth, y, cz - halfWidth,
@@ -88,7 +89,7 @@ object Render3D {
             color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f
         )
 
-        matrices.pop()
+        matrices.popPose()
     }
 
     fun renderFilledBox(
@@ -103,16 +104,16 @@ object Render3D {
     ) {
         val consumers = ctx.consumers()
         val matrices = ctx.matrixStack() ?: return
-        val cam = ctx.camera().pos.negate()
-        val layer = if (phase) StellaRenderLayers.FILLEDTHROUGHWALLS else StellaRenderLayers.FILLED
+        val cam = ctx.camera().position.reverse()
+        val layer = if (phase) StellaRenderLayers.FILLED_THROUGH_WALLS else StellaRenderLayers.FILLED
         val cx = x + 0.5
         val cz = z + 0.5
         val halfWidth = width / 2
 
-        matrices.push()
+        matrices.pushPose()
         matrices.translate(cam.x, cam.y, cam.z)
 
-        VertexRendering.drawFilledBox(
+        ShapeRenderer.addChainedFilledBoxVertices(
             matrices,
             consumers.getBuffer(layer),
             cx - halfWidth, y, cz - halfWidth,
@@ -120,7 +121,7 @@ object Render3D {
             color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f
         )
 
-        matrices.pop()
+        matrices.popPose()
     }
 
     fun renderString(
@@ -135,29 +136,29 @@ object Render3D {
     ) {
         var toScale = scale
         val matrices = Matrix4f()
-        val textRenderer = KnitClient.client.textRenderer
-        val camera = KnitClient.client.gameRenderer.camera
-        val dx = (x - camera.pos.x).toFloat()
-        val dy = (y - camera.pos.y).toFloat()
-        val dz = (z - camera.pos.z).toFloat()
+        val textRenderer = KnitClient.client.font
+        val camera = KnitClient.client.gameRenderer.mainCamera
+        val dx = (x - camera.position.x).toFloat()
+        val dy = (y - camera.position.y).toFloat()
+        val dz = (z - camera.position.z).toFloat()
 
         toScale *= if (increase) sqrt(dx * dx + dy * dy + dz * dz) / 120f else 0.025f
 
         matrices
             .translate(dx, dy, dz)
-            .rotate(camera.rotation)
+            .rotate(camera.rotation())
             .scale(toScale, -toScale, toScale)
 
-        val consumer = KnitClient.client.bufferBuilders.entityVertexConsumers
-        val textLayer = if (phase) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL
+        val consumer = KnitClient.client.renderBuffers().bufferSource()
+        val textLayer = if (phase) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL
         val lines = text.split("\n")
-        val maxWidth = lines.maxOf { textRenderer.getWidth(it) }
+        val maxWidth = lines.maxOf { textRenderer.width(it) }
         val offset = -maxWidth / 2f
 
         if (bgBox) {
-            val bgOpacity = (KnitClient.client.options.getTextBackgroundOpacity(0.25f) * 255).toInt() shl 24
+            val bgOpacity = (KnitClient.client.options.getBackgroundOpacity(0.25f) * 255).toInt() shl 24
             val boxHeight = lines.size * 9
-            textRenderer.draw(
+            textRenderer.drawInBatch(
                 "", // empty string, just draws box
                 offset,
                 0f,
@@ -167,15 +168,15 @@ object Render3D {
                 consumer,
                 textLayer,
                 bgOpacity,
-                LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE
+                LightTexture.FULL_BLOCK
             )
         }
 
         for ((i, line) in lines.withIndex()) {
-            val lineWidth = textRenderer.getWidth(line)
+            val lineWidth = textRenderer.width(line)
             val lineOffset = -lineWidth / 2f
 
-            textRenderer.draw(
+            textRenderer.drawInBatch(
                 line,
                 lineOffset,
                 i * 9f,
@@ -185,10 +186,10 @@ object Render3D {
                 consumer,
                 textLayer,
                 0,
-                LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE
+                LightTexture.FULL_BLOCK
             )
         }
 
-        consumer.draw()
+        consumer.endBatch()
     }
 }

@@ -21,11 +21,10 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.elementa.markdown.MarkdownComponent
 import gg.essential.universal.UMatrixStack
+import net.minecraft.client.resources.DefaultPlayerSkin
+import net.minecraft.world.entity.player.PlayerModelPart
 import java.awt.Color
 import java.io.File
-
-import net.minecraft.client.util.DefaultSkinHelper
-import net.minecraft.entity.player.PlayerModelPart
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.knit.api.scheduler.TickScheduler
@@ -216,17 +215,15 @@ class Config(
                 }
             }
 
-            //#if MC >= 1.21.5
-            override fun shouldPause(): Boolean = false
-            //#endif
+            override fun isPauseScreen(): Boolean = false
 
             override fun onDrawScreen(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
                 super.onDrawScreen(matrixStack, mouseX, mouseY, partialTicks)
 
                 val player = KnitPlayer.player ?: return
-                val entry = KnitClient.client.networkHandler?.getPlayerListEntry(player.uuid)
-                val skin = entry?.skinTextures?.texture ?: DefaultSkinHelper.getTexture()
-                val hasHat = player.isPartVisible(PlayerModelPart.HAT)
+                val entry = KnitClient.client.connection?.getPlayerInfo(player.uuid)
+                val skin = entry?.skin?.texture ?: DefaultPlayerSkin.getDefaultTexture()
+                val hasHat = player.isModelPartShown(PlayerModelPart.HAT)
 
                 val x = head.getLeft().toDouble()
                 val y = head.getTop().toDouble()

@@ -4,22 +4,17 @@ package co.stellarskys.stella.utils.render
 //import co.stellarskys.stella.utils.render.layers.ChromaRenderLayer
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap
 import it.unimi.dsi.fastutil.doubles.Double2ObjectOpenHashMap
-import net.minecraft.client.gl.RenderPipelines
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.RenderLayer.MultiPhase
-import net.minecraft.client.render.RenderLayer.MultiPhaseParameters
-import net.minecraft.client.render.RenderPhase
-import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer
-import net.minecraft.util.Identifier
-import net.minecraft.util.TriState
-import net.minecraft.util.Util
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.client.renderer.RenderStateShard
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.RenderType.CompositeState
 import java.util.OptionalDouble
 import java.util.function.DoubleFunction
 
 object StellaRenderLayers {
-    private val linesThroughWallsLayers: Double2ObjectMap<RenderLayer.MultiPhase> = Double2ObjectOpenHashMap()
-    private val chromaLinesLayer: Double2ObjectMap<RenderLayer.MultiPhase> = Double2ObjectOpenHashMap()
-    private val linesLayers: Double2ObjectMap<RenderLayer.MultiPhase> = Double2ObjectOpenHashMap()
+    private val linesThroughWallsLayers: Double2ObjectMap<RenderType.CompositeRenderType> = Double2ObjectOpenHashMap()
+    private val chromaLinesLayer: Double2ObjectMap<RenderType.CompositeRenderType> = Double2ObjectOpenHashMap()
+    private val linesLayers: Double2ObjectMap<RenderType.CompositeRenderType> = Double2ObjectOpenHashMap()
 
     /*
     val CHROMA_STANDARD: MultiPhase = ChromaRenderLayer(
@@ -70,50 +65,50 @@ object StellaRenderLayers {
      */
 
     private val LINES_THROUGH_WALLS = DoubleFunction { width ->
-        RenderLayer.of(
+        RenderType.create(
             "lines_through_walls",
-            RenderLayer.DEFAULT_BUFFER_SIZE, false, false,
+            RenderType.TRANSIENT_BUFFER_SIZE, false, false,
             StellaRenderPipelines.LINES_THROUGH_WALLS,
-            MultiPhaseParameters.builder()
-                .lineWidth(RenderPhase.LineWidth(OptionalDouble.of(width)))
-                .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                .build(false)
+            CompositeState.builder()
+                .setLineState(RenderStateShard.LineStateShard(OptionalDouble.of(width)))
+                .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
+                .createCompositeState(false)
         )
     }
 
     private val LINES = DoubleFunction { width ->
-        RenderLayer.of(
+        RenderType.create(
             "lines",
-            RenderLayer.DEFAULT_BUFFER_SIZE, false, false,
+            RenderType.TRANSIENT_BUFFER_SIZE, false, false,
             RenderPipelines.LINES,
-            MultiPhaseParameters.builder()
-                .lineWidth(RenderPhase.LineWidth(OptionalDouble.of(width)))
-                .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                .build(false)
+            CompositeState.builder()
+                .setLineState(RenderStateShard.LineStateShard(OptionalDouble.of(width)))
+                .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
+                .createCompositeState(false)
         )
     }
 
-    val FILLED: RenderLayer.MultiPhase = RenderLayer.of(
-        "filled", RenderLayer.DEFAULT_BUFFER_SIZE, false, true,
+    val FILLED: RenderType.CompositeRenderType = RenderType.create(
+        "filled", RenderType.TRANSIENT_BUFFER_SIZE, false, true,
         RenderPipelines.DEBUG_FILLED_BOX,
-        RenderLayer.MultiPhaseParameters.builder()
-            .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-            .build(false)
+        CompositeState.builder()
+            .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
+            .createCompositeState(false)
     )
 
 
-    val FILLEDTHROUGHWALLS: RenderLayer.MultiPhase = RenderLayer.of(
-        "filled_through_walls", RenderLayer.DEFAULT_BUFFER_SIZE, false, true,
+    val FILLED_THROUGH_WALLS: RenderType.CompositeRenderType = RenderType.create(
+        "filled_through_walls", RenderType.TRANSIENT_BUFFER_SIZE, false, true,
         StellaRenderPipelines.FILLED_THROUGH_WALLS,
-        RenderLayer.MultiPhaseParameters.builder()
-            .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-            .build(false)
+        CompositeState.builder()
+            .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
+            .createCompositeState(false)
     )
 
-    fun getLinesThroughWalls(width: Double): RenderLayer.MultiPhase =
+    fun getLinesThroughWalls(width: Double): RenderType.CompositeRenderType =
         linesThroughWallsLayers.computeIfAbsent(width, LINES_THROUGH_WALLS)
 
-    fun getLines(width: Double): RenderLayer.MultiPhase =
+    fun getLines(width: Double): RenderType.CompositeRenderType =
         linesLayers.computeIfAbsent(width, LINES)
 
     /*

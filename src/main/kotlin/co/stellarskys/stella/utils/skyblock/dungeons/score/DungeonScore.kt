@@ -3,7 +3,6 @@ package co.stellarskys.stella.utils.skyblock.dungeons.score
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ScoreboardEvent
 import co.stellarskys.stella.events.core.TablistEvent
-import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland

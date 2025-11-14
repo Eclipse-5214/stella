@@ -14,7 +14,6 @@
        "MixinStatusEffectsDisplay",
       "MixinLivingEntity",
       "accessors.AccessorMapState",
-      "accessors.AccessorNetHandlerPlayClient",
       "accessors.AccessorPlayerList"
     ]
 }

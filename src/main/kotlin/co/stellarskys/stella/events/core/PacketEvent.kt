@@ -2,7 +2,7 @@
 
 package co.stellarskys.stella.events.core
 
-import net.minecraft.network.packet.Packet
+import net.minecraft.network.protocol.Packet
 import xyz.meowing.knit.api.events.CancellableEvent
 import xyz.meowing.knit.api.events.Event
 

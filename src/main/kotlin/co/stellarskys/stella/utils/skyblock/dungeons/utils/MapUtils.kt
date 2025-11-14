@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.utils
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.PacketEvent
 import co.stellarskys.stella.events.core.TickEvent
@@ -9,18 +8,18 @@ import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon.inBoss
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils.roomDoorCombinedSize
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
-import net.minecraft.item.FilledMapItem
-import net.minecraft.item.map.MapDecoration
-import net.minecraft.item.map.MapDecorationTypes
-import net.minecraft.item.map.MapState
-import net.minecraft.network.packet.s2c.play.MapUpdateS2CPacket
+import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket
+import net.minecraft.world.item.MapItem
+import net.minecraft.world.level.saveddata.maps.MapDecoration
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer
 
 object MapUtils {
     val MapDecoration.mapX get() = (this.x() + 128) shr 1
-    val MapDecoration.mapZ get() = (this.z + 128) shr 1
-    val MapDecoration.yaw get() = this.rotation * 22.5f
+    val MapDecoration.mapZ get() = (this.y() + 128) shr 1
+    val MapDecoration.yaw get() = this.rot * 22.5f
 
     var mapCorners = Pair(5, 5)
     var mapRoomSize = 16
@@ -28,16 +27,16 @@ object MapUtils {
     var coordMultiplier = 0.625
     var calibrated = false
 
-    var mapData: MapState? = null
-    var guessMapData: MapState? = null
+    var mapData: MapItemSavedData? = null
+    var guessMapData: MapItemSavedData? = null
 
     fun init() {
         EventBus.registerIn<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event->
-            if (event.packet is MapUpdateS2CPacket && mapData == null) {
+            if (event.packet is ClientboundMapItemDataPacket && mapData == null) {
                 val world = KnitClient.world ?: return@registerIn
                 val id = event.packet.mapId.id
                 if (id and 1000 == 0) {
-                    val guess = FilledMapItem.getMapState(event.packet.mapId, world) ?: return@registerIn
+                    val guess = MapItem.getSavedData(event.packet.mapId, world) ?: return@registerIn
                     if(guess.decorations.any {it.type == MapDecorationTypes.FRAME }) {
                         guessMapData = guess
                     }
@@ -62,10 +61,10 @@ object MapUtils {
         }
     }
 
-    fun getCurrentMapState(): MapState? {
-        val stack = KnitPlayer.player?.inventory?.getStack(8) ?: return null
-        if (stack.item !is FilledMapItem || !stack.name.string.contains("Magical Map")) return null
-        return FilledMapItem.getMapState(stack, KnitClient.world!!)
+    fun getCurrentMapState(): MapItemSavedData? {
+        val stack = KnitPlayer.player?.inventory?.getItem(8) ?: return null
+        if (stack.item !is MapItem || !stack.hoverName.string.contains("Magical Map")) return null
+        return MapItem.getSavedData(stack, KnitClient.world!!)
     }
 
     fun calibrateDungeonMap(): Boolean {
@@ -108,7 +107,7 @@ object MapUtils {
         return null
     }
 
-    fun checkBloodDone(state: MapState) {
+    fun checkBloodDone(state: MapItemSavedData) {
         if (Dungeon.bloodClear) return
 
         val startX = mapCorners.first + (mapRoomSize / 2)

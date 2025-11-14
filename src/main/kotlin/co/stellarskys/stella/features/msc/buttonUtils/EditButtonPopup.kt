@@ -1,12 +1,11 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.item.Items
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import xyz.meowing.knit.api.render.KnitResolution
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
@@ -116,7 +115,7 @@ class EditButtonPopup(window: VexelWindow) {
         }
         .childOf(rect)
 
-    fun renderPreviewItem(context: DrawContext) {
+    fun renderPreviewItem(context: GuiGraphics) {
         if (!shown) return
 
         val item = NEUApi.getItemBySkyblockId(itemIdInput.value)

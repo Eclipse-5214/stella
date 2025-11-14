@@ -5,21 +5,21 @@ import com.google.gson.*
 import com.mojang.serialization.Dynamic
 import kotlinx.coroutines.launch
 import net.minecraft.SharedConstants
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.LoreComponent
-import net.minecraft.component.type.NbtComponent
-import net.minecraft.datafixer.Schemas
-import net.minecraft.datafixer.TypeReferences
-import net.minecraft.util.Identifier
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.nbt.NbtCompound
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.component.DataComponents
+import net.minecraft.data.registries.VanillaRegistries
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
-import net.minecraft.nbt.StringNbtReader
-import net.minecraft.registry.BuiltinRegistries
-import net.minecraft.registry.RegistryOps
-import net.minecraft.registry.RegistryWrapper
-import net.minecraft.text.Text
+import net.minecraft.nbt.TagParser
+import net.minecraft.network.chat.Component
+import net.minecraft.resources.RegistryOps
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.util.datafix.DataFixers
+import net.minecraft.util.datafix.fixes.References
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.ItemLore
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpHead
 import org.apache.http.impl.client.CloseableHttpClient
@@ -28,6 +28,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
+import javax.xml.crypto.Data
 import kotlin.jvm.optionals.getOrNull
 
 object NEUApi {
@@ -35,9 +36,9 @@ object NEUApi {
     private val neuRepoDir: File get() = File("config/Stella/neu-repo")
     private val etagFile = File("config/Stella/neu-repo/etag.txt")
     private var cachedItems: List<NEUItem> = emptyList()
-    private val cachedOverlays: MutableMap<String, NbtCompound> = mutableMapOf()
+    private val cachedOverlays: MutableMap<String, CompoundTag> = mutableMapOf()
     private val cashedStacks: MutableMap<String, ItemStack> = mutableMapOf()
-    val defaultRegistries: RegistryWrapper.WrapperLookup by lazy { BuiltinRegistries.createWrapperLookup() }
+    val defaultRegistries: HolderLookup.Provider by lazy { VanillaRegistries.createLookup() }
 
     fun init() {
         loadAllItems()
@@ -69,26 +70,26 @@ object NEUApi {
         return items
     }
 
-    fun loadAllOverlays(): Map<String, NbtCompound> {
+    fun loadAllOverlays(): Map<String, CompoundTag> {
         val overlayDir = File(neuRepoDir, "overlay")
         if (!overlayDir.exists()) return emptyMap()
 
         val overlays = overlayDir.listFiles { it.extension == "snbt" }?.mapNotNull { file ->
             try {
                 val internalname = file.nameWithoutExtension
-                val raw = StringNbtReader.readCompound(file.readText())
+                val raw = TagParser.parseCompoundFully(file.readText())
 
                 val source = raw.getCompound("source")
                 val dataVersion = source.getOrNull()?.getInt("dataVersion")?.getOrNull() ?: return emptyMap()
 
                 val stripped = raw.copy().apply { remove("source") }
 
-                val fixed = Schemas.getFixer().update(
-                    TypeReferences.ITEM_STACK,
+                val fixed = DataFixers.getDataFixer().update(
+                    References.ITEM_STACK,
                     Dynamic(NbtOps.INSTANCE, stripped),
                     dataVersion,
-                    SharedConstants.getGameVersion().dataVersion().id
-                ).value as? NbtCompound ?: return@mapNotNull null
+                    SharedConstants.getCurrentVersion().dataVersion().version
+                ).value as? CompoundTag ?: return@mapNotNull null
 
                 cachedOverlays[internalname] = fixed
                 internalname to fixed
@@ -101,7 +102,7 @@ object NEUApi {
         return overlays
     }
 
-    fun tryFindFromModernFormat(internalname: String): NbtCompound? {
+    fun tryFindFromModernFormat(internalname: String): CompoundTag? {
         return cachedOverlays[internalname]
     }
 
@@ -236,8 +237,8 @@ object NEUApi {
 
             if (usedLegacy) injectLegacyExtras(stack, modernTag)
 
-            stack.set(DataComponentTypes.CUSTOM_NAME, Text.literal(item.displayname))
-            stack.set(DataComponentTypes.LORE, LoreComponent(item.lore.map { Text.literal(it) }))
+            stack.set(DataComponents.CUSTOM_NAME, Component.literal(item.displayname))
+            stack.set(DataComponents.LORE, ItemLore(item.lore.map { Component.literal(it) }))
 
             stack
         } catch (e: Exception) {
@@ -246,10 +247,10 @@ object NEUApi {
         }
     }
 
-    fun getLegacyItemTag(item: NEUItem): NbtCompound? {
+    fun getLegacyItemTag(item: NEUItem): CompoundTag? {
         val raw = item.nbttag ?: return null
         return try {
-            NbtCompound().apply {
+            CompoundTag().apply {
                 put("tag", LegNBTParser.parse(raw)) // uses new parser
                 putString("id", item.itemid)
                 putByte("Count", 1)
@@ -261,32 +262,32 @@ object NEUApi {
         }
     }
 
-    fun convert189ToModern(nbt: NbtCompound): NbtCompound? = try {
-        Schemas.getFixer().update(
-            TypeReferences.ITEM_STACK,
+    fun convert189ToModern(nbt: CompoundTag): CompoundTag? = try {
+        DataFixers.getDataFixer().update(
+            References.ITEM_STACK,
             Dynamic(NbtOps.INSTANCE, nbt),
             -1,
-            SharedConstants.getGameVersion().dataVersion().id
-        ).value as? NbtCompound
+            SharedConstants.getCurrentVersion().dataVersion().version
+        ).value as? CompoundTag
     } catch (e: Exception) {
         Stella.LOGGER.error("Failed to data-fix legacy NBT", e)
         null
     }
 
-    fun decodeItemStack(nbt: NbtCompound): ItemStack? {
+    fun decodeItemStack(nbt: CompoundTag): ItemStack? {
         return ItemStack.CODEC.decode(
-            RegistryOps.of(NbtOps.INSTANCE, NEUApi.defaultRegistries),
+            RegistryOps.create(NbtOps.INSTANCE, defaultRegistries),
             nbt
         ).result().getOrNull()?.first
     }
 
-    fun injectLegacyExtras(stack: ItemStack, legacyTag: NbtCompound) {
+    fun injectLegacyExtras(stack: ItemStack, legacyTag: CompoundTag) {
         val tag = legacyTag.getCompound("tag")
         tag.getOrNull()?.getCompound("ExtraAttributes")?.getOrNull()?.let {
-            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(it))
+            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(it))
         }
         tag.getOrNull()?.getString("ItemModel")?.getOrNull()?.let {
-            stack.set(DataComponentTypes.ITEM_MODEL, Identifier.of(it))
+            stack.set(DataComponents.ITEM_MODEL, ResourceLocation.parse(it))
         }
     }
 

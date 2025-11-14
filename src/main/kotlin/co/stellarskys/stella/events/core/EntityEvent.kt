@@ -1,7 +1,7 @@
 package co.stellarskys.stella.events.core
 
 
-import net.minecraft.entity.Entity
+import net.minecraft.world.entity.Entity
 import xyz.meowing.knit.api.events.Event
 
 sealed class EntityEvent {

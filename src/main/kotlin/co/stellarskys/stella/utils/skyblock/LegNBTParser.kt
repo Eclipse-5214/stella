@@ -1,16 +1,16 @@
 package co.stellarskys.stella.utils.skyblock
 
-import net.minecraft.nbt.AbstractNbtNumber
-import net.minecraft.nbt.NbtByte
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.nbt.NbtDouble
-import net.minecraft.nbt.NbtElement
-import net.minecraft.nbt.NbtFloat
-import net.minecraft.nbt.NbtInt
-import net.minecraft.nbt.NbtList
-import net.minecraft.nbt.NbtLong
-import net.minecraft.nbt.NbtShort
-import net.minecraft.nbt.NbtString
+import net.minecraft.nbt.ByteTag
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.DoubleTag
+import net.minecraft.nbt.FloatTag
+import net.minecraft.nbt.IntTag
+import net.minecraft.nbt.ListTag
+import net.minecraft.nbt.LongTag
+import net.minecraft.nbt.NumericTag
+import net.minecraft.nbt.ShortTag
+import net.minecraft.nbt.StringTag
+import net.minecraft.nbt.Tag
 import java.util.Stack
 
 /*
@@ -50,14 +50,14 @@ object LegNBTParser {
         fun finished() = index >= input.length
     }
 
-    fun parse(raw: String): NbtCompound = LegNBTParser(raw).baseTag
+    fun parse(raw: String): CompoundTag = LegNBTParser(raw).baseTag
 
     private class LegNBTParser(raw: String) {
         val racer = StringRacer(raw)
         val baseTag = parseTag()
 
         companion object {
-            val digitRange = "0123456789-"
+            const val digitRange = "0123456789-"
             object Patterns {
                 val DOUBLE = "([-+]?[0-9]*\\.?[0-9]+)[dD]".toRegex()
                 val FLOAT = "([-+]?[0-9]*\\.?[0-9]+)[fF]".toRegex()
@@ -74,10 +74,10 @@ object LegNBTParser {
             racer.consumeWhile { it.last().isWhitespace() }
         }
 
-        private fun parseTag(): NbtCompound {
+        private fun parseTag(): CompoundTag {
             skipWhitespace()
             racer.expect("{", "Expected '{'")
-            val tag = NbtCompound()
+            val tag = CompoundTag()
             while (!racer.tryConsume("}")) {
                 skipWhitespace()
                 val key = parseIdentifier()
@@ -92,7 +92,7 @@ object LegNBTParser {
             return tag
         }
 
-        private fun parseAny(): NbtElement {
+        private fun parseAny(): Tag {
             skipWhitespace()
             val c = racer.peekReq(1) ?: racer.error("Unexpected EOF")
             return when {
@@ -104,10 +104,10 @@ object LegNBTParser {
             }
         }
 
-        private fun parseList(): NbtList {
+        private fun parseList(): ListTag {
             skipWhitespace()
             racer.expect("[", "Expected '['")
-            val list = NbtList()
+            val list = ListTag()
             while (!racer.tryConsume("]")) {
                 skipWhitespace()
                 racer.pushState()
@@ -149,21 +149,21 @@ object LegNBTParser {
             return sb.toString()
         }
 
-        private fun parseStringTag(): NbtString = NbtString.of(parseQuotedString())
+        private fun parseStringTag(): StringTag = StringTag.valueOf(parseQuotedString())
 
-        private fun parseNumericTag(): AbstractNbtNumber {
+        private fun parseNumericTag(): NumericTag {
             skipWhitespace()
             val raw = racer.consumeWhile { Patterns.ROUGH.matchEntire(it) != null }
             if (raw.isEmpty()) racer.error("Expected numeric value")
 
             return when {
-                Patterns.FLOAT.matches(raw) -> NbtFloat.of(Patterns.FLOAT.matchEntire(raw)!!.groupValues[1].toFloat())
-                Patterns.BYTE.matches(raw) -> NbtByte.of(Patterns.BYTE.matchEntire(raw)!!.groupValues[1].toByte())
-                Patterns.LONG.matches(raw) -> NbtLong.of(Patterns.LONG.matchEntire(raw)!!.groupValues[1].toLong())
-                Patterns.SHORT.matches(raw) -> NbtShort.of(Patterns.SHORT.matchEntire(raw)!!.groupValues[1].toShort())
-                Patterns.INTEGER.matches(raw) -> NbtInt.of(Patterns.INTEGER.matchEntire(raw)!!.groupValues[1].toInt())
-                Patterns.DOUBLE.matches(raw) -> NbtDouble.of(Patterns.DOUBLE.matchEntire(raw)!!.groupValues[1].toDouble())
-                Patterns.DOUBLE_UNTYPED.matches(raw) -> NbtDouble.of(Patterns.DOUBLE_UNTYPED.matchEntire(raw)!!.groupValues[1].toDouble())
+                Patterns.FLOAT.matches(raw) -> FloatTag.valueOf(Patterns.FLOAT.matchEntire(raw)!!.groupValues[1].toFloat())
+                Patterns.BYTE.matches(raw) -> ByteTag.valueOf(Patterns.BYTE.matchEntire(raw)!!.groupValues[1].toByte())
+                Patterns.LONG.matches(raw) -> LongTag.valueOf(Patterns.LONG.matchEntire(raw)!!.groupValues[1].toLong())
+                Patterns.SHORT.matches(raw) -> ShortTag.valueOf(Patterns.SHORT.matchEntire(raw)!!.groupValues[1].toShort())
+                Patterns.INTEGER.matches(raw) -> IntTag.valueOf(Patterns.INTEGER.matchEntire(raw)!!.groupValues[1].toInt())
+                Patterns.DOUBLE.matches(raw) -> DoubleTag.valueOf(Patterns.DOUBLE.matchEntire(raw)!!.groupValues[1].toDouble())
+                Patterns.DOUBLE_UNTYPED.matches(raw) -> DoubleTag.valueOf(Patterns.DOUBLE_UNTYPED.matchEntire(raw)!!.groupValues[1].toDouble())
                 else -> racer.error("Unrecognized numeric format '$raw'")
             }
         }
