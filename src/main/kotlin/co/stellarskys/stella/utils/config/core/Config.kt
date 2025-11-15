@@ -3,31 +3,27 @@ package co.stellarskys.stella.utils.config.core
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
+import co.stellarskys.stella.utils.BetterVexelScreen
 import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
-import co.stellarskys.stella.utils.Utils.createBlock
-import co.stellarskys.stella.utils.config.UCRenderPipelines
-import co.stellarskys.stella.utils.config.drawTexture
 import co.stellarskys.stella.utils.config.ui.elements.*
+import co.stellarskys.stella.utils.render.Render2D
 import com.google.gson.*
-import gg.essential.elementa.ElementaVersion
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.WindowScreen
-import gg.essential.elementa.components.*
-import gg.essential.elementa.constraints.*
-import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.*
-import gg.essential.elementa.effects.OutlineEffect
-import gg.essential.elementa.markdown.MarkdownComponent
-import gg.essential.universal.UMatrixStack
-import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.world.entity.player.PlayerModelPart
+import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color
 import java.io.File
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.knit.api.scheduler.TickScheduler
+import xyz.meowing.vexel.components.base.Offset
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.base.Size
+import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.vexel.components.core.Rectangle
+import xyz.meowing.vexel.components.core.Text
+import xyz.meowing.vexel.core.VexelScreen
+import xyz.meowing.vexel.core.VexelWindow
 
 //Main config Shananagens
 class Config(
@@ -43,10 +39,10 @@ class Config(
     private val mod = modID
     private var loaded = false
 
-    private var configUI: WindowScreen? = null
+    private var configUI: BetterVexelScreen? = null
     private var selectedCategory: ConfigCategory? = null
     private val subcategoryLayouts = mutableListOf<SubcategoryLayout>()
-    private val elementContainers = mutableMapOf<String, UIComponent>()
+    private val elementContainers = mutableMapOf<String, VexelElement<*>>()
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private val listeners = mutableListOf<(configName: String, value: Any?) -> Unit>()
     private val columnHeights = mutableMapOf<Int, Int>()
@@ -59,7 +55,7 @@ class Config(
     data class SubcategoryLayout(
         val title: String,
         val column: Int,
-        val box: UIComponent,
+        val box: VexelElement<*>,
         val subcategory: ConfigSubcategory
     )
 
@@ -80,194 +76,118 @@ class Config(
 
     // UI builders
     private fun buildUI(initial: Boolean){
-        configUI = object: WindowScreen(ElementaVersion.V2) {
-            val head = UIBlock(Color(0,0,0,0))
+        configUI = object: BetterVexelScreen() {
+            val head = Rectangle(Color(0,255,0,255).rgb)
 
             init {
-                val listBG = createBlock(5f)
-                    .constrain {
-                        width = 502.pixels()
-                        height = 252.pixels()
-                        x = CenterConstraint()
-                        y = CenterConstraint()
-                    }
-                    .setColor(Palette.Purple.withAlpha(100))
-                    .setChildOf(window)
+                val bg = Rectangle(Color.BLACK.rgb,Palette.Purple.withAlpha(100).rgb, 5f, 2f)
+                    .setSizing(50, Size.ParentPerc, 50, Size.ParentPerc)
+                    .setPositioning(Pos.ScreenCenter, Pos.ScreenCenter)
+                    .childOf(window)
 
-                val list = createBlock(5f)
-                    .constrain {
-                        width = 500.pixels()
-                        height = 250.pixels()
-                        x = CenterConstraint()
-                        y = CenterConstraint()
-                    }
-                    .setColor(Color.BLACK)
-                    .setChildOf(window)
+                val list = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
+                    .setSizing(20, Size.ParentPerc, 100, Size.ParentPerc)
+                    .setPositioning(0f, Pos.ParentPixels,0f, Pos.ParentPixels)
+                    .childOf(bg)
 
-                val card = createBlock(5f)
-                    .constrain {
-                        width = 400.pixels()
-                        height = 250.pixels()
-                        x = CenterConstraint() + 50.pixels() // Offset to the right of list panel
-                        y = CenterConstraint()
-                    }
-                    .setColor(Color.black)
-                    .setChildOf(window)
+                val card = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
+                    .setSizing(80, Size.ParentPerc, 100, Size.ParentPerc)
+                    .setPositioning(0f,Pos.AfterSibling,0f, Pos.ParentPixels)
+                    .scrollable( true)
+                    .scrollbarColor(Palette.Purple.withAlpha(100).rgb)
+                    .childOf(bg)
+
+                val top = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
+                    .setSizing(100, Size.ParentPerc, 40, Size.ParentPerc)
+                    .setPositioning(0f, Pos.ParentPixels,0f, Pos.ParentPixels)
+                    .childOf(list)
 
                 head
-                    .constrain {
-                    x = CenterConstraint() - 235.pixels()
-                    y = CenterConstraint() - 110.pixels()
-                    width = PixelConstraint(12f)
-                    height = PixelConstraint(12f)
-                }.setChildOf(window)
+                    .setSizing(12f, Size.Pixels, 12f, Size.Pixels)
+                    .setPositioning(5f, Pos.ParentPercent, 5f, Pos.ParentPercent)
+                    .childOf(top)
 
+                val username = Text(KnitPlayer.player?.name?.string ?: "null", shadowEnabled = false)
+                    .setPositioning(17, Pos.ParentPixels, 2, Pos.ParentPixels)
+                    .childOf(head)
 
-                val username = UIText(KnitPlayer.player?.name?.string ?: "null", false)
-                    .constrain {
-                        x = RelativeConstraint() + 17.pixels()
-                        y = CenterConstraint() + 2.pixels()
-                    }
-                    .setColor(Color.white)
-                    .setChildOf(head)
-
-                val tag = UIText("Stella User", false)
-                    .constrain {
-                        x = RelativeConstraint() + 17.pixels()
-                        y = CenterConstraint() + 12.pixels()
-                    }
-                    .setColor(Color.gray)
-                    .setChildOf(head)
+                val tag = Text("Stella User", Color.gray.rgb, shadowEnabled = false)
+                    .setPositioning(17, Pos.ParentPixels, 12, Pos.ParentPixels)
+                    .childOf(head)
 
 
                 // === Category Button Panel ===
 
-                val categoryLabels = mutableMapOf<ConfigCategory, Pair<UIComponent, UIComponent>>()
+                val categoryLabels = mutableMapOf<ConfigCategory, VexelElement<xyz.meowing.vexel.elements.Button>>()
 
 
-                categories.entries.forEachIndexed { index, category ->
+                categories.entries.forEachIndexed { _, category ->
                     // Actual button surface
-                    val button = createBlock(3f)
-                        .constrain {
-                            width = 80.pixels()
-                            height = 20.pixels()
-                            x = CenterConstraint() - 200.pixels()
-                            y = CenterConstraint() + (index * 30).pixels()
-                        }
-                        .setColor(if (selectedCategory == category.value) Palette.Purple.withAlpha(50) else Color(0,0, 0,0))
-                        .setChildOf(window)
+                    val button = xyz.meowing.vexel.elements.Button(
+                        category.key,
+                        if (selectedCategory == category.value) Palette.Purple.rgb else Color.WHITE.rgb,
+                        backgroundColor = if (selectedCategory == category.value) Palette.Purple.withAlpha(50).rgb else Color(0,0, 0,0).rgb,
+                        borderRadius = 5f,
+                        borderThickness = 0f,
+                        fontSize = 16f
+                    )
+                        .setSizing(80f, Size.ParentPerc, 8f, Size.ParentPerc)
+                        .setPositioning(0f, Pos.ParentCenter,20f, Pos.AfterSibling)
+                        .childOf(list)
 
-                    // Category label text
-                    val label = UIWrappedText(category.key, centered = true)
-                        .constrain {
-                            x = CenterConstraint()
-                            y = CenterConstraint()
-                            width = 76.pixels()
-                        }
-                        .setColor(if (selectedCategory == category.value) Palette.Purple else Color.WHITE)
-                        .setChildOf(button)
-
-                    categoryLabels[category.value] = Pair(button, label)
+                    categoryLabels[category.value] = button
 
                     // Click handler to change category view
-                    button.onMouseClick {
+                    button.onMouseClick { _, _, _ ->
                         if (selectedCategory != category) {
                             selectedCategory = category.value
 
                             // Update label highlight colors
-                            categoryLabels.forEach { (cat, button) ->
-                                val btn = button.first
-                                val lbl = button.second
-
-                                lbl.animate{
-                                    setColorAnimation(
-                                        Animations.OUT_CUBIC,
-                                        0.3f,
-                                        if (cat == selectedCategory) Palette.Purple.toConstraint() else Color.WHITE.toConstraint()
-                                    )
-                                }
-
-                                btn.animate {
-                                    setColorAnimation(
-                                        Animations.OUT_CUBIC,
-                                        0.3f,
-                                        if (cat == selectedCategory) Palette.Purple.withAlpha(50).toConstraint()
-                                        else Color(0,0, 0,0).toConstraint()
-                                    )
-                                }
+                            categoryLabels.forEach { (cat, btn) ->
+                                btn as xyz.meowing.vexel.elements.Button
+                                btn.textColor(if (cat == selectedCategory) Palette.Purple.rgb else Color.WHITE.rgb)
+                                btn.backgroundColor( if (cat == selectedCategory) Palette.Purple.withAlpha(50).rgb else Color(0,0, 0,0).rgb)
                             }
-
                             // Destroy left over window ui
                             FloatingUIManager.clearAll()
 
                             // Swap out current category panel
-                            card.clearChildren()
-
-                            if (category.value.isMarkdown) buildMarkown(card, category.value)
-                            else buildCategory(card, window, category.value)
+                            card.children.clear()
+                            buildCategory(card, window, category.value)
                         }
+                        true
                     }
                 }
 
                 if(initial) {
-                    if (selectedCategory!!.isMarkdown) buildMarkown(card, selectedCategory!!)
-                    else buildCategory(card, window, selectedCategory!!)
+                    buildCategory(card, window, selectedCategory!!)
                 }
             }
 
             override fun isPauseScreen(): Boolean = false
 
-            override fun onDrawScreen(matrixStack: UMatrixStack, mouseX: Int, mouseY: Int, partialTicks: Float) {
-                super.onDrawScreen(matrixStack, mouseX, mouseY, partialTicks)
-
+            override fun onRenderGui(context: GuiGraphics) {
                 val player = KnitPlayer.player ?: return
-                val entry = KnitClient.client.connection?.getPlayerInfo(player.uuid)
-                val skin = entry?.skin?.texture ?: DefaultPlayerSkin.getDefaultTexture()
-                val hasHat = player.isModelPartShown(PlayerModelPart.HAT)
+                val uuid = player.gameProfile.id
+                val size = 24
+                val x = head.scaled.left.toInt()
+                val y = head.scaled.top.toInt()
 
-                val x = head.getLeft().toDouble()
-                val y = head.getTop().toDouble()
-                val size = 24.0
-
-                drawTexture(matrixStack, UCRenderPipelines.guiTexturePipeline, skin, x, y, size, size, 8.0, 8.0, 8.0, 8.0)
-
-                if (hasHat) {
-                    drawTexture(matrixStack, UCRenderPipelines.guiTexturePipeline, skin, x, y, size, size, 40.0, 8.0, 8.0, 8.0)
-                }
+                Render2D.drawPlayerHead(context, x, y, size, uuid)
             }
-
         }
     }
 
-    private fun buildMarkown(root: UIComponent, category: ConfigCategory){
-        val catagoryContainer = ScrollComponent()
-            .constrain {
-                width = 450.pixels()
-                height = 325.pixels()
-                x = CenterConstraint()
-                y = CenterConstraint()
-            }
-            .setChildOf(root)
+    private fun buildCategory(root: VexelElement<*>, window: VexelWindow, category: ConfigCategory) {
+        val Column1 = Rectangle(Color(0,0,255,255).rgb, borderRadius = 5f)
+            .setSizing(50, Size.ParentPerc, 0, Size.Auto)
+            .setPositioning(0f,Pos.ParentPixels,0f, Pos.ParentPixels)
+            .childOf(root)
 
-        val markdown = MarkdownComponent(category.markdown)
-            .constrain {
-                width = RelativeConstraint(1f)
-                height = RelativeConstraint(1f)
-                x = CenterConstraint()
-                y = PixelConstraint(2f)
-            }
-            .setChildOf(catagoryContainer)
-    }
-
-    private fun buildCategory(root: UIComponent, window: Window, category: ConfigCategory) {
-        val categoryContainer = ScrollComponent()
-            .constrain {
-                width = 400.pixels()
-                height = 250.pixels()
-                x = CenterConstraint()
-                y = CenterConstraint()
-            }
-            .setChildOf(root)
+        val Column2 = Rectangle(Color(255,0,0,255).rgb, borderRadius = 5f)
+            .setSizing(50, Size.ParentPerc, 0, Size.Auto)
+            .setPositioning(0f,Pos.AfterSibling,0f, Pos.ParentPixels)
+            .childOf(root)
 
         columnHeights.clear()
         subcategoryLayouts.clear()
@@ -275,14 +195,17 @@ class Config(
         elementContainers.clear()
 
         category.subcategories.entries.forEachIndexed { index, (name, subcategory) ->
-            val column = index % 2
-            val row = index / 2
+            if (index % 2 == 0) {
+                buildSubcategory(Column2, window, subcategory, name)
+            } else {
+                buildSubcategory(Column1, window, subcategory, name)
+            }
 
-            buildSubcategory(categoryContainer, window, subcategory, name, row, column)
         }
 
         val maxColumnHeight = columnHeights.values.maxOrNull() ?: 0
 
+        /*
         val spacer = UIBlock()
             .constrain {
                 width = 1.pixels()
@@ -292,42 +215,28 @@ class Config(
             }
             .setChildOf(categoryContainer)
             .setColor(Color(0, 0, 0, 0)) // fully transparent
+         */
     }
 
-    private fun buildSubcategory(root: UIComponent, window: Window, subcategory: ConfigSubcategory, title: String, row: Int, column: Int) {
-        val previousHeight = columnHeights.getOrPut(column) { 10 }
-        val boxHeight = calcSubcategoryHeight(subcategory) + 20 // extra space for title
+    private fun buildSubcategory(root: VexelElement<*>, window: VexelWindow, subcategory: ConfigSubcategory, title: String) {
+        //val previousHeight = columnHeights.getOrPut(column) { 10 }
+        //val boxHeight = calcSubcategoryHeight(subcategory) + 20 // extra space for title
 
-        val box = UIBlock()
-            .constrain {
-                width = 180.pixels()
-                height = boxHeight.pixels()
-                x = CenterConstraint() - 100.pixels() + (200 * column).pixels()
-                y = previousHeight.pixels()
-            }
-            .setChildOf(root)
-            .setColor(Palette.Purple.withAlpha(20))
-            .effect(OutlineEffect(Palette.Purple.withAlpha(100), 1f))
+        val box = Rectangle(Palette.Purple.withAlpha(20).rgb, Palette.Purple.withAlpha(100).rgb, 5f, 1f)
+            .setSizing(90, Size.ParentPerc, 0f, Size.Auto)
+            .setPositioning(0, Pos.ParentCenter, 10f, Pos.AfterSibling)
+            .childOf(root)
 
-        columnHeights[column] = previousHeight + boxHeight + 10
+        //columnHeights[column] = previousHeight + boxHeight + 10
 
-        val titlebox = UIBlock()
-            .constrain {
-                width = 180.pixels()
-                height = 20.pixels()
-                x = CenterConstraint()
-                y = 0.pixels()
-            }
-            .setColor(Palette.Purple.withAlpha(100))
-            .setChildOf(box)
+        val titlebox = Rectangle(Palette.Purple.withAlpha(100).rgb)
+            .setSizing(100, Size.ParentPerc, 40, Size.Pixels)
+            .setPositioning(0, Pos.ParentCenter, 0, Pos.ParentPixels)
+            .childOf(box)
 
-        val titleText = UIText(title, false)
-            .constrain {
-                x = 5.pixels()
-                y = CenterConstraint()
-            }
-            .setChildOf(titlebox)
-            .setColor(Color.WHITE)
+        val titleText = Text(title, shadowEnabled = false)
+            .setPositioning(5, Pos.ParentPixels, 0, Pos.ParentCenter)
+            .childOf(titlebox)
 
         var eheight = 20
 
@@ -346,24 +255,29 @@ class Config(
             }
 
             val component = when (element) {
-                is Button -> ButtonUIBuilder().build(box, element, window)
-                is ColorPicker -> ColorPickerUIBuilder().build(box, element, window)
-                is Dropdown -> DropdownUIBuilder().build(box, element, window)
-                is Keybind -> KeybindUIBuilder().build(box, element, window)
-                is Slider -> SliderUIBuilder().build(box, element, window)
-                is StepSlider -> StepSliderUIBuilder().build(box, element, window)
-                is TextInput -> TextInputUIBuilder().build(box, element, window)
-                is TextParagraph -> TextParagraphUIBuilder().build(box, element)
-                is Toggle -> ToggleUIBuilder().build(box, element, this, window)
+                //is Button -> ButtonUIBuilder().build(box, element, window)
+                //is ColorPicker -> ColorPickerUIBuilder().build(box, element, window)
+                //is Dropdown -> DropdownUIBuilder().build(box, element, window)
+                //is Keybind -> KeybindUIBuilder().build(box, element, window)
+                //is Slider -> SliderUIBuilder().build(box, element, window)
+                //is StepSlider -> StepSliderUIBuilder().build(box, element, window)
+                //is TextInput -> TextInputUIBuilder().build(box, element, window)
+                //is TextParagraph -> TextParagraphUIBuilder().build(box, element)
+                //is Toggle -> ToggleUIBuilder().build(box, element, this, window)
                 else -> null
             }
 
+            /* remove this */ eheight += hmod
+
             if (component == null) return@forEachIndexed
 
+            /*
             component.constrain {
                 x = CenterConstraint()
                 y = eheight.pixels()
             }
+
+             */
 
             elementContainers[element.configName] = component
             elementRefs[element.configName] = element
@@ -371,10 +285,10 @@ class Config(
             needsVisibilityUpdate = true
             scheduleVisibilityUpdate()
 
-            eheight += hmod
+            //eheight += hmod
         }
 
-        subcategoryLayouts += SubcategoryLayout(title, column, box, subcategory)
+        //subcategoryLayouts += SubcategoryLayout(title, column, box, subcategory)
     }
 
 
@@ -414,7 +328,7 @@ class Config(
         val element = elementRefs[configKey] ?: return
         val visible = element.isVisible(this)
 
-        if (visible) container.unhide(true) else container.hide(true)
+        if (visible) container.show() else container.hide()
     }
 
     private fun recalculateElementPositions(subcategory: ConfigSubcategory) {
@@ -425,13 +339,15 @@ class Config(
             val visible = element.isVisible(this)
 
             if (visible) {
-                container.setY(currentY.pixels())
+                container.yConstraint = currentY.toFloat()
+                container.cache.positionCacheValid = false
                 currentY += getElementHeight(element)
             }
         }
 
         val layout = subcategoryLayouts.find { it.subcategory == subcategory } ?: return
-        layout.box.setHeight((currentY + 0).pixels()) // +0 for padding if needed
+        layout.box.height = currentY + 0f
+        layout.box.cache.sizeCacheValid = false
     }
 
     private fun restackSubcategories() {
@@ -445,8 +361,10 @@ class Config(
             val currentHeight = columnHeights.getOrPut(column) { 10 }
             val newHeight = calcSubcategoryHeight(subcategory) + 20
 
-            box.setY(currentHeight.pixels())
-            box.setHeight(newHeight.pixels())
+            box.yConstraint = currentHeight.toFloat()
+            box.cache.positionCacheValid = false
+            box.height = newHeight.toFloat()
+            box.cache.sizeCacheValid = false
 
             columnHeights[column] = currentHeight + newHeight + 10
         }

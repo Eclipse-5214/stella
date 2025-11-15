@@ -60,11 +60,9 @@ val clocheAction: Action<ExternalModuleDependency> = Action {
 
 dependencies {
     implementation(include("io.github.classgraph:classgraph:4.8.184")!!)
-    modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
-    modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    modImplementation(include("xyz.meowing:vexel-${mcData}:121")!!)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:124")!!)
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
     modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
     modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
