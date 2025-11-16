@@ -19,6 +19,7 @@ import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.knit.internal.events.TickEvent
 import xyz.meowing.knit.internal.events.WorldRenderEvent
 import co.stellarskys.stella.events.core.GuiEvent
+import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.network.protocol.Packet
 
 @Module

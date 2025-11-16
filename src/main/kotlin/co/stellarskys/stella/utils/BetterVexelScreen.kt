@@ -3,15 +3,16 @@ package co.stellarskys.stella.utils
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GuiEvent
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.render.GuiRenderer
+import net.minecraft.client.gui.render.state.GuiRenderState
+import net.minecraft.client.renderer.fog.FogRenderer
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.events.EventCall
 import xyz.meowing.knit.api.input.KnitKeys
-import xyz.meowing.knit.api.render.KnitResolution
 import xyz.meowing.knit.api.screen.KnitScreen
 import xyz.meowing.vexel.core.VexelWindow
 import xyz.meowing.vexel.utils.render.NVGRenderer
-import java.util.Timer
-import kotlin.concurrent.schedule
+import java.awt.Color
 
 abstract class BetterVexelScreen(screenName: String = "Vexel-Screen"): KnitScreen(screenName) {
     var renderEvent: EventCall? = null
@@ -22,6 +23,10 @@ abstract class BetterVexelScreen(screenName: String = "Vexel-Screen"): KnitScree
         private set
 
     val window = VexelWindow()
+
+    val fog = FogRenderer()
+    val state = GuiRenderState()
+    val renderer = GuiRenderer(GuiRenderState(), KnitClient.client.renderBuffers().bufferSource(), listOf())
 
     open fun afterInitialization() {}
 
@@ -34,16 +39,18 @@ abstract class BetterVexelScreen(screenName: String = "Vexel-Screen"): KnitScree
 
             afterInitialization()
 
-            renderEvent = EventBus.register<GuiEvent.RenderHUD> {
+            renderEvent = EventBus.register<GuiEvent.NVG.Render> {
                 if (KnitClient.client.screen == this) {
-                    NVGRenderer.beginFrame(KnitResolution.windowWidth.toFloat(), KnitResolution.windowHeight.toFloat())
                     window.draw()
-                    NVGRenderer.endFrame()
 
-                    onRenderGui(it.context)
+                    val graphics = GuiGraphics(KnitClient.client, state)
+
+                    it.context.fill(0,0,width, height, Color.WHITE.rgb)
+
+                    renderer.render(fog.getBuffer(FogRenderer.FogMode.NONE))
+                    renderer.incrementFrameNumber()
                 }
             }
-
         } else {
             initialized = true
         }
@@ -84,13 +91,5 @@ abstract class BetterVexelScreen(screenName: String = "Vexel-Screen"): KnitScree
     /**
      * Called after the elements and animations render.
      */
-    open fun onRenderGui(context: GuiGraphics) {}
-
-    fun display() {
-        Timer().schedule(50) {
-            KnitClient.client.execute {
-                KnitClient.client.setScreen(this@BetterVexelScreen)
-            }
-        }
-    }
+    open fun onRenderGui() {}
 }

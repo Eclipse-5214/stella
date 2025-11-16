@@ -11,6 +11,12 @@ import xyz.meowing.knit.api.events.CancellableEvent
 import xyz.meowing.knit.api.events.Event
 
 sealed class GuiEvent {
+    sealed class NVG {
+        class Render(
+            val context: GuiGraphics
+        ) : CancellableEvent()
+    }
+
     class RenderHUD(
         val context: GuiGraphics
     ) : Event()

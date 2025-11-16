@@ -166,6 +166,7 @@ class Config(
 
             override fun isPauseScreen(): Boolean = false
 
+            /*
             override fun onRenderGui(context: GuiGraphics) {
                 val player = KnitPlayer.player ?: return
                 val uuid = player.gameProfile.id
@@ -175,6 +176,7 @@ class Config(
 
                 Render2D.drawPlayerHead(context, x, y, size, uuid)
             }
+             */
         }
     }
 
