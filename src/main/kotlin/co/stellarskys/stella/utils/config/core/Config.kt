@@ -15,6 +15,7 @@ import java.awt.Color
 import java.io.File
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer
+import xyz.meowing.knit.api.render.KnitResolution
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.vexel.components.base.Offset
 import xyz.meowing.vexel.components.base.Pos
@@ -104,16 +105,16 @@ class Config(
                     .childOf(list)
 
                 head
-                    .setSizing(12f, Size.Pixels, 12f, Size.Pixels)
-                    .setPositioning(5f, Pos.ParentPercent, 5f, Pos.ParentPercent)
+                    .setSizing(48f, Size.Pixels, 48f, Size.Pixels)
+                    .setPositioning(10f, Pos.ParentPercent, 10f, Pos.ParentPercent)
                     .childOf(top)
 
-                val username = Text(KnitPlayer.player?.name?.string ?: "null", shadowEnabled = false)
-                    .setPositioning(17, Pos.ParentPixels, 2, Pos.ParentPixels)
+                val username = Text(KnitPlayer.player?.name?.string ?: "null", shadowEnabled = false, fontSize = 16f)
+                    .setPositioning(60, Pos.ParentPixels, 2, Pos.ParentPixels)
                     .childOf(head)
 
-                val tag = Text("Stella User", Color.gray.rgb, shadowEnabled = false)
-                    .setPositioning(17, Pos.ParentPixels, 12, Pos.ParentPixels)
+                val tag = Text("Stella User", Color.gray.rgb, shadowEnabled = false, fontSize = 14f)
+                    .setPositioning(60, Pos.ParentPixels, 20, Pos.ParentPixels)
                     .childOf(head)
 
 
@@ -172,12 +173,12 @@ class Config(
 
                 val player = KnitPlayer.player ?: return
                 val uuid = player.gameProfile.id
-                val size = 24
+                val size = 48 / KnitResolution.scaleFactor
                 val x = head.scaled.left.toInt()
                 val y = head.scaled.top.toInt()
 
                 CustomGuiRenderer.render {
-                    Render2D.drawPlayerHead(it, x, y, size, uuid)
+                    Render2D.drawPlayerHead(it, x, y, size.toInt(), uuid)
                 }
 
                 NVGRenderer.beginFrame(0f,0f)
@@ -203,9 +204,9 @@ class Config(
 
         category.subcategories.entries.forEachIndexed { index, (name, subcategory) ->
             if (index % 2 == 0) {
-                buildSubcategory(Column2, window, subcategory, name)
-            } else {
                 buildSubcategory(Column1, window, subcategory, name)
+            } else {
+                buildSubcategory(Column2, window, subcategory, name)
             }
 
         }
@@ -241,7 +242,7 @@ class Config(
             .setPositioning(0, Pos.ParentCenter, 0, Pos.ParentPixels)
             .childOf(box)
 
-        val titleText = Text(title, shadowEnabled = false)
+        val titleText = Text(title, shadowEnabled = false, fontSize = 14f)
             .setPositioning(5, Pos.ParentPixels, 0, Pos.ParentCenter)
             .childOf(titlebox)
 

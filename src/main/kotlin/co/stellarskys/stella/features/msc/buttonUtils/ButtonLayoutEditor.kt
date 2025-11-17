@@ -1,5 +1,6 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
+import co.stellarskys.stella.utils.render.CustomGuiRenderer
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
 import net.minecraft.client.gui.GuiGraphics
@@ -53,7 +54,7 @@ class ButtonLayoutEditor : VexelScreen() {
                     val offsetY = (20f - 16f) / 2f
 
 
-                    Render2D.renderItem(context,stack, x.toFloat() + offsetX, y.toFloat() + offsetY, 1f)
+                    Render2D.renderItem(context, stack, x.toFloat() + offsetX, y.toFloat() + offsetY, 1f)
                 }
             }
         }
@@ -61,8 +62,12 @@ class ButtonLayoutEditor : VexelScreen() {
         NVGRenderer.endFrame()
 
         super.onRender(context, mouseX, mouseY, deltaTicks)
+    }
 
-        popup.renderPreviewItem(context)
+    override fun onRenderGui() {
+        NVGRenderer.endFrame()
+        CustomGuiRenderer.render { popup.renderPreviewItem(it) }
+        NVGRenderer.beginFrame(0f, 0f)
     }
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
