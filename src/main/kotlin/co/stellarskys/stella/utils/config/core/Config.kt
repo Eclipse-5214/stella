@@ -3,11 +3,11 @@ package co.stellarskys.stella.utils.config.core
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
-import co.stellarskys.stella.utils.BetterVexelScreen
 import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.elements.*
+import co.stellarskys.stella.utils.render.CustomGuiRenderer
 import co.stellarskys.stella.utils.render.Render2D
 import com.google.gson.*
 import net.minecraft.client.gui.GuiGraphics
@@ -39,7 +39,7 @@ class Config(
     private val mod = modID
     private var loaded = false
 
-    private var configUI: BetterVexelScreen? = null
+    private var configUI: VexelScreen? = null
     private var selectedCategory: ConfigCategory? = null
     private val subcategoryLayouts = mutableListOf<SubcategoryLayout>()
     private val elementContainers = mutableMapOf<String, VexelElement<*>>()
@@ -76,7 +76,7 @@ class Config(
 
     // UI builders
     private fun buildUI(initial: Boolean){
-        configUI = object: BetterVexelScreen() {
+        configUI = object: VexelScreen("Config") {
             val head = Rectangle(Color(0,255,0,255).rgb)
 
             init {
@@ -166,17 +166,17 @@ class Config(
 
             override fun isPauseScreen(): Boolean = false
 
-            /*
-            override fun onRenderGui(context: GuiGraphics) {
+            override fun onRenderGui() {
                 val player = KnitPlayer.player ?: return
                 val uuid = player.gameProfile.id
                 val size = 24
                 val x = head.scaled.left.toInt()
                 val y = head.scaled.top.toInt()
 
-                Render2D.drawPlayerHead(context, x, y, size, uuid)
+                CustomGuiRenderer.render {
+                    Render2D.drawPlayerHead(it, x, y, size, uuid)
+                }
             }
-             */
         }
     }
 

@@ -45,16 +45,4 @@ public class MixinGameRenderer {
     private void stella$afterHudRender(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphics context) {
         EventBus.INSTANCE.post(new GuiEvent.RenderHUD(context));
     }
-
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"))
-    private void idkwhattocallthis(GuiRenderer instance, GpuBufferSlice gpuBufferSlice, Operation<Void> original) {
-        NVGRenderer.INSTANCE.beginFrame(KnitResolution.getWindowWidth(), KnitResolution.getWindowHeight());
-        GuiGraphics graphics = new GuiGraphics(KnitClient.getClient(), guiRenderState);
-
-        boolean cancelled = EventBus.INSTANCE.post(new GuiEvent.NVG.Render(graphics), false);
-
-        NVGRenderer.INSTANCE.endFrame();
-
-        if (!cancelled) { original.call(instance, gpuBufferSlice); }
-    }
 }
