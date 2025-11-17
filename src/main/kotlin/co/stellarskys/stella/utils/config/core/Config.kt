@@ -24,6 +24,7 @@ import xyz.meowing.vexel.components.core.Rectangle
 import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.core.VexelScreen
 import xyz.meowing.vexel.core.VexelWindow
+import xyz.meowing.vexel.utils.render.NVGRenderer
 
 //Main config Shananagens
 class Config(
@@ -167,6 +168,8 @@ class Config(
             override fun isPauseScreen(): Boolean = false
 
             override fun onRenderGui() {
+                NVGRenderer.endFrame()
+
                 val player = KnitPlayer.player ?: return
                 val uuid = player.gameProfile.id
                 val size = 24
@@ -176,6 +179,8 @@ class Config(
                 CustomGuiRenderer.render {
                     Render2D.drawPlayerHead(it, x, y, size, uuid)
                 }
+
+                NVGRenderer.beginFrame(0f,0f)
             }
         }
     }
