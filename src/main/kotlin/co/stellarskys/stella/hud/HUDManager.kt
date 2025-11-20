@@ -1,45 +1,68 @@
 package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.utils.DataUtils
+import com.google.gson.reflect.TypeToken
 import net.minecraft.client.gui.GuiGraphics
-
-data class HUDPosition(var x: Float, var y: Float, var scale: Float = 1f, var enabled: Boolean = true)
-data class HUDPositions(val positions: MutableMap<String, HUDPosition> = mutableMapOf())
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 object HUDManager {
-    private val elements = mutableMapOf<String, String>()
-    private val customRenderers = mutableMapOf<String, (GuiGraphics, Float, Float, Int, Int, Float, Float, Boolean) -> Unit>()
-    private val customDimensions = mutableMapOf<String, Pair<Int, Int>>()
-    private val hudData = DataUtils("hud_positions", HUDPositions())
+    val elements = mutableMapOf<String, HUDElement>()
+    val customRenderers = mutableMapOf<String, (GuiGraphics) -> Unit>()
+    val customSizes = mutableMapOf<String, Pair<Int, Int>>()
 
-    fun register(name: String, exampleText: String) {
-        elements[name] = exampleText
+    data class HudLayoutData(
+        var x: Float,
+        var y: Float,
+        var scale: Float = 1f
+    )
+
+    private val layoutStore = DataUtils(
+        fileName = "hud_positions",
+        defaultObject = mutableMapOf<String, HudLayoutData>(),
+        typeToken = object : TypeToken<MutableMap<String, HudLayoutData>>() {}
+    )
+
+    fun register(id: String, text: String, configKey: String? = null) {
+        elements[id] = HUDElement(id, 20f, 20f, 0, 0, text = text, configKey = configKey)
+        loadLayout(id)
     }
 
     fun registerCustom(
-        name: String,
+        id: String,
         width: Int,
         height: Int,
-        customRenderer: (GuiGraphics, Float, Float, Int, Int, Float, Float, Boolean) -> Unit
+        renderer: (GuiGraphics) -> Unit,
+        configKey: String? =  null
     ) {
-        elements[name] = ""
-        customRenderers[name] = customRenderer
-        customDimensions[name] = Pair(width, height)
+        customRenderers[id] = renderer
+        customSizes[id] = width to height
+        elements[id] = HUDElement(id, 20f, 20f, width, height, configKey = configKey)
+        loadLayout(id)
     }
 
-    fun getElements(): Map<String, String> = elements
-
-    fun getCustomRenderer(name: String): ((GuiGraphics, Float, Float, Int, Int, Float, Float, Boolean) -> Unit)? = customRenderers[name]
-
-    fun getCustomDimensions(name: String): Pair<Int, Int>? = customDimensions[name]
-
-    fun getX(name: String): Float = hudData.getData().positions[name]?.x ?: 50f
-    fun getY(name: String): Float = hudData.getData().positions[name]?.y ?: 50f
-    fun getScale(name: String): Float = hudData.getData().positions[name]?.scale ?: 1f
-    fun isEnabled(name: String): Boolean = hudData.getData().positions[name]?.enabled ?: true
-
-    fun setPosition(name: String, x: Float, y: Float, scale: Float = 1f, enabled: Boolean = true) {
-        hudData.getData().positions[name] = HUDPosition(x, y, scale, enabled)
-        hudData.save()
+    fun saveAllLayouts() {
+        layoutStore.updateAndSave {
+            elements.forEach { (id, element) ->
+                this[id] = HudLayoutData(element.x, element.y, element.scale)
+            }
+        }
     }
+
+    fun loadAllLayouts() { layoutStore.getData().keys.forEach { loadLayout(it) } }
+
+    fun loadLayout(id: String) {
+        layoutStore.getData()[id]?.let {
+            elements[id]?.apply {
+                x = it.x
+                y = it.y
+                scale = it.scale
+            }
+        }
+    }
+
+    fun getX(id: String): Float = elements[id]?.x ?: 0f
+    fun getY(id: String): Float = elements[id]?.y ?: 0f
+    fun getScale(id: String): Float = elements[id]?.scale ?: 1f
 }

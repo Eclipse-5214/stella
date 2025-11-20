@@ -1,134 +1,26 @@
 package co.stellarskys.stella.hud
 
-import co.stellarskys.stella.utils.TimeUtils
-import co.stellarskys.stella.utils.TimeUtils.millis
-import net.minecraft.client.gui.GuiGraphics
-import xyz.meowing.knit.api.KnitClient
-import java.awt.Color
-import kotlin.math.pow
+import co.stellarskys.stella.utils.config
 
 class HUDElement(
-    val name: String,
-    initialX: Float,
-    initialY: Float,
-    val width: Int,
-    val height: Int,
-    val exampleText: String,
+    val id: String,
+    var x: Float,
+    var y: Float,
+    var width: Int,
+    var height: Int,
     var scale: Float = 1f,
-    var enabled: Boolean = true
+    var text: String = "",
+    var configKey: String? = null
 ) {
-    private var currentX = initialX
-    private var currentY = initialY
-    var targetX = initialX
-    var targetY = initialY
-    private var lastUpdateTime = TimeUtils.now
-
-    fun setPosition(x: Float, y: Float) {
-        currentX = getRenderX()
-        currentY = getRenderY()
-        targetX = x
-        targetY = y
-        lastUpdateTime = TimeUtils.now
+    fun isHovered(mouseX: Float, mouseY: Float): Boolean {
+        val scaledWidth = width * scale
+        val scaledHeight = height * scale
+        return mouseX in x..(x + scaledWidth) && mouseY in y..(y + scaledHeight)
     }
 
-    fun getRenderX(): Float {
-        val timeDiff = lastUpdateTime.since.millis / 1000f
-        val progress = (timeDiff * 8f).coerceIn(0f, 1f)
-        return currentX + (targetX - currentX) * easeOutCubic(progress)
-    }
-
-    fun getRenderY(): Float {
-        val timeDiff = lastUpdateTime.since.millis / 1000f
-        val progress = (timeDiff * 8f).coerceIn(0f, 1f)
-        return currentY + (targetY - currentY) * easeOutCubic(progress)
-    }
-
-    private fun easeOutCubic(t: Float) = 1f + (t - 1f).pow(3)
-
-    fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, partialTicks: Float, previewMode: Boolean) {
-        if (!enabled && previewMode) return
-        val renderX = getRenderX()
-        val renderY = getRenderY()
-        val isHovered = isMouseOver(mouseX, mouseY)
-
-        context.pose().pushMatrix()
-        context.pose().translate(renderX, renderY)
-        context.pose().scale(scale, scale)
-
-        val customRenderer = HUDManager.getCustomRenderer(name)
-        if (customRenderer != null) {
-            val customDims = HUDManager.getCustomDimensions(name)
-            val renderWidth = customDims?.first ?: width
-            val renderHeight = customDims?.second ?: height
-            if (!previewMode) {
-                renderCustomBackground(context, isHovered, renderWidth, renderHeight)
-            }
-            customRenderer.invoke(context, 0f, 0f, renderWidth, renderHeight, scale, partialTicks, previewMode)
-        } else {
-            renderDefault(context, previewMode, isHovered)
-        }
-
-
-        context.pose().popMatrix()
-    }
-
-    private fun renderCustomBackground(context: GuiGraphics, isHovered: Boolean, customWidth: Int, customHeight: Int) {
-        val alpha = if (!enabled) 40 else if (isHovered) 140 else 90
-        val borderColor = when {
-            !enabled -> Color(200, 60, 60).rgb
-            isHovered -> Color(100, 180, 255).rgb
-            else -> Color(100, 100, 120).rgb
-        }
-
-        context.fill(0, 0, customWidth, customHeight, Color(30, 35, 45, alpha).rgb)
-        drawHollowRect(context, 0, 0, customWidth, customHeight, borderColor)
-    }
-
-    private fun renderBackground(context: GuiGraphics, isHovered: Boolean) {
-        val alpha = if (!enabled) 40 else if (isHovered) 140 else 90
-        val borderColor = when {
-            !enabled -> Color(200, 60, 60).rgb
-            isHovered -> Color(100, 180, 255).rgb
-            else -> Color(100, 100, 120).rgb
-        }
-
-        context.fill(0, 0, width, height, Color(30, 35, 45, alpha).rgb)
-        drawHollowRect(context, 0, 0, width, height, borderColor)
-    }
-
-    private fun renderDefault(context: GuiGraphics, previewMode: Boolean, isHovered: Boolean) {
-        if (!previewMode) {
-            renderBackground(context, isHovered)
-        }
-
-        val lines = exampleText.split("\n")
-        val textAlpha = if (enabled) 255 else 128
-        val textColor = Color(220, 240, 255, textAlpha).rgb
-
-        lines.forEachIndexed { index, line ->
-            val textY = 5f + (index * KnitClient.client.font.lineHeight)
-            context.drawString(KnitClient.client.font, line, 5, textY.toInt(), textColor, true)
-        }
-    }
-
-    fun isMouseOver(mouseX: Float, mouseY: Float): Boolean {
-        val renderX = getRenderX()
-        val renderY = getRenderY()
-
-        val customDims = HUDManager.getCustomDimensions(name)
-        val actualWidth = customDims?.first ?: width
-        val actualHeight = customDims?.second ?: height
-
-        val scaledWidth = actualWidth * scale
-        val scaledHeight = actualHeight * scale
-
-        return mouseX >= renderX && mouseX <= renderX + scaledWidth && mouseY >= renderY && mouseY <= renderY + scaledHeight
-    }
-
-    private fun drawHollowRect(context: GuiGraphics, x1: Int, y1: Int, x2: Int, y2: Int, color: Int) {
-        context.fill(x1, y1, x2, y1 + 1, color)
-        context.fill(x1, y2 - 1, x2, y2, color)
-        context.fill(x1, y1, x1 + 1, y2, color)
-        context.fill(x2 - 1, y1, x2, y2, color)
+    fun isEnabled(): Boolean {
+        return configKey?.let {
+            config[it] as? Boolean ?: false
+        } ?: true
     }
 }

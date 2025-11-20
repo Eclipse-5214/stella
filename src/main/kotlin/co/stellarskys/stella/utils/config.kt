@@ -16,6 +16,13 @@ val config = Config("Stella", "Stella") {
                 name = "Website"
                 description = "A link to stella's website"
             }
+
+            keybind {
+                configName = "test"
+                name = "test"
+                description = "test"
+                default = 3
+            }
         }
     }
 

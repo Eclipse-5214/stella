@@ -16,12 +16,12 @@ object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
         HUDManager.registerCustom(name, 148, 148, this::HUDEditorRender)
 
         register<GuiEvent.RenderHUD> { event ->
-            if (HUDManager.isEnabled(name)) RenderMap(event.context)
+            RenderMap(event.context)
         }
     }
 
-    fun HUDEditorRender(context: GuiGraphics, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean){
-        mapRender.renderPreview(context, x + 5, y + 5, scale)
+    fun HUDEditorRender(context: GuiGraphics){
+        mapRender.renderPreview(context, 5f, 5f, 1f)
     }
 
     fun RenderMap(context: GuiGraphics) {

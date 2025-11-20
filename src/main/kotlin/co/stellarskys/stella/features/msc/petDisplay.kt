@@ -118,21 +118,13 @@ object petDisplay: Feature("petDisplay", true) {
         }
 
         register<GuiEvent.RenderHUD> { event ->
-            if (HUDManager.isEnabled(name)) renderHud(event.context)
+            renderHud(event.context)
         }
     }
 
     fun HUDEditorRender(
         context: GuiGraphics,
-        x: Float, y: Float,
-        width: Int, height: Int, scale: Float,
-        partialTicks: Float, previewMode: Boolean
     ){
-        val matrix = context.pose()
-
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-
         Render2D.drawString(context,"§bEnder Dragon", 40, 7)
         Render2D.drawString(context,"§7[Lvl 100]", 40, 17)
 
@@ -140,8 +132,6 @@ object petDisplay: Feature("petDisplay", true) {
         val stack = NEUApi.createDummyStack(neuItem)
 
         Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
-
-        matrix.popMatrix()
     }
 
     fun renderHud(context: GuiGraphics) {

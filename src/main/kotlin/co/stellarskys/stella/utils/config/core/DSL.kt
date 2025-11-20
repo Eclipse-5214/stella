@@ -1,13 +1,13 @@
 package co.stellarskys.stella.utils.config.core
 
 import co.stellarskys.stella.utils.config.RGBA
-import co.stellarskys.stella.utils.Utils.createBlock
-import co.stellarskys.stella.utils.render.Render2D.width
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIText
-import gg.essential.elementa.components.Window
-import gg.essential.elementa.constraints.*
-import gg.essential.elementa.dsl.*
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.base.Size
+import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.vexel.components.core.Rectangle
+import xyz.meowing.vexel.components.core.Text
+import xyz.meowing.vexel.core.VexelWindow
+import xyz.meowing.vexel.utils.render.NVGRenderer
 import java.awt.Color
 
 open class ConfigCategory(val name: String) {
@@ -254,9 +254,6 @@ class StepSlider : ConfigElement() {
         value = default
     }
 }
-
-class Subcategory : ConfigElement()
-
 class TextInput : ConfigElement() {
     var placeholder: String = ""
         set(value) {
@@ -286,73 +283,39 @@ class Toggle : ConfigElement() {
 }
 
 object FloatingUIManager {
-    private val floatingComponents = mutableListOf<UIComponent>()
-    private val colorPickers = mutableListOf<UIComponent>()
-    private var activePicker: UIComponent? = null
+    private val floatingComponents = mutableListOf<VexelElement<*>>()
 
-
-    fun register(component: UIComponent) {
+    fun register(component: VexelElement<*>) {
         floatingComponents += component
     }
 
-    fun registerColorPicker(picker: UIComponent) {
-        colorPickers += picker
-        register(picker)
-    }
-
-    fun setActivePicker(active: UIComponent) {
-        colorPickers.forEach { it.hide() }
-        active.unhide()
-        activePicker = active
-    }
-
-    fun getActivePicker(): UIComponent? = activePicker
-
-    fun clearActivePicker() {
-        activePicker?.hide()
-        activePicker = null
-    }
-
     fun clearAll() {
-        floatingComponents.forEach { it.parent.removeChild(it) }
+        floatingComponents.forEach { it.destroy() }
         floatingComponents.clear()
-        colorPickers.clear()
     }
 }
 
-fun UIComponent.attachToWindow(window: Window): UIComponent {
-    this.setChildOf(window)
-    FloatingUIManager.register(this)
-    return this
-}
-
-fun attachTooltip(window: Window, anchor: UIComponent, description: String) {
+fun attachTooltip(window: VexelWindow, anchor: VexelElement<*>, description: String) {
     if (description == "") return
 
-    val tooltip = createBlock(3f)
-        .constrain {
-            width = (description.width() + 10).pixels()
-            height = 20.pixels()
-            x = CenterConstraint()
-            y = CenterConstraint() + 150.pixels()
-        }
-        .setColor(Color.black)
-        .setChildOf(window)
+    val fs = 14f
+    val width = NVGRenderer.textWidth(description, fs, NVGRenderer.defaultFont)
 
-    val tooltipText = UIText(description)
-        .constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-        }
-        .setColor(Color.WHITE)
-        .setChildOf(tooltip)
+    val tooltip = Rectangle(Color.black.rgb, borderRadius = 5f, borderThickness = 0f)
+        .setPositioning(Pos.ScreenCenter, Pos.ScreenCenter)
+        .setSizing(width + 10f, Size.Pixels, fs + 10f, Size.Pixels)
+        .setOffset(0f, 300f)
+        .childOf(window)
 
-    tooltip.hide(true)
+    val tooltipText = Text(description, fontSize = fs)
+        .setPositioning(Pos.ParentCenter, Pos.ParentCenter)
+        .childOf(tooltip)
 
-    anchor.onMouseEnter { tooltip.unhide(true) }
-    anchor.onMouseLeave { tooltip.hide(true) }
+    tooltip.hide()
+
+    anchor.onMouseEnter { _, _ -> tooltip.show() }
+    anchor.onMouseExit { _, _ -> tooltip.hide() }
 
     FloatingUIManager.register(tooltip)
-    FloatingUIManager.register(tooltipText)
 }
 

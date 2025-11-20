@@ -10,6 +10,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.render.Render3D
+import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import net.minecraft.resources.ResourceLocation
@@ -23,7 +24,7 @@ import java.io.InputStreamReader
 import kotlin.math.roundToInt
 
 @Module
-object termNumbers : Feature("termNumbers") {
+object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMBS) {
     val termLabelMap: Map<String, Pair<String, Color>> = mapOf(
         "T" to ("§7( §2Tank §7)" to mapConfig.tankColor),
         "M" to ("§7( §bMage §7)" to mapConfig.mageColor),
@@ -90,7 +91,7 @@ object termNumbers : Feature("termNumbers") {
 
                     val pdistance = Utils.calcDistance(playerPos, Triple(term.x, term.y, term.z))
 
-                    if (pdistance < 1600) {
+                    if (pdistance < 900) {
                         // Draw the floating label
                         if (pdistance > 13) {
                             Render3D.renderString(

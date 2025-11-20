@@ -17,26 +17,14 @@ object mapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS
     override fun initialize() {
         HUDManager.registerCustom(name, 200, 30,this::HUDEditorRender)
 
-        register<GuiEvent.RenderHUD> { event -> if (HUDManager.isEnabled(name)) RenderNormal(event.context) }
+        register<GuiEvent.RenderHUD> { event -> RenderNormal(event.context) }
     }
 
-    fun HUDEditorRender(
-        context: GuiGraphics,
-        x: Float, y: Float,
-        width: Int, height: Int, scale: Float,
-        partialTicks: Float, previewMode: Boolean
-    ){
-        val matrix = context.pose()
-
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-
+    fun HUDEditorRender(context: GuiGraphics){
         RenderMapInfo(
             context,
             true
         )
-
-        matrix.popMatrix()
     }
 
     fun RenderNormal(context: GuiGraphics) {

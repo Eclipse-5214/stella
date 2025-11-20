@@ -77,7 +77,6 @@ object Dungeon {
 
 
         EventBus.registerIn<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            if (!inDungeon) return@registerIn
             val msg = event.message.string.clearCodes()
             if (WATCHER_PATTERN.containsMatchIn(msg)) bloodDone = true
             if (DUNGEON_COMPLETE_PATTERN.containsMatchIn(msg)) {
@@ -120,6 +119,7 @@ object Dungeon {
         bloodDone = false
         complete = false
         holdingLeaps = false
+        floor = null
         mapLine1 = ""
         mapLine2 = ""
         WorldScanner.reset()

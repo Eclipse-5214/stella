@@ -66,31 +66,10 @@ dependencies {
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
     modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
     modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
-    modImplementation(includeOrShade("gg.essential:elementa:710")!!)
     modImplementation("me.owdding:item-data-fixer:1.0.5", clocheAction)
-    modImplementation("tech.thatgravyboat:skyblock-api:3.0.17") {
+    modImplementation("tech.thatgravyboat:skyblock-api:3.0.23") {
         exclude("me.owdding")
         clocheAction.execute(this)
     }
-    include("tech.thatgravyboat:skyblock-api:3.0.17", clocheAction)
-
-    when (mcData.version) {
-        MinecraftVersions.VERSION_1_21_10 -> {
-            modImplementation(include("gg.essential:universalcraft-1.21.9-fabric:430")!!)
-        }
-        MinecraftVersions.VERSION_1_21_8 -> {
-            modImplementation(include("gg.essential:universalcraft-1.21.7-fabric:430")!!)
-        }
-        else -> {}
-    }
-}
-
-tasks {
-    fatJar {
-        if (mcData.isLegacyForge) {
-            relocate("gg.essential.elementa", "co.stellarskys.elementa")
-            relocate("gg.essential.universalcraft", "co.stellarskys.universalcraft")
-        }
-    }
-
+    include("tech.thatgravyboat:skyblock-api:3.0.23", clocheAction)
 }

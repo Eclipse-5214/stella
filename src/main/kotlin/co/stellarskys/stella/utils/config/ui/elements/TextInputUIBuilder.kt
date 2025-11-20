@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils.config.ui.elements
 
+/*
 import co.stellarskys.stella.utils.Utils.createBlock
 import co.stellarskys.stella.utils.config.core.TextInput
 import co.stellarskys.stella.utils.config.core.attachTooltip
@@ -31,7 +32,7 @@ class TextInputUIBuilder {
             }
             .setChildOf(container)
 
-        attachTooltip(window, name, input.description)
+        //attachTooltip(window, name, input.description)
 
         val inputBlock = createBlock(2f)
             .constrain {
@@ -70,3 +71,4 @@ class TextInputUIBuilder {
         return container
     }
 }
+ */

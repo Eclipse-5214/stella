@@ -13,7 +13,6 @@ import java.awt.Color
  * @property a Alpha component (0–255), defaults to 255 (fully opaque)
  */
 data class RGBA(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
-
     /**
      * Converts this RGBA color to a [Color] object.
      *
@@ -107,6 +106,19 @@ data class RGBA(val r: Int, val g: Int, val b: Int, val a: Int = 255) {
             val rgb = Color.getHSBColor(hue, saturation, value)
             val a = (alpha.coerceIn(0f, 1f) * 255).toInt()
             return RGBA(rgb.red, rgb.green, rgb.blue, a)
+        }
+
+        /**
+         * Creates an [RGBA] instance from a Java AWT [Color].
+         *
+         * This method extracts the red, green, blue, and alpha components
+         * from the provided [Color] and wraps them in an [RGBA].
+         *
+         * @param color The [Color] to convert.
+         * @return An [RGBA] representing the same color values.
+         */
+        fun fromColor(color: Color): RGBA {
+            return RGBA(color.red, color.green, color.blue, color.alpha)
         }
     }
 }

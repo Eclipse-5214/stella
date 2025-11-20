@@ -14,14 +14,13 @@ import net.minecraft.client.gui.GuiGraphics
 @Module
 object roomName : Feature("showRoomName", island = SkyBlockIsland.THE_CATACOMBS) {
     override fun initialize() {
-        HUDManager.register("roomname", "No Room Found")
+        HUDManager.register("roomname", "No Room Found", "showRoomName")
         register<GuiEvent.RenderHUD> { renderHUD(it.context)}
     }
 
     private fun renderHUD(
         context: GuiGraphics
     ) {
-        if (!HUDManager.isEnabled("roomname")) return
         if (Dungeon.inBoss) return
 
         val chroma = config["roomNameChroma"] as Boolean
