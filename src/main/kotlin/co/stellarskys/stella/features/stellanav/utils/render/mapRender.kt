@@ -52,6 +52,7 @@ object mapRender {
         Render2D.drawImage(context, prevewMap, 5,5,128,128)
 
         if (mapInfoUnder) renderInfoUnder(context, true)
+        if (mapConfig.mapBorder) renderMapBorder(context)
 
         matrix.popMatrix()
     }
