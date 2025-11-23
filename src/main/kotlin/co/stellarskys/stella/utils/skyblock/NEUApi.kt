@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.skyblock
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.annotations.Module
 import com.google.gson.*
 import com.mojang.serialization.Dynamic
 import kotlinx.coroutines.launch
@@ -28,19 +29,21 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
-import javax.xml.crypto.Data
 import kotlin.jvm.optionals.getOrNull
 
+@Module
 object NEUApi {
     private val client: CloseableHttpClient = HttpClients.createDefault()
     private val neuRepoDir: File get() = File("config/Stella/neu-repo")
-    private val etagFile = File("config/Stella/neu-repo/etag.txt")
     private var cachedItems: List<NEUItem> = emptyList()
     private val cachedOverlays: MutableMap<String, CompoundTag> = mutableMapOf()
     private val cashedStacks: MutableMap<String, ItemStack> = mutableMapOf()
     val defaultRegistries: HolderLookup.Provider by lazy { VanillaRegistries.createLookup() }
 
-    fun init() {
+    var initialized = false
+        private set
+
+    init {
         loadAllItems()
         loadAllOverlays()
 
@@ -48,6 +51,7 @@ object NEUApi {
             ensureNEURepoInstalled()
             loadAllItems()
             loadAllOverlays()
+            initialized = true
             Stella.LOGGER.info("Repo Initialized!")
         }
     }
@@ -194,7 +198,7 @@ object NEUApi {
     }
 
 
-    fun getItemBySkyblockId(id: String): NEUItem? {
+    fun getItemBySkyblockId(id: String, silent: Boolean = false): NEUItem? {
         // 1. Check cached items
         val cached = cachedItems.find { it.internalname.equals(id, ignoreCase = true) }
         if (cached != null) return cached
@@ -202,7 +206,7 @@ object NEUApi {
         // 2. Try loading from disk
         val file = File(neuRepoDir, "items/$id.json")
         if (!file.exists()) {
-            Stella.LOGGER.debug("NEU item not found for Skyblock ID: $id")
+            Stella.LOGGER.warn("NEU item not found for Skyblock ID: $id")
             return null
         }
 
@@ -211,7 +215,7 @@ object NEUApi {
             cachedItems += loaded // optional: cache it for future use
             loaded
         } catch (e: Exception) {
-            Stella.LOGGER.error("Failed to load NEU item from disk: $id", e)
+            if (!silent && initialized) Stella.LOGGER.warn("Failed to load NEU item from disk: $id", e)
             null
         }
     }

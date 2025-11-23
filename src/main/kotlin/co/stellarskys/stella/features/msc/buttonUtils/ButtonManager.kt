@@ -59,7 +59,7 @@ object ButtonManager {
     }
 
     private fun renderButton(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int) {
-        val item = NEUApi.getItemBySkyblockId(button.iconId) ?: return
+        val item = NEUApi.getItemBySkyblockId(button.iconId, true) ?: return
         val stack = NEUApi.createDummyStack(item)
 
         val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)

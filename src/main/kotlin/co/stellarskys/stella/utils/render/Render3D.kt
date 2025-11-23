@@ -78,7 +78,7 @@ object Render3D {
         val cz = z + 0.5
         val halfWidth = width / 2
 
-        matrices.popPose()
+        matrices.pushPose()
         matrices.translate(cam.x, cam.y, cam.z)
 
         ShapeRenderer.renderLineBox(

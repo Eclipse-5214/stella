@@ -3,6 +3,7 @@ package co.stellarskys.stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ServerEvent
 import co.stellarskys.stella.managers.feature.FeatureManager
+import co.stellarskys.stella.utils.skyblock.NEUApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,15 +25,16 @@ object Stella: ClientModInitializer {
         FeatureManager.loadFeatures()
         FeatureManager.initializeFeatures()
         EventBus.register<ServerEvent.Connect> {
-            if (shown) return@register
+            if (!shown) {
+                val loadMessage = KnitText
+                    .literal("$PREFIX §bMod loaded.")
+                    .onHover("§b${FeatureManager.moduleCount} §dmodules §8- §b${FeatureManager.loadTime}§dms §8- §b${FeatureManager.commandCount} §dcommands")
 
-            val loadMessage = KnitText
-                .literal("$PREFIX §bMod loaded.")
-                .onHover("§b${FeatureManager.moduleCount} §dmodules §8- §b${FeatureManager.loadTime}§dms §8- §b${FeatureManager.commandCount} §dcommands")
+                KnitChat.fakeMessage(loadMessage)
+                shown = true
+            }
 
-            KnitChat.fakeMessage(loadMessage)
-
-            shown = true
+            if (!NEUApi.initialized) KnitChat.fakeMessage("$PREFIX §bWARNING §fNEU repo not initialized, some features might not work as intended")
         }
     }
 }

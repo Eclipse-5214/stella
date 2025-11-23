@@ -118,7 +118,7 @@ class EditButtonPopup(window: VexelWindow) {
     fun renderPreviewItem(context: GuiGraphics) {
         if (!shown) return
 
-        val item = NEUApi.getItemBySkyblockId(itemIdInput.value)
+        val item = NEUApi.getItemBySkyblockId(itemIdInput.value, true)
 
         var stack = ItemStack(Items.BARRIER)
 

@@ -47,7 +47,7 @@ class ButtonLayoutEditor : VexelScreen() {
                 ButtonManager.getAll().find { it.anchor == anchor && it.index == index }?.let { button ->
                     if (popup.shown) return@let
 
-                    val item = NEUApi.getItemBySkyblockId(button.iconId) ?: return@let
+                    val item = NEUApi.getItemBySkyblockId(button.iconId, true) ?: return@let
                     val stack = NEUApi.createDummyStack(item)
 
                     val offsetX = (20f - 16f) / 2f
