@@ -13,6 +13,8 @@
       "MixinInGameHud",
       "MixinStatusEffectsDisplay",
       "MixinLivingEntity",
+      "MixinGuiRenderer",
+      "MixinRenderSystem",
       "accessors.AccessorMapState"
     ]
 }

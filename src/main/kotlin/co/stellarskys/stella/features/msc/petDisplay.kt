@@ -1,5 +1,6 @@
 package co.stellarskys.stella.features.msc
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.GuiEvent
@@ -11,6 +12,8 @@ import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 
 @Module
 object petDisplay: Feature("petDisplay", true) {
@@ -149,8 +152,9 @@ object petDisplay: Feature("petDisplay", true) {
         Render2D.drawString(context,"§b$activePet", 40, 7)
         Render2D.drawString(context,"§7[Lvl $activePetLvl]", 40, 17)
 
-        val neuItem = NEUApi.getItemBySkyblockId("${activePet?.replace(" ", "_")};4") ?: return
-        val stack = NEUApi.createDummyStack(neuItem)
+        val neuItem = NEUApi.getItemBySkyblockId("${activePet?.replace(" ", "_")};4")
+        val stack = neuItem?.let { NEUApi.createDummyStack(it) } ?: ItemStack(Items.BARRIER)
+        //Stella.LOGGER.info("Stack, $stack")
 
         Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
 

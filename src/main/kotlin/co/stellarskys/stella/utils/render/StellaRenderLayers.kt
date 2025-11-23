@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils.render
 
 
 //import co.stellarskys.stella.utils.render.layers.ChromaRenderLayer
+import co.stellarskys.stella.utils.render.layers.ChromaRenderType
 import it.unimi.dsi.fastutil.doubles.Double2ObjectMap
 import it.unimi.dsi.fastutil.doubles.Double2ObjectOpenHashMap
 import net.minecraft.client.renderer.RenderPipelines
@@ -39,30 +40,30 @@ object StellaRenderLayers {
                 .build(false)
         )
     }
+    */
 
-    val CHROMA_3D: MultiPhase = ChromaRenderLayer(
+    val CHROMA_3D: RenderType.CompositeRenderType = ChromaRenderType(
         "standard_chroma",
-        RenderLayer.DEFAULT_BUFFER_SIZE,
-        false,
-        true,
-        StellaRenderPipelines.CHROMA_3D,
-        MultiPhaseParameters.builder()
-            .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-            .build(false)
+        RenderType.TRANSIENT_BUFFER_SIZE,
+        affectsCrumbling = false,
+        sortOnUpload = true,
+        renderPipeline = StellaRenderPipelines.CHROMA_3D,
+        state = CompositeState.builder()
+            .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
+            .createCompositeState(false)
     )
 
     private val CHROMA_LINES = DoubleFunction { width ->
-        ChromaRenderLayer(
+        ChromaRenderType(
             "chroma_lines",
-            RenderLayer.DEFAULT_BUFFER_SIZE, false, false,
+            RenderType.TRANSIENT_BUFFER_SIZE, false, false,
             StellaRenderPipelines.CHROMA_LINES,
-            MultiPhaseParameters.builder()
-                .lineWidth(RenderPhase.LineWidth(OptionalDouble.of(width)))
-                .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                .build(false)
+            CompositeState.builder()
+                .setLineState(RenderStateShard.LineStateShard(OptionalDouble.of(width)))
+                .setLayeringState(RenderStateShard.VIEW_OFFSET_Z_LAYERING)
+                .createCompositeState(false)
         )
     }
-     */
 
     private val LINES_THROUGH_WALLS = DoubleFunction { width ->
         RenderType.create(
@@ -111,10 +112,11 @@ object StellaRenderLayers {
     fun getLines(width: Double): RenderType.CompositeRenderType =
         linesLayers.computeIfAbsent(width, LINES)
 
-    /*
-    fun getChromaLines(width: Double): RenderLayer.MultiPhase =
+
+    fun getChromaLines(width: Double): RenderType.CompositeRenderType =
         chromaLinesLayer.computeIfAbsent(width, CHROMA_LINES)
 
+    /*
     fun getChromaTextured(identifier: Identifier) = CHROMA_TEXTURED.apply(identifier)
      */
 }

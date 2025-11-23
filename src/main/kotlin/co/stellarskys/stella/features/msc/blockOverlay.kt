@@ -38,7 +38,7 @@ object blockOverlay : Feature("overlayEnabled") {
 
             ShapeRenderer.renderShape(
                 mstack,
-                consumers.getBuffer(/* if(chroma) StellaRenderLayers.getChromaLines(5.0) else */ StellaRenderLayers.getLines(5.0)),
+                consumers.getBuffer(if(chroma) StellaRenderLayers.getChromaLines(5.0) else StellaRenderLayers.getLines(5.0)),
                 blockShape,
                 x, y, z,
                 outlineColor.toColorInt()
@@ -54,7 +54,7 @@ object blockOverlay : Feature("overlayEnabled") {
                 blockShape.forAllBoxes { minX, minY, minZ, maxX, maxY, maxZ ->
                     ShapeRenderer.addChainedFilledBoxVertices(
                         mstack,
-                        consumers.getBuffer(/* if (chroma ) StellaRenderLayers.CHROMA_3D else */ StellaRenderLayers.FILLED),
+                        consumers.getBuffer( if (chroma ) StellaRenderLayers.CHROMA_3D else StellaRenderLayers.FILLED),
                         x + minX, y + minY, z + minZ,
                         x + maxX, y + maxY, z + maxZ,
                         r,g,b,a
