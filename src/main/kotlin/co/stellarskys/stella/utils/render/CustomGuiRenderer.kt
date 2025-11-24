@@ -7,9 +7,13 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.pip.*
 import net.minecraft.client.gui.render.state.GuiRenderState
-import net.minecraft.client.renderer.RenderBuffers
 import net.minecraft.client.renderer.fog.FogRenderer
 import xyz.meowing.knit.api.KnitClient
+
+//#if MC > 1.21.9
+//$$ import net.minecraft.client.renderer.SubmitNodeStorage
+//$$ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+//#endif
 
 /**
  * A custom GUI rendering pipeline that mimics the behavior of the main GameRenderer.
@@ -19,20 +23,50 @@ import xyz.meowing.knit.api.KnitClient
  * It runs completely independently of the game's main GuiRenderer.
  */
 object CustomGuiRenderer {
-    private val minecraft = KnitClient.client
+    private val minecraft: Minecraft = KnitClient.client
     private val guiRenderState: GuiRenderState = GuiRenderState()
-    private val bufferSource = minecraft.renderBuffers().bufferSource()
+    private val renderBuffers = minecraft.renderBuffers()
+    private val bufferSource = renderBuffers.bufferSource()
+
+    //#if MC > 1.21.9
+    //$$ private val atlasManager = minecraft.atlasManager
+    //$$ private val submitNodeStorage = SubmitNodeStorage()
+    //$$ private val featureRenderDispatcher = FeatureRenderDispatcher(submitNodeStorage, minecraft.blockRenderer, bufferSource, atlasManager, renderBuffers.outlineBufferSource(), renderBuffers.crumblingBufferSource(), minecraft.font)
+    //#endif
 
     private val pipRenderers = listOf(
         GuiEntityRenderer(bufferSource, minecraft.entityRenderDispatcher),
         GuiSkinRenderer(bufferSource),
         GuiBookModelRenderer(bufferSource),
-        GuiBannerResultRenderer(bufferSource),
-        GuiSignRenderer(bufferSource),
+        GuiBannerResultRenderer(
+            bufferSource,
+
+            //#if MC > 1.21.9
+            //$$ atlasManager
+            //#endif
+        ),
+        GuiSignRenderer(
+            bufferSource,
+
+            //#if MC > 1.21.9
+            //$$ atlasManager
+            //#endif
+        ),
         GuiProfilerChartRenderer(bufferSource)
     )
 
-    private val guiRenderer: GuiRenderer = GuiRenderer(guiRenderState, bufferSource, pipRenderers)
+    private val guiRenderer: GuiRenderer = GuiRenderer(
+        guiRenderState,
+        bufferSource,
+
+        //#if MC > 1.21.9
+        //$$ submitNodeStorage,
+        //$$ featureRenderDispatcher,
+        //#endif
+
+        pipRenderers
+    )
+
     private val fogRenderer: FogRenderer = FogRenderer()
 
     init { EventBus.register<GameEvent.Stop> { close() } }
@@ -56,5 +90,9 @@ object CustomGuiRenderer {
     fun close() {
         guiRenderer.close()
         fogRenderer.close()
+
+        //#if MC > 1.21.9
+        //$$ featureRenderDispatcher.close()
+        //#endif
     }
 }

@@ -35,7 +35,7 @@ class ChromaRenderType(
             //#if MC < 1.21.9
             RenderSystem.getModelOffset(),
             //#else
-            //$$ Vector3f()
+            //$$ Vector3f(),
             //#endif
             RenderSystem.getTextureMatrix(),
             RenderSystem.getShaderLineWidth()

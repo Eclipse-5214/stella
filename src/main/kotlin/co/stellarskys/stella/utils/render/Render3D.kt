@@ -82,7 +82,11 @@ object Render3D {
         matrices.translate(cam.x, cam.y, cam.z)
 
         ShapeRenderer.renderLineBox(
+            //#if MC >= 1.21.9
+            //$$ matrices.last(),
+            //#else
             matrices,
+            //#endif
             consumers.getBuffer(layer),
             cx - halfWidth, y, cz - halfWidth,
             cx + halfWidth, y + height, cz + halfWidth,

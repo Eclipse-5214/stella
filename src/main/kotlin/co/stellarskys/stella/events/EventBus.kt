@@ -74,11 +74,11 @@ object EventBus : EventBus(true) {
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             //#if MC >= 1.21.9
             //$$ ScreenMouseEvents.allowMouseClick(screen).register { _, click ->
-            //$$    !post(GuiEvent.Click(click.x, click.y, click.keycode, true, screen))
+            //$$    !post(GuiEvent.Click(click.x, click.y, click.button(), true, screen))
             //$$ }
             //$$
             //$$ ScreenMouseEvents.allowMouseRelease(screen).register { _, click ->
-            //$$    !post(GuiEvent.Click(click.x, click.y, click.keycode, false, screen))
+            //$$    !post(GuiEvent.Click(click.x, click.y, click.button(), false, screen))
             //$$ }
             //$$
             //$$ ScreenKeyboardEvents.allowKeyPress(screen).register { _, keyInput ->

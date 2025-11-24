@@ -90,6 +90,8 @@ val doorTypeColors: Map<DoorType, Color>
 data class BossMapData(
     val image: String,
     val bounds: List<List<Double>>,
+    val width: Int,
+    val height: Int,
     val widthInWorld: Int,
     val heightInWorld: Int,
     val topLeftLocation: List<Int>,

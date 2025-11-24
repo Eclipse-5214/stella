@@ -23,7 +23,6 @@ object boss {
         val bossMap = BossMapRegistry.getBossMap(Dungeon.floorNumber!!, playerPos) ?: return
 
         val texture = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/boss/${bossMap.image}")
-        val sprite = KnitClient.client.guiSprites.getSprite(texture)
         val size = 128
 
         val sizeInWorld = minOf(
@@ -32,8 +31,8 @@ object boss {
             bossMap.renderSize ?: Int.MAX_VALUE
         )
 
-        val textureWidth = sprite.contents().width().toDouble() // Replace with actual texture size if available
-        val textureHeight = sprite.contents().height().toDouble()
+        val textureWidth = bossMap.width.toDouble()
+        val textureHeight = bossMap.height.toDouble()
 
         val pixelWidth = (textureWidth / bossMap.widthInWorld) * (bossMap.renderSize ?: bossMap.widthInWorld)
         val pixelHeight = (textureHeight / bossMap.heightInWorld) * (bossMap.renderSize ?: bossMap.heightInWorld)
