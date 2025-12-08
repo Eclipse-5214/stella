@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.utils.clearCodes
+import dev.deftu.omnicore.api.client.client
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.PlayerFaceRenderer
@@ -10,7 +11,6 @@ import net.minecraft.client.resources.PlayerSkin
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.SkullBlockEntity
-import xyz.meowing.knit.api.KnitClient
 import java.awt.Color
 import java.util.Optional
 import java.util.UUID
@@ -21,7 +21,7 @@ import java.util.UUID
 
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
-    private val mc = KnitClient.client
+    private val mc = client
 
     fun drawImage(ctx: GuiGraphics, image: ResourceLocation, x: Int, y: Int, width: Int, height: Int) {
         ctx.blitSprite(RenderPipelines.GUI_TEXTURED, image, x, y, width, height)

@@ -10,9 +10,9 @@ import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonFloor
 import co.stellarskys.stella.utils.skyblock.location.LocationAPI
+import dev.deftu.omnicore.api.scheduling.TickScheduler
+import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import xyz.meowing.knit.api.events.Event
-import xyz.meowing.knit.api.scheduler.TickScheduler
-import xyz.meowing.knit.api.scheduler.TimeScheduler
 
 open class Feature(
     val configName: String? = null,
@@ -23,8 +23,6 @@ open class Feature(
 ) {
     val events = mutableListOf<xyz.meowing.knit.api.events.EventCall>()
     val tickHandles = mutableSetOf<TickScheduler.Handle>()
-    val timeHandles = mutableSetOf<TimeScheduler.Handle>()
-    val timerIds = mutableSetOf<Long>()
     val namedEventCalls = mutableMapOf<String, xyz.meowing.knit.api.events.EventCall>()
     private var setupLoops: (() -> Unit)? = null
     private var isRegistered = false
@@ -108,67 +106,25 @@ open class Feature(
         namedEventCalls[name]?.unregister()
     }
 
-    inline fun <reified T> loop(intervalTicks: Long, noinline action: () -> Unit): Any {
+    inline fun <reified T> loop(intervalTicks: Int, noinline action: () -> Unit): Any {
         return when (T::class) {
             ClientTick::class -> {
-                val handle = TickScheduler.Client.repeat(intervalTicks, action = action)
+                val handle = TickSchedulers.client.every(intervalTicks, runnable = action)
                 tickHandles.add(handle)
                 handle
             }
             ServerTick::class -> {
-                val handle = TickScheduler.Server.repeat(intervalTicks, action = action)
-                tickHandles.add(handle)
-                handle
-            }
-            Timer::class -> {
-                val handle = TimeScheduler.repeat(intervalTicks, action = action)
-                timeHandles.add(handle)
-                handle
-            }
-            else -> throw IllegalArgumentException("Unsupported loop type: ${T::class}")
-        }
-    }
-
-    inline fun <reified T> loopDynamic(
-        noinline delay: () -> Long,
-        noinline stop: () -> Boolean = { false },
-        noinline action: () -> Unit
-    ): Any {
-        return when (T::class) {
-            Timer::class -> {
-                val handle = TimeScheduler.repeatDynamic(delay, stop, action)
-                timeHandles.add(handle)
-                handle
-            }
-            ClientTick::class -> {
-                val handle = TickScheduler.Client.repeatDynamic(delay, action)
-                tickHandles.add(handle)
-                handle
-            }
-            ServerTick::class -> {
-                val handle = TickScheduler.Server.repeatDynamic(delay, action)
+                val handle = TickSchedulers.server.every(intervalTicks, runnable = action)
                 tickHandles.add(handle)
                 handle
             }
             else -> throw IllegalArgumentException("Unsupported loop type: ${T::class}")
         }
     }
-
-    fun createTimer(ticks: Int, onTick: () -> Unit = {}, onComplete: () -> Unit = {}): Long {
-        val id = TickScheduler.Client.createTimer(ticks, onTick, onComplete)
-        timerIds.add(id)
-        return id
-    }
-
-    fun getTimer(timerId: Long): TickScheduler.Timer? = TickScheduler.Client.getTimer(timerId)
 
     private fun cancelLoops() {
         tickHandles.forEach { it.cancel() }
-        timeHandles.forEach { it.cancel() }
-        timerIds.forEach { TickScheduler.Client.cancelTimer(it) }
         tickHandles.clear()
-        timeHandles.clear()
-        timerIds.clear()
     }
 
     fun inSkyblock(): Boolean = !skyblockOnly || LocationAPI.isOnSkyBlock

@@ -11,8 +11,8 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
+import dev.deftu.omnicore.api.client.player
 import net.minecraft.client.gui.GuiGraphics
-import xyz.meowing.knit.api.KnitPlayer
 import java.awt.Color
 import java.util.UUID
 import kotlin.math.PI
@@ -150,7 +150,7 @@ object clear {
 
     /** Renders player icons and optional nametags */
     fun renderPlayers(context: GuiGraphics) {
-        val you = KnitPlayer.player ?: return
+        val you = player ?: return
         for (player in DungeonPlayerManager.players) {
             if (player == null || (!player.alive && player.name != you.name.string)) continue
 
@@ -255,7 +255,7 @@ object clear {
                 matrix.scale(1f - mapConfig.iconBorderWidth, 1f - mapConfig.iconBorderWidth)
                 Render2D.drawPlayerHead(context, -6, -6, 12, player.uuid ?: UUID(0, 0))
             } else {
-                val head = if (player.name == KnitPlayer.player?.name?.string) GreenMarker else WhiteMarker
+                val head = if (player.name == dev.deftu.omnicore.api.client.player?.name?.string) GreenMarker else WhiteMarker
                 Render2D.drawImage(context, head, -4, -5, 7, 10)
             }
         }

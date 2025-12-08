@@ -5,12 +5,11 @@ import co.stellarskys.stella.features.stellanav.utils.*
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
+import dev.deftu.omnicore.api.client.player
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.phys.Vec3
-import xyz.meowing.knit.api.KnitClient
-import xyz.meowing.knit.api.KnitPlayer
 import java.util.UUID
 import kotlin.math.PI
 
@@ -18,7 +17,7 @@ object boss {
     fun renderMap(context: GuiGraphics) {
         val matrix = context.pose()
 
-        val player = KnitPlayer.player ?: return
+        val player = player ?: return
         val playerPos = Vec3(player.x, player.y, player.z)
         val bossMap = BossMapRegistry.getBossMap(Dungeon.floorNumber!!, playerPos) ?: return
 
@@ -78,7 +77,7 @@ object boss {
         context.enableScissor(0, 0, size, size)
         for (player in DungeonPlayerManager.players) {
             if (player == null) continue
-            val you = KnitClient.player ?: continue
+            val you = dev.deftu.omnicore.api.client.player ?: continue
             if (!player.alive && player.name != you.name.string) continue
 
             val realX = player.realX ?: continue

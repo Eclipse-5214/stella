@@ -1,13 +1,12 @@
 package co.stellarskys.stella.utils
 
+import dev.deftu.omnicore.api.client.world
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.state.BlockState
-import xyz.meowing.knit.api.KnitClient
-
 
 object WorldUtils {
     fun getBlockStateAt(x: Int, y: Int, z: Int): BlockState? {
-        val world = KnitClient.world ?: return null
+        val world = world ?: return null
         return world.getBlockState(BlockPos(x, y, z))
     }
 

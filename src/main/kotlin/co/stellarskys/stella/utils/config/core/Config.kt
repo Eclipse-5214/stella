@@ -10,14 +10,12 @@ import co.stellarskys.stella.utils.config.ui.elements.*
 import co.stellarskys.stella.utils.render.CustomGuiRenderer
 import co.stellarskys.stella.utils.render.Render2D
 import com.google.gson.*
-import net.minecraft.client.gui.GuiGraphics
+import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.player
+import dev.deftu.omnicore.api.client.render.OmniResolution
+import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import java.awt.Color
 import java.io.File
-import xyz.meowing.knit.api.KnitClient
-import xyz.meowing.knit.api.KnitPlayer
-import xyz.meowing.knit.api.render.KnitResolution
-import xyz.meowing.knit.api.scheduler.TickScheduler
-import xyz.meowing.vexel.components.base.Offset
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.base.VexelElement
@@ -106,7 +104,7 @@ class Config(
                 .setPositioning(10f, Pos.ParentPercent, 10f, Pos.ParentPercent)
                 .childOf(top)
 
-            val username = Text(KnitPlayer.player?.name?.string ?: "null", shadowEnabled = false, fontSize = 16f)
+            val username = Text(player?.name?.string ?: "null", shadowEnabled = false, fontSize = 16f)
                 .setPositioning(60, Pos.ParentPixels, 2, Pos.ParentPixels)
                 .childOf(head)
 
@@ -170,9 +168,9 @@ class Config(
         override fun onRenderGui() {
             NVGRenderer.endFrame()
 
-            val player = KnitPlayer.player ?: return
+            val player = player ?: return
             val uuid = player.gameProfile.id
-            val size = 48 / KnitResolution.scaleFactor
+            val size = 48 / OmniResolution.scaleFactor
             val x = head.scaled.left.toInt()
             val y = head.scaled.top.toInt()
 
@@ -308,8 +306,8 @@ class Config(
     // UI functions
     fun open() {
         configUI = ConfigUI(categories, this)
-        TickScheduler.Client.post {
-            KnitClient.client.setScreen(configUI)
+        TickSchedulers.client.post {
+            client.setScreen(configUI)
         }
     }
 

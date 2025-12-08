@@ -18,16 +18,12 @@ object blockOverlay : Feature("overlayEnabled") {
             val mstack = event.context.matrixStack() ?: return@register
             val consumers = event.context.consumers()
             val camera = event.context.camera()
+            val camPos = camera.position
             val blockShape = event.context.blockState()?.getShape(EmptyBlockGetter.INSTANCE, blockPos, CollisionContext.of(camera.entity)) ?: return@register
             if (blockShape.isEmpty) return@register
 
-            val camPos = camera.position
-
-            val chroma = config["chromaHighlight"] as Boolean
-
             val outlineColor = config["blockHighlightColor"] as RGBA
-            val outlineWidth = (config["overlayLineWidth"] as Int).toFloat()
-
+            val outlineWidth = (config["overlayLineWidth"] as Int).toDouble()
             val fillColor = config["blockFillColor"] as RGBA
 
             event.cancel()
@@ -38,7 +34,7 @@ object blockOverlay : Feature("overlayEnabled") {
 
             ShapeRenderer.renderShape(
                 mstack,
-                consumers.getBuffer(if(chroma) StellaRenderLayers.getChromaLines(5.0) else StellaRenderLayers.getLines(5.0)),
+                consumers.getBuffer(StellaRenderLayers.getLines(outlineWidth)),
                 blockShape,
                 x, y, z,
                 outlineColor.toColorInt()
@@ -54,7 +50,7 @@ object blockOverlay : Feature("overlayEnabled") {
                 blockShape.forAllBoxes { minX, minY, minZ, maxX, maxY, maxZ ->
                     ShapeRenderer.addChainedFilledBoxVertices(
                         mstack,
-                        consumers.getBuffer( if (chroma ) StellaRenderLayers.CHROMA_3D else StellaRenderLayers.FILLED),
+                        consumers.getBuffer( StellaRenderLayers.FILLED),
                         x + minX, y + minY, z + minZ,
                         x + maxX, y + maxY, z + maxZ,
                         r,g,b,a

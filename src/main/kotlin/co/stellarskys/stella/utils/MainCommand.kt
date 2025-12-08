@@ -3,25 +3,24 @@ package co.stellarskys.stella.utils
 import co.stellarskys.stella.annotations.Command
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.hud.HUDEditor
-import xyz.meowing.knit.api.KnitClient
-import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.knit.api.scheduler.TickScheduler
+import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.scheduling.TickSchedulers
 
 @Command
-object MainCommand : Commodore("stella", "sa", "sta") {
+object MainCommand : Commodore("stella", "sta", "sa") {
     init {
         literal("hud") {
             runs {
-                TickScheduler.Client.post {
-                    KnitClient.client.setScreen(HUDEditor())
+                TickSchedulers.client.post {
+                    client.setScreen(HUDEditor())
                 }
             }
         }
 
         literal("buttons") {
             runs {
-                TickScheduler.Client.post {
-                    KnitClient.client.setScreen(ButtonLayoutEditor())
+                TickSchedulers.client.post {
+                    client.setScreen(ButtonLayoutEditor())
                 }
             }
         }

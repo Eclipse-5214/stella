@@ -2,10 +2,7 @@ package co.stellarskys.stella.mixins;
 
 import co.stellarskys.stella.events.EventBus;
 import co.stellarskys.stella.events.core.GuiEvent;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.state.GuiRenderState;
@@ -15,9 +12,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import xyz.meowing.knit.api.KnitClient;
-import xyz.meowing.knit.api.render.KnitResolution;
-import xyz.meowing.vexel.utils.render.NVGRenderer;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 

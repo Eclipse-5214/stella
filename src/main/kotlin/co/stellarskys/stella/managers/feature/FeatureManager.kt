@@ -6,10 +6,10 @@ import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.features.Feature
+import co.stellarskys.stella.utils.Commodore
 import co.stellarskys.stella.utils.config
 import io.github.classgraph.ClassGraph
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import xyz.meowing.knit.api.command.Commodore
 import java.util.concurrent.ConcurrentHashMap
 
 @Module

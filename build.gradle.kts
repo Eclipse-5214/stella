@@ -1,5 +1,5 @@
 import dev.deftu.gradle.utils.version.MinecraftVersions
-import dev.deftu.gradle.utils.includeOrShade
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     java
@@ -17,6 +17,7 @@ repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://api.modrinth.com/maven")
+    maven("https://jitpack.io")
     maven("https://maven.teamresourceful.com/repository/maven-public/")
 }
 
@@ -59,10 +60,12 @@ val clocheAction: Action<ExternalModuleDependency> = Action {
 
 
 dependencies {
+    with(libs.textile.get()) { modImplementation("${this.group}:${this.name}-$mcData:${this.version}") }
+    with(libs.omnicore.get()) { modImplementation("${this.group}:${this.name}-$mcData:${this.version}") }
     implementation(include("io.github.classgraph:classgraph:4.8.184")!!)
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    modImplementation(include("xyz.meowing:vexel-${mcData}:124")!!)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:126")!!)
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
     modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
     modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
@@ -71,5 +74,21 @@ dependencies {
         exclude("me.owdding")
         clocheAction.execute(this)
     }
+
     include("tech.thatgravyboat:skyblock-api:3.0.23", clocheAction)
+
+    property("commodore_version").let {
+        implementation("com.github.stivais:Commodore:$it")
+        include("com.github.stivais:Commodore:$it")
+    }
+}
+
+/* thanks odin! */
+tasks {
+    compileKotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_21
+            freeCompilerArgs.add("-Xlambdas=class") //Commodore
+        }
+    }
 }

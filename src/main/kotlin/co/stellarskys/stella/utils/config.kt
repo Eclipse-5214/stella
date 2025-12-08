@@ -554,26 +554,6 @@ val config = Config("Stella", "Stella") {
                 shouldShow { settings -> settings["overlayEnabled"] as Boolean && settings["fillBlockOverlay"] as Boolean }
             }
 
-            toggle {
-                configName = "chromaHighlight"
-                name = "Chroma overlay"
-                description = "Makes the outline chroma"
-                shouldShow { settings -> settings["overlayEnabled"] as Boolean }
-            }
-
-            stepslider {
-                configName = "chromaOverlaySpeed"
-                name = "Chroma Speed"
-                description = "The speed of the chroma effect"
-                min = 1
-                max = 10
-                step = 1
-                default = 1
-                shouldShow { settings ->
-                    settings["overlayEnabled"] as Boolean && settings["chromaHighlight"] as Boolean
-                }
-            }
-
             stepslider {
                 configName = "overlayLineWidth"
                 name = "Line width"

@@ -24,7 +24,7 @@ pluginManagement {
 
     plugins {
         kotlin("jvm") version("2.2.0")
-        id("dev.deftu.gradle.multiversion-root") version("2.62.0")
+        id("dev.deftu.gradle.multiversion-root") version("2.64.0")
     }
 }
 
