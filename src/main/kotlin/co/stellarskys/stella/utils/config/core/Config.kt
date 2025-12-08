@@ -300,6 +300,8 @@ class Config(
             val visible = element.isVisible(config)
 
             if (visible) container.show() else container.hide()
+
+            container.cache.positionCacheValid = false
         }
     }
 

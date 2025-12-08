@@ -24,8 +24,6 @@ object Render3D {
         val matrices = ctx.matrixStack() ?: return
         val layer = if (phase) StellaRenderLayers.FILLED_THROUGH_WALLS else StellaRenderLayers.FILLED
 
-        // TODO: make this more efficient later on
-        //  (this does way too many calls but shouldn't matter much as of right now)
         shape.forAllBoxes { minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double ->
             ShapeRenderer.addChainedFilledBoxVertices(
                 matrices,
