@@ -1,12 +1,11 @@
 package co.stellarskys.stella.utils.render
 
+import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.world.phys.shapes.VoxelShape
 import org.joml.Matrix4f
-import xyz.meowing.knit.api.KnitClient
-import xyz.meowing.knit.api.render.world.RenderContext
 import java.awt.Color
 import kotlin.math.sqrt
 
@@ -138,8 +137,8 @@ object Render3D {
     ) {
         var toScale = scale
         val matrices = Matrix4f()
-        val textRenderer = KnitClient.client.font
-        val camera = KnitClient.client.gameRenderer.mainCamera
+        val textRenderer = client.font
+        val camera = client.gameRenderer.mainCamera
         val dx = (x - camera.position.x).toFloat()
         val dy = (y - camera.position.y).toFloat()
         val dz = (z - camera.position.z).toFloat()
@@ -151,14 +150,14 @@ object Render3D {
             .rotate(camera.rotation())
             .scale(toScale, -toScale, toScale)
 
-        val consumer = KnitClient.client.renderBuffers().bufferSource()
+        val consumer = client.renderBuffers().bufferSource()
         val textLayer = if (phase) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL
         val lines = text.split("\n")
         val maxWidth = lines.maxOf { textRenderer.width(it) }
         val offset = -maxWidth / 2f
 
         if (bgBox) {
-            val bgOpacity = (KnitClient.client.options.getBackgroundOpacity(0.25f) * 255).toInt() shl 24
+            val bgOpacity = (client.options.getBackgroundOpacity(0.25f) * 255).toInt() shl 24
             val boxHeight = lines.size * 9
             textRenderer.drawInBatch(
                 "", // empty string, just draws box

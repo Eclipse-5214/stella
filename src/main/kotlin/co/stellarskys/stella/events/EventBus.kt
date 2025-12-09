@@ -1,6 +1,8 @@
 package co.stellarskys.stella.events
 
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.events.api.Event
+import co.stellarskys.stella.events.api.EventBus
 import co.stellarskys.stella.events.core.*
 import co.stellarskys.stella.managers.events.EventBusManager
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
@@ -12,28 +14,25 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import org.lwjgl.glfw.GLFW
-import xyz.meowing.knit.Knit
-import xyz.meowing.knit.api.events.Event
-import xyz.meowing.knit.api.events.EventBus
-import xyz.meowing.knit.api.scheduler.TickScheduler
-import xyz.meowing.knit.internal.events.TickEvent
-import xyz.meowing.knit.internal.events.WorldRenderEvent
 import co.stellarskys.stella.events.core.GuiEvent
-import net.minecraft.client.gui.render.GuiRenderer
+import dev.deftu.omnicore.api.eventBus
+import dev.deftu.eventbus.on
+import dev.deftu.omnicore.api.client.events.ClientTickEvent
+import dev.deftu.omnicore.api.events.ServerTickEvent
 import net.minecraft.network.protocol.Packet
 
 @Module
 object EventBus : EventBus(true) {
     init {
-        Knit.EventBus.register<WorldRenderEvent.Last> { event ->
+        register<WorldRenderEvent.Last> { event ->
             post(RenderEvent.World.Last(event.context))
         }
 
-        Knit.EventBus.register<WorldRenderEvent.AfterEntities> { event ->
+        register<WorldRenderEvent.AfterEntities> { event ->
             post(RenderEvent.World.AfterEntities(event.context))
         }
 
-        Knit.EventBus.register<WorldRenderEvent.BlockOutline> { event ->
+        register<WorldRenderEvent.BlockOutline> { event ->
             if (post(RenderEvent.World.BlockOutline(event.context))) event.cancel()
         }
 
@@ -49,14 +48,12 @@ object EventBus : EventBus(true) {
             post(ServerEvent.Disconnect())
         }
 
-        Knit.EventBus.register<TickEvent.Client.Start> {
-            TickScheduler.Client.onTick()
-            post(co.stellarskys.stella.events.core.TickEvent.Client())
+        eventBus.on<ServerTickEvent.Pre> {
+            post(TickEvent.Server())
         }
 
-        Knit.EventBus.register<TickEvent.Server.Start> {
-            TickScheduler.Server.onTick()
-            post(co.stellarskys.stella.events.core.TickEvent.Server())
+        eventBus.on<ClientTickEvent.Pre> {
+            post(TickEvent.Client())
         }
 
         ClientLifecycleEvents.CLIENT_STARTED.register { _ ->

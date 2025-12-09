@@ -13,11 +13,11 @@ import co.stellarskys.stella.utils.render.Render3D
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.player
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.Resource
 import net.minecraft.server.packs.resources.ResourceManager
-import xyz.meowing.knit.api.KnitClient
-import xyz.meowing.knit.api.KnitPlayer
 import java.awt.Color
 import java.io.IOException
 import java.io.InputStreamReader
@@ -45,7 +45,7 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
         register<RenderEvent.World.Last> { event ->
             if (!Dungeon.inBoss || Dungeon.floorNumber != 7) return@register
 
-            val player = KnitPlayer.player ?: return@register
+            val player = player ?: return@register
             val playerPos = Triple(
                 (player.x + 0.25).roundToInt() - 1,
                 player.y.roundToInt(),
@@ -125,7 +125,7 @@ object TermRegistry {
     private val terms = mutableMapOf<String, List<TermEntry>>() // p1, p2, etc.
 
     init {
-        load(KnitClient.client.resourceManager)
+        load(client.resourceManager)
     }
 
     fun load(resourceManager: ResourceManager) {

@@ -5,7 +5,7 @@ import co.stellarskys.stella.utils.skyblock.location.SkyBlockArea
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
 import net.hypixel.data.region.Environment
 import net.hypixel.data.type.ServerType
-import xyz.meowing.knit.api.events.Event
+import co.stellarskys.stella.events.api.Event
 
 sealed class LocationEvent {
     class ServerChange(

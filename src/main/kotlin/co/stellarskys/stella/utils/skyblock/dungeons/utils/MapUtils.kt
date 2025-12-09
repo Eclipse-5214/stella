@@ -8,13 +8,13 @@ import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon.inBoss
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils.roomDoorCombinedSize
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import dev.deftu.omnicore.api.client.player
+import dev.deftu.omnicore.api.client.world
 import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket
 import net.minecraft.world.item.MapItem
 import net.minecraft.world.level.saveddata.maps.MapDecoration
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData
-import xyz.meowing.knit.api.KnitClient
-import xyz.meowing.knit.api.KnitPlayer
 
 object MapUtils {
     val MapDecoration.mapX get() = (this.x() + 128) shr 1
@@ -33,7 +33,7 @@ object MapUtils {
     fun init() {
         EventBus.registerIn<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event->
             if (event.packet is ClientboundMapItemDataPacket && mapData == null) {
-                val world = KnitClient.world ?: return@registerIn
+                val world = world ?: return@registerIn
                 val id = event.packet.mapId.id
                 if (id and 1000 == 0) {
                     val guess = MapItem.getSavedData(event.packet.mapId, world) ?: return@registerIn
@@ -62,9 +62,9 @@ object MapUtils {
     }
 
     fun getCurrentMapState(): MapItemSavedData? {
-        val stack = KnitPlayer.player?.inventory?.getItem(8) ?: return null
+        val stack = player?.inventory?.getItem(8) ?: return null
         if (stack.item !is MapItem || !stack.hoverName.string.contains("Magical Map")) return null
-        return MapItem.getSavedData(stack, KnitClient.world!!)
+        return MapItem.getSavedData(stack, world!!)
     }
 
     fun calibrateDungeonMap(): Boolean {

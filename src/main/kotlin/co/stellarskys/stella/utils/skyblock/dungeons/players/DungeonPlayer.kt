@@ -1,14 +1,12 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.players
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner.RoomClearInfo
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonClass
+import dev.deftu.omnicore.api.client.world
 import net.minecraft.world.entity.player.Player
-import xyz.meowing.knit.api.KnitClient
 import java.util.*
-import java.util.concurrent.CompletableFuture
 
 class DungeonPlayer(val name: String) {
     // position
@@ -30,7 +28,7 @@ class DungeonPlayer(val name: String) {
     val secrets get() = currSecrets!! - initSecrets!!
 
     // api
-    val entity: Player? = KnitClient.world?.entitiesForRendering()?.filterIsInstance<Player>()?.find { it.gameProfile.name == name }
+    val entity: Player? = world?.entitiesForRendering()?.filterIsInstance<Player>()?.find { it.gameProfile.name == name }
     val uuid: UUID? get() = entity?.uuid
 
     var inRender = false

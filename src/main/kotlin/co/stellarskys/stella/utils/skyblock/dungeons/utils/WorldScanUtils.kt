@@ -1,14 +1,13 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.utils
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.WorldUtils
-import xyz.meowing.knit.api.KnitClient
+import dev.deftu.omnicore.api.client.world
 
 object WorldScanUtils {
     val blacklist = setOf(5, 54, 146)
 
     fun isChunkLoaded(x: Int, y: Int, z: Int): Boolean {
-        val world = KnitClient.world ?: return false
+        val world = world ?: return false
         val chunkX = x shr 4
         val chunkZ = z shr 4
         return world.chunkSource.hasChunk(chunkX, chunkZ)

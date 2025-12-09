@@ -3,10 +3,10 @@ package co.stellarskys.stella.features.msc.buttonUtils
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
+import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import xyz.meowing.knit.api.render.KnitResolution
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.core.*
@@ -126,7 +126,7 @@ class EditButtonPopup(window: VexelWindow) {
             stack = NEUApi.createDummyStack(item)
         }
 
-        val scale = KnitResolution.scaleFactor.toFloat()
+        val scale = OmniResolution.scaleFactor.toFloat()
 
         val x = itemPreview.scaled.left
         val y = itemPreview.scaled.top

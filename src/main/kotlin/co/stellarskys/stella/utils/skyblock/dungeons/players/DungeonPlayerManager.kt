@@ -6,8 +6,8 @@ import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonClass
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import dev.deftu.omnicore.api.client.player
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
-import xyz.meowing.knit.api.KnitPlayer
 
 object DungeonPlayerManager {
     /**
@@ -18,7 +18,7 @@ object DungeonPlayerManager {
      * This regex filters out the ironman icon as well as rank prefixes and emblems
      * \[\d+\] (?:\[[A-Za-z]+\] )?(?&lt;name&gt;[A-Za-z0-9_]+) (?:.+ )?\((?&lt;class&gt;\S+) ?(?&lt;level&gt;[LXVI0]+)?\)
      *
-     * Taken from Skyblocker
+     * Modified from Skyblocker
      */
     val playerTabPattern = Regex("\\[\\d+] (?:\\[[A-Za-z]+] )?(?<name>[A-Za-z0-9_]+) (?:.+ )?\\((?<class>\\S+) ?(?<level>[LXVI0]+)?\\)")
     val playerGhostPattern = Regex(" ☠ (?<name>[A-Za-z0-9_]+) .+ became a ghost\\.")
@@ -57,7 +57,7 @@ object DungeonPlayerManager {
         val match = playerGhostPattern.find(text) ?: return
 
         var name = match.groups["name"]?.value ?: return
-        if (name == "You") KnitPlayer.player?.let { name = it.name.stripped }
+        if (name == "You") player?.let { name = it.name.stripped }
 
         val player = getPlayer(name)
         if (player != null) {

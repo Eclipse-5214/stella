@@ -2,10 +2,10 @@ package co.stellarskys.stella.managers.events
 
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.api.EventCall
 import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.utils.skyblock.location.LocationAPI
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
-import xyz.meowing.knit.api.events.EventCall
 
 @Module
 object EventBusManager {

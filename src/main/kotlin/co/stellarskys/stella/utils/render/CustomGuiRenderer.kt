@@ -2,13 +2,13 @@ package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
+import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.pip.*
 import net.minecraft.client.gui.render.state.GuiRenderState
 import net.minecraft.client.renderer.fog.FogRenderer
-import xyz.meowing.knit.api.KnitClient
 
 //#if MC > 1.21.9
 //$$ import net.minecraft.client.renderer.SubmitNodeStorage
@@ -23,7 +23,7 @@ import xyz.meowing.knit.api.KnitClient
  * It runs completely independently of the game's main GuiRenderer.
  */
 object CustomGuiRenderer {
-    private val minecraft: Minecraft = KnitClient.client
+    private val minecraft: Minecraft = client
     private val guiRenderState: GuiRenderState = GuiRenderState()
     private val renderBuffers = minecraft.renderBuffers()
     private val bufferSource = renderBuffers.bufferSource()

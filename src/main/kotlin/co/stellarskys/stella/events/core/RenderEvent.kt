@@ -3,9 +3,8 @@ package co.stellarskys.stella.events.core
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.state.PlayerRenderState
-import xyz.meowing.knit.api.events.CancellableEvent
-import xyz.meowing.knit.api.events.Event
-import xyz.meowing.knit.api.render.world.RenderContext
+import co.stellarskys.stella.events.api.CancellableEvent
+import co.stellarskys.stella.events.api.Event
 
 sealed class RenderEvent {
     sealed class World {

@@ -3,6 +3,8 @@
 package co.stellarskys.stella.features
 
 import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.api.Event
+import co.stellarskys.stella.events.api.EventCall
 import co.stellarskys.stella.managers.feature.FeatureManager
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockArea
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
@@ -12,7 +14,6 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonFloor
 import co.stellarskys.stella.utils.skyblock.location.LocationAPI
 import dev.deftu.omnicore.api.scheduling.TickScheduler
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
-import xyz.meowing.knit.api.events.Event
 
 open class Feature(
     val configName: String? = null,
@@ -21,9 +22,9 @@ open class Feature(
     area: Any? = null,
     dungeonFloor: Any? = null
 ) {
-    val events = mutableListOf<xyz.meowing.knit.api.events.EventCall>()
+    val events = mutableListOf<EventCall>()
     val tickHandles = mutableSetOf<TickScheduler.Handle>()
-    val namedEventCalls = mutableMapOf<String, xyz.meowing.knit.api.events.EventCall>()
+    val namedEventCalls = mutableMapOf<String, EventCall>()
     private var setupLoops: (() -> Unit)? = null
     private var isRegistered = false
 

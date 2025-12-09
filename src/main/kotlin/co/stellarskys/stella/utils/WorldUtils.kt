@@ -1,7 +1,10 @@
 package co.stellarskys.stella.utils
 
+import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.world
+import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.core.BlockPos
+import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.state.BlockState
 
 object WorldUtils {
@@ -21,4 +24,20 @@ object WorldUtils {
 
         return LegIDs.getLegacyId(state)
     }
+
+    private val tabListComparator: Comparator<PlayerInfo> = compareBy(
+        { it.gameMode == GameType.SPECTATOR },
+        { it.team?.name ?: "" },
+        { it.profile.name.lowercase() }
+    )
+
+    @JvmStatic
+    val tablist: List<PlayerInfo>
+        get() = client.connection
+            ?.listedOnlinePlayers
+            ?.sortedWith(tabListComparator) ?: emptyList()
+
+    @JvmStatic
+    val players: List<PlayerInfo>
+        get() = tablist.filter { it.profile.id.version() == 4 }
 }

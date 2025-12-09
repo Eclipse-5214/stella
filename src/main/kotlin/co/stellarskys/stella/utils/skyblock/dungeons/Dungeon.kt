@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils.skyblock.dungeons
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ChatEvent
@@ -13,9 +12,9 @@ import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManage
 import co.stellarskys.stella.utils.skyblock.dungeons.score.*
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.*
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import dev.deftu.omnicore.api.client.player
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.find
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
-import xyz.meowing.knit.api.KnitPlayer
 
 /**
  * Central dungeon state manager.
@@ -49,7 +48,7 @@ object Dungeon {
     val floorNumber: Int? get() = floor?.floorNumber
     var inDungeon = false
     val inBoss: Boolean
-        get() = floor != null && KnitPlayer.player?.let {
+        get() = floor != null && player?.let {
             val (x, z) = WorldScanUtils.realCoordToComponent(it.x.toInt(), it.z.toInt())
             6 * z + x > 35
         } == true
@@ -161,7 +160,7 @@ object Dungeon {
 
     /** Updates leap detection based on held item */
     private fun updateHeldItem() {
-        val item = KnitPlayer.player?.mainHandItem ?: return
+        val item = player?.mainHandItem ?: return
         holdingLeaps = "leap" in item.hoverName.string.clearCodes().lowercase()
     }
 

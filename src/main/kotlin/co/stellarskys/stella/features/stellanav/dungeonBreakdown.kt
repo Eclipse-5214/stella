@@ -6,21 +6,22 @@ import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.typeToColor
 import co.stellarskys.stella.features.stellanav.utils.typeToName
+import co.stellarskys.stella.utils.ChatUtils
+import co.stellarskys.stella.utils.ChatUtils.onHover
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
-import xyz.meowing.knit.api.KnitChat
-import xyz.meowing.knit.api.scheduler.TickScheduler
-import xyz.meowing.knit.api.text.KnitText
+import dev.deftu.omnicore.api.scheduling.TickSchedulers
+import dev.deftu.textile.Text
 
 @Module
 object dungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE_CATACOMBS) {
 
     override fun initialize() {
         register<DungeonEvent.End> { event ->
-            TickScheduler.Client.schedule(3 * 20) {
-                KnitChat.fakeMessage(Stella.PREFIX + " §bCleared room counts:")
+            TickSchedulers.client.after(3 * 20) {
+                ChatUtils.fakeMessage(Stella.PREFIX + " §bCleared room counts:")
                 DungeonPlayerManager.players.forEach { player ->
                     if (player == null) return@forEach
 
@@ -30,8 +31,8 @@ object dungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE
                     val deaths = player.deaths
                     val roomLore = buildRoomLore(player)
 
-                    val mesage = KnitText.literal("§d| §b$name §fcleared §b$minmax §frooms | §b$secrets §fsecrets | §b$deaths §fdeaths").onHover(roomLore)
-                    KnitChat.fakeMessage(mesage)
+                    val mesage = Text.literal("§d| §b$name §fcleared §b$minmax §frooms | §b$secrets §fsecrets | §b$deaths §fdeaths").onHover(roomLore)
+                    ChatUtils.fakeMessage(mesage)
                 }
             }
         }

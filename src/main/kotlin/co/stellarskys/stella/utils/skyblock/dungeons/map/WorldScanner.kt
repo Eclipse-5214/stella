@@ -11,8 +11,9 @@ import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
 import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
-import xyz.meowing.knit.api.KnitClient
-import xyz.meowing.knit.api.KnitPlayer
+import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.player
+import dev.deftu.omnicore.api.client.world
 import java.util.UUID
 
 // Very loosely based of Tska
@@ -23,7 +24,7 @@ object WorldScanner {
     fun init() {
         EventBus.registerIn<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
 
-            val player = KnitPlayer.player ?: return@registerIn
+            val player = player ?: return@registerIn
 
             // checking player states
             checkPlayerState()
@@ -131,14 +132,14 @@ object WorldScanner {
     }
 
     fun checkPlayerState() {
-        val world = KnitClient.world ?: return
+        val world = world ?: return
 
         DungeonPlayerManager.players.forEach { player ->
             if (player == null) return@forEach
 
             val entity = world.players().find { it.name.string == player.name }
 
-            val entry = KnitClient.client.connection?.getPlayerInfo(entity?.uuid ?: UUID(0, 0))
+            val entry = client.connection?.getPlayerInfo(entity?.uuid ?: UUID(0, 0))
             val ping = entry?.latency ?: -1
 
             if (ping != -1 && entity != null) {

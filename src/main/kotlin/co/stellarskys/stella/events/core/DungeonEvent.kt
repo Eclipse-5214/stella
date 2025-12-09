@@ -3,7 +3,7 @@ package co.stellarskys.stella.events.core
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonFloor
-import xyz.meowing.knit.api.events.Event
+import co.stellarskys.stella.events.api.Event
 
 sealed class DungeonEvent {
     class Start(

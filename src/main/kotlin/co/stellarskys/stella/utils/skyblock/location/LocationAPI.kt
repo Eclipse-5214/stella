@@ -10,10 +10,10 @@ import net.hypixel.data.type.GameType
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.anyMatch
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findGroup
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
-import xyz.meowing.knit.api.KnitClient
 import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.events.core.ScoreboardEvent
 import co.stellarskys.stella.events.core.ServerEvent
+import co.stellarskys.stella.utils.WorldUtils
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -62,7 +62,7 @@ object LocationAPI {
         private set
 
     var playerCount: Int = 0
-        get() = field.coerceAtLeast(KnitClient.players.size)
+        get() = field.coerceAtLeast(WorldUtils.players.size)
         private set
 
     val maxPlayerCount: Int?

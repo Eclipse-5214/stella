@@ -2,13 +2,14 @@
 
 package co.stellarskys.stella.events.core
 
+import co.stellarskys.stella.events.api.CancellableEvent
+import co.stellarskys.stella.events.api.Event
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ClickType
-import xyz.meowing.knit.api.events.CancellableEvent
-import xyz.meowing.knit.api.events.Event
+
 
 sealed class GuiEvent {
     sealed class NVG {

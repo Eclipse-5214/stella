@@ -2,7 +2,7 @@ package co.stellarskys.stella.events.core
 
 
 import net.minecraft.world.entity.Entity
-import xyz.meowing.knit.api.events.Event
+import co.stellarskys.stella.events.api.Event
 
 sealed class EntityEvent {
     class Death(

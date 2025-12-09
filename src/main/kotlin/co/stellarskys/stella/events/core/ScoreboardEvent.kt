@@ -2,7 +2,7 @@ package co.stellarskys.stella.events.core
 
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
-import xyz.meowing.knit.api.events.Event
+import co.stellarskys.stella.events.api.Event
 
 sealed class ScoreboardEvent {
     class UpdateTitle(

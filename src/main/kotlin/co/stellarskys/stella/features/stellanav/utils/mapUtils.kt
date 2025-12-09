@@ -8,11 +8,11 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.world.phys.Vec3
-import xyz.meowing.knit.api.KnitClient
 import java.awt.Color
 import java.io.InputStreamReader
 
@@ -103,7 +103,7 @@ object BossMapRegistry {
     private val bossMaps = mutableMapOf<String, List<BossMapData>>()
 
     init {
-        val resourceManager = KnitClient.client.resourceManager
+        val resourceManager = client.resourceManager
         load(resourceManager)
     }
 
