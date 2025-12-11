@@ -5,19 +5,24 @@ import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.state.PlayerRenderState
 import co.stellarskys.stella.events.api.CancellableEvent
 import co.stellarskys.stella.events.api.Event
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.shapes.VoxelShape
 
 sealed class RenderEvent {
     sealed class World {
         class Last(
-            val context: RenderContext
+            val context: WorldRenderContext
         ) : Event()
 
         class AfterEntities(
-            val context: RenderContext
+            val context: WorldRenderContext
         ) : Event()
 
         class BlockOutline(
-            val context: RenderContext
+            val context: WorldRenderContext,
+            val blockPos: BlockPos?,
+            val blockShape: VoxelShape?,
         ) : CancellableEvent()
     }
 

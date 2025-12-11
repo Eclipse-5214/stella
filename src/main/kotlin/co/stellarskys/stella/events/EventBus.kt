@@ -15,27 +15,18 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
-import dev.deftu.omnicore.api.eventBus
-import dev.deftu.eventbus.on
-import dev.deftu.omnicore.api.client.events.ClientTickEvent
-import dev.deftu.omnicore.api.events.ServerTickEvent
 import net.minecraft.network.protocol.Packet
+import net.minecraft.world.level.EmptyBlockGetter
+import net.minecraft.world.phys.shapes.CollisionContext
+//#if MC < 1.21.9
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+//#else
+//$$ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
+//#endif
 
 @Module
 object EventBus : EventBus(true) {
     init {
-        register<WorldRenderEvent.Last> { event ->
-            post(RenderEvent.World.Last(event.context))
-        }
-
-        register<WorldRenderEvent.AfterEntities> { event ->
-            post(RenderEvent.World.AfterEntities(event.context))
-        }
-
-        register<WorldRenderEvent.BlockOutline> { event ->
-            if (post(RenderEvent.World.BlockOutline(event.context))) event.cancel()
-        }
-
         ClientReceiveMessageEvents.ALLOW_GAME.register { message, isActionBar ->
             !post(ChatEvent.Receive(message, isActionBar))
         }
@@ -46,14 +37,6 @@ object EventBus : EventBus(true) {
 
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
             post(ServerEvent.Disconnect())
-        }
-
-        eventBus.on<ServerTickEvent.Pre> {
-            post(TickEvent.Server())
-        }
-
-        eventBus.on<ClientTickEvent.Pre> {
-            post(TickEvent.Client())
         }
 
         ClientLifecycleEvents.CLIENT_STARTED.register { _ ->
@@ -102,6 +85,38 @@ object EventBus : EventBus(true) {
             if (screen != null) post(GuiEvent.Open(screen))
         }
 
+        WorldRenderEvents.AFTER_ENTITIES.register { context ->
+            post(RenderEvent.World.AfterEntities(context))
+        }
+
+        //#if MC < 1.21.9
+        WorldRenderEvents.LAST.register { context ->
+            post(RenderEvent.World.Last(context))
+        }
+
+        WorldRenderEvents.BLOCK_OUTLINE.register { context, blockContext ->
+            !post(
+                RenderEvent.World.BlockOutline(
+                    context,
+                    blockContext.blockPos(),
+                    blockContext.blockState()
+                        ?.getShape(
+                        EmptyBlockGetter.INSTANCE,
+                        blockContext.blockPos(),
+                            CollisionContext.of(context.camera().entity
+                            )
+                        )
+                )
+            )
+        }
+        //#else
+        //$$ WorldRenderEvents.END_MAIN.register { context ->
+        //$$    post(RenderEvent.World.Last(context))
+        //$$ }
+        //$$ WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
+        //$$    !post(RenderEvent.World.BlockOutline(context, outlineRenderState.pos, outlineRenderState.shape))
+        //$$ }
+        //#endif
     }
 
     fun onPacketReceived(packet: Packet<*>): Boolean {
