@@ -18,10 +18,10 @@ import co.stellarskys.stella.utils.render.RenderContext
 import net.minecraft.network.protocol.Packet
 import net.minecraft.world.level.EmptyBlockGetter
 import net.minecraft.world.phys.shapes.CollisionContext
-//#if MC < 1.21.9
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 
+//#if MC < 1.21.9
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 //#else
 //$$ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 //#endif
