@@ -70,7 +70,7 @@ class ButtonLayoutEditor : VexelScreen() {
         NVGRenderer.beginFrame(0f, 0f)
     }
 
-    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+    override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {
         val invX = (width - 176) / 2
         val invY = (height - 166) / 2
 
@@ -80,13 +80,13 @@ class ButtonLayoutEditor : VexelScreen() {
                     val (x, y) = ButtonManager.resolveAnchorPosition(anchor, index, invX, invY)
                     if (mouseX.toInt() in x..(x + slotSize) && mouseY.toInt() in y..(y + slotSize)) {
                         popup.open(anchor, index)
-                        return super.mouseClicked(mouseX, mouseY, button)
+                        return super.onMouseClick(mouseX, mouseY, button)
                     }
                 }
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button)
+        return super.onMouseClick(mouseX, mouseY, button)
     }
 
     override fun renderBackground(context: GuiGraphics, mouseX: Int, mouseY: Int, deltaTicks: Float) {}

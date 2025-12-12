@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
+import co.stellarskys.stella.utils.render.RenderContext
 import net.minecraft.network.protocol.Packet
 import net.minecraft.world.level.EmptyBlockGetter
 import net.minecraft.world.phys.shapes.CollisionContext
@@ -86,35 +87,39 @@ object EventBus : EventBus(true) {
         }
 
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
-            post(RenderEvent.World.AfterEntities(context))
+            post(RenderEvent.World.AfterEntities(RenderContext.fromContext(context)))
         }
 
         //#if MC < 1.21.9
         WorldRenderEvents.LAST.register { context ->
-            post(RenderEvent.World.Last(context))
+            post(RenderEvent.World.Last(RenderContext.fromContext(context)))
         }
 
         WorldRenderEvents.BLOCK_OUTLINE.register { context, blockContext ->
-            !post(
-                RenderEvent.World.BlockOutline(
-                    context,
-                    blockContext.blockPos(),
-                    blockContext.blockState()
-                        ?.getShape(
+            val ctx = RenderContext.fromContext(context).apply {
+                blockPos = blockContext.blockPos()
+                voxelShape = blockContext.blockState()
+                    ?.getShape(
                         EmptyBlockGetter.INSTANCE,
                         blockContext.blockPos(),
-                            CollisionContext.of(context.camera().entity
-                            )
+                        CollisionContext.of(context.camera().entity
                         )
-                )
-            )
+                    )
+            }
+
+            !post(RenderEvent.World.BlockOutline(ctx))
         }
         //#else
         //$$ WorldRenderEvents.END_MAIN.register { context ->
-        //$$    post(RenderEvent.World.Last(context))
+        //$$    post(RenderEvent.World.Last(RenderContext.fromContext(context)))
         //$$ }
+        //$$
         //$$ WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
-        //$$    !post(RenderEvent.World.BlockOutline(context, outlineRenderState.pos, outlineRenderState.shape))
+        //$$    val ctx = RenderContext.fromContext(context).apply {
+        //$$        blockPos = outlineRenderState.pos
+        //$$        voxelShape = outlineRenderState.shape
+        //$$    }
+        //$$    !post(RenderEvent.World.BlockOutline(ctx))
         //$$ }
         //#endif
     }

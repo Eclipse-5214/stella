@@ -1,7 +1,6 @@
 package co.stellarskys.stella.utils.render
 
 import dev.deftu.omnicore.api.client.client
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.ShapeRenderer
@@ -12,7 +11,7 @@ import kotlin.math.sqrt
 
 object Render3D {
     fun renderFilled(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         shape: VoxelShape,
         ox: Double,
         oy: Double,
@@ -20,8 +19,8 @@ object Render3D {
         color: Color,
         phase: Boolean = false
     ) {
-        val consumers = ctx.consumers() ?: return
-        val matrices = ctx.matrixStack() ?: return
+        val consumers = ctx.consumers ?: return
+        val matrices = ctx.matrixStack ?: return
         val layer = if (phase) StellaRenderLayers.FILLED_THROUGH_WALLS else StellaRenderLayers.FILLED
 
         shape.forAllBoxes { minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double ->
@@ -36,7 +35,7 @@ object Render3D {
     }
 
     fun renderOutline(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         shape: VoxelShape,
         ox: Double,
         oy: Double,
@@ -44,8 +43,8 @@ object Render3D {
         color: Color,
         phase: Boolean = false
     ) {
-        val consumers = ctx.consumers() ?: return
-        val matrices = ctx.matrixStack() ?: return
+        val consumers = ctx.consumers ?: return
+        val matrices = ctx.matrixStack ?: return
         val layer = if (phase) StellaRenderLayers.getLinesThroughWalls( 1.0) else StellaRenderLayers.getLines( 1.0)
 
         ShapeRenderer.renderShape(
@@ -58,7 +57,7 @@ object Render3D {
     }
 
     fun renderBox(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         x: Double,
         y: Double,
         z: Double,
@@ -68,9 +67,9 @@ object Render3D {
         phase: Boolean = false,
         lineWidth: Double = 1.0
     ) {
-        val consumers = ctx.consumers() ?: return
-        val matrices = ctx.matrixStack() ?: return
-        val cam = ctx.camera().position.reverse()
+        val consumers = ctx.consumers ?: return
+        val matrices = ctx.matrixStack ?: return
+        val cam = ctx.camera.position.reverse()
         val layer = if (phase) StellaRenderLayers.getLinesThroughWalls(lineWidth) else StellaRenderLayers.getLines(lineWidth)
         val cx = x + 0.5
         val cz = z + 0.5
@@ -95,7 +94,7 @@ object Render3D {
     }
 
     fun renderFilledBox(
-        ctx: WorldRenderContext,
+        ctx: RenderContext,
         x: Double,
         y: Double,
         z: Double,
@@ -104,9 +103,9 @@ object Render3D {
         color: Color = Color.CYAN,
         phase: Boolean = false
     ) {
-        val consumers = ctx.consumers() ?: return
-        val matrices = ctx.matrixStack() ?: return
-        val cam = ctx.camera().position.reverse()
+        val consumers = ctx.consumers ?: return
+        val matrices = ctx.matrixStack ?: return
+        val cam = ctx.camera.position.reverse()
         val layer = if (phase) StellaRenderLayers.FILLED_THROUGH_WALLS else StellaRenderLayers.FILLED
         val cx = x + 0.5
         val cz = z + 0.5
