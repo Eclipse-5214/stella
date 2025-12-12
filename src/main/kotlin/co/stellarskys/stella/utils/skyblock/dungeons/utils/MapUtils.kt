@@ -7,7 +7,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon.inBoss
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils.roomDoorCombinedSize
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
 import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket

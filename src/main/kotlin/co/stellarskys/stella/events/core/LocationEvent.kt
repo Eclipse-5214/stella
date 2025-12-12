@@ -1,11 +1,11 @@
 package co.stellarskys.stella.events.core
 
-import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonFloor
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockArea
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
 import net.hypixel.data.region.Environment
 import net.hypixel.data.type.ServerType
 import co.stellarskys.stella.events.api.Event
+import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 
 sealed class LocationEvent {
     class ServerChange(

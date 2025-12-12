@@ -6,7 +6,7 @@ import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.clearCodes
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 
 @Module
 object termTracker : Feature("termTracker", island = SkyBlockIsland.THE_CATACOMBS) {

@@ -10,7 +10,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.render.Render3D
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dev.deftu.omnicore.api.client.client

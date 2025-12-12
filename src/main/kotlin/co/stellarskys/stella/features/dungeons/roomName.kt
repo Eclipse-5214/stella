@@ -7,7 +7,7 @@ import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.events.core.GuiEvent
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import net.minecraft.client.gui.GuiGraphics
 
 

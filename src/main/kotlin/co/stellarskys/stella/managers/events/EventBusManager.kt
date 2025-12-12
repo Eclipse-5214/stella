@@ -4,8 +4,8 @@ import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.api.EventCall
 import co.stellarskys.stella.events.core.LocationEvent
-import co.stellarskys.stella.utils.skyblock.location.LocationAPI
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.LocationAPI
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 
 @Module
 object EventBusManager {

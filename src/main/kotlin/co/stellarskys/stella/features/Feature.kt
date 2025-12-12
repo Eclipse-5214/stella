@@ -6,14 +6,14 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.api.Event
 import co.stellarskys.stella.events.api.EventCall
 import co.stellarskys.stella.managers.feature.FeatureManager
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockArea
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonFloor
-import co.stellarskys.stella.utils.skyblock.location.LocationAPI
 import dev.deftu.omnicore.api.scheduling.TickScheduler
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
+import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
+import tech.thatgravyboat.skyblockapi.api.location.LocationAPI
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 
 open class Feature(
     val configName: String? = null,

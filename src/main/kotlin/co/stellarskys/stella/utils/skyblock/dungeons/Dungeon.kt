@@ -11,8 +11,10 @@ import co.stellarskys.stella.utils.skyblock.dungeons.map.*
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.utils.skyblock.dungeons.score.*
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.*
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import dev.deftu.omnicore.api.client.player
+import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonAPI
+import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.find
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
@@ -44,9 +46,8 @@ object Dungeon {
     var holdingLeaps = false
 
     // Floor info
-    var floor: DungeonFloor? = null
+    val floor: DungeonFloor? get() = DungeonAPI.dungeonFloor
     val floorNumber: Int? get() = floor?.floorNumber
-    var inDungeon = false
     val inBoss: Boolean
         get() = floor != null && player?.let {
             val (x, z) = WorldScanUtils.realCoordToComponent(it.x.toInt(), it.z.toInt())
@@ -66,10 +67,7 @@ object Dungeon {
     /** Initializes all dungeon systems and event listeners */
     init {
         EventBus.registerIn<LocationEvent.AreaChange>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            DUNGEON_FLOOR_PATTERN.find(event.new.name, "floor") { (f) ->
-                floor = DungeonFloor.getByName(f)
-                floor?.let { EventBus.post(DungeonEvent.Enter(it)) }
-            }
+            floor?.let { EventBus.post(DungeonEvent.Enter(it)) }
         }
 
         EventBus.register<LocationEvent.IslandChange> { reset() }
@@ -118,7 +116,6 @@ object Dungeon {
         bloodDone = false
         complete = false
         holdingLeaps = false
-        floor = null
         mapLine1 = ""
         mapLine2 = ""
         WorldScanner.reset()

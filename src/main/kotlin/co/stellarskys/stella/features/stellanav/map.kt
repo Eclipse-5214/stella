@@ -5,7 +5,7 @@ import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.render.mapRender
 import co.stellarskys.stella.hud.HUDManager
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import net.minecraft.client.gui.GuiGraphics
 
 @Module

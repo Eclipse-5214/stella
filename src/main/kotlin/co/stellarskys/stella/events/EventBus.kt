@@ -5,7 +5,6 @@ import co.stellarskys.stella.events.api.Event
 import co.stellarskys.stella.events.api.EventBus
 import co.stellarskys.stella.events.core.*
 import co.stellarskys.stella.managers.events.EventBusManager
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -21,6 +20,8 @@ import net.minecraft.world.level.EmptyBlockGetter
 import net.minecraft.world.phys.shapes.CollisionContext
 //#if MC < 1.21.9
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
+
 //#else
 //$$ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 //#endif

@@ -5,7 +5,7 @@ import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.EntityEvent
 import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.monster.Zombie
 

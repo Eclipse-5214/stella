@@ -46,18 +46,6 @@ loom {
     }
 }
 
-val clocheAction: Action<ExternalModuleDependency> = Action {
-    attributes {
-        attribute(Attribute.of("earth.terrarium.cloche.modLoader", String::class.java), "fabric")
-        attribute(Attribute.of("earth.terrarium.cloche.minecraftVersion", String::class.java),
-            when (mcData.version) {
-                MinecraftVersions.VERSION_1_21_10 -> "1.21.9"
-                else -> mcData.toString().substringBefore("-")
-            }
-        )
-    }
-}
-
 
 dependencies {
     with(libs.textile.get()) { modImplementation(include("${this.group}:${this.name}-$mcData:${this.version}")!!) }
@@ -67,15 +55,20 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
     modImplementation(include("co.stellarskys:vexel-${mcData}:127")!!)
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
-    modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
-    modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
-    modImplementation("me.owdding:item-data-fixer:1.0.5", clocheAction)
-    modImplementation("tech.thatgravyboat:skyblock-api:3.0.23") {
-        exclude("me.owdding")
-        clocheAction.execute(this)
+
+    property("skyblock_api_version").let {
+        api("tech.thatgravyboat:skyblock-api:$it") {
+            capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${mcData.version}") }
+        }
+        include("tech.thatgravyboat:skyblock-api:$it") {
+            capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${mcData.version}-remapped") }
+        }
     }
 
-    include("tech.thatgravyboat:skyblock-api:3.0.23", clocheAction)
+    property("hypixel_api_version").let {
+        modImplementation(include("net.hypixel:mod-api:$it")!!)
+        modImplementation(include("maven.modrinth:hypixel-mod-api:$it+build.1+mc1.21")!!)
+    }
 
     property("commodore_version").let {
         implementation("com.github.stivais:Commodore:$it")

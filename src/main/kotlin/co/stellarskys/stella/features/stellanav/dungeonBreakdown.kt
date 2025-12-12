@@ -11,7 +11,7 @@ import co.stellarskys.stella.utils.ChatUtils.onHover
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import dev.deftu.textile.Text
 

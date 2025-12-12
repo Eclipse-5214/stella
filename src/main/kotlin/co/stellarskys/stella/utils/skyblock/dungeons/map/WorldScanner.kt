@@ -10,7 +10,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon.rooms
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
-import co.stellarskys.stella.utils.skyblock.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
