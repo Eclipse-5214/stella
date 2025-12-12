@@ -60,8 +60,8 @@ val clocheAction: Action<ExternalModuleDependency> = Action {
 
 
 dependencies {
-    with(libs.textile.get()) { modImplementation("${this.group}:${this.name}-$mcData:${this.version}") }
-    with(libs.omnicore.get()) { modImplementation("${this.group}:${this.name}-$mcData:${this.version}") }
+    with(libs.textile.get()) { modImplementation(include("${this.group}:${this.name}-$mcData:${this.version}")!!) }
+    with(libs.omnicore.get()) { modImplementation(include("${this.group}:${this.name}-$mcData:${this.version}")!!) }
     implementation(include("io.github.classgraph:classgraph:4.8.184")!!)
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
