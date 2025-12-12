@@ -9,6 +9,7 @@ import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.elements.*
 import co.stellarskys.stella.utils.render.CustomGuiRenderer
 import co.stellarskys.stella.utils.render.Render2D
+import co.stellarskys.vexel.Vexel
 import com.google.gson.*
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.player
@@ -16,14 +17,13 @@ import dev.deftu.omnicore.api.client.render.OmniResolution
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import java.awt.Color
 import java.io.File
-import xyz.meowing.vexel.components.base.Pos
-import xyz.meowing.vexel.components.base.Size
-import xyz.meowing.vexel.components.base.VexelElement
-import xyz.meowing.vexel.components.core.Rectangle
-import xyz.meowing.vexel.components.core.Text
-import xyz.meowing.vexel.core.VexelScreen
-import xyz.meowing.vexel.core.VexelWindow
-import xyz.meowing.vexel.utils.render.NVGRenderer
+import co.stellarskys.vexel.components.base.enums.Pos
+import co.stellarskys.vexel.components.base.enums.Size
+import co.stellarskys.vexel.components.base.VexelElement
+import co.stellarskys.vexel.components.core.Rectangle
+import co.stellarskys.vexel.components.core.Text
+import co.stellarskys.vexel.core.VexelScreen
+import co.stellarskys.vexel.core.VexelWindow
 
 //Main config Shananagens
 class Config(
@@ -78,24 +78,24 @@ class Config(
 
         init {
             val bg = Rectangle(Color.BLACK.rgb,Palette.Purple.withAlpha(100).rgb, 5f, 2f)
-                .setSizing(50, Size.ParentPerc, 50, Size.ParentPerc)
+                .setSizing(50f, Size.Percent, 50f, Size.Percent)
                 .setPositioning(Pos.ScreenCenter, Pos.ScreenCenter)
                 .childOf(window)
 
             val list = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
-                .setSizing(20, Size.ParentPerc, 100, Size.ParentPerc)
+                .setSizing(20f, Size.Percent, 100f, Size.Percent)
                 .setPositioning(0f, Pos.ParentPixels,0f, Pos.ParentPixels)
                 .childOf(bg)
 
             val card = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
-                .setSizing(80, Size.ParentPerc, 100, Size.ParentPerc)
+                .setSizing(80f, Size.Percent, 100f, Size.Percent)
                 .setPositioning(0f,Pos.AfterSibling,0f, Pos.ParentPixels)
                 .scrollable( true)
                 .scrollbarColor(Palette.Purple.withAlpha(100).rgb)
                 .childOf(bg)
 
             val top = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
-                .setSizing(100, Size.ParentPerc, 40, Size.ParentPerc)
+                .setSizing(100f, Size.Percent, 40f, Size.Percent)
                 .setPositioning(0f, Pos.ParentPixels,0f, Pos.ParentPixels)
                 .childOf(list)
 
@@ -105,22 +105,22 @@ class Config(
                 .childOf(top)
 
             val username = Text(player?.name?.string ?: "null", shadowEnabled = false, fontSize = 16f)
-                .setPositioning(60, Pos.ParentPixels, 2, Pos.ParentPixels)
+                .setPositioning(60f, Pos.ParentPixels, 2f, Pos.ParentPixels)
                 .childOf(head)
 
             val tag = Text("Stella User", Color.gray.rgb, shadowEnabled = false, fontSize = 14f)
-                .setPositioning(60, Pos.ParentPixels, 20, Pos.ParentPixels)
+                .setPositioning(60f, Pos.ParentPixels, 20f, Pos.ParentPixels)
                 .childOf(head)
 
 
             // === Category Button Panel ===
 
-            val categoryLabels = mutableMapOf<ConfigCategory, VexelElement<xyz.meowing.vexel.elements.Button>>()
+            val categoryLabels = mutableMapOf<ConfigCategory, VexelElement<co.stellarskys.vexel.elements.Button>>()
 
 
             categories.entries.forEachIndexed { _, category ->
                 // Actual button surface
-                val button = xyz.meowing.vexel.elements.Button(
+                val button = co.stellarskys.vexel.elements.Button(
                     category.key,
                     if (selectedCategory == category.value) Palette.Purple.rgb else Color.WHITE.rgb,
                     backgroundColor = if (selectedCategory == category.value) Palette.Purple.withAlpha(50).rgb else Color(0,0, 0,0).rgb,
@@ -128,20 +128,20 @@ class Config(
                     borderThickness = 0f,
                     fontSize = 16f
                 )
-                    .setSizing(80f, Size.ParentPerc, 8f, Size.ParentPerc)
+                    .setSizing(80f, Size.Percent, 8f, Size.Percent)
                     .setPositioning(0f, Pos.ParentCenter,20f, Pos.AfterSibling)
                     .childOf(list)
 
                 categoryLabels[category.value] = button
 
                 // Click handler to change category view
-                button.onMouseClick { _, _, _ ->
+                button.onMouseClick { _->
                     if (selectedCategory != category) {
                         selectedCategory = category.value
 
                         // Update label highlight colors
                         categoryLabels.forEach { (cat, btn) ->
-                            btn as xyz.meowing.vexel.elements.Button
+                            btn as co.stellarskys.vexel.elements.Button
                             btn.textColor(if (cat == selectedCategory) Palette.Purple.rgb else Color.WHITE.rgb)
                             btn.backgroundColor( if (cat == selectedCategory) Palette.Purple.withAlpha(50).rgb else Color(0,0, 0,0).rgb)
                         }
@@ -163,43 +163,43 @@ class Config(
             buildCategory(card, window, selectedCategory!!, config)
         }
 
-        override fun isPauseScreen(): Boolean = false
+        override val isPausingScreen: Boolean = false
 
         override fun onRenderGui() {
-            NVGRenderer.endFrame()
+            Vexel.renderer.endFrame()
 
             val player = player ?: return
             val uuid = player.gameProfile.id
-            val size = 48 / OmniResolution.scaleFactor
-            val x = head.scaled.left.toInt()
-            val y = head.scaled.top.toInt()
+            val size = (48 / OmniResolution.scaleFactor).toInt()
+            val x = (head.raw.left / OmniResolution.scaleFactor).toInt()
+            val y = (head.raw.top/ OmniResolution.scaleFactor).toInt()
 
             CustomGuiRenderer.render {
-                Render2D.drawPlayerHead(it, x, y, size.toInt(), uuid)
+                Render2D.drawPlayerHead(it, x, y, size, uuid)
             }
 
-            NVGRenderer.beginFrame(0f,0f)
+            Vexel.renderer.beginFrame(0f,0f)
         }
 
         private fun buildCategory(root: VexelElement<*>, window: VexelWindow, category: ConfigCategory, config: Config) {
             val column1 = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-                .setSizing(50, Size.ParentPerc, 0, Size.Auto)
+                .setSizing(50f, Size.Percent, 0f, Size.Auto)
                 .setPositioning(0f,Pos.ParentPixels,0f, Pos.ParentPixels)
                 .childOf(root)
 
             val column2 = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-                .setSizing(50, Size.ParentPerc, 0, Size.Auto)
+                .setSizing(50f, Size.Percent, 0f, Size.Auto)
                 .setPositioning(0f,Pos.AfterSibling,0f, Pos.ParentPixels)
                 .childOf(root)
 
             //spacers
             Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-                .setSizing(100, Size.ParentPerc, 20, Size.Pixels)
+                .setSizing(100f, Size.Percent, 20f, Size.Pixels)
                 .setPositioning(Pos.ParentCenter, Pos.AfterSibling)
                 .childOf(column1)
 
             Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-                .setSizing(100, Size.ParentPerc, 20, Size.Pixels)
+                .setSizing(100f, Size.Percent, 20f, Size.Pixels)
                 .setPositioning(Pos.ParentCenter, Pos.AfterSibling)
                 .childOf(column2)
 
@@ -218,12 +218,12 @@ class Config(
 
             // more spaces
             Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-                .setSizing(100, Size.ParentPerc, 40, Size.Pixels)
+                .setSizing(100f, Size.Percent, 40f, Size.Pixels)
                 .setPositioning(Pos.ParentCenter, Pos.AfterSibling)
                 .childOf(column1)
 
             Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-                .setSizing(100, Size.ParentPerc, 40, Size.Pixels)
+                .setSizing(100f, Size.Percent, 40f, Size.Pixels)
                 .setPositioning(Pos.ParentCenter, Pos.AfterSibling)
                 .childOf(column2)
         }
@@ -233,20 +233,20 @@ class Config(
             //val boxHeight = calcSubcategoryHeight(subcategory) + 20 // extra space for title
 
             val box = Rectangle(Palette.Purple.withAlpha(20).rgb, Palette.Purple.withAlpha(100).rgb, 5f, 2f)
-                .setSizing(90, Size.ParentPerc, 0f, Size.Auto)
-                .setPositioning(0, Pos.ParentCenter, 10f, Pos.AfterSibling)
+                .setSizing(90f, Size.Percent, 0f, Size.Auto)
+                .setPositioning(0f, Pos.ParentCenter, 10f, Pos.AfterSibling)
                 .childOf(root)
 
             subcatRefs += box
 
             val titlebox = Rectangle(Palette.Purple.withAlpha(100).rgb)
-                .setSizing(100, Size.ParentPerc, 40, Size.Pixels)
-                .setPositioning(0, Pos.ParentCenter, 0, Pos.ParentPixels)
+                .setSizing(100f, Size.Percent, 40f, Size.Pixels)
+                .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentPixels)
                 .borderRadiusVarying(5f,  5f, 0f, 0f)
                 .childOf(box)
 
             val titleText = Text(title, shadowEnabled = false, fontSize = 14f)
-                .setPositioning(5, Pos.ParentPixels, 0, Pos.ParentCenter)
+                .setPositioning(5f, Pos.ParentPixels, 0f, Pos.ParentCenter)
                 .childOf(titlebox)
 
             subcategory.elements.entries.forEachIndexed { index, (key, element) ->

@@ -1,13 +1,13 @@
 package co.stellarskys.stella.utils.config.core
 
 import co.stellarskys.stella.utils.config.RGBA
-import xyz.meowing.vexel.components.base.Pos
-import xyz.meowing.vexel.components.base.Size
-import xyz.meowing.vexel.components.base.VexelElement
-import xyz.meowing.vexel.components.core.Rectangle
-import xyz.meowing.vexel.components.core.Text
-import xyz.meowing.vexel.core.VexelWindow
-import xyz.meowing.vexel.utils.render.NVGRenderer
+import co.stellarskys.vexel.Vexel
+import co.stellarskys.vexel.components.base.enums.Pos
+import co.stellarskys.vexel.components.base.enums.Size
+import co.stellarskys.vexel.components.base.VexelElement
+import co.stellarskys.vexel.components.core.Rectangle
+import co.stellarskys.vexel.components.core.Text
+import co.stellarskys.vexel.core.VexelWindow
 import java.awt.Color
 
 open class ConfigCategory(val name: String) {
@@ -299,7 +299,7 @@ fun attachTooltip(window: VexelWindow, anchor: VexelElement<*>, description: Str
     if (description == "") return
 
     val fs = 14f
-    val width = NVGRenderer.textWidth(description, fs, NVGRenderer.defaultFont)
+    val width = Vexel.renderer.textWidth(description, fs, Vexel.defaultFont)
 
     val tooltip = Rectangle(Color.black.rgb, borderRadius = 5f, borderThickness = 0f)
         .setPositioning(Pos.ScreenCenter, Pos.ScreenCenter)
@@ -313,8 +313,8 @@ fun attachTooltip(window: VexelWindow, anchor: VexelElement<*>, description: Str
 
     tooltip.hide()
 
-    anchor.onMouseEnter { _, _ -> tooltip.show() }
-    anchor.onMouseExit { _, _ -> tooltip.hide() }
+    anchor.onMouseEnter { _ -> tooltip.show() }
+    anchor.onMouseExit { _ -> tooltip.hide() }
 
     FloatingUIManager.register(tooltip)
 }

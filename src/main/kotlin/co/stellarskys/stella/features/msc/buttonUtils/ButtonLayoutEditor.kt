@@ -3,16 +3,18 @@ package co.stellarskys.stella.features.msc.buttonUtils
 import co.stellarskys.stella.utils.render.CustomGuiRenderer
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
-import net.minecraft.client.gui.GuiGraphics
-import xyz.meowing.vexel.core.VexelScreen
-import xyz.meowing.vexel.utils.render.NVGRenderer
+import co.stellarskys.vexel.api.nvg.NVGRenderer
+import co.stellarskys.vexel.core.VexelScreen
+import dev.deftu.omnicore.api.client.input.KeyboardModifiers
+import dev.deftu.omnicore.api.client.input.OmniMouseButton
+import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 
 class ButtonLayoutEditor : VexelScreen() {
     private val slotSize = 20
     private val popup = EditButtonPopup(window)
 
-    override fun onRender(context: GuiGraphics?, mouseX: Int, mouseY: Int, deltaTicks: Float) {
-        if (context == null) return
+    override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
+        val context = ctx.graphics ?: return
 
         // Draw dummy inventory
         val invX = (width - 176) / 2
@@ -61,7 +63,7 @@ class ButtonLayoutEditor : VexelScreen() {
 
         NVGRenderer.endFrame()
 
-        super.onRender(context, mouseX, mouseY, deltaTicks)
+        super.onRender(ctx, mouseX, mouseY, tickDelta)
     }
 
     override fun onRenderGui() {
@@ -70,24 +72,24 @@ class ButtonLayoutEditor : VexelScreen() {
         NVGRenderer.beginFrame(0f, 0f)
     }
 
-    override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {
+    override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
         val invX = (width - 176) / 2
         val invY = (height - 166) / 2
 
         if (!popup.shown) {
             for (anchor in AnchorType.entries) {
                 for (index in 0 until anchor.slots) {
-                    val (x, y) = ButtonManager.resolveAnchorPosition(anchor, index, invX, invY)
-                    if (mouseX.toInt() in x..(x + slotSize) && mouseY.toInt() in y..(y + slotSize)) {
+                    val (bx, by) = ButtonManager.resolveAnchorPosition(anchor, index, invX, invY)
+                    if (x.toInt() in bx..(bx + slotSize) && y.toInt() in by..(by + slotSize)) {
                         popup.open(anchor, index)
-                        return super.onMouseClick(mouseX, mouseY, button)
+                        return super.onMouseClick(button, x, y, modifiers)
                     }
                 }
             }
         }
 
-        return super.onMouseClick(mouseX, mouseY, button)
+        return super.onMouseClick(button, x, y, modifiers)
     }
 
-    override fun renderBackground(context: GuiGraphics, mouseX: Int, mouseY: Int, deltaTicks: Float) {}
+    override fun onBackgroundRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {}
 }

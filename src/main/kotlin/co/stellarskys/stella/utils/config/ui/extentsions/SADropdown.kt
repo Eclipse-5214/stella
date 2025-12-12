@@ -2,16 +2,16 @@ package co.stellarskys.stella.utils.config.ui.extentsions
 
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
-import xyz.meowing.vexel.animations.EasingType
-import xyz.meowing.vexel.animations.fadeIn
-import xyz.meowing.vexel.animations.fadeOut
-import xyz.meowing.vexel.components.core.Rectangle
-import xyz.meowing.vexel.components.core.SvgImage
-import xyz.meowing.vexel.components.core.Text
-import xyz.meowing.vexel.components.base.Pos
-import xyz.meowing.vexel.components.base.Size
-import xyz.meowing.vexel.components.base.VexelElement
-import xyz.meowing.vexel.elements.DropDownPanel
+import co.stellarskys.vexel.animations.presets.fadeIn
+import co.stellarskys.vexel.animations.presets.fadeOut
+import co.stellarskys.vexel.animations.types.EasingType
+import co.stellarskys.vexel.components.core.Rectangle
+import co.stellarskys.vexel.components.core.SvgImage
+import co.stellarskys.vexel.components.core.Text
+import co.stellarskys.vexel.components.base.enums.Pos
+import co.stellarskys.vexel.components.base.enums.Size
+import co.stellarskys.vexel.components.base.VexelElement
+import co.stellarskys.vexel.elements.DropDownPanel
 import java.awt.Color
 class SADropdown(
     var options: List<String>,
@@ -42,10 +42,10 @@ class SADropdown(
         padding,
         hoverColor,
         pressedColor,
-        Size.ParentPerc,
-        Size.ParentPerc
+        Size.Percent,
+        Size.Percent
     )
-        .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
+        .setSizing(100f, Size.Percent, 100f, Size.Percent)
         .ignoreMouseEvents()
         .childOf(this)
 
@@ -65,7 +65,7 @@ class SADropdown(
         setSizing(180f, Size.Pixels, 0f, Size.Auto)
         setPositioning(Pos.ParentPixels, Pos.ParentPixels)
 
-        onClick { _, _, _ ->
+        onClick { _ ->
             if (!isAnimating) togglePicker()
             true
         }
@@ -104,7 +104,7 @@ class SADropdown(
             onValueChange.forEach { it.invoke(index) }
         }
 
-        pickerPanel?.backgroundPopup?.fadeIn(200, EasingType.EASE_OUT) {
+        pickerPanel?.backgroundPopup?.fadeIn(200, EasingType.EASE_OUT ) {
             isAnimating = false
         }
 
@@ -156,8 +156,8 @@ class SADropdown(
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
-        previewRect.isHovered = hovered
-        previewRect.isPressed = pressed
+        previewRect.isHovered = isHovered
+        previewRect.isPressed = isHovered
 
         if (isPickerOpen && pickerPanel != null) {
             if (!previewRect.isVisibleInScrollableParents()) closePicker() else updatePickerPosition()

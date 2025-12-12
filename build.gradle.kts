@@ -65,7 +65,7 @@ dependencies {
     implementation(include("io.github.classgraph:classgraph:4.8.184")!!)
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    modImplementation(include("xyz.meowing:vexel-${mcData}:126")!!)
+    modImplementation(include("co.stellarskys:vexel-${mcData}:127")!!)
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
     modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
     modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)

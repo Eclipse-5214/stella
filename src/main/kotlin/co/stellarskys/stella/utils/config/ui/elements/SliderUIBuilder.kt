@@ -4,30 +4,30 @@ import co.stellarskys.stella.utils.config.core.Slider
 import co.stellarskys.stella.utils.config.core.attachTooltip
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
-import xyz.meowing.vexel.components.base.Pos
-import xyz.meowing.vexel.components.base.Size
-import xyz.meowing.vexel.components.base.VexelElement
-import xyz.meowing.vexel.components.core.Rectangle
-import xyz.meowing.vexel.components.core.Text
-import xyz.meowing.vexel.core.VexelWindow
-import xyz.meowing.vexel.elements.NumberInput
+import co.stellarskys.vexel.components.base.enums.Pos
+import co.stellarskys.vexel.components.base.enums.Size
+import co.stellarskys.vexel.components.base.VexelElement
+import co.stellarskys.vexel.components.core.Rectangle
+import co.stellarskys.vexel.components.core.Text
+import co.stellarskys.vexel.core.VexelWindow
+import co.stellarskys.vexel.elements.NumberInput
 import java.awt.Color
 import java.math.RoundingMode
 
 class SliderUIBuilder {
    fun build(root: VexelElement<*>, slider: Slider, window: VexelWindow): VexelElement<*> {
        val container = Rectangle(Color(0, 0, 0, 0).rgb)
-           .setSizing(100, Size.ParentPerc, 40, Size.Pixels)
-           .setPositioning(0, Pos.ParentCenter, 0, Pos.AfterSibling)
+           .setSizing(100f, Size.Percent, 40f, Size.Pixels)
+           .setPositioning(0f, Pos.ParentCenter, 0f, Pos.AfterSibling)
            .childOf(root)
 
        val name = Text(slider.name, shadowEnabled = false, fontSize = 14f)
-           .setPositioning(7, Pos.ParentPixels, 0, Pos.ParentCenter)
+           .setPositioning(7f, Pos.ParentPixels, 0f, Pos.ParentCenter)
            .childOf(container)
 
        attachTooltip(window, name, slider.description)
 
-       val mSlider = xyz.meowing.vexel.elements.Slider(
+       val mSlider = co.stellarskys.vexel.elements.Slider(
            slider.value as Float,
            slider.min,
            slider.max,
@@ -37,8 +37,8 @@ class SliderUIBuilder {
            thumbWidth = 15f,
            thumbHeight = 15f
        )
-           .setSizing(90, Size.Pixels, 20, Size.Pixels)
-           .setPositioning(-55, Pos.ParentPixels, 0, Pos.ParentCenter)
+           .setSizing(90f, Size.Pixels, 20f, Size.Pixels)
+           .setPositioning(-55f, Pos.ParentPixels, 0f, Pos.ParentCenter)
            .alignRight()
            .childOf(container)
 
@@ -49,7 +49,7 @@ class SliderUIBuilder {
            borderColor = Palette.Purple.withAlpha(100).rgb
        )
            .setSizing(35f, Size.Pixels, 25f, Size.Pixels)
-           .setPositioning(-10, Pos.ParentPixels, 0, Pos.ParentCenter)
+           .setPositioning(-10f, Pos.ParentPixels, 0f, Pos.ParentCenter)
            .alignRight()
            .childOf(container)
 

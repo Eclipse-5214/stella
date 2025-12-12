@@ -3,16 +3,16 @@ package co.stellarskys.stella.features.msc.buttonUtils
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
+import co.stellarskys.vexel.components.base.enums.Pos
+import co.stellarskys.vexel.components.base.enums.Size
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import xyz.meowing.vexel.components.base.Pos
-import xyz.meowing.vexel.components.base.Size
-import xyz.meowing.vexel.components.core.*
-import xyz.meowing.vexel.core.VexelWindow
-import xyz.meowing.vexel.elements.Button
-import xyz.meowing.vexel.elements.TextInput
+import co.stellarskys.vexel.components.core.*
+import co.stellarskys.vexel.core.VexelWindow
+import co.stellarskys.vexel.elements.Button
+import co.stellarskys.vexel.elements.TextInput
 import java.awt.Color
 
 class EditButtonPopup(window: VexelWindow) {
@@ -30,7 +30,7 @@ class EditButtonPopup(window: VexelWindow) {
         10f, 1f
     )
         .setPositioning(Pos.ScreenCenter, Pos.ScreenCenter)
-        .setSizing(50f, Size.ParentPerc, 50f, Size.ParentPerc)
+        .setSizing(50f, Size.Percent, 50f, Size.Percent)
         .childOf(window)
         .hide()
 
@@ -47,7 +47,7 @@ class EditButtonPopup(window: VexelWindow) {
         .setPositioning(-10f, Pos.ParentPixels, 10f, Pos.ParentPixels)
         .setSizing(40f, Size.Pixels, 40f, Size.Pixels)
         .alignRight()
-        .onClick { _, _, _ ->
+        .onClick { _ ->
             close()
             true
         }
@@ -72,7 +72,7 @@ class EditButtonPopup(window: VexelWindow) {
         borderThickness = 1f
     )
         .setPositioning(0f, Pos.ParentCenter, 30f, Pos.AfterSibling)
-        .setSizing(95f, Size.ParentPerc, 0f, Size.Auto)
+        .setSizing(95f, Size.Percent, 0f, Size.Auto)
         .childOf(rect)
 
     val commandInput = TextInput(
@@ -84,7 +84,7 @@ class EditButtonPopup(window: VexelWindow) {
         borderThickness = 1f
     )
         .setPositioning(0f, Pos.ParentCenter, 30f, Pos.AfterSibling)
-        .setSizing(95f, Size.ParentPerc, 0f, Size.Auto)
+        .setSizing(95f, Size.Percent, 0f, Size.Auto)
         .childOf(rect)
 
     val saveButton = Button(
@@ -95,7 +95,7 @@ class EditButtonPopup(window: VexelWindow) {
         .setPositioning(0f, Pos.ParentCenter, 30f, Pos.AfterSibling)
         .setSizing(130f, Size.Pixels, 0f, Size.Auto)
         .setOffset(-70f, 0f)
-        .onClick { _, _, _ ->
+        .onClick { _ ->
             save()
             true
         }
@@ -109,7 +109,7 @@ class EditButtonPopup(window: VexelWindow) {
         .setPositioning(0f, Pos.ParentCenter, 0f, Pos.MatchSibling)
         .setSizing(130f, Size.Pixels, 0f, Size.Auto)
         .setOffset(70f, 0f)
-        .onClick { _, _, _ ->
+        .onClick { _ ->
             delete()
             true
         }

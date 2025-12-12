@@ -1,11 +1,12 @@
 package co.stellarskys.stella.utils.config.ui.extentsions
 
 import co.stellarskys.stella.utils.clearCodes
-import xyz.meowing.vexel.components.base.Pos
-import xyz.meowing.vexel.components.base.Size
-import xyz.meowing.vexel.components.base.VexelElement
-import xyz.meowing.vexel.utils.render.NVGRenderer
-import xyz.meowing.vexel.utils.style.Font
+import co.stellarskys.vexel.Vexel
+import co.stellarskys.vexel.api.style.Font
+import co.stellarskys.vexel.components.base.enums.Pos
+import co.stellarskys.vexel.components.base.enums.Size
+import co.stellarskys.vexel.components.base.VexelElement
+import net.minecraft.world.entity.monster.Vex
 import java.awt.Color
 
 class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<SAWrappedText>() {
@@ -57,7 +58,7 @@ class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<S
         fontSize: Float = 12f,
         maxWidth: Float = Float.MAX_VALUE,
         defaultColor: Int = Color.WHITE.rgb,
-        font: Font = NVGRenderer.defaultFont,
+        font: Font = Vexel.defaultFont,
         centered: Boolean = false
     ) {
         var currentColor = defaultColor
@@ -75,8 +76,8 @@ class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<S
                 cursorX = x + (maxWidth - lineWidth) / 2f
             }
             for ((word, color) in lineWords) {
-                NVGRenderer.text(word, cursorX, cursorY, fontSize, color, font)
-                cursorX += NVGRenderer.textWidth(word, fontSize, font)
+                Vexel.renderer.text(word, cursorX, cursorY, fontSize, color, font)
+                cursorX += Vexel.renderer.textWidth(word, fontSize, font)
             }
             cursorY += lineHeight
             lineWords.clear()
@@ -96,7 +97,7 @@ class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<S
                     i++
                 }
                 token.isBlank() -> {
-                    val spaceWidth = NVGRenderer.textWidth(token, fontSize, font)
+                    val spaceWidth = Vexel.renderer.textWidth(token, fontSize, font)
                     if (lineWidth + spaceWidth > maxWidth) {
                         flushLine()
                     } else {
@@ -106,7 +107,7 @@ class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<S
                     i++
                 }
                 else -> {
-                    val wordWidth = NVGRenderer.textWidth(token, fontSize, font)
+                    val wordWidth = Vexel.renderer.textWidth(token, fontSize, font)
                     if (lineWidth + wordWidth > maxWidth && lineWords.isNotEmpty()) {
                         flushLine()
                     }
@@ -123,7 +124,7 @@ class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<S
         text: String,
         fontSize: Float = 12f,
         maxWidth: Float,
-        font: Font = NVGRenderer.defaultFont
+        font: Font = Vexel.defaultFont
     ): Float {
         val lineHeight = fontSize + 2f
         var lines = 1
@@ -132,11 +133,11 @@ class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<S
             when {
                 word == "\n" -> { cursorX = 0f; lines++ }
                 word.isBlank() -> {
-                    val w = NVGRenderer.textWidth(" ", fontSize, font)
+                    val w = Vexel.renderer.textWidth(" ", fontSize, font)
                     if (cursorX + w > maxWidth) { cursorX = 0f; lines++ } else cursorX += w
                 }
                 else -> {
-                    val w = NVGRenderer.textWidth(word, fontSize, font)
+                    val w = Vexel.renderer.textWidth(word, fontSize, font)
                     if (cursorX + w > maxWidth && cursorX > 0f) { cursorX = w; lines++ } else cursorX += w
                 }
             }

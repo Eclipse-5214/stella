@@ -6,13 +6,13 @@ import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.NEUApi
+import co.stellarskys.vexel.api.nvg.NVGRenderer
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
-import xyz.meowing.vexel.utils.render.NVGRenderer
 import java.io.File
 
 object ButtonManager {
