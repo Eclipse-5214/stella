@@ -74,7 +74,7 @@ class Config(
         private var subcatRefs = mutableListOf<VexelElement<*>>()
         private var needsVisibilityUpdate = false
 
-        val head = Rectangle(Color(0,255,0,255).rgb)
+        val head = Rectangle(Color(0,0,0,0).rgb)
 
         init {
             val bg = Rectangle(Color.BLACK.rgb,Palette.Purple.withAlpha(100).rgb, 5f, 2f)
