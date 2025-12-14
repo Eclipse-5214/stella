@@ -8,11 +8,13 @@ import tech.thatgravyboat.skyblockapi.api.events.info.TabListChangeEvent
 import tech.thatgravyboat.skyblockapi.api.events.screen.PlayerHotbarChangeEvent
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.events.core.PlayerEvent
 import co.stellarskys.stella.events.core.ScoreboardEvent
 import co.stellarskys.stella.events.core.TablistEvent
 import net.hypixel.data.type.GameType
+import tech.thatgravyboat.skyblockapi.api.events.dungeon.DungeonKeyPickedUpEvent
 import tech.thatgravyboat.skyblockapi.api.events.hypixel.ServerChangeEvent
 import tech.thatgravyboat.skyblockapi.api.events.location.AreaChangeEvent
 import tech.thatgravyboat.skyblockapi.api.events.location.IslandChangeEvent
@@ -61,5 +63,10 @@ object SkyblockAPI {
         val isOnSkyBlock = event.type == GameType.SKYBLOCK
         if (isOnSkyBlock) EventBus.post(LocationEvent.SkyblockJoin())
         else EventBus.post(LocationEvent.SkyblockLeave())
+    }
+
+    @Subscription
+    fun onKeyPickup(event: DungeonKeyPickedUpEvent) {
+        EventBus.post(DungeonEvent.KeyPickUp(event.key))
     }
 }

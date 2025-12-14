@@ -73,60 +73,75 @@ object WorldScanner {
 
             // Door detection
             if (cx % 2 == 1 || cz % 2 == 1) {
-                if (roofHeight < 85) {
-                    val comp = cx to cz
-                    val doorIdx = Dungeon.getDoorIdx(comp)
-                    val existingDoor = Dungeon.getDoorAtIdx(doorIdx)
-
-                    if (existingDoor == null) {
-                        val door = Door(rx to rz, comp).apply {
-                            rotation = if (cz % 2 == 1) 0 else 1
-                        }
-                        Dungeon.addDoor(door)
-                    }
-                }
+                addDoor(cx, cz, rx, rz, roofHeight)
                 continue
             }
 
-            val x = cx / 2
-            val z = cz / 2
-            val idx = Dungeon.getRoomIdx(x to z)
+            val room = addRoom(cx, cz, rx, rz, roofHeight)
+            checkAdjacent(room, cx, cz, rx, rz, rx, rz, roofHeight)
+        }
+    }
 
-            var room = rooms[idx]
+    // Adds a door
+    fun addDoor(cx: Int, cz: Int, rx: Int, rz: Int, roofHeight: Int) {
+        if (roofHeight < 85) {
+            val comp = cx to cz
+            val doorIdx = Dungeon.getDoorIdx(comp)
+            val existingDoor = Dungeon.getDoorAtIdx(doorIdx)
 
-            if (room != null) {
-                if (room.height == null) room.height = roofHeight
-                room.scan()
-            } else {
-                room = Room(x to z, roofHeight).scan()
-                rooms[idx] = room
-                Dungeon.uniqueRooms.add(room)
+            if (existingDoor == null) {
+                val door = Door(rx to rz, comp).apply {
+                    rotation = if (cz % 2 == 1) 0 else 1
+                }
+                Dungeon.addDoor(door)
             }
+        }
+    }
 
-            // Scan neighbors *before* claiming this room index
-            for ((dx, dz, cxoff, zoff) in ScanUtils.directions.map { it }) {
-                val nx = rx + dx
-                val nz = rz + dz
-                val blockBelow = WorldUtils.getBlockNumericId(nx, roofHeight, nz)
-                val blockAbove = WorldUtils.getBlockNumericId(nx, roofHeight + 1, nz)
+    // Adds a room
+    fun addRoom(cx: Int, cz: Int, rx: Int, rz: Int, roofHeight: Int): Room {
+        val x = cx / 2
+        val z = cz / 2
+        val idx = Dungeon.getRoomIdx(x to z)
 
-                if (room.type == RoomType.ENTRANCE && blockBelow != 0) {
-                    continue
-                }
-                if (blockBelow == 0 || blockAbove != 0) continue
+        var room = rooms[idx]
 
-                val neighborComp = Pair(x + cxoff, z + zoff)
-                val neighborIdx = Dungeon.getRoomIdx(neighborComp)
-                if (neighborIdx !in rooms.indices) continue
+        if (room != null) {
+            if (room.height == null) room.height = roofHeight
+            room.scan()
+            return room
+        } else {
+            room = Room(x to z, roofHeight).scan()
+            rooms[idx] = room
+            Dungeon.uniqueRooms.add(room)
+            return room
+        }
+    }
 
-                val neighborRoom = rooms[neighborIdx]
+    // Scan neighbors *before* claiming this room index
+    fun checkAdjacent(room: Room, cx: Int, cz: Int, x: Int, z: Int, rx: Int, rz: Int, roofHeight: Int){
+        for ((dx, dz, cxoff, zoff) in ScanUtils.directions.map { it }) {
+            val nx = rx + dx
+            val nz = rz + dz
+            val blockBelow = WorldUtils.getBlockNumericId(nx, roofHeight, nz)
+            val blockAbove = WorldUtils.getBlockNumericId(nx, roofHeight + 1, nz)
 
-                if (neighborRoom == null) {
-                    room.addComponent(neighborComp)
-                    rooms[neighborIdx] = room
-                } else if (neighborRoom != room && neighborRoom.type != RoomType.ENTRANCE) {
-                    Dungeon.mergeRooms(neighborRoom, room)
-                }
+            if (room.type == RoomType.ENTRANCE && blockBelow != 0) {
+                continue
+            }
+            if (blockBelow == 0 || blockAbove != 0) continue
+
+            val neighborComp = Pair(x + cxoff, z + zoff)
+            val neighborIdx = Dungeon.getRoomIdx(neighborComp)
+            if (neighborIdx !in rooms.indices) continue
+
+            val neighborRoom = rooms[neighborIdx]
+
+            if (neighborRoom == null) {
+                room.addComponent(neighborComp)
+                rooms[neighborIdx] = room
+            } else if (neighborRoom != room && neighborRoom.type != RoomType.ENTRANCE) {
+                Dungeon.mergeRooms(neighborRoom, room)
             }
         }
     }
@@ -171,6 +186,7 @@ object WorldScanner {
     fun checkDoorState() {
         for (door in Dungeon.uniqueDoors) {
             if (door.opened) continue
+            door.checkFairy()
             door.check()
         }
     }

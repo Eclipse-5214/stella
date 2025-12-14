@@ -8,6 +8,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
+import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonKey
 
 sealed class DungeonEvent {
     class Start(
@@ -42,11 +43,10 @@ sealed class DungeonEvent {
         ) : Event()
     }
 
-    /*
     class KeyPickUp(
         val key: DungeonKey
     ) : Event()
-     */
+
 
     sealed class Secrets {
         class Item(

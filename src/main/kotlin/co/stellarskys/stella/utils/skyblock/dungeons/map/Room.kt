@@ -9,7 +9,9 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomRegistry
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
+import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.Blocks
+import kotlin.math.exp
 
 class Room(
     initialComponent: Pair<Int, Int>,
@@ -20,15 +22,19 @@ class Room(
     val cores = mutableListOf<Int>()
 
     var roomData: RoomMetadata? = null
-    var shape: String = "1x1"
     var explored = false
     var checkmark = Checkmark.UNDISCOVERED
     var players: MutableSet<DungeonPlayer> = mutableSetOf()
 
     var name: String? = null
-    var corner: Triple<Double, Double, Double>? = null
+    var corner: BlockPos? = null
+    var center: BlockPos? = null
+    var componentCenters: List<BlockPos> = emptyList()
+
     var rotation: Int? = null
     var type: RoomType = RoomType.UNKNOWN
+    var shape: String = "1x1"
+
     var secrets: Int = 0
     var secretsFound: Int = 0
     var crypts: Int = 0
@@ -87,6 +93,8 @@ class Room(
         type = ScanUtils.roomTypeMap[data.type.lowercase()] ?: RoomType.NORMAL
         secrets = data.secrets
         crypts = data.crypts
+
+        if (type == RoomType.ENTRANCE) explored = true
     }
 
     fun loadFromMapColor(color: Byte): Room {
@@ -105,7 +113,7 @@ class Room(
         if (type == RoomType.FAIRY) {
             rotation = 0
             val (x, z) = realComponents.first()
-            corner = Triple(x - ScanUtils.halfRoomSize + 0.5, height!!.toDouble(), z - ScanUtils.halfRoomSize + 0.5)
+            corner = BlockPos(x - ScanUtils.halfRoomSize, height!!, z - ScanUtils.halfRoomSize)
             return this
         }
 
@@ -126,7 +134,7 @@ class Room(
                 val state = WorldUtils.getBlockStateAt(nx, height!!, nz) ?: continue
                 if (state.`is`(Blocks.BLUE_TERRACOTTA)) {
                     rotation = jdx * 90
-                    corner = Triple(nx + 0.5, height!!.toDouble(), nz + 0.5)
+                    corner = BlockPos(nx, height!!, nz)
                     return this
                 }
             }
@@ -134,6 +142,7 @@ class Room(
         return this
     }
 
+    /*
     fun fromWorldPos(pos: Triple<Double, Double, Double>): Triple<Int, Int, Int>? {
         if (corner == null || rotation == null) return null
         val rel = Triple(
@@ -153,7 +162,8 @@ class Room(
             rotated.third + corner!!.third
         )
     }
+     */
 
-    fun getRoomCoord(pos: Triple<Double, Double, Double>) = fromWorldPos(pos)
-    fun getRealCoord(local: Triple<Int, Int, Int>) = toWorldPos(local)
+    //fun getRoomCoord(pos: Triple<Double, Double, Double>) = fromWorldPos(pos)
+    //fun getRealCoord(local: Triple<Int, Int, Int>) = toWorldPos(local)
 }

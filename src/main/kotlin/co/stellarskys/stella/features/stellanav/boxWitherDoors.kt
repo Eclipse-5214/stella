@@ -1,8 +1,8 @@
 package co.stellarskys.stella.features.stellanav
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.ChatEvent
+import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.mapConfig
@@ -18,19 +18,12 @@ object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
     var keyObtained = false
     var bloodOpen = false
 
-    val obtainKey = Regex("""^(?:\[[^]]+]\s)?(\w+) has obtained (Wither|Blood) Key!$""")
     val openedDoor = Regex("""^(\w+) opened a WITHER door!$""")
     val bloodOpened = Regex("""^The BLOOD DOOR has been opened!$""")
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
             val msg = event.message.string.clearCodes()
-
-            val keyMatch = obtainKey.find(msg)
-            if (keyMatch != null){
-                keyObtained = true
-                return@register
-            }
 
             val doorMatch = openedDoor.find(msg)
             if (doorMatch != null){
@@ -46,15 +39,18 @@ object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
             }
         }
 
+        register<DungeonEvent.KeyPickUp> {
+            keyObtained = true
+        }
+
         register<RenderEvent.World.Last> { event ->
             if(bloodOpen) return@register
 
             val color = if (keyObtained) mapConfig.key else mapConfig.noKey
 
             Dungeon.doors.forEach { door ->
-                if (door == null) return@forEach
+                if (door == null || door.opened) return@forEach
                 if (door.state != DoorState.DISCOVERED) return@forEach
-                if (door.type == DoorType.BLOOD && door.opened) return@forEach
                 if (door.type !in setOf(DoorType.WITHER, DoorType.BLOOD)) return@forEach
 
                 val (x, y, z) = door.getPos()

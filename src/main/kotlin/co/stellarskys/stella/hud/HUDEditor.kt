@@ -10,9 +10,10 @@ import dev.deftu.omnicore.api.client.input.OmniMouse
 import dev.deftu.omnicore.api.client.input.OmniMouseButton
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.screen.OmniScreen
+import dev.deftu.textile.Text
 import java.awt.Color
 
-class HUDEditor : OmniScreen() {
+class HUDEditor : OmniScreen(Text.literal("HUD Editor")) {
     private val borderHoverColor = Color(255, 255, 255).rgb
     private val borderNormalColor = Color(100, 100, 120).rgb
 
