@@ -56,6 +56,13 @@ val config = Config("Stella", "Stella") {
         }
 
         subcategory("Shortcuts") {
+            toggle {
+                configName = "loadMessage"
+                name = "Show Load Message"
+                description = "Showes Stella's loading message"
+                default = true
+            }
+
             button {
                 configName = "hudEditor"
                 name = "Hud Editor"

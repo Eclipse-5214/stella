@@ -25,6 +25,18 @@ object MainCommand : Commodore("stella", "sta", "sa") {
             }
         }
 
+        literal("help") {
+            runs {
+                ChatUtils.fakeMessage("§8§m------------------------------------------");
+                ChatUtils.fakeMessage("§6/stella §7main command! Aliases: §6/sa /sta");
+                ChatUtils.fakeMessage("§6/sa help §7Opens the Stella help menu!");
+                ChatUtils.fakeMessage("§6/sa hud §7Opens the HUD editor!");
+                //ChatUtils.fakeMessage("§6/stellaroutes §routes config! (if installed) Aliases: §6/sr /str");
+                //ChatUtils.fakeMessage("§6/route §7 route recording try §6/route help §7for more info!");
+                ChatUtils.fakeMessage("§8§m------------------------------------------");
+            }
+        }
+
         runs {
             config.open()
         }
