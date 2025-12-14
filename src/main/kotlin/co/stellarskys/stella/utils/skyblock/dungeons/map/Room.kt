@@ -1,5 +1,7 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.map
 
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.WorldUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
@@ -11,7 +13,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.Blocks
-import kotlin.math.exp
+import kotlin.properties.Delegates
 
 class Room(
     initialComponent: Pair<Int, Int>,
@@ -23,8 +25,14 @@ class Room(
 
     var roomData: RoomMetadata? = null
     var explored = false
-    var checkmark = Checkmark.UNDISCOVERED
-    var players: MutableSet<DungeonPlayer> = mutableSetOf()
+    val players: MutableSet<DungeonPlayer> = mutableSetOf()
+    var checkmark by Delegates.observable(Checkmark.UNDISCOVERED) { _, oldValue, newValue ->
+        if (oldValue == newValue || name == "Unknown") return@observable
+        val roomPlayers = players.toList()
+
+        EventBus.post(DungeonEvent.Room.StateChange(this, oldValue, newValue, roomPlayers))
+    }
+
 
     var name: String? = null
     var corner: BlockPos? = null

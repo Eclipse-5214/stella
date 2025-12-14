@@ -1,27 +1,69 @@
 package co.stellarskys.stella.utils
 
+import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
+import co.stellarskys.stella.hud.HUDEditor
 import co.stellarskys.stella.utils.config.core.Config
+import dev.deftu.omnicore.api.client.client
+import net.minecraft.Util
+import java.net.URI
 
 val config = Config("Stella", "Stella") {
     category("General"){
-        subcategory("info") {
+        subcategory("Info") {
             textparagraph {
                 configName = "info"
                 name = "Stella"
-                description = "Made by NEXD_"
+                description = "§bDungeon & QOL Mod" +
+                        "\n§bMade by §dNEXD_" +
+                        "\n§bCommands: §6/stella §f, §6/sa §f, §6/sta"
             }
 
+        }
+
+        subcategory("Socials") {
             button {
                 configName = "website"
                 name = "Website"
                 description = "A link to stella's website"
+
+                onclick {
+                    val uri = URI("https://stellarskys.co")
+                    Util.getPlatform().openUri(uri)
+                }
             }
 
-            keybind {
-                configName = "test"
-                name = "test"
-                description = "test"
-                default = 3
+            button {
+                configName = "discord"
+                name = "Discord"
+                description = "A link to stella's discord"
+
+                onclick {
+                    val uri = URI("https://discord.gg/EzEfQyGdAg")
+                    Util.getPlatform().openUri(uri)
+                }
+            }
+
+            button {
+                configName = "source"
+                name = "Source"
+                description = "A link to stella's source"
+
+                onclick {
+                    val uri = URI("https://github.com/Eclipse-5214/stella")
+                    Util.getPlatform().openUri(uri)
+                }
+            }
+        }
+
+        subcategory("Shortcuts") {
+            button {
+                configName = "hudEditor"
+                name = "Hud Editor"
+                description = "Opens Stella's Hud Editor (/sa hud)"
+
+                onclick {
+                    client.setScreen(HUDEditor())
+                }
             }
         }
     }
@@ -582,7 +624,7 @@ val config = Config("Stella", "Stella") {
                 placeholder = "Open"
 
                 onclick {
-                    //Stella.mc.displayGuiScreen(ButtonLayoutEditor())
+                    client.setScreen(ButtonLayoutEditor())
                 }
             }
         }

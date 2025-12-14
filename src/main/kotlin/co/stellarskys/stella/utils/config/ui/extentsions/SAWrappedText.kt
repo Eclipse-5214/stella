@@ -26,7 +26,7 @@ class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<S
         )
     }
 
-    override fun getAutoHeight(): Float = textHeight(text, fontSize, width - 12f) + 2f
+    override fun getAutoHeight(): Float = textHeight(text, fontSize, width - 12f) + 10f
 
     object MCColor {
         private val COLORS = mapOf(

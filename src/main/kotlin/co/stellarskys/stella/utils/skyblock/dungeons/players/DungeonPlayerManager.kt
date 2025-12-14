@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.skyblock.dungeons.players
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ChatEvent
+import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonClass
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
@@ -62,6 +63,8 @@ object DungeonPlayerManager {
         val player = getPlayer(name)
         if (player != null) {
             player.deaths ++
+
+            EventBus.post(DungeonEvent.Player.Death(player))
         } else {
             Stella.LOGGER.error(
                 "[Dungeon Player Manager] Received ghost message for player '{}' but player was not found in the player list: {}",

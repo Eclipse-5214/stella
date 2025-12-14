@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.map
 
 import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.TickEvent
 import co.stellarskys.stella.utils.WorldUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
@@ -43,6 +44,10 @@ object WorldScanner {
 
                 val prevRoom = lastIdx?.let { rooms[it] }
                 val currRoom = rooms.getOrNull(idx)
+
+                if (prevRoom != null && currRoom != null && prevRoom != currRoom) {
+                    EventBus.post(DungeonEvent.Room.Change(prevRoom, currRoom))
+                }
 
                 if (lastIdx == idx) return@registerIn
 
