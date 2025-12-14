@@ -82,11 +82,12 @@ object clear {
         val scale = mapConfig.checkmarkScale
 
         Dungeon.discoveredRooms.values.forEach { room ->
-            val x = room.x * spacing + roomSize / 2 - 5
-            val y = room.z * spacing + roomSize / 2 - 6
+            val x = room.x * spacing + roomSize / 2
+            val y = room.z * spacing + roomSize / 2
             context.withMatrix {
                 context.pose().translate(x.toFloat(), y.toFloat())
                 context.pose().scale(scale, scale)
+                context.pose().translate( -5f, -6f)
                 Render2D.drawImage(context, questionMark, 0, 0, 10, 12)
             }
         }
@@ -102,12 +103,13 @@ object clear {
             if ((mapConfig.puzzleCheckmarks > 0 && room.type == RoomType.PUZZLE) || room.type == RoomType.ENTRANCE) return@forEach
 
             val (centerX, centerZ) = room.center()
-            val x = (centerX * spacing).toInt() + roomSize / 2 - 6
-            val y = (centerZ * spacing).toInt() + roomSize / 2 - 6
+            val x = (centerX * spacing).toInt() + roomSize / 2
+            val y = (centerZ * spacing).toInt() + roomSize / 2
 
             context.withMatrix {
                 context.pose().translate(x.toFloat(), y.toFloat())
                 context.pose().scale(scale, scale)
+                context.pose().translate( -6f, -6f)
                 Render2D.drawImage(context, checkmark, 0, 0, 12, 12)
             }
         }

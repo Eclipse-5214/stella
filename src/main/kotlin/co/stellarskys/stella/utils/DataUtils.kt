@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
 import com.google.gson.GsonBuilder
@@ -11,6 +12,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import co.stellarskys.stella.utils.TimeUtils.millis
+import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import net.fabricmc.loader.api.FabricLoader
 import java.awt.Color
 import java.io.File
@@ -87,7 +89,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
                 gson.fromJson(dataFile.readText(), type) ?: defaultObject
             } else defaultObject
         } catch (e: Exception) {
-            println("Error loading data from ${dataFile.absolutePath}: ${e.message}")
+            Stella.LOGGER.error("Error loading data from ${dataFile.absolutePath}: ${e.message}")
             defaultObject
         }
     }
@@ -97,7 +99,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
         try {
             dataFile.writeText(gson.toJson(data))
         } catch (e: Exception) {
-            println("Error saving data to ${dataFile.absolutePath}: ${e.message}")
+            Stella.LOGGER.error("Error saving data to ${dataFile.absolutePath}: ${e.message}")
             e.printStackTrace()
         }
     }
@@ -115,7 +117,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
     private fun startAutosaveLoop() {
         if (loopStarted) return
         loopStarted = true
-        LoopUtils.loop(10000) {
+        TickSchedulers.client.every(10000) {
             autosaveIntervals.forEach { (dataUtils, interval) ->
                 if (dataUtils.lastSavedTime.since.millis < interval) return@forEach
                 try {

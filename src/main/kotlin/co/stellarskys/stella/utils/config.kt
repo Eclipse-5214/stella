@@ -140,6 +140,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
+        /*
         subcategory("Block Overlay") {
             toggle {
                 configName = "enableDungBlockOverlay"
@@ -205,6 +206,7 @@ val config = Config("Stella", "Stella") {
                 default = rgba(255, 0, 0, 255)
             }
         }
+         */
 
         subcategory("Class Colors") {
             colorpicker {

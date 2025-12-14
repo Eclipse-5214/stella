@@ -2,6 +2,8 @@ package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.utils.DataUtils
 import com.google.gson.reflect.TypeToken
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.client.gui.GuiGraphics
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -16,7 +18,17 @@ object HUDManager {
         var x: Float,
         var y: Float,
         var scale: Float = 1f
-    )
+    ) {
+        companion object {
+            val CODEC: Codec<HudLayoutData> = RecordCodecBuilder.create { instance ->
+                instance.group(
+                    Codec.FLOAT.fieldOf("x").forGetter { it.x },
+                    Codec.FLOAT.fieldOf("y").forGetter { it.y },
+                    Codec.FLOAT.optionalFieldOf("scale", 1f).forGetter { it.scale }
+                ).apply(instance, ::HudLayoutData)
+            }
+        }
+    }
 
     private val layoutStore = DataUtils(
         fileName = "hud_positions",
