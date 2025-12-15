@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils.skyblock.dungeons.utils
 
 import co.stellarskys.stella.utils.WorldUtils
 import dev.deftu.omnicore.api.client.world
+import net.minecraft.core.BlockPos
 
 object WorldScanUtils {
     val blacklist = setOf(5, 54, 146)
@@ -10,7 +11,7 @@ object WorldScanUtils {
         val world = world ?: return false
         val chunkX = x shr 4
         val chunkZ = z shr 4
-        return world.chunkSource.hasChunk(chunkX, chunkZ)
+        return world.chunkSource.hasChunk(chunkX, chunkZ) && world.getChunk(chunkX, chunkZ)?.javaClass?.simpleName != "FakeChunk"
     }
 
     fun getCore(x: Int, z: Int): Int {
@@ -71,6 +72,18 @@ object WorldScanUtils {
             else -> pos
         }
     }
+
+    fun BlockPos.rotate(rotation: Int): BlockPos =
+        when ((rotation % 360 + 360) % 360) {
+            0   -> BlockPos(x, y, z)
+            90  -> BlockPos(z, y, -x)
+            180 -> BlockPos(-x, y, -z)
+            270 -> BlockPos(-z, y, x)
+            else -> this
+        }
+
+    fun BlockPos.unrotate(rotation: Int): BlockPos =
+        rotate(360 - rotation)
 
     fun getRoomShape(comps: List<Pair<Int, Int>>): String {
         val count = comps.size

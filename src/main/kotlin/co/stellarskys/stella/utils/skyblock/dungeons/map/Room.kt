@@ -11,7 +11,11 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomRegistry
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils.rotate
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils.unrotate
+import dev.deftu.omnicore.api.serialization.parseJsonOrNull
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Vec3i
 import net.minecraft.world.level.block.Blocks
 import kotlin.properties.Delegates
 
@@ -36,9 +40,6 @@ class Room(
 
     var name: String? = null
     var corner: BlockPos? = null
-    var center: BlockPos? = null
-    var componentCenters: List<BlockPos> = emptyList()
-
     var rotation: Int? = null
     var type: RoomType = RoomType.UNKNOWN
     var shape: String = "1x1"
@@ -150,28 +151,6 @@ class Room(
         return this
     }
 
-    /*
-    fun fromWorldPos(pos: Triple<Double, Double, Double>): Triple<Int, Int, Int>? {
-        if (corner == null || rotation == null) return null
-        val rel = Triple(
-            (pos.first - corner!!.first).toInt(),
-            (pos.second - corner!!.second).toInt(),
-            (pos.third - corner!!.third).toInt()
-        )
-        return WorldScanUtils.rotateCoords(rel, rotation!!)
-    }
-
-    fun toWorldPos(local: Triple<Int, Int, Int>): Triple<Double, Double, Double>? {
-        if (corner == null || rotation == null) return null
-        val rotated = WorldScanUtils.rotateCoords(local, 360 - rotation!!)
-        return Triple(
-            rotated.first + corner!!.first,
-            rotated.second + corner!!.second,
-            rotated.third + corner!!.third
-        )
-    }
-     */
-
-    //fun getRoomCoord(pos: Triple<Double, Double, Double>) = fromWorldPos(pos)
-    //fun getRealCoord(local: Triple<Int, Int, Int>) = toWorldPos(local)
+    fun getRoomCoord(pos: BlockPos)   = pos.subtract(Vec3i(corner?.x ?: 0, 0, corner?.z ?: 0)).unrotate(rotation ?: 0)
+    fun getRealCoord(local: BlockPos) = local.rotate(rotation ?: 0).offset(Vec3i(corner?.x ?: 0, 0, corner?.z ?: 0))
 }
