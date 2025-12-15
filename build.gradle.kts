@@ -1,67 +1,55 @@
-import dev.deftu.gradle.utils.version.MinecraftVersions
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    java
     kotlin("jvm")
-    id("dev.deftu.gradle.multiversion")
-    id("dev.deftu.gradle.tools")
-    id("dev.deftu.gradle.tools.resources")
-    id("dev.deftu.gradle.tools.bloom")
-    id("dev.deftu.gradle.tools.shadow")
-    id("dev.deftu.gradle.tools.minecraft.loom")
-    id("dev.deftu.gradle.tools.minecraft.releases")
+    id("fabric-loom")
+}
+
+val minecraft = stonecutter.current.version
+val loader = "fabric"
+
+version = "${property("mod.version")}+${minecraft}"
+base.archivesName = property("mod.id") as String
+
+val requiredJava = when {
+    stonecutter.eval(minecraft, ">=1.20.6") -> JavaVersion.VERSION_21
+    stonecutter.eval(minecraft, ">=1.18") -> JavaVersion.VERSION_17
+    stonecutter.eval(minecraft, ">=1.17") -> JavaVersion.VERSION_16
+    else -> JavaVersion.VERSION_1_8
 }
 
 repositories {
+    fun strictMaven(url: String, alias: String, vararg groups: String) = exclusiveContent {
+        forRepository { maven(url) { name = alias } }
+        filter { groups.forEach(::includeGroup) }
+    }
+    strictMaven("https://www.cursemaven.com", "CurseForge", "curse.maven")
+    strictMaven("https://api.modrinth.com/maven", "Modrinth", "maven.modrinth")
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://api.modrinth.com/maven")
     maven("https://jitpack.io")
     maven("https://maven.teamresourceful.com/repository/maven-public/")
+    maven("https://maven.deftu.dev/releases")
+    maven("https://maven.deftu.dev/snapshots")
 }
-
-toolkitMultiversion {
-    moveBuildsToRootProject.set(true)
-}
-
-toolkitLoomHelper {
-    if (!mcData.isNeoForge) {
-        useMixinRefMap(modData.id)
-    }
-
-    if (mcData.isForge) {
-        useTweaker("org.spongepowered.asm.launch.MixinTweaker")
-        useForgeMixin(modData.id)
-    }
-
-    if (mcData.isForgeLike && mcData.version >= MinecraftVersions.VERSION_1_16_5) {
-        useKotlinForForge()
-    }
-}
-
-loom {
-    if (mcData.isFabric && mcData.version >= MinecraftVersions.VERSION_1_16_5) {
-        accessWidenerPath.set(rootProject.file("src/main/resources/stella.accesswidener"))
-    }
-}
-
 
 dependencies {
-    with(libs.textile.get()) { modImplementation(include("${this.group}:${this.name}-$mcData:${this.version}")!!) }
-    with(libs.omnicore.get()) { modImplementation(include("${this.group}:${this.name}-$mcData:${this.version}")!!) }
+    minecraft("com.mojang:minecraft:$minecraft")
+    mappings(loom.officialMojangMappings())
+    modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
+    modImplementation("net.fabricmc:fabric-language-kotlin:${property("deps.fabric-kotlin")}")
+    with(libs.textile.get()) { modImplementation(include("${this.group}:${this.name}-$minecraft-$loader:${this.version}")!!) }
+    with(libs.omnicore.get()) { modImplementation(include("${this.group}:${this.name}-$minecraft-$loader:${this.version}")!!) }
     implementation(include("io.github.classgraph:classgraph:4.8.184")!!)
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
-    modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    modImplementation(include("co.stellarskys:vexel-${mcData}:130")!!)
+    modImplementation(include("co.stellarskys:vexel-$minecraft-$loader:130")!!)
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     property("skyblock_api_version").let {
         api("tech.thatgravyboat:skyblock-api:$it") {
-            capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${mcData.version}") }
+            capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$minecraft") }
         }
         include("tech.thatgravyboat:skyblock-api:$it") {
-            capabilities { requireCapability("tech.thatgravyboat:skyblock-api-${mcData.version}-remapped") }
+            capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$minecraft-remapped") }
         }
     }
 
@@ -74,14 +62,55 @@ dependencies {
         implementation("com.github.stivais:Commodore:$it")
         include("com.github.stivais:Commodore:$it")
     }
+
 }
 
-/* thanks odin! */
+loom {
+    fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json") // Useful for interface injection
+    //accessWidenerPath = rootProject.file("src/main/resources/template.accesswidener")
+
+    decompilerOptions.named("vineflower") {
+        options.put("mark-corresponding-synthetics", "1") // Adds names to lambdas - useful for mixins
+    }
+
+    runConfigs.all {
+        ideConfigGenerated(true)
+        vmArgs("-Dmixin.debug.export=true") // Exports transformed classes for debugging
+        runDir = "../../run" // Shares the run directory between versions
+    }
+}
+
+java {
+    withSourcesJar()
+    targetCompatibility = requiredJava
+    sourceCompatibility = requiredJava
+}
+
 tasks {
-    compileKotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.JVM_21
-            freeCompilerArgs.add("-Xlambdas=class") //Commodore
-        }
+    processResources {
+        inputs.property("id", project.property("mod.id"))
+        inputs.property("name", project.property("mod.name"))
+        inputs.property("version", project.property("mod.version"))
+        inputs.property("minecraft", project.property("mod.mc_dep"))
+
+        val props = mapOf(
+            "id" to project.property("mod.id"),
+            "name" to project.property("mod.name"),
+            "version" to project.property("mod.version"),
+            "minecraft" to project.property("mod.mc_dep")
+        )
+
+        filesMatching("fabric.mod.json") { expand(props) }
+
+        val mixinJava = "JAVA_${requiredJava.majorVersion}"
+        filesMatching("*.mixins.json") { expand("java" to mixinJava) }
+    }
+
+    // Builds the version into a shared folder in `build/libs/${mod version}/`
+    register<Copy>("buildAndCollect") {
+        group = "build"
+        from(remapJar.map { it.archiveFile }, remapSourcesJar.map { it.archiveFile })
+        into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
+        dependsOn("build")
     }
 }

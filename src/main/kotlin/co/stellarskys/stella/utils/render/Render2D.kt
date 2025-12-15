@@ -15,9 +15,9 @@ import java.awt.Color
 import java.util.Optional
 import java.util.UUID
 
-//#if MC >= 1.21.9
-//$$ import com.mojang.authlib.GameProfile
-//#endif
+//? if >= 1.21.9 {
+// import com.mojang.authlib.GameProfile
+//?}
 
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
@@ -104,19 +104,19 @@ object Render2D {
         }
 
         val textures = textureCache.getOrElse(uuid) {
-            //#if MC >= 1.21.9
-            //$$ val profile = mc.connection?.getPlayerInfo(uuid)?.profile
-            //$$ val skin = if (profile != null) {
-            //$$     mc.skinManager.get(profile).getNow(Optional.empty()).orElseGet { DefaultPlayerSkin.get(uuid) }
-            //$$ } else {
-            //$$     DefaultPlayerSkin.get(uuid)
-            //$$ }
-            //#else
+            //? if >= 1.21.9 {
+            /* val profile = mc.connection?.getPlayerInfo(uuid)?.profile
+               val skin = if (profile != null) {
+                    mc.skinManager.get(profile).getNow(Optional.empty()).orElseGet { DefaultPlayerSkin.get(uuid) }
+               } else {
+                    DefaultPlayerSkin.get(uuid)
+               }
+            *///?} else {
             val skin = SkullBlockEntity.fetchGameProfile(uuid)
                 .getNow(Optional.empty())
                 .map(mc.skinManager::getInsecureSkin)
                 .orElseGet { DefaultPlayerSkin.get(uuid) }
-            //#endif
+            //?}
 
             val defaultSkin = DefaultPlayerSkin.get(uuid)
             if (skin.texture() != defaultSkin.texture()) textureCache[uuid] = skin

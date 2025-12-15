@@ -1,45 +1,21 @@
-import groovy.lang.MissingPropertyException
-
 pluginManagement {
     repositories {
-        // Repositories
-        maven("https://maven.deftu.dev/releases")
-        maven("https://maven.fabricmc.net")
-        maven("https://maven.architectury.dev/")
-        maven("https://maven.minecraftforge.net")
-        maven("https://repo.essential.gg/repository/maven-public")
-        maven("https://server.bbkr.space/artifactory/libs-release/")
-        maven("https://jitpack.io/")
-        maven("https://maven.terraformersmc.com/")
-        maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-
-        // Snapshots
-        maven("https://maven.deftu.dev/snapshots")
         mavenLocal()
-
-        // Default repositories
-        gradlePluginPortal()
         mavenCentral()
-    }
-
-    plugins {
-        kotlin("jvm") version("2.2.0")
-        id("dev.deftu.gradle.multiversion-root") version("2.67.0")
+        gradlePluginPortal()
+        maven("https://maven.fabricmc.net/") { name = "Fabric" }
+        maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie" }
+        maven("https://maven.kikugie.dev/releases") { name = "KikuGie Releases" }
     }
 }
 
-val projectName: String = extra["mod.name"].toString()
+plugins {
+    id("dev.kikugie.stonecutter") version "0.7.11"
+}
 
-rootProject.name = projectName
-rootProject.buildFileName = "root.gradle.kts"
-
-listOf(
-    "1.21.8-fabric",
-    "1.21.10-fabric"
-).forEach { version ->
-    include(":$version")
-    project(":$version").apply {
-        projectDir = file("versions/$version")
-        buildFileName = "../../build.gradle.kts"
+stonecutter {
+    create(rootProject) {
+        versions("1.21.8", "1.21.10")
+        vcsVersion = "1.21.8"
     }
 }

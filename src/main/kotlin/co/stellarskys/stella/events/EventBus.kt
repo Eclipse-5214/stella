@@ -20,11 +20,11 @@ import net.minecraft.world.level.EmptyBlockGetter
 import net.minecraft.world.phys.shapes.CollisionContext
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 
-//#if MC < 1.21.9
+//? if < 1.21.9 {
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-//#else
-//$$ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
-//#endif
+//?} else {
+// import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
+//?}
 
 @Module
 object EventBus : EventBus(true) {
@@ -54,20 +54,20 @@ object EventBus : EventBus(true) {
         }
 
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
-            //#if MC >= 1.21.9
-            //$$ ScreenMouseEvents.allowMouseClick(screen).register { _, click ->
-            //$$    !post(GuiEvent.Click(click.x, click.y, click.button(), true, screen))
-            //$$ }
-            //$$
-            //$$ ScreenMouseEvents.allowMouseRelease(screen).register { _, click ->
-            //$$    !post(GuiEvent.Click(click.x, click.y, click.button(), false, screen))
-            //$$ }
-            //$$
-            //$$ ScreenKeyboardEvents.allowKeyPress(screen).register { _, keyInput ->
-            //$$    val charTyped = GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode)?.firstOrNull() ?: '\u0000'
-            //$$    !post(GuiEvent.Key(GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode), keyInput.key, charTyped, keyInput.key, screen))
-            //$$ }
-            //#else
+            //? if >= 1.21.9 {
+            /* ScreenMouseEvents.allowMouseClick(screen).register { _, click ->
+                  !post(GuiEvent.Click(click.x, click.y, click.button(), true, screen))
+               }
+
+               ScreenMouseEvents.allowMouseRelease(screen).register { _, click ->
+                  !post(GuiEvent.Click(click.x, click.y, click.button(), false, screen))
+               }
+
+               ScreenKeyboardEvents.allowKeyPress(screen).register { _, keyInput ->
+                  val charTyped = GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode)?.firstOrNull() ?: '\u0000'
+                  !post(GuiEvent.Key(GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode), keyInput.key, charTyped, keyInput.key, screen))
+               }
+            *///?} else {
             ScreenMouseEvents.allowMouseClick(screen).register { _, mx, my, mouseButton ->
                 !post(GuiEvent.Click(mx, my, mouseButton, true, screen))
             }
@@ -80,7 +80,7 @@ object EventBus : EventBus(true) {
                 val charTyped = GLFW.glfwGetKeyName(key, scancode)?.firstOrNull() ?: '\u0000'
                 !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, charTyped, scancode, screen))
             }
-            //#endif
+            //?}
         }
 
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
@@ -91,7 +91,7 @@ object EventBus : EventBus(true) {
             post(RenderEvent.World.AfterEntities(RenderContext.fromContext(context)))
         }
 
-        //#if MC < 1.21.9
+        //? if < 1.21.9 {
         WorldRenderEvents.LAST.register { context ->
             post(RenderEvent.World.Last(RenderContext.fromContext(context)))
         }
@@ -110,19 +110,19 @@ object EventBus : EventBus(true) {
 
             !post(RenderEvent.World.BlockOutline(ctx))
         }
-        //#else
-        //$$ WorldRenderEvents.END_MAIN.register { context ->
-        //$$    post(RenderEvent.World.Last(RenderContext.fromContext(context)))
-        //$$ }
-        //$$
-        //$$ WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
-        //$$    val ctx = RenderContext.fromContext(context).apply {
-        //$$        blockPos = outlineRenderState.pos
-        //$$        voxelShape = outlineRenderState.shape
-        //$$    }
-        //$$    !post(RenderEvent.World.BlockOutline(ctx))
-        //$$ }
-        //#endif
+        //?} else {
+        /* WorldRenderEvents.END_MAIN.register { context ->
+              post(RenderEvent.World.Last(RenderContext.fromContext(context)))
+           }
+
+           WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
+             val ctx = RenderContext.fromContext(context).apply {
+                  blockPos = outlineRenderState.pos
+                  voxelShape = outlineRenderState.shape
+              }
+              !post(RenderEvent.World.BlockOutline(ctx))
+           }
+        *///?}
     }
 
     fun onPacketReceived(packet: Packet<*>): Boolean {

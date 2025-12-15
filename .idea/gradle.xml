@@ -9,8 +9,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/versions/1.21.10-fabric" />
-            <option value="$PROJECT_DIR$/versions/1.21.8-fabric" />
+            <option value="$PROJECT_DIR$/versions/1.21.10" />
+            <option value="$PROJECT_DIR$/versions/1.21.8" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="true" />
