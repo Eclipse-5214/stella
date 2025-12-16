@@ -2,18 +2,12 @@ package co.stellarskys.stella.utils.skyblock.dungeons
 
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.core.ChatEvent
-import co.stellarskys.stella.events.core.DungeonEvent
-import co.stellarskys.stella.events.core.EntityEvent
-import co.stellarskys.stella.events.core.LocationEvent
-import co.stellarskys.stella.events.core.PacketEvent
-import co.stellarskys.stella.events.core.TickEvent
+import co.stellarskys.stella.events.core.*
 import co.stellarskys.stella.utils.*
 import co.stellarskys.stella.utils.skyblock.dungeons.map.*
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.utils.skyblock.dungeons.score.*
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.*
-import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket
@@ -24,7 +18,12 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.SkullBlockEntity
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonAPI
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+
+//#if MC >= 1.21.9
+//$$ import tech.thatgravyboat.skyblockapi.platform.properties
+//#endif
 
 /**
  * Central dungeon state manager.
@@ -126,37 +125,58 @@ object Dungeon {
         }
 
         EventBus.registerIn<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (event.packet !is ClientboundTakeItemEntityPacket) return@registerIn
             val world = world ?: return@registerIn
+            val entity = world.getEntity(event.packet.itemId) as? ItemEntity ?: return@registerIn
+            val name = entity.item.displayName.stripped.drop(1).dropLast(1)
 
-            when (val packet = event.packet) {
-                is ClientboundTakeItemEntityPacket -> {
-                    val entity = world.getEntity(packet.itemId) as? ItemEntity ?: return@registerIn
-                    val name = entity.item.displayName.stripped.drop(1).dropLast(1)
+            if (secretItems.contains(name)) {
+                EventBus.post(DungeonEvent.Secrets.Item(event.packet.itemId, entity))
 
-                    if (secretItems.contains(name)) {
-                        EventBus.post(DungeonEvent.Secrets.Item(packet.itemId, entity))
-                    }
+                currentRoom?.roomData?.secretCoords?.item?.find {
+                    Utils.calcDistance(
+                        currentRoom!!.getRealCoord(it.toBlockPos()),
+                        entity.blockPosition()
+                    ) < 25
+                }?.collected = true
+            }
+        }
+
+        EventBus.registerIn<PacketEvent.Sent>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (event.packet !is ServerboundUseItemOnPacket) return@registerIn
+            val pos = event.packet.hitResult.blockPos ?: return@registerIn
+            val world = world ?: return@registerIn
+            val blockState = world.getBlockState(pos)
+
+            when (blockState.block) {
+                Blocks.CHEST, Blocks.TRAPPED_CHEST -> {
+                    EventBus.post(DungeonEvent.Secrets.Chest(blockState, pos))
+
+                    currentRoom?.roomData?.secretCoords?.chest?.find {
+                        currentRoom?.getRealCoord(it.toBlockPos()) == pos
+                    }?.collected = true
                 }
+                Blocks.LEVER -> {
+                    EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.LEVER, pos))
+                }
+                else -> {
+                    val entity = world.getBlockEntity(pos) ?: return@registerIn
+                    if (entity is SkullBlockEntity) {
+                        val texture = entity.ownerProfile?.properties?.get("textures")?.firstOrNull()?.value
+                        when (texture) {
+                            WITHER_ESSENCE_TEXTURE -> {
+                                EventBus.post(DungeonEvent.Secrets.Essence(entity, pos))
 
-                is ServerboundUseItemOnPacket -> {
-                    val pos = packet.hitResult.blockPos ?: return@registerIn
-                    val blockState = world.getBlockState(pos)
+                                currentRoom?.roomData?.secretCoords?.wither?.find {
+                                    currentRoom?.getRealCoord(it.toBlockPos()) == pos
+                                }?.collected = true
+                            }
+                            RED_SKULL_TEXTURE -> {
+                                EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.RED_SKULL, pos))
 
-                    when (blockState.block) {
-                        Blocks.CHEST, Blocks.TRAPPED_CHEST -> {
-                            EventBus.post(DungeonEvent.Secrets.Chest(blockState, pos))
-                        }
-                        Blocks.LEVER -> {
-                            EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.LEVER, pos))
-                        }
-                        else -> {
-                            val entity = world.getBlockEntity(pos) ?: return@registerIn
-                            if (entity is SkullBlockEntity) {
-                                val texture = entity.ownerProfile?.properties?.get("textures")?.firstOrNull()?.value
-                                when (texture) {
-                                    WITHER_ESSENCE_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Essence(entity, pos))
-                                    RED_SKULL_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.RED_SKULL, pos))
-                                }
+                                currentRoom?.roomData?.secretCoords?.redstoneKey?.find {
+                                    currentRoom?.getRealCoord(it.toBlockPos()) == pos
+                                }?.collected = true
                             }
                         }
                     }
@@ -167,7 +187,13 @@ object Dungeon {
         EventBus.registerIn<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
             if (event.entity.type == EntityType.BAT) {
                 EventBus.post(DungeonEvent.Secrets.Bat(event.entity))
-                return@registerIn
+
+                currentRoom?.roomData?.secretCoords?.item?.find {
+                    Utils.calcDistance(
+                        currentRoom!!.getRealCoord(it.toBlockPos()),
+                        event.entity.blockPosition()
+                    ) < 100
+                }?.collected = true
             }
         }
 

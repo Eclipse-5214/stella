@@ -49,7 +49,6 @@ data class RoomMetadata(
                         label = type,
                         color = color.toColor(),
                         position = coord,
-                        collected = false,
                         room = room,
                         state = state,
                     )
@@ -69,7 +68,8 @@ data class RoomMetadata(
     data class Coord(
         val x: Int,
         val y: Int,
-        val z: Int
+        val z: Int,
+        var collected: Boolean = false
     ) {
         fun toBlockPos(): BlockPos = BlockPos(x, y, z)
     }
@@ -78,11 +78,11 @@ data class RoomMetadata(
         val label: String,
         val color: Color,
         val position: Coord,
-        val collected: Boolean,
         val room: Room,
         val state: BlockState? = null
     ) {
         fun render(context: RenderContext) {
+            if (position.collected) return
             val pos = room.getRealCoord(position.toBlockPos())
             val lineWidth = 3.0
             Render3D.outlineBlock(context, pos, color, lineWidth, true, state)
