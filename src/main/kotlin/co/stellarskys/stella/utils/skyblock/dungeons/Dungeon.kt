@@ -188,7 +188,7 @@ object Dungeon {
             if (event.entity.type == EntityType.BAT) {
                 EventBus.post(DungeonEvent.Secrets.Bat(event.entity))
 
-                currentRoom?.roomData?.secretCoords?.item?.find {
+                currentRoom?.roomData?.secretCoords?.bat?.find {
                     Utils.calcDistance(
                         currentRoom!!.getRealCoord(it.toBlockPos()),
                         event.entity.blockPosition()

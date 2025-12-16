@@ -58,7 +58,7 @@ data class RoomMetadata(
             addWaypoints("Redstone Key", redstoneKey, Blocks.SKELETON_SKULL.defaultBlockState())
             addWaypoints("Wither", wither, Blocks.SKELETON_SKULL.defaultBlockState())
             addWaypoints("Chest", chest, Blocks.CHEST.defaultBlockState())
-            addWaypoints("Item", item)
+            addWaypoints("Item", item, Blocks.SKELETON_SKULL.defaultBlockState())
             addWaypoints("Bat", bat)
 
             return waypoints
