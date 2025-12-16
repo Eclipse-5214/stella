@@ -3,19 +3,16 @@ pluginManagement {
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.fabricmc.net/") { name = "Fabric" }
-        maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie" }
-        maven("https://maven.kikugie.dev/releases") { name = "KikuGie Releases" }
+        maven("https://maven.fabricmc.net/")
+        maven("https://maven.kikugie.dev/snapshots")
     }
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.7.11"
+    id("dev.kikugie.stonecutter") version "0.8-beta.1"
 }
 
-stonecutter {
-    create(rootProject) {
-        versions("1.21.8", "1.21.10")
-        vcsVersion = "1.21.8"
-    }
+stonecutter.create(rootProject) {
+    versions("1.21.8", "1.21.10")
+    vcsVersion = "1.21.8"
 }
