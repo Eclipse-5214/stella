@@ -559,6 +559,13 @@ val config = Config("Stella", "Stella") {
             }
 
             toggle {
+                configName = "secretWaypoints"
+                name = "Box secretWaypoints Doors"
+                description = "Renders a box around wither doors"
+                default = false
+            }
+
+            toggle {
                 configName = "separateMapInfo"
                 name = "Separate map Info"
                 description = "Renders the map info separate from the dungeon map"

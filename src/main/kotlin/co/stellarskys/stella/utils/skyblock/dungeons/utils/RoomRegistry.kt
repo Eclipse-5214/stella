@@ -10,7 +10,7 @@ import java.io.FileNotFoundException
 object RoomRegistry {
     private val byCore = mutableMapOf<Int, RoomMetadata>()
     private val allRooms = mutableListOf<RoomMetadata>()
-    private const val ROOM_DATA_URL = "https://raw.githubusercontent.com/Skytils/SkytilsMod/refs/heads/2.x/mod/src/main/resources/assets/catlas/rooms.json"
+    private const val ROOM_DATA_URL = "https://raw.githubusercontent.com/Noamm9/NoammAddons/refs/heads/data/rooms.json"
     private val LOCAL_ROOMS_FILE = File("config/stella/rooms.json")
 
     fun loadFromRemote() {
@@ -18,7 +18,7 @@ object RoomRegistry {
             url = ROOM_DATA_URL,
             onSuccess = { rooms ->
                 populateRooms(rooms)
-                Stella.LOGGER.info("RoomRegistry: Loaded ${rooms.size} rooms from Skytils")
+                Stella.LOGGER.info("RoomRegistry: Loaded ${rooms.size} rooms from NoamAddons")
             },
             onError = { error ->
                 Stella.LOGGER.info("RoomRegistry: Failed to load room data — ${error.message}")
