@@ -7,17 +7,18 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.PlayerFaceRenderer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.client.resources.PlayerSkin
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.SkullBlockEntity
+import tech.thatgravyboat.skyblockapi.platform.PlayerSkin
 import java.awt.Color
 import java.util.Optional
 import java.util.UUID
 
 //? if >= 1.21.9 {
-// import com.mojang.authlib.GameProfile
-//?}
+/* import com.mojang.authlib.GameProfile
+   import tech.thatgravyboat.skyblockapi.platform.texture
+*///?}
 
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
@@ -119,7 +120,7 @@ object Render2D {
             //?}
 
             val defaultSkin = DefaultPlayerSkin.get(uuid)
-            if (skin.texture() != defaultSkin.texture()) textureCache[uuid] = skin
+            if (skin.texture != defaultSkin.texture) textureCache[uuid] = skin
             skin
         }
 

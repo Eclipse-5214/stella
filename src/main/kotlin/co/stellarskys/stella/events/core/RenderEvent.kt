@@ -2,10 +2,15 @@ package co.stellarskys.stella.events.core
 
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.entity.state.PlayerRenderState
 import co.stellarskys.stella.events.api.CancellableEvent
 import co.stellarskys.stella.events.api.Event
 import co.stellarskys.stella.utils.render.RenderContext
+
+//?if >= 1.21.9 {
+// import net.minecraft.client.renderer.entity.state.AvatarRenderState
+//?} else {
+import net.minecraft.client.renderer.entity.state.PlayerRenderState
+//?}
 
 sealed class RenderEvent {
     sealed class World {
@@ -40,7 +45,12 @@ sealed class RenderEvent {
 
     sealed class Player {
         class Pre(
+            //?if >= 1.21.9 {
+            // val entity: AvatarRenderState,
+            //?} else {
             val entity: PlayerRenderState,
+            //?}
+
             val matrices: PoseStack
         ) : CancellableEvent()
     }
