@@ -26,8 +26,8 @@ object roomName : Feature("showRoomName", island = SkyBlockIsland.THE_CATACOMBS)
         val chroma = config["roomNameChroma"] as Boolean
 
         val text = "${if (chroma) "§z" else ""}${Dungeon.currentRoom?.name ?: "No Room Found"}"
-        val x = HUDManager.getX("roomname") + 5f
-        val y = HUDManager.getY("roomname") + 5f
+        val x = HUDManager.getX("roomname")
+        val y = HUDManager.getY("roomname")
         val scale = HUDManager.getScale("roomname")
 
         Render2D.drawString(context,text, x.toInt(), y.toInt(), scale, false)
