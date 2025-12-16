@@ -1,5 +1,15 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.utils
 
+import co.stellarskys.stella.utils.config.RGBA
+import co.stellarskys.stella.utils.config.core.Config
+import co.stellarskys.stella.utils.render.Render3D
+import co.stellarskys.stella.utils.render.RenderContext
+import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.state.BlockState
+import java.awt.Color
+
 data class RoomMetadata(
     val name: String,
     val type: String,
@@ -27,14 +37,32 @@ data class RoomMetadata(
         val item: List<Coord> = emptyList(),
         val chest: List<Coord> = emptyList()
     ) {
-        fun allWithTypes(): List<Pair<String, Coord>> {
-            return buildList {
-                redstoneKey.forEach { add("Redstone Key" to it) }
-                wither.forEach      { add("Wither"       to it) }
-                bat.forEach         { add("Bat"          to it) }
-                item.forEach        { add("Item"         to it) }
-                chest.forEach       { add("Chest"        to it) }
+        fun toWaypoints(config: Config, room: Room): List<SecretWaypoint> {
+            val waypoints = mutableListOf<SecretWaypoint>()
+
+            fun addWaypoints(type: String, coords: List<Coord>, state: BlockState? = null) {
+                val colorKey = "secretWaypointColor.${type.lowercase().replace(" ", "")}"
+                val color by config.property<RGBA>(colorKey)
+
+                coords.forEach { coord ->
+                    waypoints += SecretWaypoint(
+                        label = type,
+                        color = color.toColor(),
+                        position = coord,
+                        collected = false,
+                        room = room,
+                        state = state,
+                    )
+                }
             }
+
+            addWaypoints("Redstone Key", redstoneKey, Blocks.SKELETON_SKULL.defaultBlockState())
+            addWaypoints("Wither", wither, Blocks.SKELETON_SKULL.defaultBlockState())
+            addWaypoints("Chest", chest, Blocks.CHEST.defaultBlockState())
+            addWaypoints("Item", item)
+            addWaypoints("Bat", bat)
+
+            return waypoints
         }
     }
 
@@ -42,5 +70,24 @@ data class RoomMetadata(
         val x: Int,
         val y: Int,
         val z: Int
-    )
+    ) {
+        fun toBlockPos(): BlockPos = BlockPos(x, y, z)
+    }
+
+    data class SecretWaypoint(
+        val label: String,
+        val color: Color,
+        val position: Coord,
+        val collected: Boolean,
+        val room: Room,
+        val state: BlockState? = null
+    ) {
+        fun render(context: RenderContext) {
+            val pos = room.getRealCoord(position.toBlockPos())
+            val lineWidth = 3.0
+            Render3D.outlineBlock(context, pos, color, lineWidth, true, state)
+            Render3D.renderString(label, pos.center.x, pos.center.y, pos.center.z, bgBox = true, phase = true)
+        }
+    }
+
 }

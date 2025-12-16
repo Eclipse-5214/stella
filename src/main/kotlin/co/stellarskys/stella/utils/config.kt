@@ -559,13 +559,6 @@ val config = Config("Stella", "Stella") {
             }
 
             toggle {
-                configName = "secretWaypoints"
-                name = "Box secretWaypoints Doors"
-                description = "Renders a box around wither doors"
-                default = false
-            }
-
-            toggle {
                 configName = "separateMapInfo"
                 name = "Separate map Info"
                 description = "Renders the map info separate from the dungeon map"
@@ -577,6 +570,57 @@ val config = Config("Stella", "Stella") {
                 name = "Dungeon Breakdown"
                 description = "Sends map info after run"
                 default = false
+            }
+        }
+    }
+
+    category("Secrets") {
+        subcategory("Waypoints") {
+            toggle {
+                configName = "secretWaypoints"
+                name = "Show Waypoints"
+                description = "Renders Secret Waypoints"
+                default = false
+            }
+
+            colorpicker {
+                configName = "secretWaypointColor.redstoneKey"
+                name = "Redstone Key Color"
+                description = "Highlight color for Redstone Key waypoints"
+                default = rgba(255, 0, 0, 255) // red
+                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretWaypointColor.wither"
+                name = "Wither Color"
+                description = "Highlight color for Wither waypoints"
+                default = rgba(0, 0, 255, 255) // blue
+                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretWaypointColor.bat"
+                name = "Bat Color"
+                description = "Highlight color for Bat waypoints"
+                default = rgba(128, 128, 128, 255) // gray
+                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretWaypointColor.item"
+                name = "Item Color"
+                description = "Highlight color for Item waypoints"
+                default = rgba(0, 255, 0, 255) // green
+                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretWaypointColor.chest"
+                name = "Chest Color"
+                description = "Highlight color for Chest waypoints"
+                default = rgba(255, 255, 0, 255) // yellow
+                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
         }
     }

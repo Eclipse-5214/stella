@@ -4,7 +4,9 @@ import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.DungeonEvent
+import co.stellarskys.stella.events.core.EntityEvent
 import co.stellarskys.stella.events.core.LocationEvent
+import co.stellarskys.stella.events.core.PacketEvent
 import co.stellarskys.stella.events.core.TickEvent
 import co.stellarskys.stella.utils.*
 import co.stellarskys.stella.utils.skyblock.dungeons.map.*
@@ -13,9 +15,15 @@ import co.stellarskys.stella.utils.skyblock.dungeons.score.*
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.*
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import dev.deftu.omnicore.api.client.player
+import dev.deftu.omnicore.api.client.world
+import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.entity.SkullBlockEntity
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonAPI
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
-import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.find
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 /**
@@ -24,6 +32,9 @@ import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
  */
 @Module
 object Dungeon {
+    // Textures
+    private const val RED_SKULL_TEXTURE = "eyJ0aW1lc3RhbXAiOjE1NzA5MTUxODU0ODUsInByb2ZpbGVJZCI6IjVkZTZlMTg0YWY4ZDQ5OGFiYmRlMDU1ZTUwNjUzMzE2IiwicHJvZmlsZU5hbWUiOiJBc3Nhc2luSmlhbmVyMjUiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2EyMjNlMzZhYzEzZjBmNzFhYmNmYmYwYzk2ZmRjMjAxMGNjM2UxMWZmMmIwZDgxMTJkMGU2M2Y0YjRhYWEwZGUifX19"
+    private const val WITHER_ESSENCE_TEXTURE = "ewogICJ0aW1lc3RhbXAiIDogMTYwMzYxMDQ0MzU4MywKICAicHJvZmlsZUlkIiA6ICIzM2ViZDMyYmIzMzk0YWQ5YWM2NzBjOTZjNTQ5YmE3ZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJEYW5ub0JhbmFubm9YRCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9lNDllYzdkODJiMTQxNWFjYWUyMDU5Zjc4Y2QxZDE3NTRiOWRlOWIxOGNhNTlmNjA5MDI0YzRhZjg0M2Q0ZDI0IgogICAgfQogIH0KfQ==ewogICJ0aW1lc3RhbXAiIDogMTYwMzYxMDQ0MzU4MywKICAicHJvZmlsZUlkIiA6ICIzM2ViZDMyYmIzMzk0YWQ5YWM2NzBjOTZjNTQ5YmE3ZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJEYW5ub0JhbmFubm9YRCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9lNDllYzdkODJiMTQxNWFjYWUyMDU5Zjc4Y2QxZDE3NTRiOWRlOWIxOGNhNTlmNjA5MDI0YzRhZjg0M2Q0ZDI0IgogICAgfQogIH0KfQ=="
 
     // Regex patterns for chat parsing
     private val WATCHER_PATTERN = Regex("""\[BOSS] The Watcher: That will be enough for now\.""")
@@ -62,6 +73,23 @@ object Dungeon {
     val players get() = DungeonPlayerManager.players
     val score get() = DungeonScore.score
 
+    // Secret Items
+    private val secretItems = setOf(
+        "Architect's First Draft",
+        "Candycomb",
+        "Decoy",
+        "Defuse Kit",
+        "Dungeon Chest Key",
+        "Healing VIII Splash Potion",
+        "Inflatable Jerry",
+        "Revive Stone",
+        "Secret Dye",
+        "Spirit Leap",
+        "Training Weights",
+        "Trap",
+        "Treasure Talisman"
+    )
+
     data class DiscoveredRoom(val x: Int, val z: Int, val room: Room)
 
     /** Initializes all dungeon systems and event listeners */
@@ -95,6 +123,52 @@ object Dungeon {
         EventBus.registerIn<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
             updateHudLines()
             updateHeldItem()
+        }
+
+        EventBus.registerIn<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            val world = world ?: return@registerIn
+
+            when (val packet = event.packet) {
+                is ClientboundTakeItemEntityPacket -> {
+                    val entity = world.getEntity(packet.itemId) as? ItemEntity ?: return@registerIn
+                    val name = entity.item.displayName.stripped.drop(1).dropLast(1)
+
+                    if (secretItems.contains(name)) {
+                        EventBus.post(DungeonEvent.Secrets.Item(packet.itemId, entity))
+                    }
+                }
+
+                is ServerboundUseItemOnPacket -> {
+                    val pos = packet.hitResult.blockPos ?: return@registerIn
+                    val blockState = world.getBlockState(pos)
+
+                    when (blockState.block) {
+                        Blocks.CHEST, Blocks.TRAPPED_CHEST -> {
+                            EventBus.post(DungeonEvent.Secrets.Chest(blockState, pos))
+                        }
+                        Blocks.LEVER -> {
+                            EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.LEVER, pos))
+                        }
+                        else -> {
+                            val entity = world.getBlockEntity(pos) ?: return@registerIn
+                            if (entity is SkullBlockEntity) {
+                                val texture = entity.ownerProfile?.properties?.get("textures")?.firstOrNull()?.value
+                                when (texture) {
+                                    WITHER_ESSENCE_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Essence(entity, pos))
+                                    RED_SKULL_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.RED_SKULL, pos))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        EventBus.registerIn<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (event.entity.type == EntityType.BAT) {
+                EventBus.post(DungeonEvent.Secrets.Bat(event.entity))
+                return@registerIn
+            }
         }
 
         RoomRegistry.loadFromRemote()

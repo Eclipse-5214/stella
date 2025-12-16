@@ -151,6 +151,6 @@ class Room(
         return this
     }
 
-    fun getRoomCoord(pos: BlockPos)   = pos.subtract(Vec3i(corner?.x ?: 0, 0, corner?.z ?: 0)).unrotate(rotation ?: 0)
-    fun getRealCoord(local: BlockPos) = local.rotate(rotation ?: 0).offset(Vec3i(corner?.x ?: 0, 0, corner?.z ?: 0))
+    fun getRoomCoord(pos: BlockPos)   = pos.subtract(Vec3i(corner?.x ?: 0, 0, corner?.z ?: 0)).rotate(rotation ?: 0)
+    fun getRealCoord(local: BlockPos) = local.unrotate(rotation ?: 0).offset(Vec3i(corner?.x ?: 0, 0, corner?.z ?: 0))
 }

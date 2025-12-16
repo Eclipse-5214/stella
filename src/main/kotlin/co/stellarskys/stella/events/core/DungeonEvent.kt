@@ -50,7 +50,8 @@ sealed class DungeonEvent {
 
     sealed class Secrets {
         class Item(
-            val entityId: Int
+            val entityId: Int,
+            val entity: Entity
         ) : Event()
 
         class Bat(

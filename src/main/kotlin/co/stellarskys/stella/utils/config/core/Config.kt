@@ -24,6 +24,7 @@ import co.stellarskys.vexel.components.core.Rectangle
 import co.stellarskys.vexel.components.core.Text
 import co.stellarskys.vexel.core.VexelScreen
 import co.stellarskys.vexel.core.VexelWindow
+import kotlin.reflect.KProperty
 
 //Main config Shananagens
 class Config(
@@ -474,4 +475,33 @@ class Config(
         return value as? T
             ?: error("Config value for '$key' is not of type ${T::class.simpleName}")
     }
+
+    inner class Property<T : Any>(
+        private val key: String,
+        private val type: Class<T>
+    ) {
+        operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+            val value = flattenValues()[key]
+                ?: error("Missing config value for '$key'")
+
+            return if (type.isInstance(value)) {
+                type.cast(value)
+            } else {
+                error("Config value for '$key' is not of type ${type.simpleName}")
+            }
+        }
+
+        operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+            val element = categories.values
+                .flatMap { it.subcategories.values }
+                .flatMap { it.elements.values }
+                .firstOrNull { it.configName == key }
+                ?: error("No config entry found for key '$key'")
+
+            element.value = value
+            notifyListeners(key, value)
+        }
+    }
+
+    inline fun <reified T : Any> property(key: String): Property<T> { return Property(key, T::class.java) }
 }

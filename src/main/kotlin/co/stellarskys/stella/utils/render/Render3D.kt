@@ -1,59 +1,78 @@
 package co.stellarskys.stella.utils.render
 
+import co.stellarskys.stella.utils.WorldUtils
+import co.stellarskys.stella.utils.config
+import co.stellarskys.stella.utils.config.RGBA
 import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.ShapeRenderer
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.EmptyBlockGetter
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.sqrt
 
 object Render3D {
-    fun renderFilled(
+    fun outlineBlock(
         ctx: RenderContext,
-        shape: VoxelShape,
-        ox: Double,
-        oy: Double,
-        oz: Double,
+        pos: BlockPos,
         color: Color,
-        phase: Boolean = false
+        lineWidth: Double = 1.0,
+        phase: Boolean = false,
+        blockState: BlockState? = null
     ) {
+        val finalState = blockState ?: WorldUtils.getBlockStateAt(pos.x, pos.y, pos.z) ?: return
+        val mstack = ctx.matrixStack ?: return
         val consumers = ctx.consumers ?: return
-        val matrices = ctx.matrixStack ?: return
-        val layer = if (phase) StellaRenderLayers.FILLED_THROUGH_WALLS else StellaRenderLayers.FILLED
-
-        shape.forAllBoxes { minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double ->
-            ShapeRenderer.addChainedFilledBoxVertices(
-                matrices,
-                consumers.getBuffer(layer),
-                minX + ox, minY + oy, minZ + oz,
-                maxX + ox, maxY + oy, maxZ + oz,
-                color.red / 255f, color.green / 255f, color.blue / 255f, color.alpha / 255f
-            )
+        val camera = ctx.camera
+        val camPos = camera.position
+        val blockShape = finalState.getShape(EmptyBlockGetter.INSTANCE, pos, CollisionContext.of(camera.entity))
+        if (blockShape.isEmpty) {
+            renderBox(ctx, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), 1.0, 1.0, color, phase, lineWidth)
+            return
         }
-    }
-
-    fun renderOutline(
-        ctx: RenderContext,
-        shape: VoxelShape,
-        ox: Double,
-        oy: Double,
-        oz: Double,
-        color: Color,
-        phase: Boolean = false
-    ) {
-        val consumers = ctx.consumers ?: return
-        val matrices = ctx.matrixStack ?: return
-        val layer = if (phase) StellaRenderLayers.getLinesThroughWalls( 1.0) else StellaRenderLayers.getLines( 1.0)
 
         ShapeRenderer.renderShape(
-            matrices,
-            consumers.getBuffer(layer),
-            shape,
-            ox, oy, oz,
+            mstack,
+            consumers.getBuffer(if (phase) StellaRenderLayers.getLinesThroughWalls(lineWidth) else StellaRenderLayers.getLines(lineWidth)),
+            blockShape,
+            pos.x - camPos.x, pos.y - camPos.y, pos.z - camPos.z,
             color.rgb
         )
+    }
+
+    fun fillBlock(
+        ctx: RenderContext,
+        pos: BlockPos,
+        color: Color,
+        phase: Boolean = false,
+        blockState: BlockState? = null
+    ) {
+        val blockState = WorldUtils.getBlockStateAt(pos.x, pos.y, pos.z) ?: return
+        val mstack = ctx.matrixStack ?: return
+        val consumers = ctx.consumers ?: return
+        val camera = ctx.camera
+        val camPos = camera.position
+        val blockShape = blockState.getShape(EmptyBlockGetter.INSTANCE, pos, CollisionContext.of(camera.entity))
+
+        if (blockShape.isEmpty) {
+            renderFilledBox(ctx, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), 1.0, 1.0, color, phase)
+            return
+        }
+
+        blockShape.forAllBoxes { minX, minY, minZ, maxX, maxY, maxZ ->
+            ShapeRenderer.addChainedFilledBoxVertices(
+                mstack,
+                consumers.getBuffer( if (phase) StellaRenderLayers.FILLED_THROUGH_WALLS else StellaRenderLayers.FILLED),
+                pos.x - camPos.x + minX, pos.y - camPos.y + minY, pos.z - camPos.z + minZ,
+                pos.x - camPos.x + maxX, pos.y - camPos.y + maxY, pos.z - camPos.z + maxZ,
+                color.red / 255f,color.green / 255f,color.blue / 255f,color.alpha / 255f
+            )
+        }
     }
 
     fun renderBox(
