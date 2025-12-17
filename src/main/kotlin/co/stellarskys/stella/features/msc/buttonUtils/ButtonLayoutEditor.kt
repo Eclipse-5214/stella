@@ -1,15 +1,16 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
-import co.stellarskys.stella.utils.render.CustomGuiRenderer
 import co.stellarskys.stella.utils.render.Render2D
+import co.stellarskys.stella.utils.render.vexel.NVGScreen
+import co.stellarskys.stella.utils.render.vexel.NVGSpecialRenderer
 import co.stellarskys.stella.utils.skyblock.NEUApi
 import co.stellarskys.vexel.api.nvg.NVGRenderer
-import co.stellarskys.vexel.core.VexelScreen
 import dev.deftu.omnicore.api.client.input.KeyboardModifiers
 import dev.deftu.omnicore.api.client.input.OmniMouseButton
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
+import dev.deftu.omnicore.api.client.render.OmniResolution
 
-class ButtonLayoutEditor : VexelScreen() {
+class ButtonLayoutEditor : NVGScreen() {
     private val slotSize = 20
     private val popup = EditButtonPopup(window)
 
@@ -20,56 +21,50 @@ class ButtonLayoutEditor : VexelScreen() {
         val invX = (width - 176) / 2
         val invY = (height - 166) / 2
 
-        NVGRenderer.beginFrame(width.toFloat(), height.toFloat())
+        NVGSpecialRenderer.draw(context, 0, 0, width, height) {
 
-        NVGRenderer.hollowRect(
-            invX.toFloat(),
-            invY.toFloat(),
-            176f,
-            166f,
-            1f,
-            0xFFAAAAAA.toInt(),
-            4f
-        )
+            NVGRenderer.hollowRect(
+                invX.toFloat(),
+                invY.toFloat(),
+                176f,
+                166f,
+                1f,
+                0xFFAAAAAA.toInt(),
+                4f
+            )
 
-        for (anchor in AnchorType.entries) {
-            for (index in 0 until anchor.slots) {
-                val (x, y) = ButtonManager.resolveAnchorPosition(anchor, index, invX, invY)
+            for (anchor in AnchorType.entries) {
+                for (index in 0 until anchor.slots) {
+                    val (x, y) = ButtonManager.resolveAnchorPosition(anchor, index, invX, invY)
 
-                NVGRenderer.hollowRect(
-                    x.toFloat(),
-                    y.toFloat(),
-                    slotSize.toFloat(),
-                    slotSize.toFloat(),
-                    1f,
-                    0xFFAAAAAA.toInt(),
-                    4f
-                )
+                    NVGRenderer.hollowRect(
+                        x.toFloat(),
+                        y.toFloat(),
+                        slotSize.toFloat(),
+                        slotSize.toFloat(),
+                        1f,
+                        0xFFAAAAAA.toInt(),
+                        4f
+                    )
 
-                ButtonManager.getAll().find { it.anchor == anchor && it.index == index }?.let { button ->
-                    if (popup.shown) return@let
+                    ButtonManager.getAll().find { it.anchor == anchor && it.index == index }?.let { button ->
+                        if (popup.shown) return@let
 
-                    val item = NEUApi.getItemBySkyblockId(button.iconId, true) ?: return@let
-                    val stack = NEUApi.createDummyStack(item)
+                        val item = NEUApi.getItemBySkyblockId(button.iconId, true) ?: return@let
+                        val stack = NEUApi.createDummyStack(item)
 
-                    val offsetX = (20f - 16f) / 2f
-                    val offsetY = (20f - 16f) / 2f
+                        val offsetX = (20f - 16f) / 2f
+                        val offsetY = (20f - 16f) / 2f
 
 
-                    Render2D.renderItem(context, stack, x.toFloat() + offsetX, y.toFloat() + offsetY, 1f)
+                        Render2D.renderItem(context, stack, x.toFloat() + offsetX, y.toFloat() + offsetY, 1f)
+                    }
                 }
             }
         }
 
-        NVGRenderer.endFrame()
-
         super.onRender(ctx, mouseX, mouseY, tickDelta)
-    }
-
-    override fun onRenderGui() {
-        NVGRenderer.endFrame()
-        CustomGuiRenderer.render { popup.renderPreviewItem(it) }
-        NVGRenderer.beginFrame(0f, 0f)
+        popup.renderPreviewItem(context)
     }
 
     override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
