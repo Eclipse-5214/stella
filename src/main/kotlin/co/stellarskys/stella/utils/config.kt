@@ -296,7 +296,7 @@ val config = Config("Stella", "Stella") {
     }
 
     category("StellaNav") {
-        subcategory("general") {
+        subcategory("General") {
             toggle {
                 configName = "mapEnabled"
                 name = "Enable map"
@@ -329,7 +329,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Map") {
+        subcategory("Display") {
             colorpicker {
                 configName = "mapBgColor"
                 name = "map Background Color"
@@ -523,7 +523,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("extra") {
+        subcategory("Extra") {
             toggle {
                 configName = "boxWitherDoors"
                 name = "Box Wither Doors"

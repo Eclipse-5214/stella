@@ -276,7 +276,6 @@ object EventBus : EventBus() {
     inline fun <reified T : Event> on(
         vararg scope: Any,
         skyblockOnly: Boolean = false,
-        register: Boolean = true,
         noinline handler: (T) -> Unit
     ): EventHandle<T> { // partition scopes into sets
         val islands = mutableSetOf<SkyBlockIsland>()
@@ -295,9 +294,8 @@ object EventBus : EventBus() {
             }
         }
 
-        // create handle but don’t register yet
         val handle = EventHandle(this, T::class.java, handler)
-        // track with manager
+
         EventBusManager.trackConditionalEvent(
             islands = islands.ifEmpty { null },
             arias = arias.ifEmpty { null },
@@ -306,7 +304,6 @@ object EventBus : EventBus() {
             handle = handle
         )
 
-        if (register) handle.register()
         return handle
     }
 }

@@ -13,7 +13,6 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils.rotate
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils.unrotate
-import dev.deftu.omnicore.api.serialization.parseJsonOrNull
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Vec3i
 import net.minecraft.world.level.block.Blocks

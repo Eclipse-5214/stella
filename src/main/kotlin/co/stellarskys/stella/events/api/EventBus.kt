@@ -1,5 +1,7 @@
 package co.stellarskys.stella.events.api
 
+import co.stellarskys.stella.utils.ChatUtils
+
 open class EventBus {
     private val subscribers = mutableMapOf<Class<*>, MutableList<(Event) -> Unit>>()
 
@@ -27,13 +29,15 @@ open class EventBus {
     }
 
 
-    internal fun <T : Event> add(eventClass: Class<T>, handler: (T) -> Unit) {
-        val list = subscribers.getOrPut(eventClass) { mutableListOf() }
+    internal fun <T : Event> add(eventClass: Class<T>, handler: (T) -> Unit): (Event) -> Unit {
         val wrapper: (Event) -> Unit = { e -> handler(eventClass.cast(e)) }
+        val list = subscribers.getOrPut(eventClass) { mutableListOf() }
         list += wrapper
+        return wrapper
     }
 
-    internal fun <T : Event> remove(eventClass: Class<T>, handler: (T) -> Unit) {
-        subscribers[eventClass]?.removeIf { it === handler }
+    internal fun <T : Event> remove(eventClass: Class<T>, wrapper: (Event) -> Unit) {
+        subscribers[eventClass]?.remove(wrapper)
     }
+
 }

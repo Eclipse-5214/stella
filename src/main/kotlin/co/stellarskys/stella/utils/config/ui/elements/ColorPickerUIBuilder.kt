@@ -4,6 +4,7 @@ import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.core.ColorPicker
 import co.stellarskys.stella.utils.config.core.attachTooltip
 import co.stellarskys.stella.utils.config.ui.Palette
+import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.vexel.components.base.enums.Pos
 import co.stellarskys.vexel.components.base.enums.Size
 import co.stellarskys.vexel.components.base.VexelElement
@@ -25,7 +26,7 @@ class ColorPickerUIBuilder {
 
         attachTooltip(window, name, colorpicker.description)
 
-        val picker = co.stellarskys.vexel.elements.ColorPicker((colorpicker.value as RGBA).toColor(), Color.BLACK.rgb, Palette.Purple.rgb, 25f, 0f)
+        val picker = co.stellarskys.vexel.elements.ColorPicker((colorpicker.value as RGBA).toColor(), Color.BLACK.rgb, Palette.Purple.withAlpha(100).rgb, 25f, 1f)
             .setSizing(25f, Size.Pixels, 25f, Size.Pixels)
             .setPositioning(-10f, Pos.ParentPixels, 0f, Pos.ParentCenter)
             .alignRight()
