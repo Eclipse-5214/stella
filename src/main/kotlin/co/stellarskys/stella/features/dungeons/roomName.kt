@@ -15,7 +15,7 @@ import net.minecraft.client.gui.GuiGraphics
 object roomName : Feature("showRoomName", island = SkyBlockIsland.THE_CATACOMBS) {
     override fun initialize() {
         HUDManager.register("roomname", "No Room Found", "showRoomName")
-        register<GuiEvent.RenderHUD> { renderHUD(it.context)}
+        on<GuiEvent.RenderHUD> { renderHUD(it.context)}
     }
 
     private fun renderHUD(

@@ -15,7 +15,7 @@ object termTracker : Feature("termTracker", island = SkyBlockIsland.THE_CATACOMB
 
     override fun initialize() {
         completed = mutableMapOf()
-        register<ChatEvent.Receive> { event ->
+        on<ChatEvent.Receive> { event ->
             val msg = event.message.string.clearCodes()
             val matcher = pattern.find(msg)
 

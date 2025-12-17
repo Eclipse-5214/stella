@@ -55,7 +55,7 @@ class Config(
 
     init {
         this.builder()
-        EventBus.register<GameEvent.Stop> { save() }
+        EventBus.on<GameEvent.Stop> { save() }
     }
 
     // DSL functions

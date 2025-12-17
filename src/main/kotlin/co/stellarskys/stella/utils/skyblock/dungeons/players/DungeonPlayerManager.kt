@@ -27,8 +27,8 @@ object DungeonPlayerManager {
     val players = Array<DungeonPlayer?>(5) { null }
 
     fun init() {
-        EventBus.registerIn<TablistEvent.Change>(SkyBlockIsland.THE_CATACOMBS){ event ->
-            val firstColumn = event.new.firstOrNull() ?: return@registerIn
+        EventBus.on<TablistEvent.Change>(SkyBlockIsland.THE_CATACOMBS){ event ->
+            val firstColumn = event.new.firstOrNull() ?: return@on
 
             for (i in 0 until 5) {
                 val index = 1 + i * 4
@@ -50,7 +50,7 @@ object DungeonPlayerManager {
             }
         }
 
-        EventBus.registerIn<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { onDeath(it.message.string) }
+        EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { onDeath(it.message.string) }
     }
 
 

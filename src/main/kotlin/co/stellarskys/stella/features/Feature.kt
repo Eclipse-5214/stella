@@ -4,7 +4,7 @@ package co.stellarskys.stella.features
 
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.api.Event
-import co.stellarskys.stella.events.api.EventCall
+import co.stellarskys.stella.events.api.EventHandle
 import co.stellarskys.stella.managers.feature.FeatureManager
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
@@ -22,9 +22,9 @@ open class Feature(
     area: Any? = null,
     dungeonFloor: Any? = null
 ) {
-    val events = mutableListOf<EventCall>()
+    val events = mutableListOf<EventHandle<*>>()
     val tickHandles = mutableSetOf<TickScheduler.Handle>()
-    val namedEventCalls = mutableMapOf<String, EventCall>()
+    val namedEventHandles = mutableMapOf<String, EventHandle<*>>()
     private var setupLoops: (() -> Unit)? = null
     private var isRegistered = false
 
@@ -90,21 +90,29 @@ open class Feature(
         }
     }
 
-    inline fun <reified T : Event> register(priority: Int = 0, noinline cb: (T) -> Unit) {
-        events.add(EventBus.register<T>(priority, false, cb))
+    inline fun <reified T : Event> on(noinline cb: (T) -> Unit) { register<T>(cb) }
+
+
+    inline fun <reified T : Event> register(noinline cb: (T) -> Unit) {
+        val handle = EventBus.on<T>(register = false, handler = cb)
+        events.add(handle)
     }
 
-    inline fun <reified T : Event> createCustomEvent(name: String, priority: Int = 0, noinline cb: (T) -> Unit) {
-        val eventCall = EventBus.register<T>(priority, false, cb)
-        namedEventCalls[name] = eventCall
+    inline fun <reified T : Event> createCustomEvent(
+        name: String,
+        noinline cb: (T) -> Unit
+    ) {
+        // create the handle but don’t auto‑register yet
+        val handle = EventBus.on<T>(register = false, handler = cb)
+        namedEventHandles[name] = handle
     }
 
     fun registerEvent(name: String) {
-        namedEventCalls[name]?.register()
+        namedEventHandles[name]?.register()
     }
 
     fun unregisterEvent(name: String) {
-        namedEventCalls[name]?.unregister()
+        namedEventHandles[name]?.unregister()
     }
 
     inline fun <reified T> loop(intervalTicks: Int, noinline action: () -> Unit): Any {

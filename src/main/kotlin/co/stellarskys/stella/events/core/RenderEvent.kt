@@ -3,7 +3,6 @@ package co.stellarskys.stella.events.core
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.state.PlayerRenderState
-import co.stellarskys.stella.events.api.CancellableEvent
 import co.stellarskys.stella.events.api.Event
 import co.stellarskys.stella.utils.render.RenderContext
 
@@ -19,7 +18,7 @@ sealed class RenderEvent {
 
         class BlockOutline(
             val context: RenderContext,
-        ) : CancellableEvent()
+        ) : Event(cancelable = true)
     }
 
     sealed class Entity {
@@ -28,8 +27,7 @@ sealed class RenderEvent {
             val matrices: PoseStack,
             val vertex: MultiBufferSource?,
             val light: Int
-        ) : CancellableEvent()
-
+        ) : Event(cancelable = true)
         class Post(
             val entity: net.minecraft.world.entity.Entity,
             val matrices: PoseStack,
@@ -42,6 +40,6 @@ sealed class RenderEvent {
         class Pre(
             val entity: PlayerRenderState,
             val matrices: PoseStack
-        ) : CancellableEvent()
+        ) : Event(cancelable = true)
     }
 }

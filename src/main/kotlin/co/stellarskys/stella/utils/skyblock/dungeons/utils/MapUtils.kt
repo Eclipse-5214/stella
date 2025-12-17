@@ -31,12 +31,12 @@ object MapUtils {
     var guessMapData: MapItemSavedData? = null
 
     fun init() {
-        EventBus.registerIn<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event->
+        EventBus.on<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event->
             if (event.packet is ClientboundMapItemDataPacket && mapData == null) {
-                val world = world ?: return@registerIn
+                val world = world ?: return@on
                 val id = event.packet.mapId.id
                 if (id and 1000 == 0) {
-                    val guess = MapItem.getSavedData(event.packet.mapId, world) ?: return@registerIn
+                    val guess = MapItem.getSavedData(event.packet.mapId, world) ?: return@on
                     if(guess.decorations.any {it.type == MapDecorationTypes.FRAME }) {
                         guessMapData = guess
                     }
@@ -44,7 +44,7 @@ object MapUtils {
             }
         }
 
-        EventBus.registerIn<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
+        EventBus.on<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
             if (!calibrated) {
                 if (mapData == null) {
                     mapData = getCurrentMapState()

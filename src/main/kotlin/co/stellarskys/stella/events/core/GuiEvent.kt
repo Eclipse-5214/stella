@@ -2,7 +2,6 @@
 
 package co.stellarskys.stella.events.core
 
-import co.stellarskys.stella.events.api.CancellableEvent
 import co.stellarskys.stella.events.api.Event
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
@@ -15,7 +14,7 @@ sealed class GuiEvent {
     sealed class NVG {
         class Render(
             val context: GuiGraphics
-        ) : CancellableEvent()
+        ) : Event(cancelable = true)
     }
 
     class RenderHUD(
@@ -29,7 +28,7 @@ sealed class GuiEvent {
     class Close(
         val screen: Screen,
         val handler: AbstractContainerMenu
-    ) : CancellableEvent()
+    ) : Event(cancelable = true)
 
     class Click(
         val mouseX: Double,
@@ -37,7 +36,7 @@ sealed class GuiEvent {
         val mouseButton: Int,
         val buttonState: Boolean,
         val screen: Screen
-    ) : CancellableEvent()
+    ) : Event(cancelable = true)
 
     class Key(
         val keyName: String?,
@@ -45,7 +44,7 @@ sealed class GuiEvent {
         val character: Char,
         val scanCode: Int,
         val screen: Screen
-    ) : CancellableEvent()
+    ) : Event(cancelable = true)
 
     sealed class Slot {
         class Click(
@@ -55,7 +54,7 @@ sealed class GuiEvent {
             val actionType: ClickType,
             val handler: AbstractContainerMenu,
             val screen: AbstractContainerScreen<*>
-        ) : CancellableEvent()
+        ) : Event(cancelable = true)
 
         class Render(
             val context: GuiGraphics,

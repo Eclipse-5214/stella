@@ -48,11 +48,11 @@ object DungeonScore {
 
     /** Registers event listeners for tablist and scoreboard updates */
     fun init() {
-        EventBus.registerIn<TablistEvent.Change>(SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.on<TablistEvent.Change>(SkyBlockIsland.THE_CATACOMBS) { event ->
             event.new.flatten().forEach { parseTablist(it.stripped.trim()) }
         }
 
-        EventBus.registerIn<ScoreboardEvent.Update>(SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.on<ScoreboardEvent.Update>(SkyBlockIsland.THE_CATACOMBS) { event ->
             event.new.forEach { parseSidebar(it.stripColor().trim()) }
         }
 

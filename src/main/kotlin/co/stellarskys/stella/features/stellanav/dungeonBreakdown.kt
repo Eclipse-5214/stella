@@ -19,7 +19,7 @@ import dev.deftu.textile.Text
 object dungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE_CATACOMBS) {
 
     override fun initialize() {
-        register<DungeonEvent.End> { event ->
+        on<DungeonEvent.End> { event ->
             TickSchedulers.client.after(3 * 20) {
                 ChatUtils.fakeMessage(Stella.PREFIX + " §bCleared room counts:")
                 DungeonPlayerManager.players.forEach { player ->

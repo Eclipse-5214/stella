@@ -17,7 +17,7 @@ object mapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS
     override fun initialize() {
         HUDManager.registerCustom(name, 200, 30,this::HUDEditorRender, "separateMapInfo")
 
-        register<GuiEvent.RenderHUD> { event -> RenderNormal(event.context) }
+        on<GuiEvent.RenderHUD> { event -> RenderNormal(event.context) }
     }
 
     fun HUDEditorRender(context: GuiGraphics){

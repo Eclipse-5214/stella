@@ -20,7 +20,7 @@ object FirstInstall {
         set(value) = FirstInstallStore.setData(value)
 
     init {
-        EventBus.register<ServerEvent.Connect> {
+        EventBus.on<ServerEvent.Connect> {
             if(!shown) {
                 val showMessage = config["loadMessage"] as Boolean
                 val loadMessage = Text

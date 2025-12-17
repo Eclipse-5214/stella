@@ -21,27 +21,27 @@ object MimicTrigger {
     val mimicMessages = listOf("mimic dead", "mimic dead!", "mimic killed", "mimic killed!", "\$skytils-dungeon-score-mimic$")
 
     fun init() {
-        EventBus.registerIn<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            if (Dungeon.floorNumber !in listOf(6, 7) || Dungeon.floor == null) return@registerIn
+        EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (Dungeon.floorNumber !in listOf(6, 7) || Dungeon.floor == null) return@on
 
             val msg = event.message.string.clearCodes()
-            val match = MIMIC_PATTERN.matchEntire(msg) ?: return@registerIn
+            val match = MIMIC_PATTERN.matchEntire(msg) ?: return@on
 
-            if (mimicMessages.none { it == match.groupValues[1].lowercase() }) return@registerIn
+            if (mimicMessages.none { it == match.groupValues[1].lowercase() }) return@on
             mimicDead = true
         }
 
-        EventBus.registerIn<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            if (Dungeon.floor?.floorNumber !in listOf(6, 7) || mimicDead) return@registerIn
+        EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (Dungeon.floor?.floorNumber !in listOf(6, 7) || mimicDead) return@on
             val mcEntity = event.entity
 
-            if (mcEntity !is Zombie) return@registerIn
+            if (mcEntity !is Zombie) return@on
             if (
                 !mcEntity.isBaby ||
                 EquipmentSlot.entries
                     .filter { it.type == EquipmentSlot.Type.HUMANOID_ARMOR }
                     .any { slot -> mcEntity.getItemBySlot(slot).isEmpty }
-            ) return@registerIn
+            ) return@on
 
             mimicDead = true
         }

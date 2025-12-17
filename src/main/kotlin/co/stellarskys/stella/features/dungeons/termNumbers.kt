@@ -15,6 +15,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.player
+import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.Resource
 import net.minecraft.server.packs.resources.ResourceManager
@@ -42,10 +43,10 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
     )
 
     override fun initialize() {
-        register<RenderEvent.World.Last> { event ->
-            if (!Dungeon.inBoss || Dungeon.floorNumber != 7) return@register
+        on<RenderEvent.World.Last> { event ->
+            if (!Dungeon.inBoss || Dungeon.floorNumber != 7) return@on
 
-            val player = player ?: return@register
+            val player = player ?: return@on
             val playerPos = Triple(
                 (player.x + 0.25).roundToInt() - 1,
                 player.y.roundToInt(),
@@ -108,71 +109,69 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
                         }
 
                         if (highlightTerms) {
-                            /*
-                            Render3D.renderBlock(BlockPos(term.x, term.y, term.z), partialTicks, true, color, 1f, false)
-
-                             */
+                            Render3D.outlineBlock(event.context, BlockPos(term.x, term.y, term.z), color, 1.0, false)
                         }
                     }
                 }
             }
         }
     }
-}
 
-object TermRegistry {
-    private val gson = Gson()
-    private val terms = mutableMapOf<String, List<TermEntry>>() // p1, p2, etc.
+    object TermRegistry {
+        private val gson = Gson()
+        private val terms = mutableMapOf<String, List<TermEntry>>()
 
-    init {
-        load(client.resourceManager)
-    }
+        data class TermEntry(
+            val x: Int,
+            val y: Int,
+            val z: Int,
+            val number: Int,
+            val classCode: String,
+            val m7ClassCode: String
+        )// p1, p2, etc.
 
-    fun load(resourceManager: ResourceManager) {
-        val id = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "dungeons/terms.json")
-        val resource: Resource? = try {
-            resourceManager.getResource(id).orElse(null)
-        } catch (e: IOException) {
-            println("[Terms] Error: could not find $id")
-            null
+        init {
+            load(client.resourceManager)
         }
 
-        if (resource == null) return
+        fun load(resourceManager: ResourceManager) {
+            val id = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "dungeons/terms.json")
+            val resource: Resource? = try {
+                resourceManager.getResource(id).orElse(null)
+            } catch (e: IOException) {
+                println("[Terms] Error: could not find $id")
+                null
+            }
 
-        resource.open().use { stream ->
-            InputStreamReader(stream).use { reader ->
-                // Parse as raw map first
-                val rawType = object : TypeToken<Map<String, List<List<Any>>>>() {}.type
-                val rawParsed: Map<String, List<List<Any>>> = gson.fromJson(reader, rawType)
+            if (resource == null) return
 
-                val parsed = rawParsed.mapValues { (_, list) ->
-                    list.map { arr ->
-                        TermEntry(
-                            x = (arr[0] as Number).toInt(),
-                            y = (arr[1] as Number).toInt(),
-                            z = (arr[2] as Number).toInt(),
-                            number = (arr[3] as Number).toInt(),
-                            classCode = arr[4] as String,
-                            m7ClassCode = arr[5] as String
-                        )
+            resource.open().use { stream ->
+                InputStreamReader(stream).use { reader ->
+                    // Parse as raw map first
+                    val rawType = object : TypeToken<Map<String, List<List<Any>>>>() {}.type
+                    val rawParsed: Map<String, List<List<Any>>> = gson.fromJson(reader, rawType)
+
+                    val parsed = rawParsed.mapValues { (_, list) ->
+                        list.map { arr ->
+                            TermEntry(
+                                x = (arr[0] as Number).toInt(),
+                                y = (arr[1] as Number).toInt(),
+                                z = (arr[2] as Number).toInt(),
+                                number = (arr[3] as Number).toInt(),
+                                classCode = arr[4] as String,
+                                m7ClassCode = arr[5] as String
+                            )
+                        }
                     }
-                }
 
-                terms.clear()
-                terms.putAll(parsed)
+                    terms.clear()
+                    terms.putAll(parsed)
+                }
             }
         }
+
+        fun getPhase(name: String): List<TermEntry> = terms[name].orEmpty()
+        fun getAll(): Map<String, List<TermEntry>> = terms
+
     }
-
-    fun getPhase(name: String): List<TermEntry> = terms[name].orEmpty()
-    fun getAll(): Map<String, List<TermEntry>> = terms
 }
-
-data class TermEntry(
-    val x: Int,
-    val y: Int,
-    val z: Int,
-    val number: Int,
-    val classCode: String,
-    val m7ClassCode: String
-)

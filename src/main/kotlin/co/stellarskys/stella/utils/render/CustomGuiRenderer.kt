@@ -69,7 +69,7 @@ object CustomGuiRenderer {
 
     private val fogRenderer: FogRenderer = FogRenderer()
 
-    init { EventBus.register<GameEvent.Stop> { close() } }
+    init { EventBus.on<GameEvent.Stop> { close() } }
 
     /**
      * Executes a full rendering pass with support for layering.

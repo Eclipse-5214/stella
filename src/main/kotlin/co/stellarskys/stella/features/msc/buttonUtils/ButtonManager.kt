@@ -26,7 +26,7 @@ object ButtonManager {
     init {
         load()
 
-        EventBus.register<GameEvent.Stop> {
+        EventBus.on<GameEvent.Stop> {
             save()
         }
     }

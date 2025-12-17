@@ -64,7 +64,7 @@ object petDisplay: Feature("petDisplay", true) {
             //Stella.LOGGER.info("Restored last active pet from cache: $name Lvl $lvl")
         }
 
-        register<ChatEvent.Receive> { event ->
+        on<ChatEvent.Receive> { event ->
             val msg = event.message.string.clearCodes()
 
             // Pet summon/despawn matcher
@@ -86,7 +86,7 @@ object petDisplay: Feature("petDisplay", true) {
                 }
 
 
-                return@register
+                return@on
             }
 
             // Autopet matcher
@@ -99,11 +99,11 @@ object petDisplay: Feature("petDisplay", true) {
                 activePetLvl = level
                 cachePet(petName, level)
 
-                return@register
+                return@on
             }
         }
 
-        register<TablistEvent.Change> { tabEvent ->
+        on<TablistEvent.Change> { tabEvent ->
             tabEvent.new.flatten().forEach{ entry ->
                 val text = entry.string?.clearCodes() ?: return@forEach
 
@@ -120,7 +120,7 @@ object petDisplay: Feature("petDisplay", true) {
             }
         }
 
-        register<GuiEvent.RenderHUD> { event ->
+        on<GuiEvent.RenderHUD> { event ->
             renderHud(event.context)
         }
     }

@@ -22,29 +22,29 @@ object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
     val bloodOpened = Regex("""^The BLOOD DOOR has been opened!$""")
 
     override fun initialize() {
-        register<ChatEvent.Receive> { event ->
+        on<ChatEvent.Receive> { event ->
             val msg = event.message.string.clearCodes()
 
             val doorMatch = openedDoor.find(msg)
             if (doorMatch != null){
                 keyObtained = false
-                return@register
+                return@on
             }
 
             val bloodMatch = bloodOpened.find(msg)
             if (bloodMatch != null){
                 keyObtained = false
                 bloodOpen = true
-                return@register
+                return@on
             }
         }
 
-        register<DungeonEvent.KeyPickUp> {
+        on<DungeonEvent.KeyPickUp> {
             keyObtained = true
         }
 
-        register<RenderEvent.World.Last> { event ->
-            if(bloodOpen) return@register
+        on<RenderEvent.World.Last> { event ->
+            if(bloodOpen) return@on
 
             val color = if (keyObtained) mapConfig.key else mapConfig.noKey
 

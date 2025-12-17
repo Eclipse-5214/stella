@@ -31,23 +31,23 @@ object FeatureManager {
     val features = mutableListOf<Feature>()
 
     init {
-        EventBus.register<LocationEvent.SkyblockJoin> {
+        EventBus.on<LocationEvent.SkyblockJoin> {
             skyblockFeatures.forEach { it.update() }
         }
 
-        EventBus.register<LocationEvent.SkyblockLeave> {
+        EventBus.on<LocationEvent.SkyblockLeave> {
             skyblockFeatures.forEach { it.update() }
         }
 
-        EventBus.register<LocationEvent.IslandChange> {
+        EventBus.on<LocationEvent.IslandChange> {
             islandFeatures.forEach { it.update() }
         }
 
-        EventBus.register<LocationEvent.AreaChange> {
+        EventBus.on<LocationEvent.AreaChange> {
             areaFeatures.forEach { it.update() }
         }
 
-        EventBus.register<LocationEvent.DungeonFloorChange> {
+        EventBus.on<LocationEvent.DungeonFloorChange> {
             dungeonFloorFeatures.forEach { it.update() }
         }
 

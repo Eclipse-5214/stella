@@ -15,7 +15,7 @@ object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     override fun initialize() {
         HUDManager.registerCustom(name, 148, 148, this::HUDEditorRender)
 
-        register<GuiEvent.RenderHUD> { event ->
+        on<GuiEvent.RenderHUD> { event ->
             RenderMap(event.context)
         }
     }

@@ -23,9 +23,9 @@ object WorldScanner {
     var lastIdx: Int? = null
 
     fun init() {
-        EventBus.registerIn<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
+        EventBus.on<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
 
-            val player = player ?: return@registerIn
+            val player = player ?: return@on
 
             // checking player states
             checkPlayerState()
@@ -49,11 +49,11 @@ object WorldScanner {
                     EventBus.post(DungeonEvent.Room.Change(prevRoom, currRoom))
                 }
 
-                if (lastIdx == idx) return@registerIn
+                if (lastIdx == idx) return@on
 
                 lastIdx = idx
                 Dungeon.currentRoom = Dungeon.getRoomAt(player.x.toInt(), player.z.toInt())
-                val (rmx, rmz) = Dungeon.currentRoom?.components?.firstOrNull() ?: return@registerIn
+                val (rmx, rmz) = Dungeon.currentRoom?.components?.firstOrNull() ?: return@on
                 Dungeon.discoveredRooms.remove("$rmx/$rmz")
             }
         }

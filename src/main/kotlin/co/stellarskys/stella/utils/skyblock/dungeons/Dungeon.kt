@@ -93,14 +93,14 @@ object Dungeon {
 
     /** Initializes all dungeon systems and event listeners */
     init {
-        EventBus.registerIn<LocationEvent.AreaChange>(SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.on<LocationEvent.AreaChange>(SkyBlockIsland.THE_CATACOMBS) { event ->
             floor?.let { EventBus.post(DungeonEvent.Enter(it)) }
         }
 
-        EventBus.register<LocationEvent.IslandChange> { reset() }
+        EventBus.on<LocationEvent.IslandChange> { reset() }
 
 
-        EventBus.registerIn<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val msg = event.message.string.clearCodes()
             if (WATCHER_PATTERN.containsMatchIn(msg)) bloodDone = true
             if (DUNGEON_COMPLETE_PATTERN.containsMatchIn(msg)) {
@@ -109,25 +109,25 @@ object Dungeon {
                 floor?.let { EventBus.post(DungeonEvent.End(it)) }
             }
 
-            if (!event.isActionBar) return@registerIn
+            if (!event.isActionBar) return@on
 
-            val room = currentRoom ?: return@registerIn
-            val match = ROOM_SECRETS_PATTERN.find(event.message.stripped) ?: return@registerIn
+            val room = currentRoom ?: return@on
+            val match = ROOM_SECRETS_PATTERN.find(event.message.stripped) ?: return@on
             val (found, _) = match.destructured
             val secrets = found.toInt()
             if (secrets != room.secretsFound) room.secretsFound = secrets
         }
 
 
-        EventBus.registerIn<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
+        EventBus.on<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
             updateHudLines()
             updateHeldItem()
         }
 
-        EventBus.registerIn<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            if (event.packet !is ClientboundTakeItemEntityPacket) return@registerIn
-            val world = world ?: return@registerIn
-            val entity = world.getEntity(event.packet.itemId) as? ItemEntity ?: return@registerIn
+        EventBus.on<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (event.packet !is ClientboundTakeItemEntityPacket) return@on
+            val world = world ?: return@on
+            val entity = world.getEntity(event.packet.itemId) as? ItemEntity ?: return@on
             val name = entity.item.displayName.stripped.drop(1).dropLast(1)
 
             if (secretItems.contains(name)) {
@@ -142,10 +142,10 @@ object Dungeon {
             }
         }
 
-        EventBus.registerIn<PacketEvent.Sent>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            if (event.packet !is ServerboundUseItemOnPacket) return@registerIn
-            val pos = event.packet.hitResult.blockPos ?: return@registerIn
-            val world = world ?: return@registerIn
+        EventBus.on<PacketEvent.Sent>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if (event.packet !is ServerboundUseItemOnPacket) return@on
+            val pos = event.packet.hitResult.blockPos ?: return@on
+            val world = world ?: return@on
             val blockState = world.getBlockState(pos)
 
             when (blockState.block) {
@@ -160,7 +160,7 @@ object Dungeon {
                     EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.LEVER, pos))
                 }
                 else -> {
-                    val entity = world.getBlockEntity(pos) ?: return@registerIn
+                    val entity = world.getBlockEntity(pos) ?: return@on
                     if (entity is SkullBlockEntity) {
                         val texture = entity.ownerProfile?.properties?.get("textures")?.firstOrNull()?.value
                         when (texture) {
@@ -184,7 +184,7 @@ object Dungeon {
             }
         }
 
-        EventBus.registerIn<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
             if (event.entity.type == EntityType.BAT) {
                 EventBus.post(DungeonEvent.Secrets.Bat(event.entity))
 

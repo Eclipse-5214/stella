@@ -13,14 +13,14 @@ import net.minecraft.world.phys.shapes.CollisionContext
 @Module
 object blockOverlay : Feature("overlayEnabled") {
     override fun initialize() {
-        register<RenderEvent.World.BlockOutline> { event ->
-            val blockPos = event.context.blockPos ?: return@register
-            val mstack = event.context.matrixStack ?: return@register
-            val consumers = event.context.consumers ?: return@register
+        on<RenderEvent.World.BlockOutline> { event ->
+            val blockPos = event.context.blockPos ?: return@on
+            val mstack = event.context.matrixStack ?: return@on
+            val consumers = event.context.consumers ?: return@on
             val camera = event.context.camera
             val camPos = camera.position
-            val blockShape = event.context.voxelShape ?: return@register
-            if (blockShape.isEmpty) return@register
+            val blockShape = event.context.voxelShape ?: return@on
+            if (blockShape.isEmpty) return@on
 
             val outlineColor = config["blockHighlightColor"] as RGBA
             val outlineWidth = (config["overlayLineWidth"] as Int).toDouble()

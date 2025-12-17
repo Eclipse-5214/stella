@@ -77,7 +77,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
         dataFile.parentFile.mkdirs()
         autosave(5)
         startAutosaveLoop()
-        EventBus.register<GameEvent.Stop> {
+        EventBus.on<GameEvent.Stop> {
             save()
         }
     }

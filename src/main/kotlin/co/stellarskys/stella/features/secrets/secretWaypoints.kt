@@ -10,9 +10,9 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 @Module
 object secretWaypoints: Feature("secretWaypoints", island = SkyBlockIsland.THE_CATACOMBS) {
     override fun initialize() {
-        register<RenderEvent.World.Last> { event ->
-            val room = Dungeon.currentRoom ?: return@register
-            val data = room.roomData?.secretCoords ?: return@register
+        on<RenderEvent.World.Last> { event ->
+            val room = Dungeon.currentRoom ?: return@on
+            val data = room.roomData?.secretCoords ?: return@on
 
             data.toWaypoints(config, room).forEach { waypoint ->
                 waypoint.render(event.context)
