@@ -352,14 +352,13 @@ val config = Config("Stella", "Stella") {
                 shouldShow { settings -> settings["mapBorder"] as Boolean }
             }
 
-            stepslider {
+            slider {
                 configName = "mapBdWidth"
                 name = "Border Width"
                 description = "The width of the map border"
-                min = 1
-                max = 5
-                step = 1
-                default = 2
+                min = 1f
+                max = 5f
+                default = 2f
                 shouldShow { settings -> settings["mapBorder"] as Boolean }
             }
 

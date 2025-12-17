@@ -96,7 +96,7 @@ class Config(
                 .childOf(bg)
 
             val top = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
-                .setSizing(100f, Size.Percent, 40f, Size.Percent)
+                .setSizing(100f, Size.Percent, 30f, Size.Percent)
                 .setPositioning(0f, Pos.ParentPixels,0f, Pos.ParentPixels)
                 .childOf(list)
 
