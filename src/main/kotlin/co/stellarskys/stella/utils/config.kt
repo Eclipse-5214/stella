@@ -4,6 +4,7 @@ import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.hud.HUDEditor
 import co.stellarskys.stella.utils.config.core.Config
 import dev.deftu.omnicore.api.client.client
+import kotlinx.coroutines.supervisorScope
 import net.minecraft.Util
 import java.net.URI
 
@@ -701,6 +702,14 @@ val config = Config("Stella", "Stella") {
                 description = "Color for lever route waypoints."
                 default = rgba(0, 255, 255, 255) // cyan
                 shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+        }
+
+        subcategory("Route Recording") {
+            toggle {
+                configName = "secretRoutes.recordingHud"
+                name = "Recording Hud"
+                description = "A helpful hud for recording secret routes"
             }
         }
     }

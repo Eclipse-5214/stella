@@ -1,24 +1,22 @@
 package co.stellarskys.stella.events.api
 
 class EventHandle<T : Event>(
-    private val bus: EventBus,
     val eventClass: Class<T>,
-    private val handler: (T) -> Unit
+    val handler: (T) -> Unit,
+    val priority: Int,
+    val ignoreCancelled: Boolean,
+    val bus: EventBus,
+    @Volatile private var _registered: Boolean
 ) {
-    private var registered = false
-    private var wrapper: ((Event) -> Unit)? = null
+    val registered: Boolean get() = _registered
 
-    fun register(): Boolean {
-        if (registered) return false
-        wrapper = bus.add(eventClass, handler)
-        registered = true
-        return true
-    }
+    fun register(): Boolean = toggle(bus, true)
+    fun unregister(): Boolean = toggle(bus, false)
 
-    fun unregister(): Boolean {
-        if (!registered) return false
-        wrapper?.let { bus.remove(eventClass, it) }
-        registered = false
+    private fun toggle(bus: EventBus, value: Boolean): Boolean {
+        if (_registered == value) return false
+        _registered = value
+        bus.rebuildCache(eventClass)
         return true
     }
 }

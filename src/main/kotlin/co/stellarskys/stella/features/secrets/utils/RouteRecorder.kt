@@ -7,11 +7,16 @@ import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.events.core.SoundEvent
 import co.stellarskys.stella.events.core.TickEvent
+import co.stellarskys.stella.features.secrets.secretRoutes
+import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.Utils.calcDistanceSq
+import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
+import net.fabricmc.loader.impl.lib.sat4j.pb.constraints.pb.WatchPb
+import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundEvents
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
@@ -28,7 +33,7 @@ object RouteRecorder {
     private var lastPlayerPos: BlockPos? = null
 
     val currentStep: StepData get() = route[stepIndex]
-    val lastStep: StepData? get() = if (stepIndex > 0) route[stepIndex - 1] else null
+    val lastStep: StepData? get() = route.getOrNull(stepIndex - 1)
 
     init {
         EventBus.on<DungeonEvent.Room.Change>(SkyBlockIsland.THE_CATACOMBS) {
@@ -58,6 +63,7 @@ object RouteRecorder {
         }
 
         EventBus.on<SoundEvent.Play>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            Stella.LOGGER.info("SoundEvent Called!")
             if (!recording) return@on
 
             val healdItem = player?.mainHandItem?.hoverName?.stripped ?: ""
@@ -75,7 +81,7 @@ object RouteRecorder {
             }
 
             if (sound.location.toString().contains("break")) {
-                if(!healdItem.contains("Dungeon Breaker")) return@on
+                if(!healdItem.contains("Dungeonbreaker")) return@on
                 val pos = BlockPos((sound.x - 0.5).toInt(), (sound.y - 0.5).toInt(), (sound.z - 0.5).toInt())
                 addWaypoint(WaypointType.MINE, pos)
             }
@@ -96,9 +102,9 @@ object RouteRecorder {
         }
 
         EventBus.on<RenderEvent.World.Last>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            if (!recording || lastStep == null) return@on
+            if (!recording) return@on
 
-            RoutePlayer.renderRecordingRoute(currentStep, lastStep!!, event.context)
+            RoutePlayer.renderRecordingRoute(currentStep, lastStep, event.context)
         }
     }
 
@@ -122,11 +128,11 @@ object RouteRecorder {
             return
         }
 
-        recording = true
         currentRoomName = roomName
         route.clear()
         stepIndex = 0
         route.add(StepData(mutableListOf(), mutableListOf()))
+        recording = true
 
         ChatUtils.fakeMessage("${Stella.PREFIX} §aStarted route recording for $roomName")
     }
@@ -143,5 +149,64 @@ object RouteRecorder {
 
     fun stopRecording() {
         recording = false
+    }
+
+    fun hudPreview(context: GuiGraphics) {
+        val matirix = context.pose()
+
+        matirix.pushMatrix()
+        matirix.translate(5f, 5f)
+
+        Render2D.drawString(context, "§bRecording Room §dSupertall", 0, 0)
+        Render2D.drawString(context, "§7On Step§8: §b2", 0, 10)
+        Render2D.drawString(context, "§7Line Nodes§8: §b2", 0, 20)
+        Render2D.drawString(context, "§7Etherwarps§8: §b5", 0, 30)
+        Render2D.drawString(context, "§7Superbooms§8: §b1", 0, 40)
+        Render2D.drawString(context, "§7Levers§8: §b1", 0, 50)
+        Render2D.drawString(context, "§7Stonks§8: §b6", 0, 60)
+        Render2D.drawString(context, "§7Custom Waypoints§8: §b0", 0, 70)
+        Render2D.drawString(context, "§7Secrets§8: §b1§7/§66", 0, 80)
+        Render2D.drawString(context, "§7Last Secret§8: §7(§610§7, §660§7, §620§7)", 0, 90)
+
+        matirix.popMatrix()
+    }
+
+    fun hud(context: GuiGraphics) {
+        val matrix = context.pose()
+
+        val x = HUDManager.getX(secretRoutes.rHudName)
+        val y = HUDManager.getY(secretRoutes.rHudName)
+        val scale = HUDManager.getScale(secretRoutes.rHudName)
+
+        matrix.pushMatrix()
+        matrix.translate(x,y)
+        matrix.scale(scale)
+        matrix.translate(5f, 5f)
+
+        if(!recording) {
+            Render2D.drawString(context, "§cNot Recording", 0, 0)
+        } else {
+            val etherwarps = currentStep.waypoints.filter { it.type == WaypointType.ETHERWARP }.size
+            val superbooms = currentStep.waypoints.filter { it.type == WaypointType.SUPERBOOM }.size
+            val levers = currentStep.waypoints.filter { it.type == WaypointType.LEVER }.size
+            val stonks = currentStep.waypoints.filter { it.type == WaypointType.MINE }.size
+            val customs = currentStep.waypoints.filter { it.type == WaypointType.CUSTOM }.size
+
+            val lastSecretPos = lastStep?.waypoints?.firstOrNull { it.type == WaypointType.SECRET }?.pos
+            val lastSecret = if (lastSecretPos != null) "§7(§6${lastSecretPos.x}§7, §6${lastSecretPos.x}§7, §6${lastSecretPos.x}§7)" else "§cNone"
+
+            Render2D.drawString(context, "§bRecording Room §d$currentRoomName", 0, 0)
+            Render2D.drawString(context, "§7On Step§8: §b$stepIndex", 0, 10)
+            Render2D.drawString(context, "§7Line Nodes§8: §b${currentStep.line.size}", 0, 20)
+            Render2D.drawString(context, "§7Etherwarps§8: §b$etherwarps", 0, 30)
+            Render2D.drawString(context, "§7Superbooms§8: §b$superbooms", 0, 40)
+            Render2D.drawString(context, "§7Levers§8: §b$levers", 0, 50)
+            Render2D.drawString(context, "§7Stonks§8: §b$stonks", 0, 60)
+            Render2D.drawString(context, "§7Custom Waypoints§8: §b$customs", 0, 70)
+            Render2D.drawString(context, "§7Secrets§8: §b${Dungeon.currentRoom?.secretsFound}§8/§6${Dungeon.currentRoom?.secrets}", 0, 80)
+            Render2D.drawString(context, "§7Last Secret§8: $lastSecret", 0, 90)
+        }
+
+        matrix.popMatrix()
     }
 }

@@ -1,5 +1,6 @@
 package co.stellarskys.stella.features.secrets.utils
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.render.Render3D
 import co.stellarskys.stella.utils.render.RenderContext
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
@@ -8,11 +9,13 @@ import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
 object RoutePlayer {
-    fun renderRecordingRoute(data: StepData, oldData: StepData, context: RenderContext) {
+    fun renderRecordingRoute(data: StepData, oldData: StepData?, context: RenderContext) {
         val room = Dungeon.currentRoom ?: return
 
         renderLine(data, context, room)
         renderWaypoints(data, context, room)
+
+        if (oldData == null) return
         renderLastSecret(oldData, context, room)
     }
 
@@ -54,10 +57,11 @@ object RoutePlayer {
 
     private fun renderWaypoint(waypoint: WaypointData, context: RenderContext, room: Room, name: Boolean = true){
         val realPos = room.getRealCoord(waypoint.pos)
-        val stack = context.matrixStack ?: return
-        val consumers = context.consumers ?: return
 
-        Render3D.outlineBlock(context,
+        Stella.LOGGER.info("renderWaypoint got called for ${waypoint.type.name} at $realPos, rendering")
+
+        Render3D.outlineBlock(
+            context,
             realPos,
             waypoint.type.color,
             3.0,

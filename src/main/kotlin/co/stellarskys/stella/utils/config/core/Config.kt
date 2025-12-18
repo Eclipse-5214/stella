@@ -482,11 +482,14 @@ class Config(
     ) {
         operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
             val value = flattenValues()[key]
-                ?: error("Missing config value for '$key'")
-
+                ?: run {
+                    Stella.LOGGER.error("FATAL CONFIG ERROR: Missing config value for '$key'")
+                    error("Missing config value for '$key'")
+                }
             return if (type.isInstance(value)) {
                 type.cast(value)
             } else {
+                Stella.LOGGER.error("FATAL CONFIG ERROR: '$key' expected ${type.simpleName}, got ${value::class.simpleName}")
                 error("Config value for '$key' is not of type ${type.simpleName}")
             }
         }
