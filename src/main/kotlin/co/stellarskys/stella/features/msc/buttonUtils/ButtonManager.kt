@@ -5,6 +5,7 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.render.Render2D
+import co.stellarskys.stella.utils.render.vexel.NVGSpecialRenderer
 import co.stellarskys.stella.utils.skyblock.NEUApi
 import co.stellarskys.vexel.api.nvg.NVGRenderer
 import com.google.gson.Gson
@@ -51,11 +52,9 @@ object ButtonManager {
     }
 
     fun renderAll(context: GuiGraphics, invX: Int = 0, invY: Int = 0, width: Float = this.width, height: Float = this.height) {
-        NVGRenderer.beginFrame(width, height)
-
-        buttons.forEach { renderButton(context,it, invX, invY) }
-
-        NVGRenderer.endFrame()
+        NVGSpecialRenderer.draw(context, 0, 0, width.toInt(), height.toInt()) {
+            buttons.forEach { renderButton(context,it, invX, invY) }
+        }
     }
 
     private fun renderButton(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int) {

@@ -11,12 +11,6 @@ import net.minecraft.world.inventory.ClickType
 
 
 sealed class GuiEvent {
-    sealed class NVG {
-        class Render(
-            val context: GuiGraphics
-        ) : Event(cancelable = true)
-    }
-
     class RenderHUD(
         val context: GuiGraphics
     ) : Event()
@@ -60,6 +54,14 @@ sealed class GuiEvent {
             val context: GuiGraphics,
             val slot: net.minecraft.world.inventory.Slot,
             val screen: AbstractContainerScreen<AbstractContainerMenu>
+        ) : Event()
+    }
+
+    sealed class Container {
+        class Content(
+            val context: GuiGraphics,
+            val mouseX: Int,
+            val mouseY: Int
         ) : Event()
     }
 

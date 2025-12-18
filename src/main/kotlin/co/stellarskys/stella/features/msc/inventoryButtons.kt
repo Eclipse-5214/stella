@@ -16,7 +16,7 @@ object inventoryButtons : Feature("buttonsEnabled",true) {
     val clickCooldown = 200.milliseconds
 
     override fun initialize() {
-        on<GuiEvent.RenderHUD> { event ->
+        on<GuiEvent.Container.Content> { event ->
             val screen = client.screen ?: return@on
             if (screen is InventoryScreen) {
                 val invX = (screen.width - 176) / 2
