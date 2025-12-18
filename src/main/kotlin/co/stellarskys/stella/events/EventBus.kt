@@ -20,13 +20,11 @@ import net.minecraft.network.protocol.Packet
 import net.minecraft.world.level.EmptyBlockGetter
 import net.minecraft.world.phys.shapes.CollisionContext
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
+import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
 
 //#if MC < 1.21.9
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
-import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
-import java.util.concurrent.CopyOnWriteArrayList
-
 //#else
 //$$ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 //#endif
