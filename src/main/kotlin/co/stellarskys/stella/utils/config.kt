@@ -622,6 +622,87 @@ val config = Config("Stella", "Stella") {
                 shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
         }
+
+        subcategory("Routes") {
+            toggle {
+                configName = "secretRoutes"
+                name = "Show Routes"
+                description = "Enable rendering of route waypoints."
+                default = false
+            }
+
+            toggle {
+                configName = "secretRoutes.onlyRenderAfterClear"
+                name = "Only Render After Clear"
+                description = "Only show route waypoints after the room has been cleared."
+                default = false
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            toggle {
+                configName = "secretRoutes.stopRenderAfterGreen"
+                name = "Stop Render After Green"
+                description = "Stop rendering route waypoints once the room is marked green."
+                default = false
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretRoutes.startColor"
+                name = "Start Color"
+                description = "Color for the starting point of a route."
+                default = rgba(0, 255, 0, 255) // green
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretRoutes.mineColor"
+                name = "Mine Color"
+                description = "Color for mining-related route waypoints."
+                default = rgba(255, 165, 0, 255) // orange
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretRoutes.superboomColor"
+                name = "Superboom Color"
+                description = "Color for Superboom TNT route waypoints."
+                default = rgba(255, 0, 0, 255) // red
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretRoutes.etherwarpColor"
+                name = "Etherwarp Color"
+                description = "Color for Etherwarp route waypoints."
+                default = rgba(0, 0, 255, 255) // blue
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretRoutes.secretColor"
+                name = "Secret Color"
+                description = "Color for secret route waypoints."
+                default = rgba(255, 255, 0, 255) // yellow
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretRoutes.batColor"
+                name = "Bat Color"
+                description = "Color for bat route waypoints."
+                default = rgba(128, 128, 128, 255) // gray
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretRoutes.leverColor"
+                name = "Lever Color"
+                description = "Color for lever route waypoints."
+                default = rgba(0, 255, 255, 255) // cyan
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+        }
     }
 
     category( "Msc."){

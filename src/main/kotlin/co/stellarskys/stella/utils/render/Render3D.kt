@@ -3,13 +3,18 @@ package co.stellarskys.stella.utils.render
 import co.stellarskys.stella.utils.WorldUtils
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.config.RGBA
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.PoseStack
 import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.EmptyBlockGetter
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 import org.joml.Matrix4f
@@ -146,6 +151,17 @@ object Render3D {
 
     fun renderString(
         text: String,
+        pos: Vec3,
+        scale: Float = 1f,
+        bgBox: Boolean = false,
+        increase: Boolean = false,
+        phase: Boolean = false
+    ) {
+        renderString(text, pos.x, pos.y, pos.z, scale, bgBox, increase, phase)
+    }
+
+    fun renderString(
+        text: String,
         x: Double,
         y: Double,
         z: Double,
@@ -176,20 +192,21 @@ object Render3D {
         val offset = -maxWidth / 2f
 
         if (bgBox) {
-            val bgOpacity = (client.options.getBackgroundOpacity(0.25f) * 255).toInt() shl 24
-            val boxHeight = lines.size * 9
-            textRenderer.drawInBatch(
-                "", // empty string, just draws box
-                offset,
-                0f,
-                0x20FFFFFF,
-                true,
-                matrices,
-                consumer,
-                textLayer,
-                bgOpacity,
-                LightTexture.FULL_BLOCK
-            )
+            val widestLine = lines.maxByOrNull { textRenderer.width(it) } ?: ""
+            for ((i, _) in lines.withIndex()) {
+                textRenderer.drawInBatch(
+                    widestLine,
+                    offset,
+                    i * 9f,
+                    0x20FFFFFF,
+                    true,
+                    matrices,
+                    consumer,
+                    textLayer,
+                    (client.options.getBackgroundOpacity(0.25f) * 255).toInt() shl 24,
+                    LightTexture.FULL_BLOCK
+                )
+            }
         }
 
         for ((i, line) in lines.withIndex()) {
@@ -211,5 +228,73 @@ object Render3D {
         }
 
         consumer.endBatch()
+    }
+
+    fun renderLine(
+        start: Vec3,
+        finish: Vec3,
+        thickness: Float,
+        color: Color,
+        consumers: MultiBufferSource?,
+        matrixStack: PoseStack?
+    ) {
+        val cameraPos = client.gameRenderer.mainCamera.position
+        val matrices = matrixStack ?: return
+        matrices.pushPose()
+        matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
+        val entry = matrices.last()
+        val consumers = consumers as MultiBufferSource.BufferSource
+        val buffer = consumers.getBuffer(RenderType.lines())
+
+        RenderSystem.lineWidth(thickness)
+
+        val r = color.red / 255f
+        val g = color.green / 255f
+        val b = color.blue / 255f
+        val a = color.alpha / 255f
+
+        val direction = finish.subtract(start).normalize().toVector3f()
+
+        buffer.addVertex(entry, start.x.toFloat(), start.y.toFloat(), start.z.toFloat())
+            .setColor(r, g, b, a)
+            .setNormal(entry, direction)
+
+        buffer.addVertex(entry, finish.x.toFloat(), finish.y.toFloat(), finish.z.toFloat())
+            .setColor(r, g, b, a)
+            .setNormal(entry, direction)
+
+        consumers.endBatch(RenderType.lines())
+        matrices.popPose()
+    }
+
+    fun renderLineFromCursor(
+        consumers: MultiBufferSource?,
+        matrixStack: PoseStack?,
+        point: Vec3,
+        colorComponents: FloatArray,
+        alpha: Float
+    ) {
+        val camera = client.gameRenderer.mainCamera
+        val cameraPos = camera.position
+        matrixStack?.pushPose()
+        matrixStack?.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
+        val entry = matrixStack?.last()
+        val consumers = consumers as MultiBufferSource.BufferSource
+        val layer = RenderType.lines()
+        val buffer = consumers.getBuffer(layer)
+
+        val cameraPoint = cameraPos.add(Vec3.directionFromRotation(camera.xRot, camera.yRot))
+        val normal = point.toVector3f().sub(cameraPoint.x.toFloat(), cameraPoint.y.toFloat(), cameraPoint.z.toFloat()).normalize()
+
+        buffer.addVertex(entry, cameraPoint.x.toFloat(), cameraPoint.y.toFloat(), cameraPoint.z.toFloat())
+            .setColor(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
+            .setNormal(entry, normal)
+
+        buffer.addVertex(entry, point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
+            .setColor(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
+            .setNormal(entry, normal)
+
+        consumers.endBatch(layer)
+        matrixStack?.popPose()
     }
 }
