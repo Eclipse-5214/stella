@@ -681,9 +681,25 @@ val config = Config("Stella", "Stella") {
             }
 
             colorpicker {
-                configName = "secretRoutes.secretColor"
-                name = "Secret Color"
-                description = "Color for secret route waypoints."
+                configName = "secretRoutes.chestColor"
+                name = "Chest Color"
+                description = "Color for Chest waypoints."
+                default = rgba(255, 255, 0, 255) // yellow
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretRoutes.itemColor"
+                name = "Item Color"
+                description = "Color for Item waypoints."
+                default = rgba(255, 255, 0, 255) // yellow
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "secretRoutes.essenceColor"
+                name = "Essence Color"
+                description = "Color for Essence waypoints."
                 default = rgba(255, 255, 0, 255) // yellow
                 shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
@@ -710,6 +726,12 @@ val config = Config("Stella", "Stella") {
                 configName = "secretRoutes.recordingHud"
                 name = "Recording Hud"
                 description = "A helpful hud for recording secret routes"
+            }
+
+            toggle {
+                configName = "secretRoutes.recordingHud.minimized"
+                name = "Minimize Recording Hud"
+                description = "Makes the hud A lot smaller"
             }
         }
     }

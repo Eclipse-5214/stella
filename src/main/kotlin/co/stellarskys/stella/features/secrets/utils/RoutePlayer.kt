@@ -51,7 +51,7 @@ object RoutePlayer {
     }
 
     private fun renderLastSecret(data: StepData, context: RenderContext, room: Room) {
-        val secret = data.waypoints.firstOrNull { it.type == WaypointType.SECRET } ?: return
+        val secret = data.waypoints.firstOrNull { it.type in WaypointType.SECRET } ?: return
         renderWaypoint(secret, context, room)
     }
 

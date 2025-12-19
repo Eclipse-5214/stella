@@ -5,8 +5,10 @@ import java.awt.Color
 
 enum class WaypointType {
     START,
-    SECRET,
     BAT,
+    CHEST,
+    ESSENCE,
+    ITEM,
     MINE,
     LEVER,
     SUPERBOOM,
@@ -18,7 +20,9 @@ enum class WaypointType {
         get() = when (this) {
             BAT -> secretRoutes.batColor.toColor()
             MINE -> secretRoutes.mineColor.toColor()
-            SECRET -> secretRoutes.secretColor.toColor()
+            CHEST -> secretRoutes.chestColor.toColor()
+            ITEM -> secretRoutes.itemColor.toColor()
+            ESSENCE -> secretRoutes.essenceColor.toColor()
             ETHERWARP -> secretRoutes.etherWarpColor.toColor()
             SUPERBOOM -> secretRoutes.superBoomColor.toColor()
             LEVER -> secretRoutes.leverColor.toColor()
@@ -31,7 +35,8 @@ enum class WaypointType {
         get() = when (this) {
             BAT -> "Bat"
             MINE -> "Mine"
-            SECRET -> "Click"
+            CHEST, ESSENCE -> "Click"
+            ITEM -> "Item"
             ETHERWARP -> "Warp"
             SUPERBOOM -> "Boom!"
             LEVER -> "Flick"
@@ -44,5 +49,7 @@ enum class WaypointType {
             if (value == null) return null
             return entries.find { it.name.equals(value, ignoreCase = true) }
         }
+
+        val SECRET = setOf(CHEST, ITEM, ESSENCE, BAT)
     }
 }

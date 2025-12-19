@@ -21,11 +21,14 @@ object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
     val mineColor by config.property<RGBA>("secretRoutes.mineColor")
     val superBoomColor by config.property<RGBA>("secretRoutes.superboomColor")
     val etherWarpColor by config.property<RGBA>("secretRoutes.etherwarpColor")
-    val secretColor by config.property<RGBA>("secretRoutes.secretColor")
+    val chestColor by config.property<RGBA>("secretRoutes.chestColor")
+    val itemColor by config.property<RGBA>("secretRoutes.itemColor")
+    val essenceColor by config.property<RGBA>("secretRoutes.essenceColor")
     val batColor by config.property<RGBA>("secretRoutes.batColor")
     val leverColor by config.property<RGBA>("secretRoutes.leverColor")
 
     val recordingHud by config.property<Boolean>("secretRoutes.recordingHud")
+    val minimized by config.property<Boolean>("secretRoutes.recordingHud.minimized")
     val rHudName = "rhud"
 
     init {

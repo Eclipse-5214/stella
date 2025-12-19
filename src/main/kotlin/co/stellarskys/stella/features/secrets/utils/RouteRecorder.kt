@@ -21,6 +21,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundEvents
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+import kotlin.collections.setOf
 
 @Module
 object RouteRecorder {
@@ -43,13 +44,16 @@ object RouteRecorder {
             stopRecording()
         }
 
-        EventBus.on<DungeonEvent.Secrets.Bat>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.SECRET, it.entity.blockPosition()) }
-        EventBus.on<DungeonEvent.Secrets.Chest>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.SECRET, it.blockPos) }
-        EventBus.on<DungeonEvent.Secrets.Essence>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.SECRET, it.blockPos)}
+        EventBus.on<DungeonEvent.Secrets.Bat>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.BAT, it.entity.blockPosition()) }
+        EventBus.on<DungeonEvent.Secrets.Chest>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.CHEST, it.blockPos) }
+        EventBus.on<DungeonEvent.Secrets.Essence>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.ESSENCE, it.blockPos)}
 
-        EventBus.on<DungeonEvent.Secrets.Item>(SkyBlockIsland.THE_CATACOMBS) {
+        EventBus.on<DungeonEvent.Secrets.Item>(SkyBlockIsland.THE_CATACOMBS) { event ->
             if (!recording) return@on
-            val pos = world?.getEntity(it.entityId)?.blockPosition() ?: return@on
+            val pos = world?.getEntity(event.entityId)?.blockPosition() ?: return@on
+            val lastSecretPos = lastStep?.waypoints?.firstOrNull { it.type == WaypointType.CHEST }?.pos
+            if (lastSecretPos != null && calcDistanceSq(lastSecretPos, pos) < 2) return@on
+            addWaypoint(WaypointType.ITEM, pos)
         }
 
 
@@ -144,7 +148,7 @@ object RouteRecorder {
         val waypoint = WaypointData(relPos, type)
         currentStep.waypoints += waypoint
 
-        if (type == WaypointType.SECRET) nextStep()
+        if (type in WaypointType.SECRET) nextStep()
     }
 
     fun stopRecording() {
@@ -157,16 +161,20 @@ object RouteRecorder {
         matirix.pushMatrix()
         matirix.translate(5f, 5f)
 
-        Render2D.drawString(context, "§bRecording Room §dSupertall", 0, 0)
-        Render2D.drawString(context, "§7On Step§8: §b2", 0, 10)
-        Render2D.drawString(context, "§7Line Nodes§8: §b2", 0, 20)
-        Render2D.drawString(context, "§7Etherwarps§8: §b5", 0, 30)
-        Render2D.drawString(context, "§7Superbooms§8: §b1", 0, 40)
-        Render2D.drawString(context, "§7Levers§8: §b1", 0, 50)
-        Render2D.drawString(context, "§7Stonks§8: §b6", 0, 60)
-        Render2D.drawString(context, "§7Custom Waypoints§8: §b0", 0, 70)
-        Render2D.drawString(context, "§7Secrets§8: §b1§7/§66", 0, 80)
-        Render2D.drawString(context, "§7Last Secret§8: §7(§610§7, §660§7, §620§7)", 0, 90)
+        if(secretRoutes.minimized) {
+            Render2D.drawString(context, "§a▶ Recording", 0, 0)
+        } else {
+            Render2D.drawString(context, "§bRecording Room §dSupertall", 0, 0)
+            Render2D.drawString(context, "§7On Step§8: §b2", 0, 10)
+            Render2D.drawString(context, "§7Line Nodes§8: §b2", 0, 20)
+            Render2D.drawString(context, "§7Etherwarps§8: §b5", 0, 30)
+            Render2D.drawString(context, "§7Superbooms§8: §b1", 0, 40)
+            Render2D.drawString(context, "§7Levers§8: §b1", 0, 50)
+            Render2D.drawString(context, "§7Stonks§8: §b6", 0, 60)
+            Render2D.drawString(context, "§7Custom Waypoints§8: §b0", 0, 70)
+            Render2D.drawString(context, "§7Secrets§8: §b1§7/§66", 0, 80)
+            Render2D.drawString(context, "§7Last Secret§8: §7(§610§7, §660§7, §620§7)", 0, 90)
+        }
 
         matirix.popMatrix()
     }
@@ -184,7 +192,8 @@ object RouteRecorder {
         matrix.translate(5f, 5f)
 
         if(!recording) {
-            Render2D.drawString(context, "§cNot Recording", 0, 0)
+            if(secretRoutes.minimized) Render2D.drawString(context, "§c■ Not Recording", 0, 0)
+            else Render2D.drawString(context, "§cNot Recording", 0, 0)
         } else {
             val etherwarps = currentStep.waypoints.filter { it.type == WaypointType.ETHERWARP }.size
             val superbooms = currentStep.waypoints.filter { it.type == WaypointType.SUPERBOOM }.size
@@ -192,19 +201,22 @@ object RouteRecorder {
             val stonks = currentStep.waypoints.filter { it.type == WaypointType.MINE }.size
             val customs = currentStep.waypoints.filter { it.type == WaypointType.CUSTOM }.size
 
-            val lastSecretPos = lastStep?.waypoints?.firstOrNull { it.type == WaypointType.SECRET }?.pos
-            val lastSecret = if (lastSecretPos != null) "§7(§6${lastSecretPos.x}§7, §6${lastSecretPos.x}§7, §6${lastSecretPos.x}§7)" else "§cNone"
+            val lastSecretType = lastStep?.waypoints?.firstOrNull { it.type in WaypointType.SECRET}?.type ?: "§cNone"
 
-            Render2D.drawString(context, "§bRecording Room §d$currentRoomName", 0, 0)
-            Render2D.drawString(context, "§7On Step§8: §b$stepIndex", 0, 10)
-            Render2D.drawString(context, "§7Line Nodes§8: §b${currentStep.line.size}", 0, 20)
-            Render2D.drawString(context, "§7Etherwarps§8: §b$etherwarps", 0, 30)
-            Render2D.drawString(context, "§7Superbooms§8: §b$superbooms", 0, 40)
-            Render2D.drawString(context, "§7Levers§8: §b$levers", 0, 50)
-            Render2D.drawString(context, "§7Stonks§8: §b$stonks", 0, 60)
-            Render2D.drawString(context, "§7Custom Waypoints§8: §b$customs", 0, 70)
-            Render2D.drawString(context, "§7Secrets§8: §b${Dungeon.currentRoom?.secretsFound}§8/§6${Dungeon.currentRoom?.secrets}", 0, 80)
-            Render2D.drawString(context, "§7Last Secret§8: $lastSecret", 0, 90)
+            if(secretRoutes.minimized) {
+                Render2D.drawString(context, "§a▶ Recording", 0, 0)
+            } else {
+                Render2D.drawString(context, "§bRecording Room §d$currentRoomName", 0, 0)
+                Render2D.drawString(context, "§7On Step§8: §b$stepIndex", 0, 10)
+                Render2D.drawString(context, "§7Line Nodes§8: §b${currentStep.line.size}", 0, 20)
+                Render2D.drawString(context, "§7Etherwarps§8: §b$etherwarps", 0, 30)
+                Render2D.drawString(context, "§7Superbooms§8: §b$superbooms", 0, 40)
+                Render2D.drawString(context, "§7Levers§8: §b$levers", 0, 50)
+                Render2D.drawString(context, "§7Stonks§8: §b$stonks", 0, 60)
+                Render2D.drawString(context, "§7Custom Waypoints§8: §b$customs", 0, 70)
+                Render2D.drawString(context, "§7Secrets§8: §b${Dungeon.currentRoom?.secretsFound}§8/§6${Dungeon.currentRoom?.secrets}", 0, 80)
+                Render2D.drawString(context, "§7Last Secret§8: $lastSecretType", 0, 90)
+            }
         }
 
         matrix.popMatrix()
