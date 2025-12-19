@@ -12,19 +12,21 @@ object RoutePlayer {
     fun renderRecordingRoute(data: StepData, oldData: StepData?, context: RenderContext) {
         val room = Dungeon.currentRoom ?: return
 
-        renderLine(data, context, room)
+        renderLine(data, context, room, oldData == null)
         renderWaypoints(data, context, room)
 
         if (oldData == null) return
         renderLastSecret(oldData, context, room)
     }
 
-    fun renderLine(data: StepData, context: RenderContext, room: Room) {
+    fun renderLine(data: StepData, context: RenderContext, room: Room, firstStep: Boolean) {
         if (data.line.size <= 1) return
-        val startPoint = room.getRealCoord(data.line.first())
-        val startPos = Vec3(startPoint.center.x, startPoint.center.y + 1, startPoint.center.z)
 
-        Render3D.renderString("Start!", startPos, bgBox = true)
+        if (firstStep) {
+            val startPoint = room.getRealCoord(data.line.first())
+            val startPos = Vec3(startPoint.center.x, startPoint.center.y + 1, startPoint.center.z)
+            Render3D.renderString("Start!", startPos, bgBox = true)
+        }
 
         data.line.zipWithNext { a, b ->
             val p1 = room.getRealCoord(a)
@@ -57,8 +59,6 @@ object RoutePlayer {
 
     private fun renderWaypoint(waypoint: WaypointData, context: RenderContext, room: Room, name: Boolean = true){
         val realPos = room.getRealCoord(waypoint.pos)
-
-        Stella.LOGGER.info("renderWaypoint got called for ${waypoint.type.name} at $realPos, rendering")
 
         Render3D.outlineBlock(
             context,
