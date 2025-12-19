@@ -67,7 +67,6 @@ object RouteRecorder {
         }
 
         EventBus.on<SoundEvent.Play>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            Stella.LOGGER.info("SoundEvent Called!")
             if (!recording) return@on
 
             val healdItem = player?.mainHandItem?.hoverName?.stripped ?: ""

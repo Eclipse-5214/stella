@@ -31,6 +31,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 
 @Module
 object EventBus : EventBus() {
+
     init {
         ClientReceiveMessageEvents.ALLOW_GAME.register { message, isActionBar ->
             !post(ChatEvent.Receive(message, isActionBar))

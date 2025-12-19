@@ -7,19 +7,18 @@ open class EventBus {
         priority: Int = 0,
         register: Boolean = true,
         noinline handler: (T) -> Unit
-    ): EventHandle<T> {
-        val handle = EventHandle(T::class.java, handler, priority, this, register)
-        subscribers.setup(T::class.java).add(handle)
-        return handle
+    ) = EventHandle(T::class.java, handler, priority, this, register).also {
+        subscribers.setup(T::class.java).add(it)
     }
 
     fun <T : Event> post(event: T): Boolean {
         @Suppress("UNCHECKED_CAST")
-        subscribers.enabled[event.javaClass]?.forEach { (it as EventHandle<T>).handler(event) }
+        val handles = subscribers.enabled[event.javaClass] as? Array<EventHandle<T>> ?: return false
+        for (h in handles) h.handler(event)
         return event.cancelable && event.cancelled
     }
 
     @PublishedApi internal fun updateEnabled(eventClass: Class<*>) {
-        subscribers.enabled[eventClass] = subscribers.all[eventClass]?.filter { it.registered } ?: return
+        subscribers.enabled[eventClass] = subscribers.all[eventClass]?.filter { it.registered }?.toTypedArray() ?: return
     }
 }
