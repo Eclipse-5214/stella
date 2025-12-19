@@ -4,19 +4,22 @@ class EventHandle<T : Event>(
     val eventClass: Class<T>,
     val handler: (T) -> Unit,
     val priority: Int,
-    val ignoreCancelled: Boolean,
     val bus: EventBus,
-    @Volatile private var _registered: Boolean
 ) {
-    val registered: Boolean get() = _registered
+    var registered = false
+        private set
 
-    fun register(): Boolean = toggle(bus, true)
-    fun unregister(): Boolean = toggle(bus, false)
+    fun register(): Boolean {
+        if (registered) return false
+        registered = true
+        bus.updateEnabled(eventClass)
+        return true
+    }
 
-    private fun toggle(bus: EventBus, value: Boolean): Boolean {
-        if (_registered == value) return false
-        _registered = value
-        bus.rebuildCache(eventClass)
+    fun unregister(): Boolean {
+        if (!registered) return false
+        registered = false
+        bus.updateEnabled(eventClass)
         return true
     }
 }

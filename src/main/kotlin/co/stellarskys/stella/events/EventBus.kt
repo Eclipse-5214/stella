@@ -137,7 +137,6 @@ object EventBus : EventBus() {
         vararg scope: Any,
         skyblockOnly: Boolean = false,
         priority: Int = 0,
-        ignoreCancelled: Boolean = false,
         noinline handler: (T) -> Unit
     ): EventHandle<T> { // partition scopes into sets
         val islands = mutableSetOf<SkyBlockIsland>()
@@ -156,7 +155,7 @@ object EventBus : EventBus() {
             }
         }
 
-        val handle = on<T>(priority, ignoreCancelled, handler = handler, register = false)
+        val handle = on<T>(priority, handler = handler, register = false)
 
             EventBusManager.trackConditionalEvent(
                 islands = islands.ifEmpty { null },
