@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentSkipListSet
 
 data class SubscriberSet(
     val all: ConcurrentHashMap<Class<*>, ConcurrentSkipListSet<EventHandle<*>>> = ConcurrentHashMap(),
-    val enabled: ConcurrentHashMap<Class<*>, List<EventHandle<out Event>>> = ConcurrentHashMap()
+    val enabled: ConcurrentHashMap<Class<*>, List<EventHandle<*>>> = ConcurrentHashMap()
 ) {
     fun setup(eventClass: Class<*>): ConcurrentSkipListSet<EventHandle<*>> = all.computeIfAbsent(eventClass) { ConcurrentSkipListSet(compareByDescending { it.priority }) }
 }

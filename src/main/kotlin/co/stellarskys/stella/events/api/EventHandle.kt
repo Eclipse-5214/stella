@@ -5,21 +5,20 @@ class EventHandle<T : Event>(
     val handler: (T) -> Unit,
     val priority: Int,
     val bus: EventBus,
+    initreg: Boolean = false
 ) {
-    var registered = false
+    init {if (initreg) register()}
+
+    @Volatile var registered = false
         private set
 
-    fun register(): Boolean {
-        if (registered) return false
-        registered = true
+    fun setRegistered(value: Boolean): Boolean {
+        if (registered == value) return false
+        registered = value
         bus.updateEnabled(eventClass)
         return true
     }
 
-    fun unregister(): Boolean {
-        if (!registered) return false
-        registered = false
-        bus.updateEnabled(eventClass)
-        return true
-    }
+    fun register() = setRegistered(true)
+    fun unregister() = setRegistered(false)
 }
