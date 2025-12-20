@@ -13,6 +13,7 @@ import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.Utils.calcDistanceSq
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
+import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
 import net.fabricmc.loader.impl.lib.sat4j.pb.constraints.pb.WatchPb
@@ -30,7 +31,7 @@ object RouteRecorder {
 
     private val route = mutableListOf<StepData>()
     private var stepIndex = 0
-    private var currentRoomName: String? = null
+    private var currentRoom: Room? = null
     private var lastPlayerPos: BlockPos? = null
 
     val currentStep: StepData get() = route[stepIndex]
@@ -115,6 +116,9 @@ object RouteRecorder {
         stepIndex++
         if (stepIndex >= route.size) {
             route.add(StepData(mutableListOf(), mutableListOf()))
+            val loc = player?.onPos ?: return
+            val pos = currentRoom?.getRoomCoord(BlockPos(loc.x, loc.y + 1, loc.z)) ?: return
+            currentStep.line += pos
         }
     }
 
@@ -125,19 +129,19 @@ object RouteRecorder {
     fun getRoute(): List<StepData> = route
 
     fun startRecording() {
-        val roomName = Dungeon.currentRoom?.name
-        if (roomName == null) {
+        val room = Dungeon.currentRoom
+        if (room?.name == null) {
             ChatUtils.fakeMessage("${Stella.PREFIX} §cNot in a valid dungeon room")
             return
         }
 
-        currentRoomName = roomName
+        currentRoom = room
         route.clear()
         stepIndex = 0
         route.add(StepData(mutableListOf(), mutableListOf()))
         recording = true
 
-        ChatUtils.fakeMessage("${Stella.PREFIX} §aStarted route recording for $roomName")
+        ChatUtils.fakeMessage("${Stella.PREFIX} §aStarted route recording for ${room.name}")
     }
 
     fun stopRecording() {
@@ -146,14 +150,20 @@ object RouteRecorder {
     }
 
     fun saveRoute() {
-        if (currentRoomName == null || !recording || route.isEmpty()) {
+        if (currentRoom?.name == null || !recording || route.isEmpty()) {
             ChatUtils.fakeMessage("${Stella.PREFIX} §cNo route to save")
             return
         }
 
-        RouteRegistry.saveRoute(currentRoomName ?: return, route)
-        ChatUtils.fakeMessage("${Stella.PREFIX} §aSaved route for $currentRoomName")
+        RouteRegistry.saveRoute(currentRoom?.name ?: return, getRoute())
+        RouteRegistry.reload()
+        ChatUtils.fakeMessage("${Stella.PREFIX} §aSaved route for ${currentRoom?.name}")
         stopRecording()
+    }
+
+    fun reloadRoutes() {
+        RouteRegistry.reload()
+        ChatUtils.fakeMessage("${Stella.PREFIX} §aReloaded routes")
     }
 
     fun addWaypoint(type: WaypointType, pos: BlockPos) {
@@ -217,7 +227,7 @@ object RouteRecorder {
             if(secretRoutes.minimized) {
                 Render2D.drawString(context, "§a▶ Recording", 0, 0)
             } else {
-                Render2D.drawString(context, "§bRecording Room §d$currentRoomName", 0, 0)
+                Render2D.drawString(context, "§bRecording Room §d${currentRoom?.name}", 0, 0)
                 Render2D.drawString(context, "§7On Step§8: §b$stepIndex", 0, 10)
                 Render2D.drawString(context, "§7Line Nodes§8: §b${currentStep.line.size}", 0, 20)
                 Render2D.drawString(context, "§7Etherwarps§8: §b$etherwarps", 0, 30)

@@ -48,16 +48,13 @@ object MainCommand : Commodore("stella", "sta", "sa") {
                 }
             }
 
-            /*
             literal("reload") {
                 runs {
-                    WaypointRegistry.reloadFromLocal(notifyUser = true)
-                    RoomWaypointHandler.reloadCurrentRoom()
+                    RouteRecorder.reloadRoutes()
                 }
             }
-             */
-        }
 
+        }
 
         literal("help") {
             runs {
