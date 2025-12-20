@@ -7,8 +7,9 @@ open class EventBus {
         priority: Int = 0,
         register: Boolean = true,
         noinline handler: (T) -> Unit
-    ) = EventHandle(T::class.java, handler, priority, this, register).also {
+    ) = EventHandle(T::class.java, handler, priority, this).also {
         subscribers.setup(T::class.java).add(it)
+        if (register) it.register()
     }
 
     fun <T : Event> post(event: T): Boolean {

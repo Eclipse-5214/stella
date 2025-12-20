@@ -12,8 +12,10 @@ import io.github.classgraph.ClassGraph
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import java.util.concurrent.ConcurrentHashMap
 
-@Module
 object FeatureManager {
+    private val MODULE_ANN = Module::class.java.name
+    private val COMMAND_ANN = Command::class.java.name
+
     var moduleCount = 0
         private set
     var commandCount = 0
@@ -22,37 +24,33 @@ object FeatureManager {
         private set
 
     private val configListeners = ConcurrentHashMap<String, MutableList<Feature>>()
-    private val pendingFeatures = mutableListOf<Feature>()
-    private val islandFeatures = mutableListOf<Feature>()
-    private val areaFeatures = mutableListOf<Feature>()
-    private val skyblockFeatures = mutableListOf<Feature>()
-    private val dungeonFloorFeatures = mutableListOf<Feature>()
-
-    val features = mutableListOf<Feature>()
+    private val pendingFeatures = ArrayList<Feature>()
+    private val islandFeatures = ArrayList<Feature>()
+    private val areaFeatures = ArrayList<Feature>()
+    private val skyblockFeatures = ArrayList<Feature>()
+    private val dungeonFloorFeatures = ArrayList<Feature>()
+    val features = ArrayList<Feature>()
 
     init {
         EventBus.on<LocationEvent.SkyblockJoin> {
-            skyblockFeatures.forEach { it.update() }
+            for (f in skyblockFeatures) f.update()
         }
-
         EventBus.on<LocationEvent.SkyblockLeave> {
-            skyblockFeatures.forEach { it.update() }
+            for (f in skyblockFeatures) f.update()
         }
-
         EventBus.on<LocationEvent.IslandChange> {
-            islandFeatures.forEach { it.update() }
+            for (f in islandFeatures) f.update()
         }
-
         EventBus.on<LocationEvent.AreaChange> {
-            areaFeatures.forEach { it.update() }
+            for (f in areaFeatures) f.update()
         }
-
         EventBus.on<LocationEvent.DungeonFloorChange> {
-            dungeonFloorFeatures.forEach { it.update() }
+            for (f in dungeonFloorFeatures) f.update()
         }
-
-        config.registerListener{ name, value ->
-            configListeners[name]?.forEach { it.update() }
+        config.registerListener { name, _ ->
+            configListeners[name]?.let { list ->
+                for (f in list) f.update()
+            }
         }
     }
 
@@ -62,39 +60,41 @@ object FeatureManager {
         val startTime = System.currentTimeMillis()
 
         ClassGraph()
-            .enableClassInfo()
-            .enableAnnotationInfo()
             .acceptPackages("co.stellarskys.stella")
+            .disableModuleScanning()
+            .disableNestedJarScanning()
+            .ignoreClassVisibility()
+            .enableAnnotationInfo()
+            .removeTemporaryFilesAfterScan()
             .scan()
             .use { result ->
-                val features = result.getClassesWithAnnotation(Module::class.java.name).loadClasses()
-                val commands = result.getClassesWithAnnotation(Command::class.java.name).loadClasses()
+                val modules = result.getClassesWithAnnotation(MODULE_ANN).loadClasses()
+                val commands = result.getClassesWithAnnotation(COMMAND_ANN).loadClasses()
 
-                features.forEach {
+                for (module in modules) {
                     try {
-                        Class.forName(it.name)
+                        Class.forName(module.name)
                         moduleCount++
-
-                        Stella.LOGGER.debug("Loaded module: ${it.name}")
                     } catch (e: Exception) {
-                        Stella.LOGGER.error("Error initializing module ${it.name}: $e")
+                        Stella.LOGGER.error("Error initializing module ${module.name}: $e")
                     }
+
+                    Stella.LOGGER.debug("Loaded module: ${module.name}")
                 }
 
-                commands.forEach {
+                for (command in commands) {
                     try {
-                        val instanceField = it.getDeclaredField("INSTANCE")
-                        val command = instanceField.get(null) as Commodore
+                        val command = command.kotlin.objectInstance as Commodore
 
                         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
                             command.register(dispatcher)
                         }
                         commandCount++
-
-                        Stella.LOGGER.debug("Loaded command: ${it.name}")
                     } catch (e: Exception) {
-                        Stella.LOGGER.error("Error initializing command ${it.name}: $e")
+                        Stella.LOGGER.error("Error initializing command ${command.name}: $e")
                     }
+
+                    Stella.LOGGER.debug("Loaded command: ${command.name}")
                 }
             }
 
@@ -106,14 +106,13 @@ object FeatureManager {
     }
 
     fun initializeFeatures() {
-        pendingFeatures.forEach { feature ->
+        for (feature in pendingFeatures) {
             features.add(feature)
-            if (feature.hasIslands()) islandFeatures.add(feature)
-            if (feature.hasAreas()) areaFeatures.add(feature)
-            if (feature.hasDungeonFloors()) dungeonFloorFeatures.add(feature)
+            if (feature.islands.isNotEmpty()) islandFeatures.add(feature)
+            if (feature.areas.isNotEmpty()) areaFeatures.add(feature)
+            if (feature.dungeonFloors.isNotEmpty()) dungeonFloorFeatures.add(feature)
             if (feature.skyblockOnly) skyblockFeatures.add(feature)
 
-            feature.addConfig()
             feature.initialize()
             feature.configName?.let { registerListener(it, feature) }
             feature.update()

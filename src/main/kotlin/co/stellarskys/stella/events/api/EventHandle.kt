@@ -4,11 +4,8 @@ class EventHandle<T : Event>(
     val eventClass: Class<T>,
     val handler: (T) -> Unit,
     val priority: Int,
-    val bus: EventBus,
-    initreg: Boolean = false
+    val bus: EventBus
 ) {
-    init {if (initreg) register()}
-
     @Volatile var registered = false
         private set
 

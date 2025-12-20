@@ -45,7 +45,7 @@ object inventoryButtons : Feature("buttonsEnabled",true) {
             ButtonManager.handleMouseClicked(gui, mouseX, mouseY)
         }
 
-        register<LocationEvent.IslandChange> {
+        on<LocationEvent.IslandChange> {
             lastClick = TimeUtils.zero
         }
     }
