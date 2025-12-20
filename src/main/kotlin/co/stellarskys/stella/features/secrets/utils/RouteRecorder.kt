@@ -44,7 +44,7 @@ object RouteRecorder {
             stopRecording()
         }
 
-        EventBus.on<DungeonEvent.Secrets.Bat>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.BAT, it.entity.blockPosition()) }
+        EventBus.on<DungeonEvent.Secrets.Bat>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.BAT, it.blockPos) }
         EventBus.on<DungeonEvent.Secrets.Chest>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.CHEST, it.blockPos) }
         EventBus.on<DungeonEvent.Secrets.Essence>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.ESSENCE, it.blockPos)}
 
@@ -140,6 +140,22 @@ object RouteRecorder {
         ChatUtils.fakeMessage("${Stella.PREFIX} §aStarted route recording for $roomName")
     }
 
+    fun stopRecording() {
+        recording = false
+        ChatUtils.fakeMessage("${Stella.PREFIX} §cStopped Recording")
+    }
+
+    fun saveRoute() {
+        if (currentRoomName == null || !recording || route.isEmpty()) {
+            ChatUtils.fakeMessage("${Stella.PREFIX} §cNo route to save")
+            return
+        }
+
+        RouteRegistry.saveRoute(currentRoomName ?: return, route)
+        ChatUtils.fakeMessage("${Stella.PREFIX} §aSaved route for $currentRoomName")
+        stopRecording()
+    }
+
     fun addWaypoint(type: WaypointType, pos: BlockPos) {
         val room = Dungeon.currentRoom ?: return
         val relPos = room.getRoomCoord(pos)
@@ -148,10 +164,6 @@ object RouteRecorder {
         currentStep.waypoints += waypoint
 
         if (type in WaypointType.SECRET) nextStep()
-    }
-
-    fun stopRecording() {
-        recording = false
     }
 
     fun hudPreview(context: GuiGraphics) {

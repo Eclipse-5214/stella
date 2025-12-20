@@ -42,6 +42,12 @@ object MainCommand : Commodore("stella", "sta", "sa") {
                 }
             }
 
+            literal("save") {
+                runs {
+                    RouteRecorder.saveRoute()
+                }
+            }
+
             /*
             literal("reload") {
                 runs {

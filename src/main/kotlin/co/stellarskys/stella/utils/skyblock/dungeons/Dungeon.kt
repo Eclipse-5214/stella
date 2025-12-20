@@ -10,8 +10,10 @@ import co.stellarskys.stella.utils.skyblock.dungeons.score.*
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.*
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
+import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
+import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Blocks
@@ -20,6 +22,7 @@ import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonAPI
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+import kotlin.math.roundToInt
 
 //#if MC >= 1.21.9
 //$$ import tech.thatgravyboat.skyblockapi.platform.properties
@@ -184,14 +187,16 @@ object Dungeon {
             }
         }
 
-        EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            if (event.entity.type == EntityType.BAT) {
-                EventBus.post(DungeonEvent.Secrets.Bat(event.entity))
+        EventBus.on<SoundEvent.Play>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            val sound = event.sound
+            if (sound.location == SoundEvents.BAT_DEATH.location) {
+                val pos = BlockPos(sound.x.roundToInt(), sound.y.roundToInt(), sound.z.roundToInt())
+                EventBus.post(DungeonEvent.Secrets.Bat(pos))
 
                 currentRoom?.roomData?.secretCoords?.bat?.find {
                     Utils.calcDistance(
                         currentRoom!!.getRealCoord(it.toBlockPos()),
-                        event.entity.blockPosition()
+                        pos
                     ) < 100
                 }?.collected = true
             }

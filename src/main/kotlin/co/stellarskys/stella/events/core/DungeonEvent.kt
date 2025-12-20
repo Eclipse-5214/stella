@@ -55,7 +55,7 @@ sealed class DungeonEvent {
         ) : Event()
 
         class Bat(
-            val entity: Entity
+            val blockPos: BlockPos
         ) : Event()
 
         class Chest(
