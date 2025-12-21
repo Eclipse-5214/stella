@@ -7,6 +7,8 @@ import co.stellarskys.stella.events.api.EventBusBenchmark
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
+import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
+import co.stellarskys.stella.utils.skyblock.dungeons.score.DungeonScore
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
 
@@ -67,6 +69,30 @@ object MainCommand : Commodore("stella", "sta", "sa") {
                 ChatUtils.fakeMessage("§8§m------------------------------------------");
             }
         }
+
+        literal("dumpscore") {
+            runs {
+                if (Dungeon.floor == null) {
+                    ChatUtils.fakeMessage("${Stella.PREFIX} §cError: Not in dungeon")
+                }
+
+                val data = DungeonScore.data
+
+                ChatUtils.fakeMessage("§d§m------------------------------------------")
+                ChatUtils.fakeMessage("§bDungeon Score Breakdown §7(§6${Dungeon.floor?.name ?: "?"}§7)")
+                ChatUtils.fakeMessage("§d§m------------------------------------------")
+                ChatUtils.fakeMessage("                 §bScore: §6${data.score}")
+                ChatUtils.fakeMessage("")
+
+                ChatUtils.fakeMessage("§7Skill Score§8: §b${data.skillScore}")
+                ChatUtils.fakeMessage("§7Explore Score§8: §b${data.exploreScore}")
+                ChatUtils.fakeMessage("§7Speed Score§8: §b${data.speedScore}")
+                ChatUtils.fakeMessage("§7Bonus Score§8: §b${data.bonusScore}")
+                ChatUtils.fakeMessage("")
+                ChatUtils.fakeMessage("§d§m------------------------------------------")
+            }
+        }
+
 
         literal("benchmark") {
             runs {

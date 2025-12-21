@@ -29,6 +29,7 @@ data class ScoreData(
     var secretsScore: Double = 0.0,
     var exploreScore: Double = 0.0,
     var bonusScore: Int = 0,
+    var speedScore: Int = 0,
     var score: Int = 0,
     var maxSecrets: Int = 0,
     var minSecrets: Int = 0

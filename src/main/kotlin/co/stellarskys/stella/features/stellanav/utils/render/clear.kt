@@ -36,8 +36,8 @@ object clear {
 
         renderRooms(context)
         renderCheckmarks(context)
-        renderRoomLabels(context, RoomType.PUZZLE, mapConfig.puzzleCheckmarks, mapConfig.pcsize)
-        renderRoomLabels(context, RoomType.NORMAL, mapConfig.roomCheckmarks, mapConfig.rcsize)
+        renderRoomLabels(context, mapConfig.puzzleCheckmarks, mapConfig.pcsize, RoomType.PUZZLE, RoomType.TRAP, RoomType.YELLOW)
+        renderRoomLabels(context, mapConfig.roomCheckmarks, mapConfig.rcsize,RoomType.NORMAL,)
         renderPlayers(context)
 
         matrix.popMatrix()
@@ -100,7 +100,7 @@ object clear {
                     RoomType.RARE
                 ) && room.secrets != 0
             ) return@forEach
-            if ((mapConfig.puzzleCheckmarks > 0 && room.type == RoomType.PUZZLE) || room.type == RoomType.ENTRANCE) return@forEach
+            if ((mapConfig.puzzleCheckmarks > 0 && room.type in setOf(RoomType.PUZZLE, RoomType.TRAP, RoomType.YELLOW)) || room.type == RoomType.ENTRANCE) return@forEach
 
             val (centerX, centerZ) = room.center()
             val x = (centerX * spacing).toInt() + roomSize / 2
@@ -116,9 +116,9 @@ object clear {
     }
 
     /** Renders room names and secret counts */
-    fun renderRoomLabels(context: GuiGraphics, type: RoomType, checkmarkMode: Int, scaleFactor: Float) {
+    fun renderRoomLabels(context: GuiGraphics, checkmarkMode: Int, scaleFactor: Float, vararg type: RoomType) {
         Dungeon.uniqueRooms.forEach { room ->
-            if (!room.explored || room.type != type || checkmarkMode < 1) return@forEach
+            if (!room.explored || room.type !in type || checkmarkMode < 1) return@forEach
 
             val secrets = if (room.checkmark == Checkmark.GREEN) room.secrets else room.secretsFound
             val textColor = getTextColor(room.checkmark)
@@ -233,6 +233,7 @@ object clear {
 
     /** Renders a text string with a soft shadow */
     fun drawShadowedText(context: GuiGraphics, text: String, x: Int, y: Int, scale: Float) {
+        if (!mapConfig.textShadow) return
         val offsets = listOf(Pair(scale, 0f), Pair(-scale, 0f), Pair(0f, scale), Pair(0f, -scale))
         for ((dx, dy) in offsets) {
             context.withMatrix {

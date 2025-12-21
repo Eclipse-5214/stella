@@ -149,13 +149,14 @@ fun renderNametag(context: GuiGraphics, name: String, scale: Float) {
     matrix.scale(scale, scale)
     matrix.translate(0f, 12f)
 
-    for ((dx, dy) in offsets) {
-        matrix.pushMatrix()
-        matrix.translate(dx, dy)
-        Render2D.drawString(context, "§0$name", drawX, drawY)
-        matrix.popMatrix()
+    if (mapConfig.textShadow) {
+        for ((dx, dy) in offsets) {
+            matrix.pushMatrix()
+            matrix.translate(dx, dy)
+            Render2D.drawString(context, "§0$name", drawX, drawY)
+            matrix.popMatrix()
+        }
     }
-
 
     Render2D.drawString(context, name, drawX, drawY)
     matrix.popMatrix()

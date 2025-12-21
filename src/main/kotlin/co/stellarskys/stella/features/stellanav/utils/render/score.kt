@@ -46,6 +46,7 @@ object score {
     fun render(context: GuiGraphics){
         val matrix = context.pose()
         val renderState = getCurrentMapRender() ?: cachedRenderState
+        if (cachedRenderState.texture == null) return
 
         matrix.pushMatrix()
         matrix.translate(5f, 5f,)

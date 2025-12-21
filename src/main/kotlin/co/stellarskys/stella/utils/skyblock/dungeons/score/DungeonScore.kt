@@ -112,9 +112,9 @@ object DungeonScore {
 
         secretsScore = (40 * ((secretsFoundPercent / 100.0) / secretsPercentNeeded)).coerceIn(0.0, 40.0)
         exploreScore = if (clearedPercent == 0) 0.0 else (60 * completionRatio + secretsScore).coerceIn(0.0, 100.0)
-         bonusScore = crypts.coerceAtMost(5) + if (MimicTrigger.mimicDead) 2 else 0 + if (hasPaul) 10 else 0
+        bonusScore = crypts.coerceAtMost(5) + if (MimicTrigger.mimicDead) 2 else 0 + if (MimicTrigger.princeDead) 1 else 0 +  if (hasPaul) 10 else 0
         val timeOffset = dungeonSeconds - (floorTimes[Dungeon.floor?.name] ?: 0)
-        val speedScore = calculateSpeedScore(timeOffset, if (Dungeon.floor?.name == "E") 0.7 else 1.0)
+        speedScore = calculateSpeedScore(timeOffset, if (Dungeon.floor?.name == "E") 0.7 else 1.0)
 
         score = (skillScore + exploreScore + speedScore + bonusScore).toInt()
         maxSecrets = ceil(totalSecrets * secretsPercentNeeded).toInt()

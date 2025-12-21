@@ -13,6 +13,7 @@ object mapConfig {
     val rcsize: Float get() = config["rcsize"] as? Float ?: 1f
     val puzzleCheckmarks: Int get() = config["puzzleCheckmarks"] as? Int ?: 0
     val pcsize: Float get() = config["pcsize"] as? Float ?: 1f
+    val textShadow: Boolean get() = config["mtextshadow"] as? Boolean ?: true
 
     val mapInfoUnder: Boolean get() = config["mapInfoUnder"] as? Boolean ?: false
 

@@ -405,6 +405,13 @@ val config = Config("Stella", "Stella") {
                 max = 2f
                 default = 1f
             }
+
+            toggle {
+                configName = "mtextshadow"
+                name = "Text Shadow"
+                description = "Gives the text a cool shadow"
+                default = true
+            }
         }
 
         subcategory("Player Icons") {
