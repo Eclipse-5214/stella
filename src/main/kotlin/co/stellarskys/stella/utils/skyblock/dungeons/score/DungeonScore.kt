@@ -5,6 +5,7 @@ import co.stellarskys.stella.events.core.ScoreboardEvent
 import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
+import tech.thatgravyboat.skyblockapi.api.data.Perk
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
@@ -36,8 +37,8 @@ object DungeonScore {
     val DUNGEON_TIME_PATTERN =  Regex("""^Time: (?:(\d+)h)?\s?(?:(\d+)m)?\s?(?:(\d+)s)?$""")
 
     // Current dungeon score state and accessor
-    var hasPaul = false
     var data = ScoreData()
+    val hasPaul get() = Perk.EZPZ.active
     val score get() = data.score
 
     /** Resets all score data to default values */
@@ -55,11 +56,6 @@ object DungeonScore {
         EventBus.on<ScoreboardEvent.Update>(SkyBlockIsland.THE_CATACOMBS) { event ->
             event.new.forEach { parseSidebar(it.stripColor().trim()) }
         }
-
-        HypixelApi.fetchElectionData(
-            onResult = { data -> hasPaul = (data?.mayorName?.lowercase() == "paul" && data.mayorPerks.any { it.first.lowercase() == "ezpz" }) || (data?.ministerName?.lowercase() == "paul" && data.ministerPerk.lowercase() == "ezpz") },
-            onError = { error -> error.printStackTrace() }
-        )
     }
 
     /** Parses a single tablist line and updates score data */

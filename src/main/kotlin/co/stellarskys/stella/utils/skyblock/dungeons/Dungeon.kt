@@ -42,7 +42,6 @@ object Dungeon {
     private val WATCHER_PATTERN = Regex("""\[BOSS] The Watcher: That will be enough for now\.""")
     private val DUNGEON_COMPLETE_PATTERN = Regex("""^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$""")
     private val ROOM_SECRETS_PATTERN = Regex("""\b([0-9]|10)/([0-9]|10)\s+Secrets\b""")
-    private val DUNGEON_FLOOR_PATTERN = Regex("The Catacombs \\((?<floor>.+)\\)")
 
     // Room and door data
     val rooms = Array<Room?>(36) { null }
@@ -101,7 +100,6 @@ object Dungeon {
         }
 
         EventBus.on<LocationEvent.IslandChange> { reset() }
-
 
         EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val msg = event.message.string.clearCodes()
