@@ -108,8 +108,8 @@ object RouteRegistry {
         save()
     }
 
-    fun getRoute(roomName: String): RouteData? =
-        routeFile.routes[roomName]
+    fun getRoute(roomName: String): List<StepData>? =
+        routeFile.routes[roomName]?.toRuntime()
 
     fun getAll(): Map<String, RouteData> =
         routeFile.routes
@@ -123,7 +123,10 @@ object RouteRegistry {
 
     data class RouteData(
         val steps: List<StepDataSerializable>
-    )
+    ) {
+        fun toRuntime(): List<StepData> =
+            steps.map { it.toRuntime() }
+    }
 
     data class StepDataSerializable(
         val waypoints: List<WaypointDataSerializable>,
@@ -138,7 +141,6 @@ object RouteRegistry {
     )
 
     fun BlockPos.toList() = listOf(x, y, z)
-
     fun Color.toList() = listOf(red, green, blue)
 
     fun StepData.toSerializable() = StepDataSerializable(
@@ -152,4 +154,17 @@ object RouteRegistry {
         name = name,
         color = color?.toList()
     )
+
+    fun StepDataSerializable.toRuntime(): StepData {
+        val runtimeWaypoints = waypoints.map { it.toRuntime() }.toMutableList()
+        val runtimeLine = line.map { BlockPos(it[0], it[1], it[2]) }.toMutableList()
+        return StepData(runtimeWaypoints, runtimeLine)
+    }
+
+    fun WaypointDataSerializable.toRuntime(): WaypointData {
+        val pos = BlockPos(this.pos[0], this.pos[1], this.pos[2])
+        val type = WaypointType.valueOf(this.type)
+        val colorObj = this.color?.let { Color(it[0], it[1], it[2]) }
+        return WaypointData(pos, type, name, colorObj)
+    }
 }
