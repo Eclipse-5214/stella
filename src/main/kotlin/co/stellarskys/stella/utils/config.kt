@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
+import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
 import co.stellarskys.stella.utils.config.core.Config
 import dev.deftu.omnicore.api.client.client
@@ -655,6 +656,20 @@ val config = Config("Stella", "Stella") {
                 shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
+            keybind {
+                configName = "secretRoutes.nextStep"
+                name = "Next Step Bind"
+                description = "Goes to the next step of a route"
+            }
+
+            keybind {
+                configName = "secretRoutes.lastStep"
+                name = "Next Step Bind"
+                description = "Goes to the last step of a route"
+            }
+        }
+
+        subcategory("Rendering") {
             colorpicker {
                 configName = "secretRoutes.startColor"
                 name = "Start Color"
@@ -739,6 +754,36 @@ val config = Config("Stella", "Stella") {
                 configName = "secretRoutes.recordingHud.minimized"
                 name = "Minimize Recording Hud"
                 description = "Makes the hud A lot smaller"
+            }
+
+            button {
+                configName = "secretRoutes.startRecording"
+                name = "Start Recording"
+                description = "Starts recording a route (/sa route start)"
+
+                onclick {
+                    RouteRecorder.startRecording()
+                }
+            }
+
+            button {
+                configName = "secretRoutes.stopRecording"
+                name = "Stop Recording"
+                description = "Stops recording a route (/sa route stop)"
+
+                onclick {
+                    RouteRecorder.stopRecording()
+                }
+            }
+
+            button {
+                configName = "secretRoutes.saveRecording"
+                name = "Save Recording"
+                description = "Saves the recording of the route (/sa route save)"
+
+                onclick {
+                    RouteRecorder.saveRoute()
+                }
             }
         }
     }

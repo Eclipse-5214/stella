@@ -1,5 +1,7 @@
 package co.stellarskys.stella.utils.config.core
 
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.KeyEvent
 import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.components.base.enums.Pos
@@ -218,13 +220,47 @@ class Keybind : ConfigElement() {
     var default: Int = 0
         set(value) {
             field = value
-            this.value = value
+            this.value = Handler(value)
         }
 
     init {
-        value = default
+        value = Handler(default)
+    }
+
+    class Handler(keyCode: Int) {
+        private val pressListeners = mutableListOf<() -> Unit>()
+        private val releaseListeners = mutableListOf<() -> Unit>()
+
+        var isDown = false
+            private set
+
+            init {
+                EventBus.on<KeyEvent.Press> {
+                    if (it.keyCode == keyCode && !isDown) {
+                        isDown = true
+                        pressListeners.forEach { fn -> fn() }
+                    }
+                }
+
+                EventBus.on<KeyEvent.Release> {
+                    if (it.keyCode == keyCode && isDown) {
+                        isDown = false
+                        releaseListeners.forEach { fn -> fn() }
+                    }
+                }
+            }
+
+        // Register listeners
+        fun onPress(block: () -> Unit) {
+            pressListeners += block
+        }
+
+        fun onRelease(block: () -> Unit) {
+            releaseListeners += block
+        }
     }
 }
+
 
 class Slider : ConfigElement() {
     var min: Float = 0f

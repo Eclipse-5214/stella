@@ -16,6 +16,7 @@ import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.config.RGBA
+import co.stellarskys.stella.utils.config.core.Keybind
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
@@ -28,6 +29,8 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOMBS) {
     val onlyRenderAfterClear by config.property<Boolean>("secretRoutes.onlyRenderAfterClear")
     val stopRenderAfterGreen by config.property<Boolean>("secretRoutes.stopRenderAfterGreen")
+    var nextStepBind by config.property<Keybind.Handler>("secretRoutes.nextStep")
+    var lastStepBind by config.property<Keybind.Handler>("secretRoutes.lastStep")
     val renderText by config.property<Boolean>("secretRoutes.renderText")
 
     val startColor by config.property<RGBA>("secretRoutes.startColor")
@@ -88,6 +91,16 @@ object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
             if (stopRenderAfterGreen && currentRoom?.checkmark == Checkmark.GREEN) return@on
 
             RoutePlayer.renderRoute(currentStep!!, firstStep, event.context)
+        }
+
+        nextStepBind.onPress {
+            if(!this@secretRoutes.isEnabled() || RouteRecorder.recording) return@onPress
+            nextStep()
+        }
+
+        lastStepBind.onPress{
+            if(!this@secretRoutes.isEnabled() || RouteRecorder.recording) return@onPress
+            previousStep()
         }
     }
 

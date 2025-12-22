@@ -15,6 +15,7 @@
       "MixinLivingEntity",
       "MixinContainer",
       "MixinSoundManager",
+      "MixinKeyboardHandler",
       "accessors.AccessorMapState"
     ]
 }
