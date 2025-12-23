@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
+import co.stellarskys.stella.features.secrets.utils.RouteRegistry
 import co.stellarskys.stella.hud.HUDEditor
 import co.stellarskys.stella.utils.config.core.Config
 import dev.deftu.omnicore.api.client.client
@@ -656,6 +657,23 @@ val config = Config("Stella", "Stella") {
                 shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
+            textinput {
+                configName = "secretRoutes.fileName"
+                name = "File Name"
+                description = "The name of the file to load the routes from (press reload after changing)"
+                placeholder = "default.json"
+            }
+
+            button {
+                configName = "secretRoutes.reload"
+                name = "Reload Routes"
+                description = "reloads the secret routes from the config file"
+
+                onclick {
+                    RouteRegistry.reload()
+                }
+            }
+
             keybind {
                 configName = "secretRoutes.nextStep"
                 name = "Next Step Bind"
@@ -664,18 +682,17 @@ val config = Config("Stella", "Stella") {
 
             keybind {
                 configName = "secretRoutes.lastStep"
-                name = "Next Step Bind"
+                name = "Last Step Bind"
                 description = "Goes to the last step of a route"
             }
         }
 
-        subcategory("Rendering") {
+        subcategory("Route Rendering") {
             colorpicker {
                 configName = "secretRoutes.startColor"
                 name = "Start Color"
                 description = "Color for the starting point of a route."
                 default = rgba(0, 255, 0, 255) // green
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             colorpicker {
@@ -683,7 +700,6 @@ val config = Config("Stella", "Stella") {
                 name = "Mine Color"
                 description = "Color for mining-related route waypoints."
                 default = rgba(255, 165, 0, 255) // orange
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             colorpicker {
@@ -691,7 +707,6 @@ val config = Config("Stella", "Stella") {
                 name = "Superboom Color"
                 description = "Color for Superboom TNT route waypoints."
                 default = rgba(255, 0, 0, 255) // red
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             colorpicker {
@@ -699,7 +714,6 @@ val config = Config("Stella", "Stella") {
                 name = "Etherwarp Color"
                 description = "Color for Etherwarp route waypoints."
                 default = rgba(0, 0, 255, 255) // blue
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             colorpicker {
@@ -707,7 +721,6 @@ val config = Config("Stella", "Stella") {
                 name = "Chest Color"
                 description = "Color for Chest waypoints."
                 default = rgba(255, 255, 0, 255) // yellow
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             colorpicker {
@@ -715,7 +728,6 @@ val config = Config("Stella", "Stella") {
                 name = "Item Color"
                 description = "Color for Item waypoints."
                 default = rgba(255, 255, 0, 255) // yellow
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             colorpicker {
@@ -723,7 +735,6 @@ val config = Config("Stella", "Stella") {
                 name = "Essence Color"
                 description = "Color for Essence waypoints."
                 default = rgba(255, 255, 0, 255) // yellow
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             colorpicker {
@@ -731,7 +742,6 @@ val config = Config("Stella", "Stella") {
                 name = "Bat Color"
                 description = "Color for bat route waypoints."
                 default = rgba(128, 128, 128, 255) // gray
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             colorpicker {
@@ -779,7 +789,7 @@ val config = Config("Stella", "Stella") {
             button {
                 configName = "secretRoutes.saveRecording"
                 name = "Save Recording"
-                description = "Saves the recording of the route (/sa route save)"
+                description = "Saves the recording of the route (/sa route save) (To change route file version do it in the file)"
 
                 onclick {
                     RouteRecorder.saveRoute()

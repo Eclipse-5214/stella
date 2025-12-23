@@ -2,6 +2,7 @@ package co.stellarskys.stella.features.secrets.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.features.secrets.secretRoutes
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.core.BlockPos
@@ -10,7 +11,7 @@ import java.io.File
 
 @Module
 object RouteRegistry {
-    private val ROUTES_FILE = File("config/stella/routes.json")
+    private val ROUTES_FILE get() = File("config/stella/routes/${secretRoutes.routeFile}")
     private val gson = GsonBuilder().disableHtmlEscaping().create()
     private var routeFile: RouteFile = RouteFile()
 
@@ -20,7 +21,7 @@ object RouteRegistry {
 
     fun load() {
         if (!ROUTES_FILE.exists()) {
-            Stella.LOGGER.info("RouteRegistry: routes.json not found, creating new file")
+            Stella.LOGGER.info("RouteRegistry: ${secretRoutes.routeFile} not found, creating new file")
             save()
             return
         }
@@ -52,7 +53,7 @@ object RouteRegistry {
 
             Stella.LOGGER.info("RouteRegistry: Successfully loaded ${routes.size} rooms")
         }.onFailure {
-            Stella.LOGGER.error("RouteRegistry: Failed to load routes.json — ${it.message}")
+            Stella.LOGGER.error("RouteRegistry: Failed to load ${secretRoutes.routeFile} — ${it.message}")
         }
     }
 
@@ -60,39 +61,41 @@ object RouteRegistry {
         runCatching {
             val sb = StringBuilder()
 
-            // Opening brace
             sb.append("{\n")
 
-            // Header fields
             sb.append("    \"#name\": \"${routeFile.`#name`}\",\n")
             sb.append("    \"#origin\": \"${routeFile.`#origin`}\",\n")
-            sb.append("    \"Version\": \"${routeFile.Version}\",\n\n")
+            sb.append("    \"Version\": \"${routeFile.Version}\"")
 
-            // Each room on its own line
             val entries = routeFile.routes.entries.toList()
-            entries.forEachIndexed { index, (room, data) ->
-                sb.append("    \"").append(room).append("\":")
-                sb.append(gson.toJson(data.steps)) // compact JSON array
 
-                // Add comma except for last entry
-                if (index != entries.lastIndex) sb.append(",")
+            if (entries.isNotEmpty()) {
+                sb.append(",\n\n") // only add comma + blank line if routes exist
+
+                entries.forEachIndexed { index, (room, data) ->
+                    sb.append("    \"").append(room).append("\":")
+                    sb.append(gson.toJson(data.steps))
+
+                    if (index != entries.lastIndex) sb.append(",")
+                    sb.append("\n")
+                }
+            } else {
                 sb.append("\n")
             }
 
-            // Closing brace
             sb.append("}")
 
             ROUTES_FILE.parentFile.mkdirs()
             ROUTES_FILE.writeText(sb.toString())
 
-            Stella.LOGGER.info("RouteRegistry: Saved routes.json")
+            Stella.LOGGER.info("RouteRegistry: Saved ${secretRoutes.routeFile}")
         }.onFailure {
-            Stella.LOGGER.error("RouteRegistry: Failed to save routes.json — ${it.message}")
+            Stella.LOGGER.error("RouteRegistry: Failed to save ${secretRoutes.routeFile} — ${it.message}")
         }
     }
 
     fun reload() {
-        Stella.LOGGER.info("RouteRegistry: Reloading routes.json...")
+        Stella.LOGGER.info("RouteRegistry: Reloading ${secretRoutes.routeFile}...")
 
         runCatching {
             load()

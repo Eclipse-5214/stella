@@ -31,6 +31,7 @@ object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
     val stopRenderAfterGreen by config.property<Boolean>("secretRoutes.stopRenderAfterGreen")
     var nextStepBind by config.property<Keybind.Handler>("secretRoutes.nextStep")
     var lastStepBind by config.property<Keybind.Handler>("secretRoutes.lastStep")
+    var routeFile by config.property<String>("secretRoutes.fileName")
     val renderText by config.property<Boolean>("secretRoutes.renderText")
 
     val startColor by config.property<RGBA>("secretRoutes.startColor")

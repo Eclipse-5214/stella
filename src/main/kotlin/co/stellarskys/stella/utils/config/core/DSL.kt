@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils.config.core
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.KeyEvent
 import co.stellarskys.stella.utils.config.RGBA
@@ -162,7 +163,7 @@ open class ConfigElement {
     var description: String = ""
 
     /** The current value of the element (can be Boolean, String, Int, etc). */
-    var value: Any? = null
+    open var value: Any? = null
 
     var showIf: ((Map<String, Any?>) -> Boolean)? = null
 
@@ -220,16 +221,24 @@ class Keybind : ConfigElement() {
     var default: Int = 0
         set(value) {
             field = value
-            this.value = Handler(value)
+            this.handler.setCode(value)
         }
 
-    init {
-        value = Handler(default)
-    }
+    private var handler = Handler(default)
 
-    class Handler(keyCode: Int) {
+    override var value: Any?
+        get() = handler
+        set(value) {
+            when (value) {
+                is Int -> handler.setCode(value)
+                else -> Stella.LOGGER.warn("Invalid value for Keybind: $value")
+            }
+        }
+
+    class Handler(initCode: Int) {
         private val pressListeners = mutableListOf<() -> Unit>()
         private val releaseListeners = mutableListOf<() -> Unit>()
+        private var keyCode = initCode
 
         var isDown = false
             private set
@@ -258,6 +267,9 @@ class Keybind : ConfigElement() {
         fun onRelease(block: () -> Unit) {
             releaseListeners += block
         }
+
+        fun keyCode() = keyCode
+        fun setCode(newCode: Int) { keyCode = newCode}
     }
 }
 

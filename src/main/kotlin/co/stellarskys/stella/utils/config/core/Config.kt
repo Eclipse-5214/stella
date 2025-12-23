@@ -255,10 +255,10 @@ class Config(
                     is Button -> ButtonUIBuilder().build(box, element, window)
                     is ColorPicker -> ColorPickerUIBuilder().build(box, element, window)
                     is Dropdown -> DropdownUIBuilder().build(box, element, window)
-                    //is Keybind -> KeybindUIBuilder().build(box, element, window)
+                    is Keybind -> KeybindUIBuilder().build(box, element, window)
                     is Slider -> SliderUIBuilder().build(box, element, window)
                     is StepSlider -> StepSliderUIBuilder().build(box, element, window)
-                    //is TextInput -> TextInputUIBuilder().build(box, element, window)
+                    is TextInput -> TextInputUIBuilder().build(box, element, window)
                     is TextParagraph -> TextParagraphUIBuilder().build(box, element)
                     is Toggle -> ToggleUIBuilder().build(box, element, config, window)
                     else -> null
@@ -359,6 +359,7 @@ class Config(
                             is Double -> JsonPrimitive(value)
                             is String -> JsonPrimitive(value)
                             is RGBA -> JsonPrimitive(value.toHex())
+                            is Keybind.Handler -> JsonPrimitive(value.keyCode())
                             else -> {
                                 Stella.LOGGER.error("Unsupported type for $id: ${value::class.simpleName}")
                                 return@forEach
@@ -399,6 +400,7 @@ class Config(
                         is Float -> jsonValue.asFloat
                         is Double -> jsonValue.asDouble
                         is String -> jsonValue.asString
+                        is Keybind.Handler -> jsonValue.asInt
                         is RGBA -> RGBA.fromHex(jsonValue.asString)
                         else -> {
                             Stella.LOGGER.warn("Skipping unsupported load type for '$id': ${current?.let { it::class.simpleName } ?: "null"}")
