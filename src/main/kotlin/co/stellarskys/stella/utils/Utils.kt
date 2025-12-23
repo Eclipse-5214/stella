@@ -41,17 +41,11 @@ object Utils {
 
     // Angle interpolation (shortest path), in radians
     fun lerpAngle(f: Double, a: Double, b: Double): Double {
-        var start = a % (2 * PI)
-        var end = b % (2 * PI)
-
-        if (start < 0) start += 2 * PI
-        if (end < 0) end += 2 * PI
-
-        // unwrap across 360° boundary
-        if (end - start > PI) end -= 2 * PI
-        if (start - end > PI) start -= 2 * PI
-
-        return lerp(f, start, end)
+        var diff = (b - a) % 360.0
+        if (diff < -180.0) diff += 360.0
+        if (diff > 180.0) diff -= 360.0
+        val t = f.coerceIn(0.0, 1.0)
+        return a + diff * t
     }
 
     fun mapRange(n: Double, inMin: Double, inMax: Double, outMin: Double, outMax: Double): Double = (n - inMin) * (outMax - outMin) / (inMax - inMin) + outMin

@@ -3,81 +3,117 @@ package co.stellarskys.stella.utils.skyblock.dungeons.players
 import co.stellarskys.stella.utils.Utils
 
 class DungeonPlayerPosition {
-    val real = Real()
-    class Real {
-        var x: Double? = null
-        var z: Double? = null
+    val raw = Raw()
+    class Raw {
+        var IconX: Double? = null
+        var IconZ: Double? = null
+        var RealX: Double? = null
+        var RealZ: Double? = null
         var yaw: Double? = null
     }
 
-    val icon = Icon()
-    class Icon {
-        var x: Double? = null
-        var z: Double? = null
-    }
 
+    // LERPED VIEW
     val lerped = Lerped(this)
     class Lerped(private val p: DungeonPlayerPosition) {
-        val x: Double?
-            get() = p.computeLerp()?.first
-        val z: Double?
-            get() = p.computeLerp()?.second
-        val yaw: Double?
-            get() = p.computeLerp()?.third
+        private val data get() = p.computeLerp()
+
+        val IconX get() = data?.iconX
+        val IconZ get() = data?.iconZ
+        val RealX get() = data?.realX
+        val RealZ get() = data?.realZ
+        var yaw: Double? = data?.yaw
+
+        val real = Real(p)
+        class Real(private val p: DungeonPlayerPosition) {
+            val x get() = p.computeLerp()?.realX
+            val z get() = p.computeLerp()?.realZ
+            val yaw get() = p.computeLerp()?.realYaw
+        }
+
+        val icon = Icon(p)
+        class Icon(private val p: DungeonPlayerPosition) {
+            val x get() = p.computeLerp()?.iconX
+            val z get() = p.computeLerp()?.iconZ
+            val yaw get() = p.computeLerp()?.iconYaw
+        }
     }
 
-    // interpolation state
-    private var lastX: Double? = null
-    private var lastZ: Double? = null
-    private var lastYaw: Double? = null
+    private var lastRealX: Double? = null
+    private var lastRealZ: Double? = null
+    private var lastRealYaw: Double? = null
+
+    private var lastIconX: Double? = null
+    private var lastIconZ: Double? = null
+    private var lastIconYaw: Double? = null
+
     private var lastTime: Double? = null
 
-    private var currX: Double? = null
-    private var currZ: Double? = null
+    private var currRealX: Double? = null
+    private var currRealZ: Double? = null
     private var currYaw: Double? = null
+
+    private var currIconX: Double? = null
+    private var currIconZ: Double? = null
+    private var currIconYaw: Double? = null
+
     private var currTime: Double? = null
 
-    // update function
-    fun updatePosition(realX: Double, realZ: Double, yaw: Float, iconX: Double?, iconZ: Double?) {
+    fun updatePosition(realX: Double, realZ: Double, yaw: Float, iconX: Double, iconZ: Double) {
         val now = System.nanoTime() * 1e-6
 
-        lastX = currX
-        lastZ = currZ
-        lastYaw = currYaw
+        // shift current → last
+        lastRealX = currRealX
+        lastRealZ = currRealZ
+        lastRealYaw = currRealYaw
+
+        lastIconX = currIconX
+        lastIconZ = currIconZ
+        lastIconYaw = currIconYaw
+
         lastTime = currTime
 
-        currX = realX
-        currZ = realZ
-        currYaw = yaw.toDouble()
+        // store new
+        currRealX = realX
+        currRealZ = realZ
+        currRealYaw = yaw.toDouble()
+
+        currIconX = iconX
+        currIconZ = iconZ
+        currIconYaw = yaw.toDouble()
+
         currTime = now
 
-        real.x = realX
-        real.z = realZ
-        real.yaw = yaw.toDouble()
+        // update raw
+        raw.RealX = realX
+        raw.RealZ = realZ
 
-        if (iconX != null) icon.x = iconX
-        if (iconZ != null) icon.z = iconZ
+        raw.IconX = iconX
+        raw.IconZ = iconZ
     }
 
-    private fun computeLerp(): Triple<Double, Double, Double>? {
-        val lx = lastX ?: return currX?.let { Triple(it, currZ!!, currYaw!!) }
-        val lz = lastZ ?: return currX?.let { Triple(it, currZ!!, currYaw!!) }
-        val ly = lastYaw ?: return currX?.let { Triple(it, currZ!!, currYaw!!) }
-
-        val cx = currX ?: return null
-        val cz = currZ ?: return null
-        val cy = currYaw ?: return null
-
-        val lt = lastTime ?: return Triple(cx, cz, cy)
-        val ct = currTime ?: return Triple(cx, cz, cy)
+    private fun computeLerp(): LerpResult? {
+        val lt = lastTime ?: return null
+        val ct = currTime ?: return null
 
         val now = System.nanoTime() * 1e-6
-        val f = (now - ct) / (ct - lt)
+        val f = ((now - ct) / (ct - lt)).coerceIn(0.0, 1.0)
 
-        return Triple(
-            Utils.lerp(f, lx, cx),
-            Utils.lerp(f, lz, cz),
-            Utils.lerpAngle(f, ly, cy)
+        return LerpResult(
+            realX = Utils.lerp(f, lastRealX ?: currRealX!!, currRealX!!),
+            realZ = Utils.lerp(f, lastRealZ ?: currRealZ!!, currRealZ!!),
+            yaw = Utils.lerpAngle(f, lastRealYaw ?: currRealYaw!!, currRealYaw!!),
+
+            iconX = Utils.lerp(f, lastIconX ?: currIconX!!, currIconX!!),
+            iconZ = Utils.lerp(f, lastIconZ ?: currIconZ!!, currIconZ!!),
         )
     }
+
+    data class LerpResult(
+        val realX: Double,
+        val realZ: Double,
+        val yaw: Double,
+        val iconX: Double,
+        val iconZ: Double,
+    )
 }
