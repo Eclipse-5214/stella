@@ -9,26 +9,21 @@ import net.minecraft.world.entity.player.Player
 import java.util.*
 
 class DungeonPlayer(val name: String) {
-    // position
-    var iconX: Double? = null
-    var iconZ: Double? = null
-    var realX: Double? = null
-    var realZ: Double? = null
-    var yaw: Float? = null
-
-    // score stuff
+    var pos = DungeonPlayerPosition()
     var deaths = 0
     var minRooms = 0
     var maxRooms = 0
     var dclass = DungeonClass.UNKNOWN
-    val alive get() = dclass != DungeonClass.DEAD;
+    val alive get() = dclass != DungeonClass.DEAD
 
     private var initSecrets: Int? = null
     private var currSecrets: Int? = null
     val secrets get() = currSecrets!! - initSecrets!!
 
-    // api
-    val entity: Player? = world?.entitiesForRendering()?.filterIsInstance<Player>()?.find { it.gameProfile.name == name }
+    val entity: Player? = world?.entitiesForRendering()
+        ?.filterIsInstance<Player>()
+        ?.find { it.gameProfile.name == name }
+
     val uuid: UUID? get() = entity?.uuid
 
     var inRender = false
@@ -50,12 +45,11 @@ class DungeonPlayer(val name: String) {
 
     fun updateSecrets() {
         if (uuid == null) return
-
         HypixelApi.fetchSecrets(uuid.toString(), cacheMs = 0) { secrets ->
             currSecrets = secrets
         }
     }
 
-    fun getGreenChecks(): MutableMap<String, RoomClearInfo> = clearedRooms["GREEN"] ?: mutableMapOf()
-    fun getWhiteChecks(): MutableMap<String, RoomClearInfo> = clearedRooms["WHITE"] ?: mutableMapOf()
+    fun getGreenChecks() = clearedRooms["GREEN"] ?: mutableMapOf()
+    fun getWhiteChecks() = clearedRooms["WHITE"] ?: mutableMapOf()
 }

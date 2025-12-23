@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.skyblock.dungeons.map
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.TickEvent
+import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.WorldUtils
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.ScanUtils
@@ -199,24 +200,14 @@ object WorldScanner {
         if (entity == null) return
         entity.inRender = true
 
-        if ( x in -200.0..-10.0 || z in -200.0..-10.0){
-            entity.iconX = clampMap(x, -200.0, -10.0, 0.0, ScanUtils.defaultMapSize.first.toDouble())
-            entity.iconZ = clampMap(z, -200.0, -10.0, 0.0, ScanUtils.defaultMapSize.second.toDouble())
 
+        val iconX = Utils.mapRange(x, -200.0, -10.0, 0.0, ScanUtils.defaultMapSize.first.toDouble())
+        val iconZ = Utils.mapRange(z, -200.0, -10.0, 0.0, ScanUtils.defaultMapSize.second.toDouble())
+        entity.pos.updatePosition(x, z, yaw + 180f, iconX, iconZ)
+
+        if ( x in -200.0..-10.0 || z in -200.0..-10.0){
             val currRoom = Dungeon.getRoomAt(x.toInt(), z.toInt())
             entity.currRoom = currRoom
-        }
-
-        entity.realX = x
-        entity.realZ = z
-        entity.yaw = yaw + 180f
-    }
-
-    fun clampMap(n: Double, inMin: Double, inMax: Double, outMin: Double, outMax: Double): Double {
-        return when {
-            n <= inMin -> outMin
-            n >= inMax -> outMax
-            else -> (n - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
         }
     }
 }

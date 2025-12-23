@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils
 
 import net.minecraft.core.BlockPos
+import kotlin.math.PI
 import kotlin.math.sqrt
 
 object Utils {
@@ -31,6 +32,29 @@ object Utils {
         val dz = (a.third - b.third).toDouble()
         return dx * dx + dy * dy + dz * dz
     }
+
+    // Linear interpolation with clamped factor
+    fun lerp(f: Double, a: Double, b: Double): Double {
+        val t = f.coerceIn(0.0, 1.0)
+        return a + (b - a) * t
+    }
+
+    // Angle interpolation (shortest path), in radians
+    fun lerpAngle(f: Double, a: Double, b: Double): Double {
+        var start = a % (2 * PI)
+        var end = b % (2 * PI)
+
+        if (start < 0) start += 2 * PI
+        if (end < 0) end += 2 * PI
+
+        // unwrap across 360° boundary
+        if (end - start > PI) end -= 2 * PI
+        if (start - end > PI) start -= 2 * PI
+
+        return lerp(f, start, end)
+    }
+
+    fun mapRange(n: Double, inMin: Double, inMax: Double, outMin: Double, outMax: Double): Double = (n - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
 
     fun decodeRoman(roman: String): Int {
         val values = mapOf(

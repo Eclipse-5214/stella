@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.skyblock.dungeons.map
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.mixins.accessors.AccessorMapState
 import co.stellarskys.stella.utils.TimeUtils
+import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon.rooms
 import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
@@ -230,13 +231,14 @@ object MapScanner {
             if (dplayer.inRender) continue
             Stella.LOGGER.info("Updating player ${dplayer.name} to (${mapDecoration.mapX},${mapDecoration.mapZ}), yaw ${mapDecoration.yaw}")
 
-            dplayer.iconX = clampMap(mapDecoration.mapX.toDouble() - MapUtils.mapCorners.first.toDouble(), 0.0, MapUtils.mapRoomSize.toDouble() * 6 + 20.0, 0.0, ScanUtils.defaultMapSize.first.toDouble())
-            dplayer.iconZ = clampMap(mapDecoration.mapZ.toDouble() - MapUtils.mapCorners.second.toDouble(), 0.0, MapUtils.mapRoomSize.toDouble() * 6 + 20.0, 0.0, ScanUtils.defaultMapSize.second.toDouble())
-            dplayer.realX = clampMap(dplayer.iconX!!, 0.0, 125.0, -200.0, -10.0)
-            dplayer.realZ = clampMap(dplayer.iconZ!!, 0.0, 125.0, -200.0, -10.0)
-            dplayer.yaw = mapDecoration.yaw + 180f
+            val iconX = Utils.mapRange(mapDecoration.mapX.toDouble() - MapUtils.mapCorners.first.toDouble(), 0.0, MapUtils.mapRoomSize.toDouble() * 6 + 20.0, 0.0, ScanUtils.defaultMapSize.first.toDouble())
+            val iconZ = Utils.mapRange(mapDecoration.mapZ.toDouble() - MapUtils.mapCorners.second.toDouble(), 0.0, MapUtils.mapRoomSize.toDouble() * 6 + 20.0, 0.0, ScanUtils.defaultMapSize.second.toDouble())
+            val realX = Utils.mapRange(iconX, 0.0, 125.0, -200.0, -10.0)
+            val realZ = Utils.mapRange(iconZ, 0.0, 125.0, -200.0, -10.0)
+            val yaw = mapDecoration.yaw + 180f
 
-            dplayer.currRoom = Dungeon.getRoomAt(dplayer.realX!!.toInt(), dplayer.realZ!!.toInt())
+            dplayer.pos.updatePosition(realX, realZ, yaw, iconX, iconZ)
+            dplayer.currRoom = Dungeon.getRoomAt(realX.toInt(), realZ.toInt())
             dplayer.currRoom?.players?.add(dplayer)
         }
     }
@@ -270,13 +272,5 @@ object MapScanner {
 
     private fun dungeonPlayerError(decorationId: String?, reason: String?, i: Int, dungeonPlayers: Array<DungeonPlayer?>?, mapDecorations: MutableMap<String?, MapDecoration?>?) {
         Stella.LOGGER.error("[Dungeon Map] Dungeon player for map decoration '{}' {}. Player list index (zero-indexed): {}. Player list: {}. Map decorations: {}", decorationId, reason, i, dungeonPlayers.toString(), mapDecorations)
-    }
-
-    fun clampMap(n: Double, inMin: Double, inMax: Double, outMin: Double, outMax: Double): Double {
-        return when {
-            n <= inMin -> outMin
-            n >= inMax -> outMax
-            else -> (n - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
-        }
     }
 }

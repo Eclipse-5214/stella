@@ -156,9 +156,9 @@ object clear {
         for (player in DungeonPlayerManager.players) {
             if (player == null || (!player.alive && player.name != you.name.string)) continue
 
-            val iconX = player.iconX ?: continue
-            val iconY = player.iconZ ?: continue
-            val rotation = player.yaw ?: continue
+            val iconX = player.pos.lerped.x ?: continue
+            val iconY = player.pos.lerped.z ?: continue
+            val rotation = player.pos.lerped.yaw ?: continue
 
             val x = iconX / 125.0 * 128.0
             val y = iconY / 125.0 * 128.0
@@ -171,7 +171,7 @@ object clear {
                 }
             }
 
-            renderPlayerIcon(context, player, x, y, rotation)
+            renderPlayerIcon(context, player, x, y, rotation.toFloat())
         }
     }
 

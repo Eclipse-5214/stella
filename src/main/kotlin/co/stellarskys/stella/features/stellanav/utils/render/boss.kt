@@ -80,9 +80,10 @@ object boss {
             val you = dev.deftu.omnicore.api.client.player ?: continue
             if (!player.alive && player.name != you.name.string) continue
 
-            val realX = player.realX ?: continue
-            val realY = player.realZ ?: continue
-            val rotation = player.yaw ?: continue
+            //TODO Lerp these
+            val realX = player.pos.real.x ?: continue
+            val realY = player.pos.real.z ?: continue
+            val rotation = player.pos.real.yaw ?: continue
 
             val x = ((realX - bossMap.topLeftLocation[0]) / sizeInWorld) * size - topLeftHudLocX
             val y = ((realY - bossMap.topLeftLocation[1]) / sizeInWorld) * size - topLeftHudLocZ
