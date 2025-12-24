@@ -1,6 +1,10 @@
 package co.stellarskys.stella.utils
 
+import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.player
 import net.minecraft.core.BlockPos
+import net.minecraft.network.chat.Component
+import net.minecraft.sounds.SoundEvent
 import kotlin.math.PI
 import kotlin.math.sqrt
 
@@ -75,5 +79,13 @@ object Utils {
         }
 
         return total
+    }
+
+    fun alert(title: String, sound: SoundEvent? = null, volume: Float = 1f, pitch: Float = 1f) {
+        client.gui.setTimes(0, 20, 5)
+        client.gui.setTitle(Component.literal(title))
+
+        if (sound == null) return
+        player?.playSound(sound, volume, pitch)
     }
 }

@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils.skyblock.dungeons.score
 
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ChatEvent
+import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.EntityEvent
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
@@ -30,7 +31,10 @@ object MimicTrigger {
 
             when {
                 MIMIC_PATTERN.matches(msg) && mimicMessages.any { msg.contains(it) } -> mimicDead = true
-                msg == "a prince falls. +1 bonus score" -> princeDead = true
+                msg == "a prince falls. +1 bonus score" -> {
+                    princeDead = true
+                    EventBus.post(DungeonEvent.Score.PrinceDead())
+                }
             }
         }
 
@@ -39,6 +43,7 @@ object MimicTrigger {
             val entity = event.entity as? Zombie ?: return@on
             if (entity.isBaby && (0 .. 3).all { entity.getArmor(it).isEmpty }) {
                 mimicDead = true
+                EventBus.post(DungeonEvent.Score.MimicDead())
             }
         }
     }

@@ -78,4 +78,12 @@ sealed class DungeonEvent {
             LEVER
         }
     }
+
+    sealed class Score {
+        class On270() : Event()
+        class On300() : Event()
+        class PrinceDead() : Event()
+        class MimicDead() : Event()
+        class AllCrypts() : Event()
+    }
 }

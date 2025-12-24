@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.score
 
 import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.ScoreboardEvent
 import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.utils.skyblock.HypixelApi
@@ -40,6 +41,9 @@ object DungeonScore {
     var data = ScoreData()
     val hasPaul get() = Perk.EZPZ.active
     val score get() = data.score
+
+    private var lastScore = 0
+    private var lastCrypts = 0
 
     /** Resets all score data to default values */
     fun reset() {
@@ -119,6 +123,13 @@ object DungeonScore {
         score = (skillScore + exploreScore + speedScore + bonusScore).toInt()
         maxSecrets = ceil(totalSecrets * secretsPercentNeeded).toInt()
         minSecrets = floor(maxSecrets * ((40.0 - bonusScore + deathPenalty) / 40.0)).toInt()
+
+        if (score >= 270 && lastScore < 270) EventBus.post(DungeonEvent.Score.On270())
+        if (score >= 300 && lastScore < 300) EventBus.post(DungeonEvent.Score.On300())
+        if (crypts >= 5 && lastCrypts < 5) EventBus.post(DungeonEvent.Score.AllCrypts())
+
+        lastScore = score
+        lastCrypts = crypts
     }
 
 

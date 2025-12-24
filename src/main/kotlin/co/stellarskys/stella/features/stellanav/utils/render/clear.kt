@@ -156,9 +156,10 @@ object clear {
         for (player in DungeonPlayerManager.players) {
             if (player == null || (!player.alive && player.name != you.name.string)) continue
 
-            val iconX = player.pos.lerped.x ?: continue
-            val iconY = player.pos.lerped.z ?: continue
-            val rotation = player.pos.lerped.yaw ?: continue
+            val pos = (if (mapConfig.smoothMovement) player.pos.getLerped() else player.pos.raw) ?: continue
+            val iconX = pos.iconX?: continue
+            val iconY = pos.iconZ ?: continue
+            val rotation = pos.yaw ?: continue
 
             val x = iconX / 125.0 * 128.0
             val y = iconY / 125.0 * 128.0

@@ -44,6 +44,7 @@ object mapConfig {
 
     // icon settings
     val iconScale: Float get() = config["iconScale"] as? Float ?: 1f
+    val smoothMovement: Boolean get() = config["smoothMovement"] as? Boolean ?: true
     val showPlayerHead: Boolean get() = config["showPlayerHeads"] as? Boolean ?: false
     val iconBorderWidth: Float get() = config["iconBorderWidth"] as? Float ?: 0.2f
     val iconBorderColor: Color get() = (config["iconBorderColor"] as? RGBA)?.toColor() ?: Color(0, 0, 0, 255)

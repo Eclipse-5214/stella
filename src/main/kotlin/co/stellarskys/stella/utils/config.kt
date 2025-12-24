@@ -296,6 +296,63 @@ val config = Config("Stella", "Stella") {
                 default = rgba(30, 170, 50, 255)
             }
         }
+
+        subcategory("Score Alerts") {
+            toggle {
+                configName = "scoreAlerts"
+                name = "Enable Score Alerts"
+                description = "Enables alerts for dungeon score milestones"
+                default = false
+            }
+
+            toggle {
+                configName = "scoreAlerts.alert270"
+                name = "270 Score Alert"
+                description = "Alerts you when your score reaches 270"
+                default = true
+                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
+            }
+
+            textinput {
+                configName = "scoreAlerts.message270"
+                name = "270 Score Message"
+                description = "Message to display when reaching 270 score"
+                placeholder = "&d270 score!"
+                shouldShow { settings ->  (settings["scoreAlerts"] as Boolean) && (settings["scoreAlerts.alert270"] as Boolean) }
+            }
+
+            toggle {
+                configName = "scoreAlerts.alert300"
+                name = "300 Score Alert"
+                description = "Alerts you when your score reaches 300"
+                default = true
+                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
+            }
+
+            textinput {
+                configName = "scoreAlerts.message300"
+                name = "300 Score Message"
+                description = "Message to display when reaching 300 score"
+                placeholder = "&d300 score!"
+                shouldShow { settings -> (settings["scoreAlerts"] as Boolean) && (settings["scoreAlerts.alert300"] as Boolean) }
+            }
+
+            toggle {
+                configName = "scoreAlerts.alert5Crypts"
+                name = "5 Crypts Alert"
+                description = "Alerts you when your team reaches 5 crypts"
+                default = true
+                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
+            }
+
+            textinput {
+                configName = "scoreAlerts.message5Crypts"
+                name = "5 Crypts Message"
+                description = "Message to display when reaching 5 crypts"
+                placeholder = "&d5 crypts!"
+                shouldShow { settings -> (settings["scoreAlerts"] as Boolean) && (settings["scoreAlerts.alert5Crypts"] as Boolean) }
+            }
+        }
     }
 
     category("StellaNav") {
@@ -424,6 +481,13 @@ val config = Config("Stella", "Stella") {
                 min = 0.1f
                 max = 2f
                 default = 1f
+            }
+
+            toggle {
+                configName = "smoothMovement"
+                name = "Smooth Movement"
+                description = "Smooths marker movement"
+                default = true
             }
 
             toggle {
