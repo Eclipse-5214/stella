@@ -106,7 +106,7 @@ object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
     }
 
     fun nextStep() {
-        if(stepIndex < route.size) stepIndex++
+        if(stepIndex < route.size - 1) stepIndex++
     }
 
     fun previousStep() {
