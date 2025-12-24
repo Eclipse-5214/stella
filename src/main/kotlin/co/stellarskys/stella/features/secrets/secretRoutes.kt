@@ -83,7 +83,7 @@ object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
         on<DungeonEvent.Room.Change> { event ->
             currentRoom = event.new
             stepIndex = 0
-            route = RouteRegistry.getRoute(currentRoom?.name ?: return@on) ?: return@on
+            route = RouteRegistry.getRoute(currentRoom?.name ?: return@on) ?: emptyList()
         }
 
         on<RenderEvent.World.Last> { event ->
