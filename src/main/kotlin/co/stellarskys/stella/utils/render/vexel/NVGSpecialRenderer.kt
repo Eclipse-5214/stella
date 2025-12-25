@@ -8,6 +8,7 @@ import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.deftu.omnicore.api.client.render.OmniResolution
+import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
@@ -24,7 +25,6 @@ import org.joml.Matrix3x2f
  * See full license at: https://opensource.org/licenses/BSD-3-Clause
  */
 class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource) : PictureInPictureRenderer<NVGSpecialRenderer.NVGRenderState>(vertexConsumers) {
-
     override fun renderToTexture(state: NVGRenderState, poseStack: PoseStack) {
         val colorTex = RenderSystem.outputColorTextureOverride ?: return
         val bufferManager = (RenderSystem.getDevice() as? GlDevice)?.directStateAccess() ?: return
@@ -74,7 +74,7 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource) : Pict
         override fun bounds(): ScreenRectangle? = bounds
     }
 
-    companion   object {
+    companion object {
         /**
          * Draw NVG content as a special GUI element.
          *

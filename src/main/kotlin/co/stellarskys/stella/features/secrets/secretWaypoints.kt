@@ -5,6 +5,7 @@ import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 
 @Module
@@ -13,6 +14,7 @@ object secretWaypoints: Feature("secretWaypoints", island = SkyBlockIsland.THE_C
         on<RenderEvent.World.Last> { event ->
             val room = Dungeon.currentRoom ?: return@on
             val data = room.roomData?.secretCoords ?: return@on
+            if(room.checkmark == Checkmark.GREEN) return@on
 
             data.toWaypoints(config, room).forEach { waypoint ->
                 waypoint.render(event.context)

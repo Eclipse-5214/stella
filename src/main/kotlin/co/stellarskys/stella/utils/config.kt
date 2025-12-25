@@ -931,5 +931,69 @@ val config = Config("Stella", "Stella") {
                 description = "Enables the pet display"
             }
         }
+
+        subcategory("Health & Mana") {
+            toggle {
+                configName = "bars"
+                name = "Enabled"
+                description = "Enables the health & mana bars"
+            }
+
+            toggle {
+                configName = "bars.healthBar"
+                name = "Health Bar"
+                description = "Shows a custom health bar"
+                default = true
+                shouldShow { it["bars"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.manaBar"
+                name = "Mana Bar"
+                description = "Shows a custom mana bar"
+                default = true
+                shouldShow { it["bars"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.hideVanillaHealth"
+                name = "Hide Vanilla Health"
+                description = "Hides the vanilla Minecraft health bar"
+                default = false
+                shouldShow { it["bars"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.hideVanillaMana"
+                name = "Hide Vanilla Mana"
+                description = "Hides the vanilla mana display"
+                default = false
+                shouldShow { it["bars"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "bars.healthColor"
+                name = "Health Bar Color"
+                description = "Color of the custom health bar"
+                default = rgba(255, 0, 0, 255) // red
+                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "bars.absorptionColor"
+                name = "Absorption Bar Color"
+                description = "Color of the custom absorption bar"
+                default = rgba(255, 200, 0, 255) // golden yellow
+                shouldShow { it["bars"] as Boolean && it["bars.absorptionBar"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "bars.manaColor"
+                name = "Mana Bar Color"
+                description = "Color of the custom mana bar"
+                default = rgba(0, 128, 255, 255) // blue
+                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
+            }
+        }
     }
 }

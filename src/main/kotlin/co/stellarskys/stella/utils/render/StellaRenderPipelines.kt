@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.Stella
+import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.DepthTestFunction
 import com.mojang.blaze3d.shaders.UniformType
@@ -12,16 +13,29 @@ import net.minecraft.resources.ResourceLocation
 object StellaRenderPipelines {
     val LINES_THROUGH_WALLS: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
-            .withLocation(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "lines_through_walls"))
+            .withLocation(id( "lines_through_walls"))
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .build()
     )
 
     val FILLED_THROUGH_WALLS: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
-            .withLocation(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "filled_through_walls"))
+            .withLocation(id("filled_through_walls"))
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .build()
     )
+
+    val ROUND_RECT: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
+            .withLocation(id("round_rect"))
+            .withFragmentShader(id("round_rect"))
+            .withVertexShader(id("round_rect"))
+            .withBlend(BlendFunction.TRANSLUCENT)
+            .withUniform("u", UniformType.UNIFORM_BUFFER)
+            .withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS)
+            .build()
+    )
+
+    private fun id(path: String) = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, path)
 }

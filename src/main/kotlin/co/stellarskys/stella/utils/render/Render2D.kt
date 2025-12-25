@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.utils.clearCodes
+import co.stellarskys.stella.utils.render.components.RoundRectRenderer
 import dev.deftu.omnicore.api.client.client
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphics
@@ -61,6 +62,17 @@ object Render2D {
     @JvmOverloads
     fun drawRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
         ctx.fill(RenderPipelines.GUI, x, y, x + width, y + height, color.rgb)
+    }
+
+    fun drawRoundRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Color, color2: Color? = null, shadow: Float = 0f, edgeSoftness: Float = 1f) {
+        RoundRectRenderer.draw(
+            ctx,
+            x.toFloat(), y.toFloat(),
+            width.toFloat(), height.toFloat(), radius.toFloat(),
+            col = color, col2 = color2,
+            s = shadow,
+            e = edgeSoftness
+        )
     }
 
     @JvmOverloads

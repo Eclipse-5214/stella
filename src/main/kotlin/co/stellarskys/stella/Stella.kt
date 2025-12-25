@@ -1,6 +1,7 @@
 package co.stellarskys.stella
 
 import co.stellarskys.stella.managers.feature.FeatureManager
+import co.stellarskys.stella.utils.render.components.RoundRectRenderer
 import co.stellarskys.stella.utils.render.vexel.NVGSpecialRenderer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,9 +22,8 @@ object Stella: ClientModInitializer {
         FeatureManager.loadFeatures()
         FeatureManager.initializeFeatures()
 
-        SpecialGuiElementRegistry.register { context ->
-            NVGSpecialRenderer(context.vertexConsumers())
-        }
+        SpecialGuiElementRegistry.register { context -> NVGSpecialRenderer(context.vertexConsumers()) }
+        SpecialGuiElementRegistry.register { context -> RoundRectRenderer(context.vertexConsumers()) }
     }
 }
 
