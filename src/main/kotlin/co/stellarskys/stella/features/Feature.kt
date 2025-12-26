@@ -76,5 +76,5 @@ open class Feature(
         }
     }
 
-    inline fun <reified T : Event> on(noinline cb: (T) -> Unit) { events += EventBus.on<T>(register = false, handler = cb) }
+    inline fun <reified T : Event> on(priority: Int = 0,noinline cb: (T) -> Unit) { events += EventBus.on<T>(register = false, priority = priority, handler = cb) }
 }

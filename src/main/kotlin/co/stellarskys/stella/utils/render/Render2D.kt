@@ -87,6 +87,26 @@ object Render2D {
         if (scale != 1f) matrices.popMatrix()
     }
 
+    @JvmOverloads
+    fun drawString(ctx: GuiGraphics, str: String, x: Int, y: Int, scale: Float = 1f, color: Color, shadow: Boolean = true) {
+        val matrices = ctx.pose()
+        if (scale != 1f) {
+            matrices.pushMatrix()
+            matrices.scale(scale, scale)
+        }
+
+        ctx.drawString(
+            mc.font,
+            str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
+            x,
+            y,
+            color.rgb,
+            shadow
+        )
+
+        if (scale != 1f) matrices.popMatrix()
+    }
+
     fun renderItem(context: GuiGraphics, item: ItemStack, x: Float, y: Float, scale: Float) {
         context.pose().pushMatrix()
         context.pose().translate(x, y)

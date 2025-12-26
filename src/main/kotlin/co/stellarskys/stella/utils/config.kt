@@ -11,7 +11,7 @@ import net.minecraft.Util
 import java.net.URI
 
 val config = Config("Stella", "Stella") {
-    category("General"){
+    category("General") {
         subcategory("Info") {
             textparagraph {
                 configName = "info"
@@ -78,8 +78,8 @@ val config = Config("Stella", "Stella") {
         }
     }
 
-    category( "Dungeons") {
-        subcategory( "Room Name") {
+    category("Dungeons") {
+        subcategory("Room Name") {
             toggle {
                 configName = "showRoomName"
                 name = "Show Room Name"
@@ -318,7 +318,7 @@ val config = Config("Stella", "Stella") {
                 name = "270 Score Message"
                 description = "Message to display when reaching 270 score"
                 placeholder = "&d270 score!"
-                shouldShow { settings ->  (settings["scoreAlerts"] as Boolean) && (settings["scoreAlerts.alert270"] as Boolean) }
+                shouldShow { settings -> (settings["scoreAlerts"] as Boolean) && (settings["scoreAlerts.alert270"] as Boolean) }
             }
 
             toggle {
@@ -510,7 +510,7 @@ val config = Config("Stella", "Stella") {
                 configName = "iconBorderColor"
                 name = "Border Color"
                 description = "The color for the icon border"
-                default = rgba(0,0,0,255)
+                default = rgba(0, 0, 0, 255)
             }
 
             toggle {
@@ -853,7 +853,8 @@ val config = Config("Stella", "Stella") {
             button {
                 configName = "secretRoutes.saveRecording"
                 name = "Save Recording"
-                description = "Saves the recording of the route (/sa route save) (To change route file version do it in the file)"
+                description =
+                    "Saves the recording of the route (/sa route save) (To change route file version do it in the file)"
 
                 onclick {
                     RouteRecorder.saveRoute()
@@ -862,7 +863,7 @@ val config = Config("Stella", "Stella") {
         }
     }
 
-    category( "Msc."){
+    category("Msc.") {
         subcategory("Block Overlay") {
             toggle {
                 configName = "overlayEnabled"
@@ -905,7 +906,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Inventory Buttons"){
+        subcategory("Inventory Buttons") {
             toggle {
                 configName = "buttonsEnabled"
                 name = "Enabled"
@@ -933,26 +934,11 @@ val config = Config("Stella", "Stella") {
         }
 
         subcategory("Health & Mana") {
+
             toggle {
                 configName = "bars"
                 name = "Enabled"
                 description = "Enables the health & mana bars"
-            }
-
-            toggle {
-                configName = "bars.healthBar"
-                name = "Health Bar"
-                description = "Shows a custom health bar"
-                default = true
-                shouldShow { it["bars"] as Boolean }
-            }
-
-            toggle {
-                configName = "bars.manaBar"
-                name = "Mana Bar"
-                description = "Shows a custom mana bar"
-                default = true
-                shouldShow { it["bars"] as Boolean }
             }
 
             toggle {
@@ -964,18 +950,42 @@ val config = Config("Stella", "Stella") {
             }
 
             toggle {
-                configName = "bars.hideVanillaMana"
-                name = "Hide Vanilla Mana"
-                description = "Hides the vanilla mana display"
+                configName = "bars.hideVanillaHunger"
+                name = "Hide Vanilla Hunger"
+                description = "Hides the vanilla hunger display"
                 default = false
                 shouldShow { it["bars"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.hideVanillaArmor"
+                name = "Hide Vanilla Mana"
+                description = "Hides the vanilla armor display"
+                default = false
+                shouldShow { it["bars"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.healthBar"
+                name = "Health Bar"
+                description = "Shows a custom health bar"
+                default = true
+                shouldShow { it["bars"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.absorptionBar"
+                name = "Absorption Bar"
+                description = "Shows a custom absorption bar"
+                default = true
+                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
             colorpicker {
                 configName = "bars.healthColor"
                 name = "Health Bar Color"
                 description = "Color of the custom health bar"
-                default = rgba(255, 0, 0, 255) // red
+                default = rgba(255, 0, 0, 255)
                 shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
@@ -983,15 +993,72 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.absorptionColor"
                 name = "Absorption Bar Color"
                 description = "Color of the custom absorption bar"
-                default = rgba(255, 200, 0, 255) // golden yellow
+                default = rgba(255, 200, 0, 255)
+                shouldShow { it["bars"] as Boolean && it["bars.absorptionBar"] as Boolean }
+            }
+
+
+            toggle {
+                configName = "bars.hpChange"
+                name = "Health Change HUD"
+                description = "Shows the health delta (damage/healing numbers)"
+                default = true
                 shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.hpNum"
+                name = "Health Number HUD"
+                description = "Shows the numeric health value"
+                default = true
+                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.manaBar"
+                name = "Mana Bar"
+                description = "Shows a custom mana bar"
+                default = true
+                shouldShow { it["bars"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.overflowManaBar"
+                name = "Overflow Mana Bar"
+                description = "Shows a custom overflow mana bar"
+                default = true
+                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
             }
 
             colorpicker {
                 configName = "bars.manaColor"
                 name = "Mana Bar Color"
                 description = "Color of the custom mana bar"
-                default = rgba(0, 128, 255, 255) // blue
+                default = rgba(0, 128, 255, 255)
+                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "bars.ofmColor"
+                name = "Overflow Mana Color"
+                description = "Color of the overflow mana bar"
+                default = rgba(128, 0, 255, 255)
+                shouldShow { it["bars"] as Boolean && it["bars.overflowManaBar"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.ofMana"
+                name = "Overflow Mana HUD"
+                description = "Shows your overflow mana value"
+                default = true
+                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
+            }
+
+            toggle {
+                configName = "bars.mpNum"
+                name = "Mana Number HUD"
+                description = "Shows the numeric mana value"
+                default = true
                 shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
             }
         }

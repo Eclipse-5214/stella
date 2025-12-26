@@ -16,6 +16,7 @@
       "MixinContainer",
       "MixinSoundManager",
       "MixinKeyboardHandler",
+      "MixinChatListener",
       "accessors.AccessorMapState"
     ]
 }
