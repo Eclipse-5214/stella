@@ -984,7 +984,7 @@ val config = Config("Stella", "Stella") {
                 name = "Absorption Bar Color"
                 description = "Color of the custom absorption bar"
                 default = rgba(255, 200, 0, 255) // golden yellow
-                shouldShow { it["bars"] as Boolean && it["bars.absorptionBar"] as Boolean }
+                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
             colorpicker {

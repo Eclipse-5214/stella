@@ -1,16 +1,16 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.render.vexel.NVGScreen
-import co.stellarskys.stella.utils.render.vexel.NVGSpecialRenderer
 import co.stellarskys.stella.utils.skyblock.NEUApi
-import co.stellarskys.vexel.api.nvg.NVGRenderer
+import co.stellarskys.vexel.Vexel
+import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
+import co.stellarskys.vexel.core.VexelScreen
 import dev.deftu.omnicore.api.client.input.KeyboardModifiers
 import dev.deftu.omnicore.api.client.input.OmniMouseButton
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.render.OmniResolution
 
-class ButtonLayoutEditor : NVGScreen() {
+class ButtonLayoutEditor : VexelScreen() {
     private val slotSize = 20
     private val popup = EditButtonPopup(window)
 
@@ -20,10 +20,11 @@ class ButtonLayoutEditor : NVGScreen() {
         // Draw dummy inventory
         val invX = (width - 176) / 2
         val invY = (height - 166) / 2
+        val sf = OmniResolution.scaleFactor.toFloat()
 
-        NVGSpecialRenderer.draw(context, 0, 0, width, height) {
-
-            NVGRenderer.hollowRect(
+        NVGSpecialRenderer.draw(context, 0, 0, context.guiWidth(),  context.guiHeight()) {
+            Vexel.renderer.scale(sf, sf)
+            Vexel.renderer.hollowRect(
                 invX.toFloat(),
                 invY.toFloat(),
                 176f,
@@ -37,7 +38,7 @@ class ButtonLayoutEditor : NVGScreen() {
                 for (index in 0 until anchor.slots) {
                     val (x, y) = ButtonManager.resolveAnchorPosition(anchor, index, invX, invY)
 
-                    NVGRenderer.hollowRect(
+                    Vexel.renderer.hollowRect(
                         x.toFloat(),
                         y.toFloat(),
                         slotSize.toFloat(),

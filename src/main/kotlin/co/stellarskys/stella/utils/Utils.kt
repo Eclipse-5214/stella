@@ -5,7 +5,6 @@ import dev.deftu.omnicore.api.client.player
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundEvent
-import kotlin.math.PI
 import kotlin.math.sqrt
 
 object Utils {

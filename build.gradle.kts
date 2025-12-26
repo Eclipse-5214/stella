@@ -53,7 +53,7 @@ dependencies {
     implementation(include("io.github.classgraph:classgraph:4.8.184")!!)
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    modImplementation(include("co.stellarskys:vexel-${mcData}:131")!!)
+    modImplementation(include("co.stellarskys:vexel-${mcData}:135")!!)
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     property("skyblock_api_version").let {

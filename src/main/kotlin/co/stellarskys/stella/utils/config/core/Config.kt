@@ -7,7 +7,6 @@ import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.elements.*
-import co.stellarskys.stella.utils.render.CustomGuiRenderer
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.vexel.Vexel
 import com.google.gson.*
@@ -24,6 +23,7 @@ import co.stellarskys.vexel.components.core.Rectangle
 import co.stellarskys.vexel.components.core.Text
 import co.stellarskys.vexel.core.VexelScreen
 import co.stellarskys.vexel.core.VexelWindow
+import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import kotlin.reflect.KProperty
 
 //Main config Shananagens
@@ -166,8 +166,8 @@ class Config(
 
         override val isPausingScreen: Boolean = false
 
-        override fun onRenderGui() {
-            Vexel.renderer.endFrame()
+        override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
+            super.onRender(ctx, mouseX, mouseY, tickDelta)
 
             val player = player ?: return
             val uuid = player.gameProfile.id
@@ -175,11 +175,8 @@ class Config(
             val x = (head.raw.left / OmniResolution.scaleFactor).toInt()
             val y = (head.raw.top/ OmniResolution.scaleFactor).toInt()
 
-            CustomGuiRenderer.render {
-                Render2D.drawPlayerHead(it, x, y, size, uuid)
-            }
-
-            Vexel.renderer.beginFrame(0f,0f)
+            val context = ctx.graphics ?: return
+            Render2D.drawPlayerHead(context, x, y, size, uuid)
         }
 
         private fun buildCategory(root: VexelElement<*>, window: VexelWindow, category: ConfigCategory, config: Config) {

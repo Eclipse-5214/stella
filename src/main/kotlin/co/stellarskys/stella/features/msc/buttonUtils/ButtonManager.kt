@@ -5,9 +5,9 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.render.vexel.NVGSpecialRenderer
 import co.stellarskys.stella.utils.skyblock.NEUApi
-import co.stellarskys.vexel.api.nvg.NVGRenderer
+import co.stellarskys.vexel.Vexel
+import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -52,7 +52,9 @@ object ButtonManager {
     }
 
     fun renderAll(context: GuiGraphics, invX: Int = 0, invY: Int = 0, width: Float = this.width, height: Float = this.height) {
+        val sf = OmniResolution.scaleFactor.toFloat()
         NVGSpecialRenderer.draw(context, 0, 0, width.toInt(), height.toInt()) {
+            Vexel.renderer.scale(sf, sf)
             buttons.forEach { renderButton(context,it, invX, invY) }
         }
     }
@@ -64,7 +66,7 @@ object ButtonManager {
         val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
 
         if (button.background) {
-            NVGRenderer.hollowRect(
+            Vexel.renderer.hollowRect(
                 x.toFloat(),
                 y.toFloat(),
                 20f,

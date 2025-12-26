@@ -1,8 +1,10 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.utils.clearCodes
-import co.stellarskys.stella.utils.render.components.RoundRectRenderer
+import co.stellarskys.vexel.Vexel
+import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
 import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.PlayerFaceRenderer
@@ -12,6 +14,7 @@ import net.minecraft.client.resources.PlayerSkin
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.SkullBlockEntity
+import org.joml.Matrix3x2f
 import java.awt.Color
 import java.util.Optional
 import java.util.UUID
@@ -62,17 +65,6 @@ object Render2D {
     @JvmOverloads
     fun drawRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
         ctx.fill(RenderPipelines.GUI, x, y, x + width, y + height, color.rgb)
-    }
-
-    fun drawRoundRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, radius: Int, color: Color, color2: Color? = null, shadow: Float = 0f, edgeSoftness: Float = 1f) {
-        RoundRectRenderer.draw(
-            ctx,
-            x.toFloat(), y.toFloat(),
-            width.toFloat(), height.toFloat(), radius.toFloat(),
-            col = color, col2 = color2,
-            s = shadow,
-            e = edgeSoftness
-        )
     }
 
     @JvmOverloads
@@ -147,5 +139,26 @@ object Render2D {
     fun String.height(): Int {
         val lineCount = count { it == '\n' } + 1
         return mc.font.lineHeight * lineCount
+    }
+
+    fun GuiGraphics.drawNVG(block: (snapshot: Matrix3x2f) -> Unit) {
+        val snapshot = Matrix3x2f(this.pose())
+
+        NVGSpecialRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
+            val n = Vexel.renderer
+            val sf = OmniResolution.scaleFactor.toFloat()
+
+            n.resetTransform()
+
+            // 3. Automatically apply the matrix sync
+            n.setTransform(
+                snapshot.m00 * sf, snapshot.m01 * sf,
+                snapshot.m10 * sf, snapshot.m11 * sf,
+                snapshot.m20 * sf, snapshot.m21 * sf
+            )
+
+            // 4. Run the user's drawing code
+            block(snapshot)
+        }
     }
 }
