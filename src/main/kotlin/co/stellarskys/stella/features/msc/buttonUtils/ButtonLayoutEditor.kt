@@ -1,7 +1,6 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.skyblock.NEUApi
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
 import co.stellarskys.vexel.core.VexelScreen
@@ -9,6 +8,7 @@ import dev.deftu.omnicore.api.client.input.KeyboardModifiers
 import dev.deftu.omnicore.api.client.input.OmniMouseButton
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.render.OmniResolution
+import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
 
 class ButtonLayoutEditor : VexelScreen() {
     private val slotSize = 20
@@ -50,9 +50,7 @@ class ButtonLayoutEditor : VexelScreen() {
 
                     ButtonManager.getAll().find { it.anchor == anchor && it.index == index }?.let { button ->
                         if (popup.shown) return@let
-
-                        val item = NEUApi.getItemBySkyblockId(button.iconId, true) ?: return@let
-                        val stack = NEUApi.createDummyStack(item)
+                        val stack = RepoItemsAPI.getItem(button.iconId)
 
                         val offsetX = (20f - 16f) / 2f
                         val offsetY = (20f - 16f) / 2f

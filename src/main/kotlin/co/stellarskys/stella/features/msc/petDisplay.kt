@@ -1,6 +1,5 @@
 package co.stellarskys.stella.features.msc
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.GuiEvent
@@ -10,14 +9,13 @@ import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.DataUtils
 import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.skyblock.NEUApi
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
+import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
+import tech.thatgravyboat.skyblockapi.api.remote.RepoPetsAPI
 
 @Module
 object petDisplay: Feature("petDisplay", true) {
-    const val name = "Pet Display"
+    const val name = "petDisplay"
 
     val petSummon = Regex("""You (summoned|despawned) your ([A-Za-z ]+)(?: ✦)?!""")
     val autoPet = Regex("""Autopet equipped your \[Lvl (\d+)] ([A-Za-z ]+)(?: ✦)?! VIEW RULE""")
@@ -56,7 +54,7 @@ object petDisplay: Feature("petDisplay", true) {
 
 
     override fun initialize() {
-        HUDManager.registerCustom(name, 120, 30,this::HUDEditorRender)
+        HUDManager.registerCustom(name, 120, 30,this::HUDEditorRender, "petDisplay")
 
         getLastActivePet()?.let { (name, lvl) ->
             activePet = name
@@ -130,9 +128,7 @@ object petDisplay: Feature("petDisplay", true) {
     ){
         Render2D.drawString(context,"§bEnder Dragon", 40, 7)
         Render2D.drawString(context,"§7[Lvl 100]", 40, 17)
-
-        val neuItem = NEUApi.getItemBySkyblockId("ender_dragon;4") ?: return
-        val stack = NEUApi.createDummyStack(neuItem)
+        val stack = RepoPetsAPI.getPetAsItem("ENDER_DRAGON", SkyBlockRarity.LEGENDARY)
 
         Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
     }
@@ -152,10 +148,7 @@ object petDisplay: Feature("petDisplay", true) {
         Render2D.drawString(context,"§b$activePet", 40, 7)
         Render2D.drawString(context,"§7[Lvl $activePetLvl]", 40, 17)
 
-        val neuItem = NEUApi.getItemBySkyblockId("${activePet?.replace(" ", "_")};4")
-        val stack = neuItem?.let { NEUApi.createDummyStack(it) } ?: ItemStack(Items.BARRIER)
-        //Stella.LOGGER.info("Stack, $stack")
-
+        val stack = RepoPetsAPI.getPetAsItem(activePet?.replace(" ", "_").orEmpty().uppercase(), SkyBlockRarity.LEGENDARY)
         Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
 
         matrix.popMatrix()

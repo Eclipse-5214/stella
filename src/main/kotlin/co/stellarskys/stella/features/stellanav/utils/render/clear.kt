@@ -13,6 +13,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
 import dev.deftu.omnicore.api.client.player
 import net.minecraft.client.gui.GuiGraphics
+import tech.thatgravyboat.skyblockapi.platform.pushPop
 import java.awt.Color
 import java.util.UUID
 import kotlin.math.PI
@@ -84,7 +85,7 @@ object clear {
         Dungeon.discoveredRooms.values.forEach { room ->
             val x = room.x * spacing + roomSize / 2
             val y = room.z * spacing + roomSize / 2
-            context.withMatrix {
+            context.pushPop {
                 context.pose().translate(x.toFloat(), y.toFloat())
                 context.pose().scale(scale, scale)
                 context.pose().translate( -5f, -6f)
@@ -106,7 +107,7 @@ object clear {
             val x = (centerX * spacing).toInt() + roomSize / 2
             val y = (centerZ * spacing).toInt() + roomSize / 2
 
-            context.withMatrix {
+            context.pushPop {
                 context.pose().translate(x.toFloat(), y.toFloat())
                 context.pose().scale(scale, scale)
                 context.pose().translate( -6f, -6f)
@@ -135,7 +136,7 @@ object clear {
             val y = (centerZ * spacing).toInt() + roomSize / 2
             val scale = 0.75f * scaleFactor
 
-            context.withMatrix {
+            context.pushPop {
                 context.pose().translate(x.toFloat(), y.toFloat())
                 context.pose().scale(scale, scale)
 
@@ -166,7 +167,7 @@ object clear {
             val ownName = mapConfig.dontShowOwn && player.name == you.name.string
 
             if (Dungeon.holdingLeaps && mapConfig.showNames && !ownName) {
-                context.withMatrix {
+                context.pushPop {
                     context.pose().translate(x.toFloat(), y.toFloat())
                     renderNametag(context, player.name, mapConfig.iconScale / 1.3f)
                 }
@@ -225,19 +226,13 @@ object clear {
         return Pair(minX + width / 2.0, centerZ)
     }
 
-    /** Scoped matrix push/pop wrapper */
-    inline fun GuiGraphics.withMatrix(block: () -> Unit) {
-        pose().pushMatrix()
-        block()
-        pose().popMatrix()
-    }
-
+    
     /** Renders a text string with a soft shadow */
     fun drawShadowedText(context: GuiGraphics, text: String, x: Int, y: Int, scale: Float) {
         if (!mapConfig.textShadow) return
         val offsets = listOf(Pair(scale, 0f), Pair(-scale, 0f), Pair(0f, scale), Pair(0f, -scale))
         for ((dx, dy) in offsets) {
-            context.withMatrix {
+            context.pushPop {
                 context.pose().translate(dx, dy)
                 Render2D.drawString(context, "§0$text", x, y)
             }
@@ -246,7 +241,7 @@ object clear {
 
     /** Renders a player's icon (head or marker) */
     fun renderPlayerIcon(context: GuiGraphics, player: DungeonPlayer, x: Double, y: Double, rotation: Float) {
-        context.withMatrix {
+        context.pushPop {
             val matrix = context.pose()
             matrix.translate(x.toFloat(), y.toFloat())
             matrix.rotate((rotation * (PI / 180)).toFloat())

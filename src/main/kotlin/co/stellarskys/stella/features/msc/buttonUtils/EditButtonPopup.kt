@@ -2,17 +2,15 @@ package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.skyblock.NEUApi
 import co.stellarskys.vexel.components.base.enums.Pos
 import co.stellarskys.vexel.components.base.enums.Size
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
 import co.stellarskys.vexel.components.core.*
 import co.stellarskys.vexel.core.VexelWindow
 import co.stellarskys.vexel.elements.Button
 import co.stellarskys.vexel.elements.TextInput
+import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
 import java.awt.Color
 
 class EditButtonPopup(window: VexelWindow) {
@@ -118,14 +116,7 @@ class EditButtonPopup(window: VexelWindow) {
     fun renderPreviewItem(context: GuiGraphics) {
         if (!shown) return
 
-        val item = NEUApi.getItemBySkyblockId(itemIdInput.value, true)
-
-        var stack = ItemStack(Items.BARRIER)
-
-        if (item != null) {
-            stack = NEUApi.createDummyStack(item)
-        }
-
+        val stack = RepoItemsAPI.getItem(itemIdInput.value)
         val scale = OmniResolution.scaleFactor.toFloat()
 
         val x = itemPreview.scaled.left

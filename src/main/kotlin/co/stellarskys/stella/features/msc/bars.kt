@@ -1,10 +1,11 @@
 package co.stellarskys.stella.features.msc
 
 import co.stellarskys.stella.annotations.Module
-import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
+import co.stellarskys.stella.utils.TimeUtils
+import co.stellarskys.stella.utils.TimeUtils.millis
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.render.Render2D
@@ -12,13 +13,12 @@ import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.api.nvg.NVGRenderer
-import dev.deftu.omnicore.api.client.player
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.profile.StatsAPI
+import tech.thatgravyboat.skyblockapi.platform.pushPop
 import java.awt.Color
 import kotlin.math.max
-import kotlin.math.min
 
 @Module
 object bars : Feature("bars", true) {
@@ -50,7 +50,7 @@ object bars : Feature("bars", true) {
 
     private var lastHealth = StatsAPI.health.toFloat()
     private var healthDelta: Float? = null
-    private var lastHealthDeltaTime = 0L
+    private var lastHealthDeltaTime = TimeUtils.zero
 
 
     val HPHudName = "hpHud"
@@ -60,17 +60,15 @@ object bars : Feature("bars", true) {
     val OFManaHudName = "ofManaHud"
     val MPNumHudName = "mpNumHud"
 
-    val hpBarWidth get() = ((min(StatsAPI.health.toDouble(), StatsAPI.maxHealth.toDouble()) / StatsAPI.maxHealth.toDouble()) * 82.0).toFloat()
-    val absBarWidth get() = ((max(StatsAPI.health.toDouble() - StatsAPI.maxHealth.toDouble(), 0.0) / StatsAPI.maxHealth.toDouble()) * 82.toDouble()).toFloat()
-    val mpBarWidth get() = ((min(StatsAPI.mana.toDouble(), StatsAPI.maxMana.toDouble()) / StatsAPI.maxMana.toDouble()) * 82.0).toFloat()
-    val ofBarWidth get() = (( StatsAPI.overflowMana.toDouble() / StatsAPI.maxMana.toDouble()) * 82.0).toFloat()
-
+    val hpBarWidth get() = ratioWidth(StatsAPI.health, StatsAPI.maxHealth)
+    val absBarWidth get() = ratioWidth(max(StatsAPI.health.toDouble() - StatsAPI.maxHealth.toDouble(), 0.0), StatsAPI.maxHealth)
+    val mpBarWidth get() = ratioWidth(StatsAPI.mana, StatsAPI.maxMana)
+    val ofBarWidth get() = ratioWidth(StatsAPI.overflowMana, StatsAPI.maxMana)
 
     private var smoothHp = 0f
     private var smoothAbs = 0f
     private var smoothMp = 0f
     private var smoothOf = 0f
-
 
     override fun initialize() {
         HUDManager.registerCustom(HPHudName, 90, 15, this::hpHudPreview, "bars.healthBar")
@@ -93,11 +91,10 @@ object bars : Feature("bars", true) {
         }
     }
 
-    fun hpHudPreview(context: GuiGraphics) {
-        context.drawNVG {
+    fun hpHudPreview(context: GuiGraphics) = context.drawNVG {
             Vexel.renderer.rect(5f, 5f, 80f, 5f, healthColor.toColorInt(), 3f)
-        }
     }
+
 
     fun hpNumPreview(context: GuiGraphics) {
         val string = "1000/1000"
@@ -113,10 +110,8 @@ object bars : Feature("bars", true) {
         Render2D.drawString(context, "§a$string", x,5)
     }
 
-    fun mpHudPreview(context: GuiGraphics) {
-        context.drawNVG {
+    fun mpHudPreview(context: GuiGraphics) = context.drawNVG {
             Vexel.renderer.rect(5f, 5f, 80f, 5f, manaColor.toColorInt(), 3f)
-        }
     }
 
     fun mpNumPreview(context: GuiGraphics) {
@@ -133,67 +128,33 @@ object bars : Feature("bars", true) {
         Render2D.drawString(context, string + "ʬ", x,5, color = ofmColor.toColor())
     }
 
-    fun hpHud(context: GuiGraphics) {
+    fun hpHud(context: GuiGraphics) = HUDManager.renderHud(HPHudName, context) {
         val matrix = context.pose()
-
-        val x = HUDManager.getX(HPHudName)
-        val y = HUDManager.getY(HPHudName)
-        val scale = HUDManager.getScale(HPHudName)
+        matrix.translate(5f, 5f)
 
         smoothHp = lerp(smoothHp, hpBarWidth, 0.15f)
         smoothAbs = lerp(smoothAbs, absBarWidth, 0.15f)
 
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-        matrix.scale(scale)
-        matrix.translate(5f, 5f)
-
-        context.drawNVG {
-            NVGRenderer.drawMasked(0f, 0f, 80f, 5f, 3f) {
-                Vexel.renderer.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
-                Vexel.renderer.rect(-1f, 0f, smoothHp, 5f, healthColor.toColorInt(), 3f)
-                if(absorptionBar) Vexel.renderer.rect(-1f, 0f, smoothAbs, 5f, absorptionColor.toColorInt(), 3f)
-            }
-        }
-
-        matrix.popMatrix()
+        drawBar(context, smoothHp, smoothAbs, absorptionBar, healthColor, absorptionColor)
     }
 
-    fun hpNumHud(context: GuiGraphics) {
+    fun hpNumHud(context: GuiGraphics) = HUDManager.renderHud(HPNumHudName, context) {
         val matrix = context.pose()
 
         val left = StatsAPI.health
-        val slash = "/"
         val right = StatsAPI.maxHealth
-        val width = left.toString().width() + slash.width() + right.toString().width()
+        val text = "$left/$right"
 
-        val x = HUDManager.getX(HPNumHudName)
-        val y = HUDManager.getY(HPNumHudName)
-        val scale = HUDManager.getScale(HPNumHudName)
+        matrix.translate(35f - text.width() / 2, 5f)
 
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-        matrix.scale(scale)
-        matrix.translate(35f - width / 2, 5f)
-
-        val leftColor = if(left > right) absorptionColor else healthColor
+        val leftColor = if (left > right) absorptionColor else healthColor
         Render2D.drawString(context, left.toString(), 0, 0, color = leftColor.toColor())
-        Render2D.drawString(context, "§8$slash", left.toString().width(), 0)
-        Render2D.drawString(context, right.toString(), left.toString().width() + slash.width(), 0, color = healthColor.toColor())
-
-        matrix.popMatrix()
+        Render2D.drawString(context, "§8/", left.toString().width(), 0)
+        Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = healthColor.toColor())
     }
 
-    fun hpChangeHud(context: GuiGraphics) {
+    fun hpChangeHud(context: GuiGraphics) = HUDManager.renderHud(HPChangeHudName, context) {
         val matrix = context.pose()
-
-        val x = HUDManager.getX(HPChangeHudName)
-        val y = HUDManager.getY(HPChangeHudName)
-        val scale = HUDManager.getScale(HPChangeHudName)
-
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-        matrix.scale(scale)
         matrix.translate(15f, 5f)
 
         healthDelta?.let { delta ->
@@ -203,78 +164,40 @@ object bars : Feature("bars", true) {
             matrix.translate(-width / 2f, 0f)
             Render2D.drawString(context,"$color$text",  0,0)
         }
-
-        matrix.popMatrix()
     }
 
-    fun mpHud(context: GuiGraphics) {
+    fun mpHud(context: GuiGraphics) = HUDManager.renderHud(MPHudName, context) {
         val matrix = context.pose()
-
-        val x = HUDManager.getX(MPHudName)
-        val y = HUDManager.getY(MPHudName)
-        val scale = HUDManager.getScale(MPHudName)
+        matrix.translate(5f, 5f)
 
         smoothMp = lerp(smoothMp, mpBarWidth, 0.15f)
         smoothOf = lerp(smoothOf, ofBarWidth, 0.15f)
 
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-        matrix.scale(scale)
-        matrix.translate(5f , 5f)
-
-        context.drawNVG {
-            NVGRenderer.drawMasked(0f, 0f, 80f, 5f, 3f) {
-                Vexel.renderer.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
-                Vexel.renderer.rect(-1f, 0f, smoothMp, 5f, manaColor.toColorInt(), 3f)
-                if(overflowManaBar) Vexel.renderer.rect(-1f, 0f, smoothOf, 5f, ofmColor.toColorInt(), 3f)
-            }
-        }
-
-        matrix.popMatrix()
+        drawBar(context, smoothMp, smoothOf, overflowManaBar, manaColor, ofmColor)
     }
 
-    fun ofManaHud(context: GuiGraphics) {
+    fun ofManaHud(context: GuiGraphics) = HUDManager.renderHud(OFManaHudName, context){
         val matrix = context.pose()
-
-        val x = HUDManager.getX(OFManaHudName)
-        val y = HUDManager.getY(OFManaHudName)
-        val scale = HUDManager.getScale(OFManaHudName)
 
         val string = StatsAPI.overflowMana.toString() + "ʬ"
         val width = string.width()
 
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-        matrix.scale(scale)
         matrix.translate(15f - width / 2, 5f)
-
         Render2D.drawString(context, string, 0,0, color = ofmColor.toColor())
-
-        matrix.popMatrix()
     }
 
-    fun mpNumHud(context: GuiGraphics) {
+    fun mpNumHud(context: GuiGraphics) = HUDManager.renderHud(MPNumHudName, context) {
         val matrix = context.pose()
 
         val left = StatsAPI.mana
-        val slash = "/"
         val right = StatsAPI.maxMana
-        val width = left.toString().width() + slash.width() + right.toString().width()
+        val text = "$left/$right"
 
-        val x = HUDManager.getX(MPNumHudName)
-        val y = HUDManager.getY(MPNumHudName)
-        val scale = HUDManager.getScale(MPNumHudName)
-
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-        matrix.scale(scale)
-        matrix.translate(35f - width / 2, 5f)
+        matrix.translate(35f - text.width() / 2, 5f)
 
         Render2D.drawString(context, left.toString(), 0, 0, color = manaColor.toColor())
-        Render2D.drawString(context, "§8$slash", left.toString().width(), 0)
-        Render2D.drawString(context, right.toString(), left.toString().width() + slash.width(), 0, color = manaColor.toColor())
-
-        matrix.popMatrix()
+        Render2D.drawString(context, "§8/", left.toString().width(), 0)
+        Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = manaColor.toColor())
     }
 
 
@@ -287,24 +210,45 @@ object bars : Feature("bars", true) {
 
         if (current != lastHealth) {
             healthDelta = current - lastHealth
-            lastHealthDeltaTime = System.currentTimeMillis()
+            lastHealthDeltaTime = TimeUtils.now
             lastHealth = current
         }
 
-        if (healthDelta != null && System.currentTimeMillis() - lastHealthDeltaTime > 3000) {
+        if (healthDelta != null && lastHealthDeltaTime.since.millis > 3000) {
             healthDelta = null
         }
     }
 
-    fun cleanAB(text: Component): Component{
-        if (!hpNum && !mpNum && !ofMana || !this.isEnabled()) return text
+    private fun drawBar(context: GuiGraphics, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: RGBA, secondaryColor: RGBA) {
+        context.drawNVG {
+            NVGRenderer.drawMasked(0f, 0f, 80f, 5f, 3f) {
+                Vexel.renderer.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
+                Vexel.renderer.rect(-1f, 0f, mainWidth, 5f, mainColor.toColorInt(), 3f)
+                if (showSecondary) {
+                    Vexel.renderer.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.toColorInt(), 3f)
+                }
+            }
+        }
+    }
+
+    private fun ratioWidth(current: Number, max: Number, full: Float = 82f): Float {
+        val c = current.toDouble()
+        val m = max.toDouble()
+        return ((c / m).coerceIn(0.0, 1.0) * full).toFloat()
+    }
+
+    fun cleanAB(text: Component): Component {
+        if (!isEnabled() || (!hpNum && !mpNum && !ofMana)) return text
+
         val msg = text.string
-        var cleaned = msg
-        if (hpNum) cleaned = HEALTH_REGEX.replace(cleaned, "")
-        if (mpNum) cleaned = MANA_REGEX.replace(cleaned, "")
-        if (ofMana) cleaned = OVERFLOW_REGEX.replace(cleaned, "")
-        cleaned = cleaned.trim().replace("  ", " ")
-        println(cleaned)
+        val cleaned = msg.let {
+            var t = it
+            if (hpNum) t = HEALTH_REGEX.replace(t, "")
+            if (mpNum) t = MANA_REGEX.replace(t, "")
+            if (ofMana) t = OVERFLOW_REGEX.replace(t, "")
+            t
+        }.trim().replace("\\s+".toRegex(), " ")
+
         return if (cleaned != msg) Component.literal(cleaned) else text
     }
 }

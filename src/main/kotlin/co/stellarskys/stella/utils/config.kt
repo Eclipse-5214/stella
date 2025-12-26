@@ -981,23 +981,6 @@ val config = Config("Stella", "Stella") {
                 shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
-            colorpicker {
-                configName = "bars.healthColor"
-                name = "Health Bar Color"
-                description = "Color of the custom health bar"
-                default = rgba(255, 0, 0, 255)
-                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
-            }
-
-            colorpicker {
-                configName = "bars.absorptionColor"
-                name = "Absorption Bar Color"
-                description = "Color of the custom absorption bar"
-                default = rgba(255, 200, 0, 255)
-                shouldShow { it["bars"] as Boolean && it["bars.absorptionBar"] as Boolean }
-            }
-
-
             toggle {
                 configName = "bars.hpChange"
                 name = "Health Change HUD"
@@ -1012,6 +995,22 @@ val config = Config("Stella", "Stella") {
                 description = "Shows the numeric health value"
                 default = true
                 shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "bars.healthColor"
+                name = "Health Bar Color"
+                description = "Color of the custom health bar"
+                default = rgba(255, 0, 0, 255)
+                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "bars.absorptionColor"
+                name = "Absorption Bar Color"
+                description = "Color of the custom absorption bar"
+                default = rgba(255, 200, 0, 255)
+                shouldShow { it["bars"] as Boolean && it["bars.absorptionBar"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
             toggle {
@@ -1030,22 +1029,6 @@ val config = Config("Stella", "Stella") {
                 shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
             }
 
-            colorpicker {
-                configName = "bars.manaColor"
-                name = "Mana Bar Color"
-                description = "Color of the custom mana bar"
-                default = rgba(0, 128, 255, 255)
-                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
-            }
-
-            colorpicker {
-                configName = "bars.ofmColor"
-                name = "Overflow Mana Color"
-                description = "Color of the overflow mana bar"
-                default = rgba(128, 0, 255, 255)
-                shouldShow { it["bars"] as Boolean && it["bars.overflowManaBar"] as Boolean }
-            }
-
             toggle {
                 configName = "bars.ofMana"
                 name = "Overflow Mana HUD"
@@ -1060,6 +1043,30 @@ val config = Config("Stella", "Stella") {
                 description = "Shows the numeric mana value"
                 default = true
                 shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "bars.manaColor"
+                name = "Mana Bar Color"
+                description = "Color of the custom mana bar"
+                default = rgba(0, 128, 255, 255)
+                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "bars.ofmColor"
+                name = "Overflow Mana Color"
+                description = "Color of the overflow mana bar"
+                default = rgba(128, 0, 255, 255)
+                shouldShow { it["bars"] as Boolean && it["bars.overflowManaBar"] as Boolean && it["bars.manaBar"] as Boolean }
+            }
+        }
+
+        subcategory("Soulflow Display") {
+            toggle {
+                configName = "soulflowDisplay"
+                name = "Enabled"
+                description = "Enables the soulflow display"
             }
         }
     }

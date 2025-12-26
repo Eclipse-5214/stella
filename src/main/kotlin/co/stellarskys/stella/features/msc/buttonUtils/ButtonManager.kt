@@ -5,7 +5,6 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.skyblock.NEUApi
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
 import com.google.gson.Gson
@@ -14,6 +13,7 @@ import com.google.gson.reflect.TypeToken
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
+import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
 import java.io.File
 
 object ButtonManager {
@@ -60,8 +60,7 @@ object ButtonManager {
     }
 
     private fun renderButton(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int) {
-        val item = NEUApi.getItemBySkyblockId(button.iconId, true) ?: return
-        val stack = NEUApi.createDummyStack(item)
+        val stack = RepoItemsAPI.getItem(button.iconId)
 
         val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
 

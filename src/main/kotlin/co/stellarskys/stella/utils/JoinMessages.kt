@@ -6,12 +6,11 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ServerEvent
 import co.stellarskys.stella.managers.feature.FeatureManager
 import co.stellarskys.stella.utils.ChatUtils.onHover
-import co.stellarskys.stella.utils.skyblock.NEUApi
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import dev.deftu.textile.Text
 
 @Module
-object FirstInstall {
+object JoinMessages {
     private var shown = false
 
     val FirstInstallStore = DataUtils("firstInstall", true)
@@ -29,8 +28,6 @@ object FirstInstall {
                 if (showMessage) ChatUtils.fakeMessage(loadMessage)
                 shown = true
             }
-
-            if (!NEUApi.initialized) ChatUtils.fakeMessage("$PREFIX §bWARNING §fNEU repo not initialized, some features might not work as intended")
 
             if (FirstInstall) {
                 TickSchedulers.client.after(20*1) {

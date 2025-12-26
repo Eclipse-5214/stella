@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.client.gui.GuiGraphics
+import tech.thatgravyboat.skyblockapi.platform.pushPop
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
@@ -77,4 +78,17 @@ object HUDManager {
     fun getX(id: String): Float = elements[id]?.x ?: 0f
     fun getY(id: String): Float = elements[id]?.y ?: 0f
     fun getScale(id: String): Float = elements[id]?.scale ?: 1f
+
+    inline fun renderHud(name: String, context: GuiGraphics, block: () -> Unit) {
+        val matrix = context.pose()
+        val x = getX(name)
+        val y = getY(name)
+        val scale = getScale(name)
+
+        context.pushPop {
+            matrix.translate(x, y)
+            matrix.scale(scale)
+            block()
+        }
+    }
 }
