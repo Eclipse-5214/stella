@@ -5,6 +5,7 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.render.Render2D
+import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
 import com.google.gson.Gson
@@ -52,11 +53,7 @@ object ButtonManager {
     }
 
     fun renderAll(context: GuiGraphics, invX: Int = 0, invY: Int = 0, width: Float = this.width, height: Float = this.height) {
-        val sf = OmniResolution.scaleFactor.toFloat()
-        NVGSpecialRenderer.draw(context, 0, 0, width.toInt(), height.toInt()) {
-            Vexel.renderer.scale(sf, sf)
-            buttons.forEach { renderButton(context,it, invX, invY) }
-        }
+        buttons.forEach { renderButton(context,it, invX, invY); renderButtonBackgroud(context,it, invX, invY) }
     }
 
     private fun renderButton(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int) {
@@ -64,7 +61,16 @@ object ButtonManager {
 
         val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
 
-        if (button.background) {
+        val offsetX = (20f - 16f) / 2f
+        val offsetY = (20f - 16f) / 2f
+
+        Render2D.renderItem(context, stack, x.toFloat() + offsetX, y.toFloat() + offsetY, 1f)
+    }
+
+    private fun renderButtonBackgroud(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int){
+        if(!button.background) return
+        val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
+        context.drawNVG {
             Vexel.renderer.hollowRect(
                 x.toFloat(),
                 y.toFloat(),
@@ -75,11 +81,6 @@ object ButtonManager {
                 4f
             )
         }
-
-        val offsetX = (20f - 16f) / 2f
-        val offsetY = (20f - 16f) / 2f
-
-        Render2D.renderItem(context, stack, x.toFloat() + offsetX, y.toFloat() + offsetY, 1f)
     }
 
     fun handleMouseClicked(gui: Screen, mouseX: Int, mouseY: Int): Boolean {
