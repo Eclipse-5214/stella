@@ -1,5 +1,18 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.utils
 
+/*
+ * Portions of this file are adapted from DungeonScanner.js
+ * Original project: https://github.com/DocilElm/tska
+ * Author: DocilElm
+ *
+ * The original work is licensed under the GNU General Public License v3.0.
+ * In accordance with the GPL, modifications and derivative portions in this
+ * file are also distributed under GPL‑3.0.
+ *
+ * Only small parts of the logic (e.g., scanning patterns / algorithms)
+ * are derived from the original source; all other code is original work.
+ */
+
 object ScanUtils {
     // Dungeon grid constants
     val cornerStart = Pair(-200, -200)

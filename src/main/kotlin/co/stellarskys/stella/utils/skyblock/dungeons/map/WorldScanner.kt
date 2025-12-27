@@ -18,7 +18,16 @@ import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
 import java.util.UUID
 
-// Very loosely based of Tska
+/*
+ * Portions of this file are adapted from DungeonScanner.js
+ * Original project: https://github.com/DocilElm/tska
+ * Author: DocilElm
+ *
+ * The original work is licensed under the GNU General Public License v3.0.
+ * In accordance with the GPL, modifications and derivative portions in this
+ * file are also distributed under GPL‑3.0.
+ */
+
 object WorldScanner {
     val availableComponents = ScanUtils.getScanCoords().toMutableList()
     var lastIdx: Int? = null

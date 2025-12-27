@@ -1,30 +1,212 @@
 {
-  "p1": [
-    [111, 113, 73, 1, "T", "T"],
-    [111, 119, 79, 2, "M", "T"],
-    [89, 112, 92, 3, "B", "M"],
-    [89, 122, 101, 4, "A", "M"]
-  ],
+  "metadata": {
+    "author": "NEXD",
+    "source": "M7 Guides",
+    "discord_link": "https://discord.gg/m7guides",
+    "description": "Terminal assignments based on info from the M7 Guides community."
+  },
 
-  "p2": [
-    [68, 109, 121, 1, "T", "T"],
-    [59, 120, 122, 2, "M", "M"],
-    [47, 109, 121, 3, "B", "S"],
-    [39, 108, 143, 4, "A", "A"],
-    [40, 124, 122, 5, "S", "B"]
-  ],
+  "presets": {
+    "f7": {
+      "p1": {
+        "archer": { "term": [], "device": [], "lever": [1,2]},
+        "berserk": { "term": [], "device": [], "lever": []},
+        "mage": { "term": [3,4], "device": [], "lever": []},
+        "healer": { "term": [], "device": [1], "lever": []},
+        "tank": { "term": [1,2], "device": [], "lever": []}
+      },
+      "p2": {
+        "archer": { "term": [3,4], "device": [], "lever": []},
+        "berserk": { "term": [3,5], "device": [], "lever": []},
+        "mage": { "term": [2,3], "device": [], "lever": []},
+        "healer": { "term": [], "device": [1], "lever": [1,2]},
+        "tank": { "term": [1,3], "device": [], "lever": []}
+      },
+      "p3": {
+        "archer": { "term": [4], "device": [], "lever": [1,2]},
+        "berserk": { "term": [3], "device": [], "lever": []},
+        "mage": { "term": [2], "device": [], "lever": []},
+        "healer": { "term": [], "device": [1], "lever": []},
+        "tank": { "term": [1], "device": [], "lever": []}
+      },
+      "p4": {
+        "archer": { "term": [4], "device": [], "lever": []},
+        "berserk": { "term": [3], "device": [1], "lever": []},
+        "mage": { "term": [2], "device": [], "lever": []},
+        "healer": { "term": [], "device": [], "lever": [1,2]},
+        "tank": { "term": [1], "device": [], "lever": []}
+      }
+    },
 
-  "p3": [
-    [-3, 109, 112, 1, "T", "T"],
-    [-3, 119, 93, 2, "M", "M"],
-    [19, 123, 93, 3, "B", "B"],
-    [-3, 109, 77, 4, "A", "A"]
-  ],
+    "super_low_m7": {
+      "p1": {
+        "archer": { "term": [], "device": [], "lever": [1,2] },
+        "berserk": { "term": [], "device": [], "lever": [] },
+        "mage": { "term": [4,3], "device": [], "lever": [] },
+        "healer": { "term": [], "device": [1], "lever": [] },
+        "tank": { "term": [2,1], "device": [], "lever": [] }
+      },
+      "p2": {
+        "archer": { "term": [4,3], "device": [1], "lever": [] },
+        "berserk": { "term": [5,3], "device": [], "lever": [] },
+        "mage": { "term": [2], "device": [], "lever": [] },
+        "healer": { "term": [], "device": [], "lever": [1,2] },
+        "tank": { "term": [1,3], "device": [], "lever": [] }
+      },
+      "p3": {
+        "archer": { "term": [4], "device": [], "lever": [1,2] },
+        "berserk": { "term": [3], "device": [1], "lever": [] },
+        "mage": { "term": [], "device": [], "lever": [] },
+        "healer": { "term": [2], "device": [1], "lever": [] },
+        "tank": { "term": [1], "device": [], "lever": [1,2] }
+      },
+      "p4": {
+        "archer": { "term": [2], "device": [], "lever": [] },
+        "berserk": { "term": [3], "device": [1], "lever": [1,2] },
+        "mage": { "term": [], "device": [], "lever": [] },
+        "healer": { "term": [4], "device": [], "lever": [1,2] },
+        "tank": { "term": [1], "device": [], "lever": [] }
+      }
+    },
 
-  "p4": [
-    [41, 109, 29, 1, "T", "T"],
-    [44, 121, 29, 2, "M", "M"],
-    [67, 109, 29, 3, "B", "B"],
-    [72, 115, 48, 4, "A", "A"]
-  ]
+    "low_m7": {
+      "p1": {
+        "archer": { "term": [], "device": [], "lever": [1,2] },
+        "berserk": { "term": [], "device": [], "lever": [] },
+        "mage": { "term": [2,1], "device": [], "lever": [] },
+        "healer": { "term": [4,3], "device": [], "lever": [] },
+        "tank": { "term": [], "device": [1], "lever": [] }
+      },
+      "p2": {
+        "archer": { "term": [4,3], "device": [1], "lever": [] },
+        "berserk": { "term": [5,3], "device": [], "lever": [] },
+        "mage": { "term": [2], "device": [], "lever": [] },
+        "healer": { "term": [], "device": [], "lever": [1,2] },
+        "tank": { "term": [1,3], "device": [], "lever": [] }
+      },
+      "p3": {
+        "archer": { "term": [4], "device": [], "lever": [1,2] },
+        "berserk": { "term": [3], "device": [1], "lever": [] },
+        "mage": { "term": [], "device": [], "lever": [] },
+        "healer": { "term": [1], "device": [], "lever": [1,2] },
+        "tank": { "term": [2], "device": [1], "lever": [] }
+      },
+      "p4": {
+        "archer": { "term": [2], "device": [], "lever": [] },
+        "berserk": { "term": [3], "device": [1], "lever": [] },
+        "mage": { "term": [4], "device": [], "lever": [] },
+        "healer": { "term": [], "device": [], "lever": [1,2] },
+        "tank": { "term": [1], "device": [], "lever": [] }
+      }
+    },
+
+    "mid_m7": {
+      "p1": {
+        "archer": { "term": [], "device": [], "lever": [1,2] },
+        "berserk": { "term": [], "device": [], "lever": [] },
+        "mage": { "term": [2,1], "device": [], "lever": [] },
+        "healer": { "term": [4,3], "device": [], "lever": [] },
+        "tank": { "term": [], "device": [1], "lever": [] }
+      },
+      "p2": {
+        "archer": { "term": [4], "device": [1], "lever": [2] },
+        "berserk": { "term": [5,3], "device": [], "lever": [] },
+        "mage": { "term": [2], "device": [], "lever": [] },
+        "healer": { "term": [], "device": [], "lever": [1] },
+        "tank": { "term": [1,3], "device": [], "lever": [] }
+      },
+      "p3": {
+        "archer": { "term": [4], "device": [], "lever": [1,2] },
+        "berserk": { "term": [3], "device": [1], "lever": [] },
+        "mage": { "term": [], "device": [], "lever": [] },
+        "healer": { "term": [1], "device": [], "lever": [1,2] },
+        "tank": { "term": [2], "device": [1], "lever": [] }
+      },
+      "p4": {
+        "archer": { "term": [2], "device": [], "lever": [] },
+        "berserk": { "term": [3], "device": [1], "lever": [] },
+        "mage": { "term": [4], "device": [], "lever": [] },
+        "healer": { "term": [], "device": [], "lever": [1,2] },
+        "tank": { "term": [1], "device": [], "lever": [] }
+      }
+    },
+
+    "high_m7": {
+      "p1": {
+        "archer": { "term": [], "device": [], "lever": [1,2] },
+        "berserk": { "term": [], "device": [], "lever": [] },
+        "mage": { "term": [2,1], "device": [], "lever": [] },
+        "healer": { "term": [4,3], "device": [], "lever": [] },
+        "tank": { "term": [], "device": [1], "lever": [] }
+      },
+      "p2": {
+        "archer": { "term": [4], "device": [1], "lever": [2] },
+        "berserk": { "term": [5,3], "device": [], "lever": [] },
+        "mage": { "term": [2], "device": [], "lever": [] },
+        "healer": { "term": [], "device": [], "lever": [1] },
+        "tank": { "term": [1,3], "device": [], "lever": [2] }
+      },
+      "p3": {
+        "archer": { "term": [4], "device": [1], "lever": [1,2] },
+        "berserk": { "term": [1], "device": [], "lever": [] },
+        "mage": { "term": [], "device": [], "lever": [] },
+        "healer": { "term": [3], "device": [], "lever": [1,2] },
+        "tank": { "term": [2], "device": [], "lever": [] }
+      },
+      "p4": {
+        "archer": { "term": [2], "device": [], "lever": [] },
+        "berserk": { "term": [3], "device": [], "lever": [] },
+        "mage": { "term": [4], "device": [], "lever": [] },
+        "healer": { "term": [], "device": [], "lever": [1,2] },
+        "tank": { "term": [1], "device": [1], "lever": [] }
+      }
+    }
+  },
+
+  "coords": {
+    "p1": {
+      "terms": [
+        [111, 113, 73, 1],
+        [111, 119, 79, 2],
+        [89, 112, 92, 3],
+        [89, 122, 101, 4]
+      ],
+      "levers": [],
+      "devices": []
+    },
+
+    "p2": {
+      "terms": [
+        [68, 109, 121, 1],
+        [59, 120, 122, 2],
+        [47, 109, 121, 3],
+        [39, 108, 143, 4],
+        [40, 124, 122, 5]
+      ],
+      "levers": [],
+      "devices": []
+    },
+
+    "p3": {
+      "terms": [
+        [-3, 109, 112, 1],
+        [-3, 119, 93, 2],
+        [19, 123, 93, 3],
+        [-3, 109, 77, 4]
+      ],
+      "levers": [],
+      "devices": []
+    },
+
+    "p4": {
+      "terms":[
+        [41, 109, 29, 1],
+        [44, 121, 29, 2],
+        [67, 109, 29, 3],
+        [72, 115, 48, 4]
+      ],
+      "levers": [],
+      "devices": []
+    }
+  }
 }

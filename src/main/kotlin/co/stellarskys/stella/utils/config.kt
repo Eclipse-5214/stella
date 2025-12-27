@@ -96,98 +96,80 @@ val config = Config("Stella", "Stella") {
         subcategory("Terminals") {
             toggle {
                 configName = "termNumbers"
-                name = "Terminal Numbers"
-                description = "Number the terminals in dungeons (for calling terms)"
+                name = "Enabled"
+                description = "Shows terminal numbers and class labels in F7/M7 boss."
                 default = false
             }
 
             dropdown {
-                configName = "termNumber"
-                name = "Number"
-                description = "What terminal number you want to call"
-                options = listOf("1", "2", "3", "4", "All")
-                default = 4
-                shouldShow { settings -> settings["termNumbers"] as Boolean }
+                configName = "selectedRole"
+                name = "Your Role"
+                description = "Which class you are playing for terminal assignments."
+                options = listOf("Tank", "Mage", "Bers", "Arch", "Heal", "All")
+                default = 4 // All
+                shouldShow { it["termNumbers"] as Boolean }
+            }
+
+            dropdown {
+                configName = "preset"
+                name = "Role Presets"
+                description = "Which roll presets you want to use (from M7 Guides)"
+                options = listOf("F7", "SL M7", "Low M7", "Mid M7", "High M7")
+                default = 1 // All
+                shouldShow { it["termNumbers"] as Boolean }
+            }
+
+            toggle {
+                configName = "showTermClass"
+                name = "Show Class Label"
+                description = "Displays the class label next to each terminal."
+                default = true
+                shouldShow { it["termNumbers"] as Boolean }
+            }
+
+            toggle {
+                configName = "hideNumber"
+                name = "Hide Terminal Number"
+                description = "Hides the terminal number and only shows the class label."
+                default = false
+                shouldShow { settings ->
+                    (settings["termNumbers"] as Boolean) &&
+                            (settings["showTermClass"] as Boolean)
+                }
             }
 
             toggle {
                 configName = "highlightTerms"
-                name = "Highlight Terms"
-                description = "Highlights the terminals"
-                default = false
-                shouldShow { settings -> settings["termNumbers"] as Boolean }
+                name = "Highlight Term Blocks"
+                description = "Outlines terminals in the world."
+                default = true
+                shouldShow { it["termNumbers"] as Boolean }
             }
 
             colorpicker {
                 configName = "termColor"
                 name = "Highlight Color"
-                description = "The color to highlight the terminals"
+                description = "Color used when not using class colors."
                 default = rgba(0, 255, 255, 255)
                 shouldShow { settings ->
                     (settings["termNumbers"] as Boolean) &&
-                            (settings["highlightTerms"] as Boolean)
+                            (settings["highlightTerms"] as Boolean) &&
+                            !(settings["classColor"] as Boolean)
                 }
-            }
-
-            toggle {
-                configName = "showTermClass"
-                name = "Show Class"
-                description = "Displays related class"
-                default = false
-                shouldShow { settings -> settings["termNumbers"] as Boolean }
             }
 
             toggle {
                 configName = "classColor"
-                name = "Highlight Class Color"
-                description = "Highlights the terminals the color of the class"
-                default = false
-                shouldShow { settings ->
-                    (settings["termNumbers"] as Boolean) &&
-                            (settings["highlightTerms"] as Boolean) &&
-                            (settings["showTermClass"] as Boolean)
-                }
-            }
-
-            toggle {
-                configName = "hideNumber"
-                name = "Hide Number"
-                description = "Hides the terminal number"
-                default = false
-                shouldShow { settings ->
-                    (settings["termNumbers"] as Boolean) &&
-                            (settings["showTermClass"] as Boolean)
-                }
-            }
-
-            toggle {
-                configName = "m7Roles"
-                name = "M7 Roles"
-                description = "Displays M7 roles instead"
-                default = false
-                shouldShow { settings ->
-                    (settings["termNumbers"] as Boolean) &&
-                            (settings["showTermClass"] as Boolean)
-                }
-            }
-
-            dropdown {
-                configName = "termClass"
-                name = "M7 Class"
-                description = "What class you are playing"
-                options = listOf("Tank", "Mage", "Bers", "Arch", "All")
-                default = 4
-                shouldShow { settings ->
-                    (settings["termNumbers"] as Boolean) &&
-                            (settings["showTermClass"] as Boolean) &&
-                            (settings["m7Roles"] as Boolean)
-                }
+                name = "Use Class Color"
+                description = "Colors terminals based on the assigned class."
+                default = true
+                shouldShow { it["termNumbers"] as Boolean && it["showTermClass"] as Boolean && it["highlightTerms"] as Boolean }
             }
 
             toggle {
                 configName = "termTracker"
                 name = "Terminal Tracker"
-                description = "Tracks terminals, devices, and levers"
+                description = "Tracks terminals, devices, and levers during boss."
                 default = false
             }
         }
@@ -657,7 +639,7 @@ val config = Config("Stella", "Stella") {
             }
 
             colorpicker {
-                configName = "secretWaypointColor.redstoneKey"
+                configName = "secretWaypointColor.redstonekey"
                 name = "Redstone Key Color"
                 description = "Highlight color for Redstone Key waypoints"
                 default = rgba(255, 0, 0, 255) // red
@@ -934,7 +916,6 @@ val config = Config("Stella", "Stella") {
         }
 
         subcategory("Health & Mana") {
-
             toggle {
                 configName = "bars"
                 name = "Enabled"
