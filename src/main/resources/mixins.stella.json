@@ -9,7 +9,6 @@
     ],
     "client": [
       "MixinNetworkManager",
-      "MixinGameRenderer",
       "MixinInGameHud",
       "MixinStatusEffectsDisplay",
       "MixinLivingEntity",

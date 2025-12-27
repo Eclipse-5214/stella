@@ -1,5 +1,6 @@
 package co.stellarskys.stella.events
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.api.Event
 import co.stellarskys.stella.events.api.EventBus
@@ -25,12 +26,18 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
 
 //#if MC < 1.21.9
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
+import net.minecraft.client.gui.Gui
+import net.minecraft.resources.ResourceLocation
+
 //#else
 //$$ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 //#endif
 
 @Module
 object EventBus : EventBus() {
+    private val STELLA_HUDS = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stella_hud")
 
     init {
         ClientReceiveMessageEvents.ALLOW_GAME.register { message, isActionBar ->
@@ -128,6 +135,10 @@ object EventBus : EventBus() {
         //$$    !post(RenderEvent.World.BlockOutline(ctx))
         //$$ }
         //#endif
+
+        HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->
+            post(GuiEvent.RenderHUD(context))
+        }
     }
 
     fun onPacketReceived(packet: Packet<*>): Boolean {

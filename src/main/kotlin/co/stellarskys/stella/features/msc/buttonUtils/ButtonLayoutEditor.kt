@@ -1,6 +1,7 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.utils.render.Render2D
+import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
 import co.stellarskys.vexel.core.VexelScreen
@@ -16,14 +17,13 @@ class ButtonLayoutEditor : VexelScreen() {
 
     override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
         val context = ctx.graphics ?: return
+        context.fill(0, 0, width, height, 0x90000000.toInt())
 
         // Draw dummy inventory
         val invX = (width - 176) / 2
         val invY = (height - 166) / 2
-        val sf = OmniResolution.scaleFactor.toFloat()
 
-        NVGSpecialRenderer.draw(context, 0, 0, context.guiWidth(),  context.guiHeight()) {
-            Vexel.renderer.scale(sf, sf)
+        context.drawNVG {
             Vexel.renderer.hollowRect(
                 invX.toFloat(),
                 invY.toFloat(),
