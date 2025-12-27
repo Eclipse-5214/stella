@@ -16,7 +16,6 @@ import co.stellarskys.vexel.api.nvg.NVGRenderer
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.profile.StatsAPI
-import tech.thatgravyboat.skyblockapi.platform.pushPop
 import java.awt.Color
 import kotlin.math.max
 
@@ -78,7 +77,6 @@ object bars : Feature("bars", true) {
         HUDManager.registerCustom(MPHudName, 90, 15, this::mpHudPreview, "bars.manaBar")
         HUDManager.registerCustom(MPNumHudName, 70,19, this::mpNumPreview,"bars.mpNum")
         HUDManager.registerCustom(OFManaHudName, 30,19, this::ofManaPreview,"bars.ofMana")
-
 
         on<GuiEvent.RenderHUD> {
             if (healthBar) hpHud(it.context)

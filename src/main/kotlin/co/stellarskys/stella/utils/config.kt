@@ -123,7 +123,7 @@ val config = Config("Stella", "Stella") {
                 configName = "showTermClass"
                 name = "Show Class Label"
                 description = "Displays the class label next to each terminal."
-                default = true
+                default = false
                 shouldShow { it["termNumbers"] as Boolean }
             }
 
@@ -142,7 +142,7 @@ val config = Config("Stella", "Stella") {
                 configName = "highlightTerms"
                 name = "Highlight Term Blocks"
                 description = "Outlines terminals in the world."
-                default = true
+                default = false
                 shouldShow { it["termNumbers"] as Boolean }
             }
 
@@ -162,7 +162,7 @@ val config = Config("Stella", "Stella") {
                 configName = "classColor"
                 name = "Use Class Color"
                 description = "Colors terminals based on the assigned class."
-                default = true
+                default = false
                 shouldShow { it["termNumbers"] as Boolean && it["showTermClass"] as Boolean && it["highlightTerms"] as Boolean }
             }
 
@@ -950,7 +950,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.healthBar"
                 name = "Health Bar"
                 description = "Shows a custom health bar"
-                default = true
+                default = false
                 shouldShow { it["bars"] as Boolean }
             }
 
@@ -958,7 +958,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.absorptionBar"
                 name = "Absorption Bar"
                 description = "Shows a custom absorption bar"
-                default = true
+                default = false
                 shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
@@ -966,7 +966,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.hpChange"
                 name = "Health Change HUD"
                 description = "Shows the health delta (damage/healing numbers)"
-                default = true
+                default = false
                 shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
@@ -974,7 +974,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.hpNum"
                 name = "Health Number HUD"
                 description = "Shows the numeric health value"
-                default = true
+                default = false
                 shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
@@ -998,7 +998,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.manaBar"
                 name = "Mana Bar"
                 description = "Shows a custom mana bar"
-                default = true
+                default = false
                 shouldShow { it["bars"] as Boolean }
             }
 
@@ -1006,7 +1006,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.overflowManaBar"
                 name = "Overflow Mana Bar"
                 description = "Shows a custom overflow mana bar"
-                default = true
+                default = false
                 shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
             }
 
@@ -1014,7 +1014,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.ofMana"
                 name = "Overflow Mana HUD"
                 description = "Shows your overflow mana value"
-                default = true
+                default = false
                 shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
             }
 
@@ -1022,7 +1022,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.mpNum"
                 name = "Mana Number HUD"
                 description = "Shows the numeric mana value"
-                default = true
+                default = false
                 shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
             }
 

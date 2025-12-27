@@ -1,8 +1,6 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.utils.WorldUtils
-import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.utils.config.RGBA
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import dev.deftu.omnicore.api.client.client
@@ -16,7 +14,6 @@ import net.minecraft.world.level.EmptyBlockGetter
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
-import net.minecraft.world.phys.shapes.VoxelShape
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.sqrt
