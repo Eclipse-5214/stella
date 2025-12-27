@@ -14,6 +14,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
+import net.minecraft.resources.ResourceLocation
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.utils.render.RenderContext
@@ -26,11 +29,6 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
 
 //#if MC < 1.21.9
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-import net.minecraft.client.gui.Gui
-import net.minecraft.resources.ResourceLocation
-
 //#else
 //$$ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 //#endif
