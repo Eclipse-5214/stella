@@ -5,6 +5,8 @@ import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.entity.state.PlayerRenderState
 import co.stellarskys.stella.events.api.Event
 import co.stellarskys.stella.utils.render.RenderContext
+import net.minecraft.client.renderer.entity.state.EntityRenderState
+import net.minecraft.network.chat.Component
 
 sealed class RenderEvent {
     sealed class World {
@@ -34,6 +36,13 @@ sealed class RenderEvent {
             val vertex: MultiBufferSource?,
             val light: Int
         ) : Event()
+        class Nametag(
+            val state: EntityRenderState,
+            val matrices: PoseStack,
+            val vertex: MultiBufferSource?,
+            val text: Component,
+            val light: Int
+        ) : Event(cancelable = true)
     }
 
     sealed class Player {

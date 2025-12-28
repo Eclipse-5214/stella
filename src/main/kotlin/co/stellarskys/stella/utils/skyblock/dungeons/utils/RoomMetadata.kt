@@ -86,7 +86,7 @@ data class RoomMetadata(
             val pos = room.getRealCoord(position.toBlockPos())
             val lineWidth = 3.0
             Render3D.outlineBlock(context, pos, color, lineWidth, true, state)
-            Render3D.renderString(label, pos.center.x, pos.center.y, pos.center.z, bgBox = true, phase = true)
+            Render3D.renderCustomString(context,label, pos.center.x, pos.center.y, pos.center.z, phase = true)
         }
     }
 

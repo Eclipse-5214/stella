@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils.render
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.WorldUtils
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
@@ -10,6 +11,9 @@ import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.core.BlockPos
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.EmptyBlockGetter
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.Vec3
@@ -293,5 +297,55 @@ object Render3D {
 
         consumers.endBatch(layer)
         matrixStack?.popPose()
+    }
+
+    fun renderCustomString(
+        ctx: RenderContext,
+        text: String,
+        x: Double,
+        y: Double,
+        z: Double,
+        color: Int = 0xFFFFFFFF.toInt(),
+        scale: Float = 1f,
+        phase: Boolean = false,
+        center: Boolean = true
+    ) {
+        val mstack = ctx.matrixStack ?: return
+        val consumers = ctx.consumers ?: return
+        val textRenderer = client.font
+        val camera = ctx.camera
+        val camPos = camera.position
+
+        val location = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "montserrat")
+        val font = location
+        val style = Style.EMPTY.withFont(font)
+        val component = Component.literal(text).setStyle(style)
+
+        mstack.pushPose()
+        mstack.translate(x - camPos.x, y - camPos.y, z - camPos.z)
+        mstack.mulPose(camera.rotation())
+
+        val finalScale = scale * 0.025f
+        mstack.scale(finalScale, -finalScale, finalScale)
+
+        val matrix = mstack.last().pose()
+        val textLayer = if (phase) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL
+
+        val xOffset = if (center) -textRenderer.width(component) / 2f else 0f
+
+        textRenderer.drawInBatch(
+            component,
+            xOffset,
+            0f,
+            color,
+            false, // drop shadow
+            matrix,
+            consumers,
+            textLayer,
+            0,
+            15728880 // Full bright lightmap
+        )
+
+        mstack.popPose()
     }
 }
