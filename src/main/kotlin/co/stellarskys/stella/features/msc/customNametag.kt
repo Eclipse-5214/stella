@@ -1,37 +1,40 @@
+/*
 package co.stellarskys.stella.features.msc
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.utils.getClassColor
+import co.stellarskys.stella.utils.Fonts
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import com.mojang.blaze3d.vertex.VertexConsumer
 import dev.deftu.omnicore.api.client.client
-import dev.deftu.textile.Text
-import dev.deftu.textile.minecraft.MCText
-import dev.deftu.textile.minecraft.TextColors
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.state.PlayerRenderState
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.ComponentUtils
-import net.minecraft.network.chat.Style
-import net.minecraft.resources.ResourceLocation
 import org.joml.Matrix4f
-import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
+
+//#if MC > 1.21.9
+//$$ import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+//#endif
 
 @Module
 object customNametag: Feature("customNametags") {
     override fun initialize() {
         on<RenderEvent.Entity.Nametag> { event ->
             val state = event.state as? PlayerRenderState ?: return@on
-            val montserrat = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "montserrat")
+
+            //#if MC > 1.21.9
+            //$$ val username = state.nameTag?.stripped ?: return@on
+            //#else
             val username = state.name
+            //#endif
+
             val nametag = event.text.toFlatList().find { it.string.contains(username) } ?: return@on
             val final = Component.literal(nametag.string).withStyle {
-                it.withFont(montserrat)
+                it.withFont(Fonts.montserrat)
                     .withBold(nametag.style.isBold)
             }
 
@@ -140,3 +143,4 @@ object customNametag: Feature("customNametags") {
         consumers.addVertex(matrix, x1, y1, 0f).setColor(r, g, b, a).setLight(15728880)
     }
 }
+ */

@@ -1,3 +1,4 @@
+/*
 package co.stellarskys.stella.mixins;
 
 import co.stellarskys.stella.events.EventBus;
@@ -20,3 +21,4 @@ public abstract class MixinNametag<T extends Entity, S extends EntityRenderState
         if (EventBus.INSTANCE.post(new RenderEvent.Entity.Nametag(entityRenderState, poseStack, multiBufferSource, component, i))) ci.cancel();
     }
 }
+ */
