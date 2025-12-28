@@ -1051,6 +1051,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
+        /*
         subcategory("Custom Nametags") {
             toggle {
                 configName = "customNametags"
@@ -1058,5 +1059,6 @@ val config = Config("Stella", "Stella") {
                 description = "Enables the soulflow display"
             }
         }
+         */
     }
 }
