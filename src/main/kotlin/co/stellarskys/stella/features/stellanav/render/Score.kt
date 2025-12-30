@@ -1,4 +1,4 @@
-package co.stellarskys.stella.features.stellanav.utils.render
+package co.stellarskys.stella.features.stellanav.render
 
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.player

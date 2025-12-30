@@ -1,4 +1,4 @@
-package co.stellarskys.stella.features.stellanav.utils.render
+package co.stellarskys.stella.features.stellanav.render
 
 import co.stellarskys.stella.features.stellanav.map
 import co.stellarskys.stella.utils.render.Render2D

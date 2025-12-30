@@ -16,6 +16,7 @@ import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
+import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import net.fabricmc.loader.impl.lib.sat4j.pb.constraints.pb.WatchPb
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.BlockPos
@@ -88,6 +89,16 @@ object RouteRecorder {
                 if(!healdItem.contains("Dungeonbreaker")) return@on
                 val pos = BlockPos((sound.x - 0.5).toInt(), (sound.y - 0.5).toInt(), (sound.z - 0.5).toInt())
                 addWaypoint(WaypointType.MINE, pos)
+            }
+
+            if (sound.location in setOf(SoundEvents.ARROW_SHOOT.location, SoundEvents.ENDERMAN_TELEPORT.location) ) {
+                if (!healdItem.contains("Ender Pearl")) return@on
+                val land = sound.location == SoundEvents.ENDERMAN_TELEPORT.location
+                TickSchedulers.client.post {
+                    var pos = player?.onPos ?: BlockPos((sound.x - 0.5).toInt(), (sound.y - 1).toInt(), (sound.z - 0.5).toInt())
+                    if (land) pos = player?.onPos?.below(1) ?: pos
+                    addWaypoint(WaypointType.PEARL, pos)
+                }
             }
         }
 

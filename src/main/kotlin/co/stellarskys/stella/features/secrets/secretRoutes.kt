@@ -38,6 +38,7 @@ object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
     val mineColor by config.property<Color>("secretRoutes.mineColor")
     val superBoomColor by config.property<Color>("secretRoutes.superboomColor")
     val etherWarpColor by config.property<Color>("secretRoutes.etherwarpColor")
+    val pearlColor by config.property<Color>("secretRoutes.pearlColor")
     val chestColor by config.property<Color>("secretRoutes.chestColor")
     val itemColor by config.property<Color>("secretRoutes.itemColor")
     val essenceColor by config.property<Color>("secretRoutes.essenceColor")

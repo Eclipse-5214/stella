@@ -13,6 +13,7 @@ enum class WaypointType {
     LEVER,
     SUPERBOOM,
     ETHERWARP,
+    PEARL,
     CUSTOM,
     ;
 
@@ -24,6 +25,7 @@ enum class WaypointType {
             ITEM -> secretRoutes.itemColor
             ESSENCE -> secretRoutes.essenceColor
             ETHERWARP -> secretRoutes.etherWarpColor
+            PEARL -> secretRoutes.pearlColor
             SUPERBOOM -> secretRoutes.superBoomColor
             LEVER -> secretRoutes.leverColor
             START -> secretRoutes.startColor
@@ -38,6 +40,7 @@ enum class WaypointType {
             CHEST, ESSENCE -> "Click"
             ITEM -> "Item"
             ETHERWARP -> "Warp"
+            PEARL -> "Pearl"
             SUPERBOOM -> "Boom!"
             LEVER -> "Flick"
             START -> ""

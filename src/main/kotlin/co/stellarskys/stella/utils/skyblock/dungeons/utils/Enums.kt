@@ -51,7 +51,7 @@ enum class RoomType(
     FAIRY("Fairy", "d", { map.FairyColor }),
     RARE("Rare", "b", { null }),
     ENTRANCE("Entrance", "a", { map.EntranceColor }),
-    UNKNOWN("Unknown", "f", { null });
+    UNKNOWN("Unknown", "f", { Color(100, 100, 100) });
 
     val color: Color? get() = colorGetter()
 

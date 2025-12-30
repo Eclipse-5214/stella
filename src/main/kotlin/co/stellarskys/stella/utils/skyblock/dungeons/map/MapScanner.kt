@@ -69,7 +69,7 @@ object MapScanner {
         checkRoomAdjacency(room, cx, cz, x, z, colors)
 
         // type/height
-        if (room.type == RoomType.UNKNOWN && room.height == null) {
+        if (room.type == RoomType.UNKNOWN && rcolor != 0.toByte()) {
             room.loadFromMapColor(rcolor)
         }
 

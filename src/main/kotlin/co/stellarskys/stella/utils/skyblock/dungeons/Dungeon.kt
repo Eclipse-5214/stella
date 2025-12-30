@@ -122,9 +122,11 @@ object Dungeon {
 
             val room = currentRoom ?: return@on
             val match = ROOM_SECRETS_PATTERN.find(event.message.stripped) ?: return@on
-            val (found, _) = match.destructured
+            val (found, total) = match.destructured
             val secrets = found.toInt()
+            val max = total.toInt()
             if (secrets != room.secretsFound) room.secretsFound = secrets
+            if (max != room.secrets) room.secrets = max
         }
 
 

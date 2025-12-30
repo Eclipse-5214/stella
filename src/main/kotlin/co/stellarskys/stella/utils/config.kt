@@ -765,6 +765,13 @@ val config = Config("Stella", "Stella") {
             }
 
             colorpicker {
+                configName = "secretRoutes.pearlColor"
+                name = "Pearl Color"
+                description = "Color for Pearl waypoints."
+                default = Color(0, 255, 255, 255) // blue
+            }
+
+            colorpicker {
                 configName = "secretRoutes.chestColor"
                 name = "Chest Color"
                 description = "Color for Chest waypoints."

@@ -4,7 +4,7 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.features.stellanav.utils.render.MapRenderer
+import co.stellarskys.stella.features.stellanav.render.MapRenderer
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.config
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
