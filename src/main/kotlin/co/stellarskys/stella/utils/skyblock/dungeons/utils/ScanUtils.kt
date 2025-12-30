@@ -40,27 +40,6 @@ object ScanUtils {
         0 to -1  // North
     )
 
-    val roomTypeMap = mapOf(
-        "normal" to RoomType.NORMAL,
-        "puzzle" to RoomType.PUZZLE,
-        "trap" to RoomType.TRAP,
-        "champion" to RoomType.YELLOW,
-        "blood" to RoomType.BLOOD,
-        "fairy" to RoomType.FAIRY,
-        "rare" to RoomType.RARE,
-        "entrance" to RoomType.ENTRANCE
-    )
-
-    val mapColorToRoomType = mapOf(
-        18 to RoomType.BLOOD,
-        30 to RoomType.ENTRANCE,
-        63 to RoomType.NORMAL,
-        82 to RoomType.FAIRY,
-        62 to RoomType.TRAP,
-        74 to RoomType.YELLOW,
-        66 to RoomType.PUZZLE
-    )
-
     fun getScanCoords(): List<Triple<Int, Int, Pair<Int, Int>>> {
         val coords = mutableListOf<Triple<Int, Int, Pair<Int, Int>>>()
 

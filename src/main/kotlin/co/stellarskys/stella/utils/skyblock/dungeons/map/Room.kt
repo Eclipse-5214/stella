@@ -22,6 +22,11 @@ class Room(
     initialComponent: Pair<Int, Int>,
     var height: Int? = null
 ) {
+    private val hs = ScanUtils.halfRoomSize
+    private val OFFSETS = arrayOf(Pair(-hs, -hs), Pair(hs, -hs), Pair(hs, hs), Pair(-hs, hs))
+    private val componentSet = mutableSetOf<Pair<Int, Int>>()
+    private var lastUpdatedSize = 0
+
     val components = mutableListOf<Pair<Int, Int>>()
     val realComponents = mutableListOf<Pair<Int, Int>>()
     val cores = mutableListOf<Int>()
@@ -54,59 +59,51 @@ class Room(
     }
 
     fun addComponent(comp: Pair<Int, Int>, update: Boolean = true): Room {
-        if (!components.contains(comp)) components += comp
-        if (update) update()
-        return this
-    }
-
-    fun addComponents(comps: List<Pair<Int, Int>>): Room {
-        comps.forEach { addComponent(it, update = false) }
-        update()
-        return this
-    }
-
-    fun hasComponent(x: Int, z: Int): Boolean {
-        return components.any { it.first == x && it.second == z }
-    }
-
-    fun update() {
-        components.sortWith(compareBy({ it.first }, { it.second }))
-        realComponents.clear()
-        realComponents += components.map { WorldScanUtils.componentToRealCoords(it.first, it.second) }
-        scan()
-        shape = WorldScanUtils.getRoomShape(components)
-        corner = null
-        rotation = null
-    }
-
-    fun scan(): Room {
-        for ((x, z) in realComponents) {
-            if (height == null) height = WorldScanUtils.getHighestY(x, z)
-            val core = WorldScanUtils.getCore(x, z)
-            cores += core
-            loadFromCore(core)
+        if (componentSet.add(comp)) {
+            components.add(comp)
+            if (update) update()
         }
         return this
     }
 
-    private fun loadFromCore(core: Int): Boolean {
-        val data = RoomRegistry.getByCore(core) ?: return false
-        loadFromData(data)
-        return true
+    fun addComponents(comps: List<Pair<Int, Int>>) = apply {
+        if (comps.any { componentSet.add(it).also { added -> if (added) components += it } }) update()
+    }
+
+    fun hasComponent(x: Int, z: Int): Boolean = componentSet.contains(x to z)
+
+    fun update() {
+        if (components.size == lastUpdatedSize) return
+        components.sortWith(compareBy({ it.first }, { it.second }))
+        realComponents.clear()
+        components.mapTo(realComponents) { WorldScanUtils.componentToRealCoords(it.first, it.second) }
+
+        scan()
+        shape = WorldScanUtils.getRoomShape(components)
+        corner = null; rotation = null
+        lastUpdatedSize = components.size
+    }
+
+    fun scan() = apply {
+        realComponents.forEach { (x, z) ->
+            if (height == null) height = WorldScanUtils.getHighestY(x, z)
+            val core = WorldScanUtils.getCore(x, z)
+            if (cores.add(core) && roomData == null) {
+                RoomRegistry.getByCore(core)?.let { loadFromData(it) }
+            }
+        }
     }
 
     fun loadFromData(data: RoomMetadata) {
         roomData = data
         name = data.name
-        type = ScanUtils.roomTypeMap[data.type.lowercase()] ?: RoomType.NORMAL
-        secrets = data.secrets
-        crypts = data.crypts
-
+        type = RoomType.fromString(data.type)
+        secrets = data.secrets; crypts = data.crypts
         if (type == RoomType.ENTRANCE) explored = true
     }
 
     fun loadFromMapColor(color: Byte): Room {
-        type = ScanUtils.mapColorToRoomType[color.toInt()] ?: RoomType.UNKNOWN
+        type = RoomType.fromByte(color.toInt())
         when (type) {
             RoomType.BLOOD -> RoomRegistry.getAll().find { it.name == "Blood" }?.let { loadFromData(it) }
             RoomType.ENTRANCE -> RoomRegistry.getAll().find { it.name == "Entrance" }?.let { loadFromData(it) }
@@ -116,34 +113,26 @@ class Room(
     }
 
     fun findRotation(): Room {
-        if (height == null) return this
+        if (rotation != null || height == null) return this
+        val h = height!!
 
         if (type == RoomType.FAIRY) {
             rotation = 0
             val (x, z) = realComponents.first()
-            corner = BlockPos(x - ScanUtils.halfRoomSize, height!!, z - ScanUtils.halfRoomSize)
+            corner = BlockPos(x - hs, h, z - hs)
             return this
         }
 
-        val offsets = listOf(
-            Pair(-ScanUtils.halfRoomSize, -ScanUtils.halfRoomSize),
-            Pair(ScanUtils.halfRoomSize, -ScanUtils.halfRoomSize),
-            Pair(ScanUtils.halfRoomSize, ScanUtils.halfRoomSize),
-            Pair(-ScanUtils.halfRoomSize, ScanUtils.halfRoomSize)
-        )
+        val targets = if (components.size > 1) listOf(realComponents.first(), realComponents.last()) else realComponents
 
-        for ((x, z) in realComponents) {
-            for ((jdx, offset) in offsets.withIndex()) {
-                val (dx, dz) = offset
-                val nx = x + dx
-                val nz = z + dz
-
-                if (!WorldScanUtils.isChunkLoaded(nx, height!!, nz)) continue
-                val state = WorldUtils.getBlockStateAt(nx, height!!, nz) ?: continue
-                if (state.`is`(Blocks.BLUE_TERRACOTTA)) {
-                    rotation = jdx * 90
-                    corner = BlockPos(nx, height!!, nz)
-                    return this
+        for ((x, z) in targets) {
+            OFFSETS.forEachIndexed { i, (dx, dz) ->
+                val nx = x + dx; val nz = z + dz
+                if (WorldScanUtils.isChunkLoaded(nx, h, nz) &&
+                    WorldUtils.getBlockStateAt(nx, h, nz)?.`is`(Blocks.BLUE_TERRACOTTA) == true) {
+                    rotation = i * 90
+                    corner = BlockPos(nx, h, nz)
+                    return@findRotation this
                 }
             }
         }

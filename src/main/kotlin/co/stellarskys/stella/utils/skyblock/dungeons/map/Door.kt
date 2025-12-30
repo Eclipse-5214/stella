@@ -8,7 +8,6 @@ import co.stellarskys.stella.utils.skyblock.dungeons.utils.RoomType
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.WorldScanUtils
 
 class Door(val worldPos: Pair<Int, Int>, val componentPos: Pair<Int, Int>) {
-
     var opened: Boolean = false
     var fairy: Boolean = false
     var rotation: Int? = null
@@ -54,19 +53,19 @@ class Door(val worldPos: Pair<Int, Int>, val componentPos: Pair<Int, Int>) {
         opened = (id == 0)
     }
 
-    fun getCanidates(): List<Int> {
+    fun getCandidates(): List<Int> {
         val (cx, cz) = componentPos
-        val candidates: List<Pair<Int, Int>> =
-            if (cx % 2 == 1) listOf((cx - 1) / 2 to cz / 2, (cx + 1) / 2 to cz / 2)
-            else listOf(cx / 2 to (cz - 1) / 2, cx / 2 to (cz + 1) / 2)
-
-        return candidates
-            .map { (rx, rz) -> 6 * rz + rx }
+        return (if (cx % 2 == 1) {
+            listOf((cx - 1) / 2 to cz / 2, (cx + 1) / 2 to cz / 2)
+        } else {
+            listOf(cx / 2 to (cz - 1) / 2, cx / 2 to (cz + 1) / 2)
+        })
+            .map { (rx, rz) -> rz * 6 + rx }
             .filter { it in 0..35 }
     }
 
     fun checkFairy() {
-        fairy = getCanidates().any { idx ->
+        fairy = getCandidates().any { idx ->
             val room = Dungeon.getRoomAtIdx(idx)
             room != null && room.type == RoomType.FAIRY && !room.explored
         }
