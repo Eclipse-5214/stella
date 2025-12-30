@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils.config.ui.elements
 
-import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.core.ColorPicker
 import co.stellarskys.stella.utils.config.core.attachTooltip
 import co.stellarskys.stella.utils.config.ui.Palette
@@ -26,13 +25,13 @@ class ColorPickerUIBuilder {
 
         attachTooltip(window, name, colorpicker.description)
 
-        val picker = co.stellarskys.vexel.elements.ColorPicker((colorpicker.value as RGBA).toColor(), Color.BLACK.rgb, Palette.Purple.withAlpha(100).rgb, 25f, 1f)
+        val picker = co.stellarskys.vexel.elements.ColorPicker((colorpicker.value as Color), Color.BLACK.rgb, Palette.Purple.withAlpha(100).rgb, 25f, 1f)
             .setSizing(25f, Size.Pixels, 25f, Size.Pixels)
             .setPositioning(-10f, Pos.ParentPixels, 0f, Pos.ParentCenter)
             .alignRight()
             .childOf(container)
 
-        picker.onValueChange { colorpicker.value = RGBA.fromColor(it as Color) }
+        picker.onValueChange { colorpicker.value = it as Color }
 
         return container
     }

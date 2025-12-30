@@ -5,13 +5,14 @@ import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.features.stellanav.utils.mapConfig
 import co.stellarskys.stella.utils.render.Render3D
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.clearCodes
+import co.stellarskys.stella.utils.config
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
+import java.awt.Color
 
 @Module
 object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -20,6 +21,10 @@ object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
 
     val openedDoor = Regex("""^(\w+) opened a WITHER door!$""")
     val bloodOpened = Regex("""^The BLOOD DOOR has been opened!$""")
+
+    val noKey by config.property<Color>("noKeyColor")
+    val key by config.property<Color>("keyColor")
+    val doorLW by config.property<Int>("doorLineWidth")
 
     override fun initialize() {
         on<ChatEvent.Receive> { event ->
@@ -46,7 +51,7 @@ object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
         on<RenderEvent.World.Last> { event ->
             if(bloodOpen) return@on
 
-            val color = if (keyObtained) mapConfig.key else mapConfig.noKey
+            val color = if (keyObtained) key else noKey
 
             Dungeon.doors.forEach { door ->
                 if (door == null || door.opened) return@forEach
@@ -59,7 +64,7 @@ object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
                     event.context,
                     x.toDouble(), y.toDouble(), z.toDouble(),
                     3.0, 4.0,
-                    color, true, mapConfig.doorLW
+                    color, true, doorLW.toDouble()
                 )
             }
         }

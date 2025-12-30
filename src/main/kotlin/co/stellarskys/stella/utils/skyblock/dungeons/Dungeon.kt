@@ -22,6 +22,7 @@ import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonAPI
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+import java.awt.Color
 import kotlin.math.roundToInt
 
 //#if MC >= 1.21.9
@@ -73,6 +74,13 @@ object Dungeon {
     // Shortcuts
     val players get() = DungeonPlayerManager.players
     val score get() = DungeonScore.score
+
+    // Class Colors
+    val healerColor by config.property<Color>("healerColor")
+    val mageColor by config.property<Color>("mageColor")
+    val berzColor by config.property<Color>("berzColor")
+    val archerColor by config.property<Color>("archerColor")
+    val tankColor by config.property<Color>("tankColor")
 
     // Secret Items
     private val secretItems = setOf(

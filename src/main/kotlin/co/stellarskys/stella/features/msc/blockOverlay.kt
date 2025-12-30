@@ -3,12 +3,11 @@ package co.stellarskys.stella.features.msc
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
+import co.stellarskys.stella.utils.Utils.getNormalized
 import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.render.StellaRenderLayers
 import net.minecraft.client.renderer.ShapeRenderer
-import net.minecraft.world.level.EmptyBlockGetter
-import net.minecraft.world.phys.shapes.CollisionContext
+import java.awt.Color
 
 @Module
 object blockOverlay : Feature("overlayEnabled") {
@@ -22,9 +21,9 @@ object blockOverlay : Feature("overlayEnabled") {
             val blockShape = event.context.voxelShape ?: return@on
             if (blockShape.isEmpty) return@on
 
-            val outlineColor = config["blockHighlightColor"] as RGBA
-            val outlineWidth = (config["overlayLineWidth"] as Int).toDouble()
-            val fillColor = config["blockFillColor"] as RGBA
+            val outlineColor by config.property<Color>("blockHighlightColor")
+            val outlineWidth by config.property<Int>("overlayLineWidth")
+            val fillColor by config.property<Color>("blockFillColor")
 
             event.cancel()
 
@@ -34,18 +33,14 @@ object blockOverlay : Feature("overlayEnabled") {
 
             ShapeRenderer.renderShape(
                 mstack,
-                consumers.getBuffer(StellaRenderLayers.getLines(outlineWidth)),
+                consumers.getBuffer(StellaRenderLayers.getLines(outlineWidth.toDouble())),
                 blockShape,
                 x, y, z,
-                outlineColor.toColorInt()
+                outlineColor.rgb
             )
 
             if (config["fillBlockOverlay"] as Boolean) {
-                val (rRaw, gRaw, bRaw, aRaw) = fillColor
-                val r = rRaw / 255f
-                val g = gRaw / 255f
-                val b = bRaw / 255f
-                val a = aRaw / 255f
+                val (r, g, b, a) = fillColor.getNormalized()
 
                 blockShape.forAllBoxes { minX, minY, minZ, maxX, maxY, maxZ ->
                     ShapeRenderer.addChainedFilledBoxVertices(

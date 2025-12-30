@@ -15,7 +15,6 @@ import co.stellarskys.stella.features.secrets.utils.WaypointType
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.core.Keybind
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
@@ -24,6 +23,7 @@ import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
 import net.minecraft.core.BlockPos
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
+import java.awt.Color
 
 @Module
 object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -34,15 +34,15 @@ object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
     var routeFile by config.property<String>("secretRoutes.fileName")
     val renderText by config.property<Boolean>("secretRoutes.renderText")
 
-    val startColor by config.property<RGBA>("secretRoutes.startColor")
-    val mineColor by config.property<RGBA>("secretRoutes.mineColor")
-    val superBoomColor by config.property<RGBA>("secretRoutes.superboomColor")
-    val etherWarpColor by config.property<RGBA>("secretRoutes.etherwarpColor")
-    val chestColor by config.property<RGBA>("secretRoutes.chestColor")
-    val itemColor by config.property<RGBA>("secretRoutes.itemColor")
-    val essenceColor by config.property<RGBA>("secretRoutes.essenceColor")
-    val batColor by config.property<RGBA>("secretRoutes.batColor")
-    val leverColor by config.property<RGBA>("secretRoutes.leverColor")
+    val startColor by config.property<Color>("secretRoutes.startColor")
+    val mineColor by config.property<Color>("secretRoutes.mineColor")
+    val superBoomColor by config.property<Color>("secretRoutes.superboomColor")
+    val etherWarpColor by config.property<Color>("secretRoutes.etherwarpColor")
+    val chestColor by config.property<Color>("secretRoutes.chestColor")
+    val itemColor by config.property<Color>("secretRoutes.itemColor")
+    val essenceColor by config.property<Color>("secretRoutes.essenceColor")
+    val batColor by config.property<Color>("secretRoutes.batColor")
+    val leverColor by config.property<Color>("secretRoutes.leverColor")
 
     val recordingHud by config.property<Boolean>("secretRoutes.recordingHud")
     val minimized by config.property<Boolean>("secretRoutes.recordingHud.minimized")

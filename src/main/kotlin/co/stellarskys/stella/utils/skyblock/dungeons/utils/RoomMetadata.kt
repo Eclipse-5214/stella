@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.utils
 
-import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.config.core.Config
 import co.stellarskys.stella.utils.render.Render3D
 import co.stellarskys.stella.utils.render.RenderContext
@@ -42,12 +41,12 @@ data class RoomMetadata(
 
             fun addWaypoints(type: String, coords: List<Coord>, state: BlockState? = null) {
                 val colorKey = "secretWaypointColor.${type.lowercase().replace(" ", "")}"
-                val color by config.property<RGBA>(colorKey)
+                val color by config.property<Color>(colorKey)
 
                 coords.forEach { coord ->
                     waypoints += SecretWaypoint(
                         label = type,
-                        color = color.toColor(),
+                        color = color,
                         position = coord,
                         room = room,
                         state = state,

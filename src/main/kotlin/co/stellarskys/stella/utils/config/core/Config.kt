@@ -3,7 +3,8 @@ package co.stellarskys.stella.utils.config.core
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
-import co.stellarskys.stella.utils.config.RGBA
+import co.stellarskys.stella.utils.Utils
+import co.stellarskys.stella.utils.Utils.toHex
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.elements.*
@@ -355,7 +356,7 @@ class Config(
                             is Float -> JsonPrimitive(value)
                             is Double -> JsonPrimitive(value)
                             is String -> JsonPrimitive(value)
-                            is RGBA -> JsonPrimitive(value.toHex())
+                            is Color -> JsonPrimitive(value.toHex())
                             is Keybind.Handler -> JsonPrimitive(value.keyCode())
                             else -> {
                                 Stella.LOGGER.error("Unsupported type for $id: ${value::class.simpleName}")
@@ -398,7 +399,7 @@ class Config(
                         is Double -> jsonValue.asDouble
                         is String -> jsonValue.asString
                         is Keybind.Handler -> jsonValue.asInt
-                        is RGBA -> RGBA.fromHex(jsonValue.asString)
+                        is Color -> Utils.colorFromHex(jsonValue.asString)
                         else -> {
                             Stella.LOGGER.warn("Skipping unsupported load type for '$id': ${current?.let { it::class.simpleName } ?: "null"}")
                             null

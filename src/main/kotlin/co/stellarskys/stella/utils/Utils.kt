@@ -5,6 +5,7 @@ import dev.deftu.omnicore.api.client.player
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundEvent
+import java.awt.Color
 import kotlin.math.sqrt
 
 object Utils {
@@ -52,6 +53,43 @@ object Utils {
     }
 
     fun mapRange(n: Double, inMin: Double, inMax: Double, outMin: Double, outMax: Double): Double = (n - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+
+    /**
+     * Converts a java.awt.Color to a Hex string.
+     * @param includeAlpha If true, returns #rrggbbaa; otherwise #rrggbb.
+     */
+    fun Color.toHex(includeAlpha: Boolean = true): String {
+        return if (includeAlpha) {
+            String.format("#%02x%02x%02x%02x", red, green, blue, alpha)
+        } else {
+            String.format("#%02x%02x%02x", red, green, blue)
+        }
+    }
+
+    /**
+     * Parses a hex string into a java.awt.Color.
+     * Supports #rgb, #rgba, #rrggbb, and #rrggbbaa.
+     */
+    fun colorFromHex(hex: String): Color {
+        val cleaned = hex.trim().lowercase().removePrefix("#")
+
+        val expanded = when (cleaned.length) {
+            3 -> cleaned.map { "$it$it" }.joinToString("") + "ff"
+            4 -> cleaned.map { "$it$it" }.joinToString("")
+            6 -> cleaned + "ff"
+            8 -> cleaned
+            else -> throw IllegalArgumentException("Invalid hex color: $hex")
+        }
+
+        val r = expanded.take(2).toInt(16)
+        val g = expanded.substring(2, 4).toInt(16)
+        val b = expanded.substring(4, 6).toInt(16)
+        val a = expanded.substring(6, 8).toInt(16)
+
+        return Color(r, g, b, a)
+    }
+
+    fun Color.getNormalized(): FloatArray = this.getRGBComponents(null)
 
     fun decodeRoman(roman: String): Int {
         val values = mapOf(

@@ -4,8 +4,6 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.features.stellanav.utils.typeToColor
-import co.stellarskys.stella.features.stellanav.utils.typeToName
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.ChatUtils.onHover
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner
@@ -48,8 +46,8 @@ object dungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE
         fun formatRoomInfo(info: MapScanner.RoomClearInfo, checkColor: String, isLast: Boolean = false): String {
             val room = info.room
             val name = if (room.name == "Default") room.shape else room.name ?: room.shape
-            val type = typeToName(room.type)
-            val color = typeToColor(room.type)
+            val type = room.type.name
+            val color = room.type.colorCode
             val time = info.time
 
             val stackStr = if (info.solo) "" else {

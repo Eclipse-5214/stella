@@ -4,11 +4,9 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.features.stellanav.utils.mapConfig
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.render.Render3D
 import co.stellarskys.stella.utils.render.RenderContext
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
@@ -29,11 +27,11 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
     private val roleKeys = listOf("tank", "mage", "berserk", "archer", "healer", "all")
 
     val termLabelMap: Map<String, Pair<String, Color>> = mapOf(
-        "tank" to ("§7( §2Tank §7)" to mapConfig.tankColor),
-        "mage" to ("§7( §bMage §7)" to mapConfig.mageColor),
-        "berserk" to ("§7( §cBers §7)" to mapConfig.berzColor),
-        "archer" to ("§7( §6Arch §7)" to mapConfig.archerColor),
-        "healer" to ("§7( §dHeal §7)" to mapConfig.healerColor),
+        "tank" to ("§7( §2Tank §7)" to Dungeon.tankColor),
+        "mage" to ("§7( §bMage §7)" to Dungeon.mageColor),
+        "berserk" to ("§7( §cBers §7)" to Dungeon.berzColor),
+        "archer" to ("§7( §6Arch §7)" to Dungeon.archerColor),
+        "healer" to ("§7( §dHeal §7)" to Dungeon.healerColor),
         "stack" to ("§7( §6S§bt§ca§2c§dk §7)" to Color.white)
     )
 
@@ -45,7 +43,7 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
     val classColor by config.property<Boolean>("classColor")
 
     val highlightTerms by config.property<Boolean>("highlightTerms")
-    val termColor by config.property<RGBA>("termColor")
+    val termColor by config.property<Color>("termColor")
 
     enum class TaskType(val jsonKey: String, val coordKey: String) {
         TERMINAL("term", "terms"),
@@ -117,8 +115,8 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
 
                     val displayColor = when {
                         isStack || (task.roles.size > 1 && currentRoleKey == "all") -> Color.WHITE
-                        task.roles.isNotEmpty() -> termLabelMap[task.roles[0]]?.second ?: termColor.toColor()
-                        else -> termColor.toColor()
+                        task.roles.isNotEmpty() -> termLabelMap[task.roles[0]]?.second ?: termColor
+                        else -> termColor
                     }
 
                     // Prefix handling: L1, D1, or just 1
@@ -160,7 +158,7 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
         )
 
         if (highlightTerms) {
-            val renderColor = if (classColor) color else termColor.toColor()
+            val renderColor = if (classColor) color else termColor
             Render3D.outlineBlock(context, coord.toBlockPos(), renderColor, 1.0, false)
         }
     }

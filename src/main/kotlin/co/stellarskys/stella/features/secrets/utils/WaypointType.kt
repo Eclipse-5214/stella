@@ -18,15 +18,15 @@ enum class WaypointType {
 
     val color: Color
         get() = when (this) {
-            BAT -> secretRoutes.batColor.toColor()
-            MINE -> secretRoutes.mineColor.toColor()
-            CHEST -> secretRoutes.chestColor.toColor()
-            ITEM -> secretRoutes.itemColor.toColor()
-            ESSENCE -> secretRoutes.essenceColor.toColor()
-            ETHERWARP -> secretRoutes.etherWarpColor.toColor()
-            SUPERBOOM -> secretRoutes.superBoomColor.toColor()
-            LEVER -> secretRoutes.leverColor.toColor()
-            START -> secretRoutes.startColor.toColor()
+            BAT -> secretRoutes.batColor
+            MINE -> secretRoutes.mineColor
+            CHEST -> secretRoutes.chestColor
+            ITEM -> secretRoutes.itemColor
+            ESSENCE -> secretRoutes.essenceColor
+            ETHERWARP -> secretRoutes.etherWarpColor
+            SUPERBOOM -> secretRoutes.superBoomColor
+            LEVER -> secretRoutes.leverColor
+            START -> secretRoutes.startColor
             CUSTOM -> Color.WHITE
         }
 

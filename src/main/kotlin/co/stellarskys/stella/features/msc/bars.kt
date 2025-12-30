@@ -7,7 +7,6 @@ import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.TimeUtils.millis
 import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.Render2D.width
@@ -41,11 +40,11 @@ object bars : Feature("bars", true) {
     val hideVanillaArmor by config.property<Boolean>("bars.hideVanillaArmor")
 
     // Colors
-    val healthColor by config.property<RGBA>("bars.healthColor")
-    val absorptionColor by config.property<RGBA>("bars.absorptionColor")
+    val healthColor by config.property<Color>("bars.healthColor")
+    val absorptionColor by config.property<Color>("bars.absorptionColor")
 
-    val manaColor by config.property<RGBA>("bars.manaColor")
-    val ofmColor by config.property<RGBA>("bars.ofmColor")
+    val manaColor by config.property<Color>("bars.manaColor")
+    val ofmColor by config.property<Color>("bars.ofmColor")
 
     private var lastHealth = StatsAPI.health.toFloat()
     private var healthDelta: Float? = null
@@ -90,16 +89,16 @@ object bars : Feature("bars", true) {
     }
 
     fun hpHudPreview(context: GuiGraphics) = context.drawNVG {
-            Vexel.renderer.rect(5f, 5f, 80f, 5f, healthColor.toColorInt(), 3f)
+            Vexel.renderer.rect(5f, 5f, 80f, 5f, healthColor.rgb, 3f)
     }
 
 
     fun hpNumPreview(context: GuiGraphics) {
         val string = "1000/1000"
         val x = 35 - (string.width() / 2)
-        Render2D.drawString(context, "1000", x,5, color = healthColor.toColor())
+        Render2D.drawString(context, "1000", x,5, color = healthColor)
         Render2D.drawString(context, "§8/", x + "1000".width(), 5)
-        Render2D.drawString(context, "1000", x + "1000/".width(), 5, color = healthColor.toColor())
+        Render2D.drawString(context, "1000", x + "1000/".width(), 5, color = healthColor)
     }
 
     fun hpChangePreview(context: GuiGraphics) {
@@ -109,21 +108,21 @@ object bars : Feature("bars", true) {
     }
 
     fun mpHudPreview(context: GuiGraphics) = context.drawNVG {
-            Vexel.renderer.rect(5f, 5f, 80f, 5f, manaColor.toColorInt(), 3f)
+            Vexel.renderer.rect(5f, 5f, 80f, 5f, manaColor.rgb, 3f)
     }
 
     fun mpNumPreview(context: GuiGraphics) {
         val string = "1000/1000"
         val x = 35 - (string.width() / 2)
-        Render2D.drawString(context, "1000", x,5, color = manaColor.toColor())
+        Render2D.drawString(context, "1000", x,5, color = manaColor)
         Render2D.drawString(context, "§8/", x + "1000".width(), 5)
-        Render2D.drawString(context, "1000", x + "1000/".width(), 5, color = manaColor.toColor())
+        Render2D.drawString(context, "1000", x + "1000/".width(), 5, color = manaColor)
     }
 
     fun ofManaPreview(context: GuiGraphics) {
         val string = "400"
         val x = 15 - (string.width() / 2)
-        Render2D.drawString(context, string + "ʬ", x,5, color = ofmColor.toColor())
+        Render2D.drawString(context, string + "ʬ", x,5, color = ofmColor)
     }
 
     fun hpHud(context: GuiGraphics) = HUDManager.renderHud(HPHudName, context) {
@@ -146,9 +145,9 @@ object bars : Feature("bars", true) {
         matrix.translate(35f - text.width() / 2, 5f)
 
         val leftColor = if (left > right) absorptionColor else healthColor
-        Render2D.drawString(context, left.toString(), 0, 0, color = leftColor.toColor())
+        Render2D.drawString(context, left.toString(), 0, 0, color = leftColor)
         Render2D.drawString(context, "§8/", left.toString().width(), 0)
-        Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = healthColor.toColor())
+        Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = healthColor)
     }
 
     fun hpChangeHud(context: GuiGraphics) = HUDManager.renderHud(HPChangeHudName, context) {
@@ -181,7 +180,7 @@ object bars : Feature("bars", true) {
         val width = string.width()
 
         matrix.translate(15f - width / 2, 5f)
-        Render2D.drawString(context, string, 0,0, color = ofmColor.toColor())
+        Render2D.drawString(context, string, 0,0, color = ofmColor)
     }
 
     fun mpNumHud(context: GuiGraphics) = HUDManager.renderHud(MPNumHudName, context) {
@@ -193,9 +192,9 @@ object bars : Feature("bars", true) {
 
         matrix.translate(35f - text.width() / 2, 5f)
 
-        Render2D.drawString(context, left.toString(), 0, 0, color = manaColor.toColor())
+        Render2D.drawString(context, left.toString(), 0, 0, color = manaColor)
         Render2D.drawString(context, "§8/", left.toString().width(), 0)
-        Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = manaColor.toColor())
+        Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = manaColor)
     }
 
 
@@ -217,13 +216,13 @@ object bars : Feature("bars", true) {
         }
     }
 
-    private fun drawBar(context: GuiGraphics, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: RGBA, secondaryColor: RGBA) {
+    private fun drawBar(context: GuiGraphics, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color) {
         context.drawNVG {
             NVGRenderer.drawMasked(0f, 0f, 80f, 5f, 3f) {
                 Vexel.renderer.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
-                Vexel.renderer.rect(-1f, 0f, mainWidth, 5f, mainColor.toColorInt(), 3f)
+                Vexel.renderer.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
                 if (showSecondary) {
-                    Vexel.renderer.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.toColorInt(), 3f)
+                    Vexel.renderer.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.rgb, 3f)
                 }
             }
         }

@@ -8,6 +8,7 @@ import co.stellarskys.stella.utils.config.core.Config
 import dev.deftu.omnicore.api.client.client
 import kotlinx.coroutines.supervisorScope
 import net.minecraft.Util
+import java.awt.Color
 import java.net.URI
 
 val config = Config("Stella", "Stella") {
@@ -150,7 +151,7 @@ val config = Config("Stella", "Stella") {
                 configName = "termColor"
                 name = "Highlight Color"
                 description = "Color used when not using class colors."
-                default = rgba(0, 255, 255, 255)
+                default = Color(0, 255, 255, 255)
                 shouldShow { settings ->
                     (settings["termNumbers"] as Boolean) &&
                             (settings["highlightTerms"] as Boolean) &&
@@ -195,49 +196,49 @@ val config = Config("Stella", "Stella") {
                 configName = "dungCrackedColour"
                 name = "Cracked Brick Color"
                 description = "Color used for cracked stone bricks"
-                default = rgba(255, 0, 255, 255)
+                default = Color(255, 0, 255, 255)
             }
 
             colorpicker {
                 configName = "dungDispenserColour"
                 name = "Dispenser Color"
                 description = "Color used for dispensers"
-                default = rgba(255, 255, 0, 255)
+                default = Color(255, 255, 0, 255)
             }
 
             colorpicker {
                 configName = "dungLeverColour"
                 name = "Lever Color"
                 description = "Color used for levers"
-                default = rgba(0, 255, 0, 255)
+                default = Color(0, 255, 0, 255)
             }
 
             colorpicker {
                 configName = "dungTripWireColour"
                 name = "Tripwire Color"
                 description = "Color used for tripwires"
-                default = rgba(0, 255, 255, 255)
+                default = Color(0, 255, 255, 255)
             }
 
             colorpicker {
                 configName = "dungBatColour"
                 name = "Bat Color"
                 description = "Color used for map bats"
-                default = rgba(255, 100, 255, 255)
+                default = Color(255, 100, 255, 255)
             }
 
             colorpicker {
                 configName = "dungChestColour"
                 name = "Chest Color"
                 description = "Color used for normal map chests"
-                default = rgba(255, 150, 0, 255)
+                default = Color(255, 150, 0, 255)
             }
 
             colorpicker {
                 configName = "dungTrappedChestColour"
                 name = "Trapped Chest Color"
                 description = "Color used for trapped map chests"
-                default = rgba(255, 0, 0, 255)
+                default = Color(255, 0, 0, 255)
             }
         }
          */
@@ -247,35 +248,35 @@ val config = Config("Stella", "Stella") {
                 configName = "healerColor"
                 name = "Healer Color"
                 description = "Color used for Healer class"
-                default = rgba(240, 70, 240, 255)
+                default = Color(240, 70, 240, 255)
             }
 
             colorpicker {
                 configName = "mageColor"
                 name = "Mage Color"
                 description = "Color used for Mage class"
-                default = rgba(70, 210, 210, 255)
+                default = Color(70, 210, 210, 255)
             }
 
             colorpicker {
                 configName = "berzColor"
                 name = "Berserker Color"
                 description = "Color used for Berserker class"
-                default = rgba(255, 0, 0, 255)
+                default = Color(255, 0, 0, 255)
             }
 
             colorpicker {
                 configName = "archerColor"
                 name = "Archer Color"
                 description = "Color used for Archer class"
-                default = rgba(254, 223, 0, 255)
+                default = Color(254, 223, 0, 255)
             }
 
             colorpicker {
                 configName = "tankColor"
                 name = "Tank Color"
                 description = "Color used for Tank class"
-                default = rgba(30, 170, 50, 255)
+                default = Color(30, 170, 50, 255)
             }
         }
 
@@ -376,7 +377,7 @@ val config = Config("Stella", "Stella") {
                 configName = "mapBgColor"
                 name = "map Background Color"
                 description = "Background color of the map"
-                default = rgba(0, 0, 0, 100)
+                default = Color(0, 0, 0, 100)
             }
 
             toggle {
@@ -390,17 +391,18 @@ val config = Config("Stella", "Stella") {
                 configName = "mapBdColor"
                 name = "map Border Color"
                 description = "Color of the map border"
-                default = rgba(0, 0, 0, 255)
+                default = Color(0, 0, 0, 255)
                 shouldShow { settings -> settings["mapBorder"] as Boolean }
             }
 
-            slider {
+            stepslider {
                 configName = "mapBdWidth"
                 name = "Border Width"
                 description = "The width of the map border"
-                min = 1f
-                max = 5f
-                default = 2f
+                min = 1
+                max = 5
+                step = 1
+                default = 2
                 shouldShow { settings -> settings["mapBorder"] as Boolean }
             }
 
@@ -492,7 +494,7 @@ val config = Config("Stella", "Stella") {
                 configName = "iconBorderColor"
                 name = "Border Color"
                 description = "The color for the icon border"
-                default = rgba(0, 0, 0, 255)
+                default = Color(0, 0, 0, 255)
             }
 
             toggle {
@@ -521,37 +523,37 @@ val config = Config("Stella", "Stella") {
             colorpicker {
                 configName = "normalRoomColor"
                 name = "Normal"
-                default = rgba(107, 58, 17, 255)
+                default = Color(107, 58, 17, 255)
             }
             colorpicker {
                 configName = "puzzleRoomColor"
                 name = "Puzzle"
-                default = rgba(117, 0, 133, 255)
+                default = Color(117, 0, 133, 255)
             }
             colorpicker {
                 configName = "trapRoomColor"
                 name = "Trap"
-                default = rgba(216, 127, 51, 255)
+                default = Color(216, 127, 51, 255)
             }
             colorpicker {
                 configName = "minibossRoomColor"
                 name = "Miniboss"
-                default = rgba(254, 223, 0, 255)
+                default = Color(254, 223, 0, 255)
             }
             colorpicker {
                 configName = "bloodRoomColor"
                 name = "Blood"
-                default = rgba(255, 0, 0, 255)
+                default = Color(255, 0, 0, 255)
             }
             colorpicker {
                 configName = "fairyRoomColor"
                 name = "Fairy"
-                default = rgba(224, 0, 255, 255)
+                default = Color(224, 0, 255, 255)
             }
             colorpicker {
                 configName = "entranceRoomColor"
                 name = "Entrance"
-                default = rgba(20, 133, 0, 255)
+                default = Color(20, 133, 0, 255)
             }
         }
 
@@ -559,22 +561,22 @@ val config = Config("Stella", "Stella") {
             colorpicker {
                 configName = "normalDoorColor"
                 name = "Normal Door"
-                default = rgba(80, 40, 10, 255)
+                default = Color(80, 40, 10, 255)
             }
             colorpicker {
                 configName = "witherDoorColor"
                 name = "Wither Door"
-                default = rgba(0, 0, 0, 255)
+                default = Color(0, 0, 0, 255)
             }
             colorpicker {
                 configName = "bloodDoorColor"
                 name = "Blood Door"
-                default = rgba(255, 0, 0, 255)
+                default = Color(255, 0, 0, 255)
             }
             colorpicker {
                 configName = "entranceDoorColor"
                 name = "Entrance Door"
-                default = rgba(0, 204, 0, 255)
+                default = Color(0, 204, 0, 255)
             }
         }
 
@@ -590,7 +592,7 @@ val config = Config("Stella", "Stella") {
                 configName = "keyColor"
                 name = "Key Color"
                 description = "Color for doors with keys"
-                default = rgba(0, 255, 0, 255)
+                default = Color(0, 255, 0, 255)
                 shouldShow { settings -> settings["boxWitherDoors"] as Boolean }
             }
 
@@ -598,7 +600,7 @@ val config = Config("Stella", "Stella") {
                 configName = "noKeyColor"
                 name = "No Key Color"
                 description = "Color for doors without keys"
-                default = rgba(255, 0, 0, 255)
+                default = Color(255, 0, 0, 255)
                 shouldShow { settings -> settings["boxWitherDoors"] as Boolean }
             }
 
@@ -642,7 +644,7 @@ val config = Config("Stella", "Stella") {
                 configName = "secretWaypointColor.redstonekey"
                 name = "Redstone Key Color"
                 description = "Highlight color for Redstone Key waypoints"
-                default = rgba(255, 0, 0, 255) // red
+                default = Color(255, 0, 0, 255) // red
                 shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
@@ -650,7 +652,7 @@ val config = Config("Stella", "Stella") {
                 configName = "secretWaypointColor.wither"
                 name = "Wither Color"
                 description = "Highlight color for Wither waypoints"
-                default = rgba(0, 0, 255, 255) // blue
+                default = Color(0, 0, 255, 255) // blue
                 shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
@@ -658,7 +660,7 @@ val config = Config("Stella", "Stella") {
                 configName = "secretWaypointColor.bat"
                 name = "Bat Color"
                 description = "Highlight color for Bat waypoints"
-                default = rgba(128, 128, 128, 255) // gray
+                default = Color(128, 128, 128, 255) // gray
                 shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
@@ -666,7 +668,7 @@ val config = Config("Stella", "Stella") {
                 configName = "secretWaypointColor.item"
                 name = "Item Color"
                 description = "Highlight color for Item waypoints"
-                default = rgba(0, 255, 0, 255) // green
+                default = Color(0, 255, 0, 255) // green
                 shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
@@ -674,7 +676,7 @@ val config = Config("Stella", "Stella") {
                 configName = "secretWaypointColor.chest"
                 name = "Chest Color"
                 description = "Highlight color for Chest waypoints"
-                default = rgba(255, 255, 0, 255) // yellow
+                default = Color(255, 255, 0, 255) // yellow
                 shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
         }
@@ -738,63 +740,63 @@ val config = Config("Stella", "Stella") {
                 configName = "secretRoutes.startColor"
                 name = "Start Color"
                 description = "Color for the starting point of a route."
-                default = rgba(0, 255, 0, 255) // green
+                default = Color(0, 255, 0, 255) // green
             }
 
             colorpicker {
                 configName = "secretRoutes.mineColor"
                 name = "Mine Color"
                 description = "Color for mining-related route waypoints."
-                default = rgba(255, 165, 0, 255) // orange
+                default = Color(255, 165, 0, 255) // orange
             }
 
             colorpicker {
                 configName = "secretRoutes.superboomColor"
                 name = "Superboom Color"
                 description = "Color for Superboom TNT route waypoints."
-                default = rgba(255, 0, 0, 255) // red
+                default = Color(255, 0, 0, 255) // red
             }
 
             colorpicker {
                 configName = "secretRoutes.etherwarpColor"
                 name = "Etherwarp Color"
                 description = "Color for Etherwarp route waypoints."
-                default = rgba(0, 0, 255, 255) // blue
+                default = Color(0, 0, 255, 255) // blue
             }
 
             colorpicker {
                 configName = "secretRoutes.chestColor"
                 name = "Chest Color"
                 description = "Color for Chest waypoints."
-                default = rgba(255, 255, 0, 255) // yellow
+                default = Color(255, 255, 0, 255) // yellow
             }
 
             colorpicker {
                 configName = "secretRoutes.itemColor"
                 name = "Item Color"
                 description = "Color for Item waypoints."
-                default = rgba(255, 255, 0, 255) // yellow
+                default = Color(255, 255, 0, 255) // yellow
             }
 
             colorpicker {
                 configName = "secretRoutes.essenceColor"
                 name = "Essence Color"
                 description = "Color for Essence waypoints."
-                default = rgba(255, 255, 0, 255) // yellow
+                default = Color(255, 255, 0, 255) // yellow
             }
 
             colorpicker {
                 configName = "secretRoutes.batColor"
                 name = "Bat Color"
                 description = "Color for bat route waypoints."
-                default = rgba(128, 128, 128, 255) // gray
+                default = Color(128, 128, 128, 255) // gray
             }
 
             colorpicker {
                 configName = "secretRoutes.leverColor"
                 name = "Lever Color"
                 description = "Color for lever route waypoints."
-                default = rgba(0, 255, 255, 255) // cyan
+                default = Color(0, 255, 255, 255) // cyan
                 shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
         }
@@ -857,7 +859,7 @@ val config = Config("Stella", "Stella") {
                 configName = "blockHighlightColor"
                 name = "Block Highlight Color"
                 description = "The color to highlight blocks"
-                default = rgba(0, 255, 255, 255)
+                default = Color(0, 255, 255, 255)
                 shouldShow { settings -> settings["overlayEnabled"] as Boolean }
             }
 
@@ -872,7 +874,7 @@ val config = Config("Stella", "Stella") {
                 configName = "blockFillColor"
                 name = "Block Fill Color"
                 description = "The color to fill blocks"
-                default = rgba(0, 255, 255, 30)
+                default = Color(0, 255, 255, 30)
                 shouldShow { settings -> settings["overlayEnabled"] as Boolean && settings["fillBlockOverlay"] as Boolean }
             }
 
@@ -982,7 +984,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.healthColor"
                 name = "Health Bar Color"
                 description = "Color of the custom health bar"
-                default = rgba(255, 0, 0, 255)
+                default = Color(255, 0, 0, 255)
                 shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
@@ -990,7 +992,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.absorptionColor"
                 name = "Absorption Bar Color"
                 description = "Color of the custom absorption bar"
-                default = rgba(255, 200, 0, 255)
+                default = Color(255, 200, 0, 255)
                 shouldShow { it["bars"] as Boolean && it["bars.absorptionBar"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
@@ -1030,7 +1032,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.manaColor"
                 name = "Mana Bar Color"
                 description = "Color of the custom mana bar"
-                default = rgba(0, 128, 255, 255)
+                default = Color(0, 128, 255, 255)
                 shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
             }
 
@@ -1038,7 +1040,7 @@ val config = Config("Stella", "Stella") {
                 configName = "bars.ofmColor"
                 name = "Overflow Mana Color"
                 description = "Color of the overflow mana bar"
-                default = rgba(128, 0, 255, 255)
+                default = Color(128, 0, 255, 255)
                 shouldShow { it["bars"] as Boolean && it["bars.overflowManaBar"] as Boolean && it["bars.manaBar"] as Boolean }
             }
         }

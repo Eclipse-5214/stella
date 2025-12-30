@@ -3,7 +3,6 @@ package co.stellarskys.stella.utils.config.core
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.KeyEvent
-import co.stellarskys.stella.utils.config.RGBA
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.components.base.enums.Pos
 import co.stellarskys.vexel.components.base.enums.Size
@@ -189,7 +188,7 @@ class Button : ConfigElement() {
 }
 
 class ColorPicker : ConfigElement() {
-    var default: RGBA = RGBA(255, 255, 255, 255)
+    var default: Color = Color(255, 255, 255, 255)
         set(value) {
             field = value
             this.value = value
@@ -197,10 +196,6 @@ class ColorPicker : ConfigElement() {
 
     init {
         value = default
-    }
-
-    fun rgba(r: Int, g: Int, b: Int, a: Int): RGBA {
-        return RGBA(r, g, b, a)
     }
 }
 
