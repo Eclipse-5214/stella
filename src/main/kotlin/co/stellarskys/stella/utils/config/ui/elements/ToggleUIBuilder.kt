@@ -15,7 +15,7 @@ import co.stellarskys.vexel.elements.Switch
 import java.awt.Color
 
 class ToggleUIBuilder {
-    fun build(root: VexelElement<*>, toggle: Toggle, config: Config, window: VexelWindow): VexelElement<*> {
+    fun build(root: VexelElement<*>, toggle: Toggle, window: VexelWindow): VexelElement<*> {
         val container = Rectangle(Color(0,0,0,0).rgb)
             .setSizing(100f, Size.Percent, 40f, Size.Pixels)
             .setPositioning(0f, Pos.ParentCenter, 0f, Pos.AfterSibling)
@@ -45,7 +45,6 @@ class ToggleUIBuilder {
 
         toggleSwitch.onValueChange {
             toggle.value = it as Boolean
-            config.notifyListeners(toggle.configName, toggle.value)
         }
 
         return container

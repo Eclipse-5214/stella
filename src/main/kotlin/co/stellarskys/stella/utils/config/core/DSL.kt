@@ -12,17 +12,15 @@ import co.stellarskys.vexel.components.core.Text
 import co.stellarskys.vexel.core.VexelWindow
 import java.awt.Color
 
-open class ConfigCategory(val name: String) {
+open class ConfigCategory(val name: String, val config: Config) {
     val subcategories = mutableMapOf<String, ConfigSubcategory>()
-    var isMarkdown = false
-    var markdown = ""
 
     fun subcategory(name: String, builder: ConfigSubcategory.() -> Unit) {
-        subcategories[name] = ConfigSubcategory(name).apply(builder)
+        subcategories[name] = ConfigSubcategory(name, config).apply(builder)
     }
 }
 
-open class ConfigSubcategory(val subName: String) {
+open class ConfigSubcategory(val subName: String, val config: Config) {
     val elements = mutableMapOf<String, ConfigElement>()
 
     /**
@@ -31,7 +29,7 @@ open class ConfigSubcategory(val subName: String) {
      * @param builder Lambda used to configure the Button.
      */
     fun button(builder: Button.() -> Unit) {
-        val button = Button().apply(builder)
+        val button = Button().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[button.configName] = button
     }
 
@@ -41,7 +39,7 @@ open class ConfigSubcategory(val subName: String) {
      * @param builder Lambda used to configure the ColorPicker.
      */
     fun colorpicker(builder: ColorPicker.() -> Unit) {
-        val color = ColorPicker().apply(builder)
+        val color = ColorPicker().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[color.configName] = color
     }
 
@@ -51,7 +49,7 @@ open class ConfigSubcategory(val subName: String) {
      * @param builder Lambda used to configure the Dropdown.
      */
     fun dropdown(builder: Dropdown.() -> Unit) {
-        val dropdown = Dropdown().apply(builder)
+        val dropdown = Dropdown().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[dropdown.configName] = dropdown
     }
 
@@ -61,7 +59,7 @@ open class ConfigSubcategory(val subName: String) {
      * @param builder Lambda used to configure the Keybind.
      */
     fun keybind(builder: Keybind.() -> Unit) {
-        val keybind = Keybind().apply(builder)
+        val keybind = Keybind().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[keybind.configName] = keybind
     }
 
@@ -71,7 +69,7 @@ open class ConfigSubcategory(val subName: String) {
      * @param builder Lambda used to configure the Slider.
      */
     fun slider(builder: Slider.() -> Unit) {
-        val slider = Slider().apply(builder)
+        val slider = Slider().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[slider.configName] = slider
     }
 
@@ -81,7 +79,7 @@ open class ConfigSubcategory(val subName: String) {
      * @param builder Lambda used to configure the StepSlider.
      */
     fun stepslider(builder: StepSlider.() -> Unit) {
-        val step = StepSlider().apply(builder)
+        val step = StepSlider().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[step.configName] = step
     }
 
@@ -91,7 +89,7 @@ open class ConfigSubcategory(val subName: String) {
      * @param builder Lambda used to configure the TextInput.
      */
     fun textinput(builder: TextInput.() -> Unit) {
-        val input = TextInput().apply(builder)
+        val input = TextInput().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[input.configName] = input
     }
 
@@ -101,7 +99,7 @@ open class ConfigSubcategory(val subName: String) {
      * @param builder Lambda used to configure the TextParagraph.
      */
     fun textparagraph(builder: TextParagraph.() -> Unit) {
-        val para = TextParagraph().apply(builder)
+        val para = TextParagraph().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[para.configName] = para
     }
 
@@ -111,7 +109,7 @@ open class ConfigSubcategory(val subName: String) {
      * @param builder Lambda used to configure the Toggle.
      */
     fun toggle(builder: Toggle.() -> Unit) {
-        val toggle = Toggle().apply(builder)
+        val toggle = Toggle().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[toggle.configName] = toggle
     }
 
@@ -134,23 +132,6 @@ open class ConfigSubcategory(val subName: String) {
     }
 }
 
-
-/**
- * A special category type that displays static markdown content.
- *
- * Used for rendering documentation, tutorials, or decorative sections
- * within a NovaConfig UI.
- *
- * @param mdName The display name of the category.
- * @param md The markdown string to be rendered.
- */
-class MarkdownCategory(val mdName: String, val md: String): ConfigCategory(md){
-    init {
-        isMarkdown = true
-        markdown = md
-    }
-}
-
 open class ConfigElement {
     /** Unique identifier for the element used in saving/loading. */
     var configName: String = ""
@@ -162,22 +143,31 @@ open class ConfigElement {
     var description: String = ""
 
     /** The current value of the element (can be Boolean, String, Int, etc). */
-    open var value: Any? = null
+    private var _value: Any? = null
+    open var value: Any?
+        get() = _value
+        set(v) {
+            _value = v
+            // We need a reference to the parent Config to notify it
+            config?.notifyListeners(configName, v)
+        }
 
-    var showIf: ((Map<String, Any?>) -> Boolean)? = null
+    // Reference set when building the DSL
+    var config: Config? = null
+
+    var showIf: ((Config) -> Boolean)? = null
 
     /**
      * Assigns a conditional visibility predicate.
      *
      * @param predicate Lambda that receives flattened config values.
      */
-    fun shouldShow(predicate: (Map<String, Any?>) -> Boolean) {
+    fun shouldShow(predicate: (Config) -> Boolean) {
         showIf = predicate
     }
 
     internal fun isVisible(config: Config): Boolean {
-        val flat = config.flattenValues()
-        return showIf?.invoke(flat) ?: true
+        return showIf?.invoke(config) ?: true
     }
 }
 

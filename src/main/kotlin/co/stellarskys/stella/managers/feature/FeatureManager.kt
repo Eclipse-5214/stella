@@ -32,21 +32,12 @@ object FeatureManager {
     val features = ArrayList<Feature>()
 
     init {
-        EventBus.on<LocationEvent.SkyblockJoin> {
-            for (f in skyblockFeatures) f.update()
-        }
-        EventBus.on<LocationEvent.SkyblockLeave> {
-            for (f in skyblockFeatures) f.update()
-        }
-        EventBus.on<LocationEvent.IslandChange> {
-            for (f in islandFeatures) f.update()
-        }
-        EventBus.on<LocationEvent.AreaChange> {
-            for (f in areaFeatures) f.update()
-        }
-        EventBus.on<LocationEvent.DungeonFloorChange> {
-            for (f in dungeonFloorFeatures) f.update()
-        }
+        EventBus.on<LocationEvent.SkyblockJoin> { for (f in skyblockFeatures) f.update() }
+        EventBus.on<LocationEvent.SkyblockLeave> { for (f in skyblockFeatures) f.update() }
+        EventBus.on<LocationEvent.IslandChange> { for (f in islandFeatures) f.update() }
+        EventBus.on<LocationEvent.AreaChange> { for (f in areaFeatures) f.update() }
+        EventBus.on<LocationEvent.DungeonFloorChange> { for (f in dungeonFloorFeatures) f.update() }
+
         config.registerListener { name, _ ->
             configListeners[name]?.let { list ->
                 for (f in list) f.update()

@@ -48,7 +48,7 @@ open class Feature(
     open fun onUnregister() {}
 
     fun isEnabled(): Boolean {
-        if (!(configName?.let { config.getValue<Boolean>(it) } ?: true)) return false
+        if (!(configName?.let { config[it] as? Boolean } ?: true)) return false
         if (skyblockOnly && !LocationAPI.isOnSkyBlock) return false
         if (islands.isNotEmpty() && LocationAPI.island !in islands) return false
         if (areas.isNotEmpty() && LocationAPI.area !in areas) return false
