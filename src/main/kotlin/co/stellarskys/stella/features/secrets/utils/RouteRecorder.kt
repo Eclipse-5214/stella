@@ -102,7 +102,6 @@ object RouteRecorder {
             }
         }
 
-
         EventBus.on<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
             if (!recording) return@on
 

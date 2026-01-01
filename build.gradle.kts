@@ -1,4 +1,3 @@
-import dev.deftu.gradle.utils.version.MinecraftVersions
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -25,35 +24,13 @@ toolkitMultiversion {
     moveBuildsToRootProject.set(true)
 }
 
-toolkitLoomHelper {
-    if (!mcData.isNeoForge) {
-        useMixinRefMap(modData.id)
-    }
-
-    if (mcData.isForge) {
-        useTweaker("org.spongepowered.asm.launch.MixinTweaker")
-        useForgeMixin(modData.id)
-    }
-
-    if (mcData.isForgeLike && mcData.version >= MinecraftVersions.VERSION_1_16_5) {
-        useKotlinForForge()
-    }
-}
-
-loom {
-    if (mcData.isFabric && mcData.version >= MinecraftVersions.VERSION_1_16_5) {
-        accessWidenerPath.set(rootProject.file("src/main/resources/stella.accesswidener"))
-    }
-}
-
-
 dependencies {
     with(libs.textile.get()) { modImplementation(include("${this.group}:${this.name}-$mcData:${this.version}")!!) }
     with(libs.omnicore.get()) { modImplementation(include("${this.group}:${this.name}-$mcData:${this.version}")!!) }
     implementation(include("io.github.classgraph:classgraph:4.8.184")!!)
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    modImplementation(include("co.stellarskys:vexel-${mcData}:135")!!)
+    modImplementation(include("co.stellarskys:vexel-${mcData}:138")!!)
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     property("skyblock_api_version").let {

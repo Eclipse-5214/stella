@@ -3,6 +3,7 @@ package co.stellarskys.stella.features.stellanav
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.DungeonEvent
+import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.utils.render.Render3D
@@ -67,6 +68,11 @@ object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
                     color, true, doorLW.toDouble()
                 )
             }
+        }
+
+        on<LocationEvent.ServerChange>{
+            bloodOpen = false
+            keyObtained = false
         }
     }
 
