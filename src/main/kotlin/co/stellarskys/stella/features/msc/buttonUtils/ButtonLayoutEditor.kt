@@ -3,7 +3,6 @@ package co.stellarskys.stella.features.msc.buttonUtils
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.vexel.Vexel
-import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
 import co.stellarskys.vexel.core.VexelScreen
 import dev.deftu.omnicore.api.client.input.KeyboardModifiers
 import dev.deftu.omnicore.api.client.input.OmniMouseButton

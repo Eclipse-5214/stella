@@ -164,6 +164,7 @@ object Render2D {
     fun GuiGraphics.drawNVG(block: (snapshot: Matrix3x2f) -> Unit) {
         val snapshot = Matrix3x2f(this.pose())
 
+        /*
         NVGSpecialRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
             val n = Vexel.renderer
             val sf = OmniResolution.scaleFactor.toFloat()
@@ -180,5 +181,6 @@ object Render2D {
             // 4. Run the user's drawing code
             block(snapshot)
         }
+         */
     }
 }
