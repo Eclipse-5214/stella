@@ -6,6 +6,7 @@ import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.Utils.toHex
 import co.stellarskys.stella.utils.config.ui.ConfigUI
+import co.stellarskys.stella.utils.config.ui.NewConfigUI
 import com.google.gson.*
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
@@ -25,7 +26,7 @@ class Config(
     private val categories = mutableMapOf<String, ConfigCategory>()
     private val listeners = mutableListOf<(String, Any?) -> Unit>()
 
-    private var configUI: ConfigUI? = null
+    private var configUI: NewConfigUI? = null
     private var loaded = false
     private var loading = false
 
@@ -43,7 +44,7 @@ class Config(
 
     // UI functions
     fun open() {
-        configUI = ConfigUI(categories, this)
+        configUI = NewConfigUI(categories, this)
         TickSchedulers.client.post { client.setScreen(configUI) }
     }
 

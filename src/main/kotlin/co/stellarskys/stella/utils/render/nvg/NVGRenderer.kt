@@ -1,9 +1,12 @@
 package co.stellarskys.stella.utils.render.nvg
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.alpha
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.red
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.green
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.blue
+import dev.deftu.omnicore.api.client.client
+import net.minecraft.resources.ResourceLocation
 import org.lwjgl.nanovg.NVGColor
 import org.lwjgl.nanovg.NVGPaint
 import org.lwjgl.nanovg.NanoSVG.*
@@ -39,6 +42,8 @@ object NVGRenderer {
     private var scissor: Scissor? = null
     private var drawing: Boolean = false
     private var vg = -1L
+
+    val defaultFont = Font("Default", client.resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/font.ttf")).get().open())
 
     init {
         vg = nvgCreate(NVG_ANTIALIAS or NVG_STENCIL_STROKES)
