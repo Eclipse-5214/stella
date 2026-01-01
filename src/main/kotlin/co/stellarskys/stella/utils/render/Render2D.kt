@@ -164,23 +164,18 @@ object Render2D {
     fun GuiGraphics.drawNVG(block: (snapshot: Matrix3x2f) -> Unit) {
         val snapshot = Matrix3x2f(this.pose())
 
-        /*
         NVGSpecialRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
             val n = Vexel.renderer
             val sf = OmniResolution.scaleFactor.toFloat()
 
             n.resetTransform()
-
-            // 3. Automatically apply the matrix sync
             n.setTransform(
                 snapshot.m00 * sf, snapshot.m01 * sf,
                 snapshot.m10 * sf, snapshot.m11 * sf,
                 snapshot.m20 * sf, snapshot.m21 * sf
             )
 
-            // 4. Run the user's drawing code
             block(snapshot)
         }
-         */
     }
 }

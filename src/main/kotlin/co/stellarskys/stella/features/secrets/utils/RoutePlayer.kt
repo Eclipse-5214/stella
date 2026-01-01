@@ -1,5 +1,6 @@
 package co.stellarskys.stella.features.secrets.utils
 
+import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render3D
 import co.stellarskys.stella.utils.render.RenderContext
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
@@ -8,6 +9,9 @@ import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
 object RoutePlayer {
+    val text by config.property<Boolean>("secretRoutes.text")
+    val textScale by config.property<Float>("secretRoutes.textScale")
+
     fun renderRoute(data: StepData, firstStep: Boolean, context: RenderContext) {
         val room = Dungeon.currentRoom ?: return
 
@@ -74,6 +78,6 @@ object RoutePlayer {
             true,
         )
 
-        if (name) Render3D.renderString(waypoint.type.label, realPos.center, phase = true)
+        if (name && text) Render3D.renderString(waypoint.type.label, realPos.center, scale = textScale, phase = true)
     }
 }

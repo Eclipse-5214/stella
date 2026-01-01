@@ -282,6 +282,13 @@ val config = Config("Stella", "Stella") {
 
         subcategory("Score Alerts") {
             toggle {
+                configName = "forcePaul"
+                name = "Force Paul"
+                description = "Forces Paul's EZPZ +10 score"
+                default = false
+            }
+
+            toggle {
                 configName = "scoreAlerts"
                 name = "Enable Score Alerts"
                 description = "Enables alerts for dungeon score milestones"
@@ -301,7 +308,29 @@ val config = Config("Stella", "Stella") {
                 name = "270 Score Message"
                 description = "Message to display when reaching 270 score"
                 placeholder = "&d270 score!"
-                shouldShow { settings -> (settings["scoreAlerts"] as Boolean) && (settings["scoreAlerts.alert270"] as Boolean) }
+                shouldShow { settings ->
+                    (settings["scoreAlerts"] as Boolean) &&
+                            (settings["scoreAlerts.alert270"] as Boolean)
+                }
+            }
+
+            toggle {
+                configName = "scoreAlerts.chat270"
+                name = "270 Score Chat Alert"
+                description = "Sends a chat message when reaching 270 score"
+                default = true
+                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
+            }
+
+            textinput {
+                configName = "scoreAlerts.chatMessage270"
+                name = "270 Score Chat Message"
+                description = "Chat message to send when reaching 270 score"
+                placeholder = "270 score!"
+                shouldShow { settings ->
+                    (settings["scoreAlerts"] as Boolean) &&
+                            (settings["scoreAlerts.chat270"] as Boolean)
+                }
             }
 
             toggle {
@@ -317,7 +346,29 @@ val config = Config("Stella", "Stella") {
                 name = "300 Score Message"
                 description = "Message to display when reaching 300 score"
                 placeholder = "&d300 score!"
-                shouldShow { settings -> (settings["scoreAlerts"] as Boolean) && (settings["scoreAlerts.alert300"] as Boolean) }
+                shouldShow { settings ->
+                    (settings["scoreAlerts"] as Boolean) &&
+                            (settings["scoreAlerts.alert300"] as Boolean)
+                }
+            }
+
+            toggle {
+                configName = "scoreAlerts.chat300"
+                name = "300 Score Chat Alert"
+                description = "Sends a chat message when reaching 300 score"
+                default = true
+                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
+            }
+
+            textinput {
+                configName = "scoreAlerts.chatMessage300"
+                name = "300 Score Chat Message"
+                description = "Chat message to send when reaching 300 score"
+                placeholder = "300 score!"
+                shouldShow { settings ->
+                    (settings["scoreAlerts"] as Boolean) &&
+                            (settings["scoreAlerts.chat300"] as Boolean)
+                }
             }
 
             toggle {
@@ -333,7 +384,29 @@ val config = Config("Stella", "Stella") {
                 name = "5 Crypts Message"
                 description = "Message to display when reaching 5 crypts"
                 placeholder = "&d5 crypts!"
-                shouldShow { settings -> (settings["scoreAlerts"] as Boolean) && (settings["scoreAlerts.alert5Crypts"] as Boolean) }
+                shouldShow { settings ->
+                    (settings["scoreAlerts"] as Boolean) &&
+                            (settings["scoreAlerts.alert5Crypts"] as Boolean)
+                }
+            }
+
+            toggle {
+                configName = "scoreAlerts.chat5Crypts"
+                name = "5 Crypts Chat Alert"
+                description = "Sends a chat message when reaching 5 crypts"
+                default = true
+                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
+            }
+
+            textinput {
+                configName = "scoreAlerts.chatMessage5Crypts"
+                name = "5 Crypts Chat Message"
+                description = "Chat message to send when reaching 5 crypts"
+                placeholder = "5 crypts!"
+                shouldShow { settings ->
+                    (settings["scoreAlerts"] as Boolean) &&
+                            (settings["scoreAlerts.chat5Crypts"] as Boolean)
+                }
             }
         }
     }
@@ -640,6 +713,24 @@ val config = Config("Stella", "Stella") {
                 default = false
             }
 
+            toggle {
+                configName = "secretWaypoints.text"
+                name = "Show Waypoint Text"
+                description = "Renders Secret Waypoints text"
+                default = true
+                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
+            }
+
+            slider {
+                configName = "secretWaypoints.textScale"
+                name = "Text Scale"
+                description = "Scale of the waypoint text"
+                min = 0.1f
+                max = 2f
+                default = 1f
+                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
+            }
+
             colorpicker {
                 configName = "secretWaypointColor.redstonekey"
                 name = "Redstone Key Color"
@@ -736,6 +827,24 @@ val config = Config("Stella", "Stella") {
         }
 
         subcategory("Route Rendering") {
+            toggle {
+                configName = "secretRoutes.text"
+                name = "Show Waypoint Text"
+                description = "Renders Secret Routes Waypoints text"
+                default = true
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
+            slider {
+                configName = "secretRoutes.textScale"
+                name = "Text Scale"
+                description = "Scale of the waypoint text"
+                min = 0.1f
+                max = 2f
+                default = 1f
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+
             colorpicker {
                 configName = "secretRoutes.startColor"
                 name = "Start Color"

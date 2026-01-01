@@ -4,6 +4,7 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.ScoreboardEvent
 import co.stellarskys.stella.events.core.TablistEvent
+import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import tech.thatgravyboat.skyblockapi.api.data.Perk
@@ -39,7 +40,8 @@ object DungeonScore {
 
     // Current dungeon score state and accessor
     var data = ScoreData()
-    val hasPaul get() = Perk.EZPZ.active
+    val forcePaul by config.property<Boolean>("forcePaul")
+    val hasPaul get() = Perk.EZPZ.active || forcePaul
     val score get() = data.score
 
     private var lastScore = 0

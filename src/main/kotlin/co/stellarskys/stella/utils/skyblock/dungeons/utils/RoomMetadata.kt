@@ -4,6 +4,7 @@ import co.stellarskys.stella.utils.config.core.Config
 import co.stellarskys.stella.utils.render.Render3D
 import co.stellarskys.stella.utils.render.RenderContext
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
+import co.stellarskys.stella.utils.config
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
@@ -80,12 +81,15 @@ data class RoomMetadata(
         val room: Room,
         val state: BlockState? = null
     ) {
+        val text by config.property<Boolean>("secretWaypoints.text")
+        val textScale by config.property<Float>("secretWaypoints.textScale")
+
         fun render(context: RenderContext) {
             if (position.collected) return
             val pos = room.getRealCoord(position.toBlockPos())
             val lineWidth = 3.0
             Render3D.outlineBlock(context, pos, color, lineWidth, true, state)
-            Render3D.renderString(label, pos.center.x, pos.center.y, pos.center.z, phase = true, bgBox = true)
+            if (text) Render3D.renderString(label, pos.center.x, pos.center.y, pos.center.z, scale = textScale, phase = true, bgBox = true)
         }
     }
 
