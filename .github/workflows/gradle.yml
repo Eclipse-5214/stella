@@ -33,7 +33,7 @@ jobs:
       - name: Process built JARs
         run: |
           mkdir -p build/processed
-          for jar in build/versions/*.jar; do
+          for jar in build/libs/*.jar; do
             if [[ ! "$jar" == *"dev"* ]]; then
               filename=$(basename "$jar")
               version=$(echo "$filename" | grep -o '1\.21\.[0-9]\+')

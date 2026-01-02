@@ -20,3 +20,4 @@ stonecutter {
 }
 
 rootProject.name = "Stella"
+include("stella-ksp")

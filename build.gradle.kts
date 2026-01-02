@@ -1,16 +1,14 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.loom)
+    alias(libs.plugins.ksp)
 }
-
 
 val mc = stonecutter.current.version
 val loader = "fabric"
 
 version = "${property("mod.version")}+${mc}"
 base.archivesName = property("mod.id") as String
-
-val requiredJava = JavaVersion.VERSION_21
 
 repositories {
     @Suppress("UnstableApiUsage")
@@ -28,6 +26,8 @@ repositories {
 dependencies {
     minecraft("com.mojang:minecraft:$mc")
     mappings(loom.officialMojangMappings())
+
+    ksp(project(":stella-ksp"))
 
     modRuntimeOnly(libs.devauth)
 
@@ -67,12 +67,6 @@ loom {
     }
 }
 
-java {
-    withSourcesJar()
-    targetCompatibility = requiredJava
-    sourceCompatibility = requiredJava
-}
-
 tasks {
     processResources {
         inputs.property("id", project.property("mod.id"))
@@ -88,9 +82,6 @@ tasks {
         )
 
         filesMatching("fabric.mod.json") { expand(props) }
-
-        val mixinJava = "JAVA_${requiredJava.majorVersion}"
-        filesMatching("*.mixins.json") { expand("java" to mixinJava) }
     }
 
     // Builds the version into a shared folder in `build/libs/${mod version}/`
@@ -101,6 +92,8 @@ tasks {
         dependsOn("build")
     }
 }
+
+sourceSets.main { java.srcDir("build/generated/ksp/main/kotlin") }
 
 fun String.mc(mc: String): Provider<MinimalExternalModuleDependency> = project.extensions.getByType<VersionCatalogsExtension>().named("libs").findLibrary("$this-${mc.replace(".", "_")}").get()
 
