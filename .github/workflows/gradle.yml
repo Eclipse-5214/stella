@@ -29,11 +29,11 @@ jobs:
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
       - name: Execute Gradle build
-        run: ./gradlew clean build
+        run: ./gradlew clean buildAndCollect
       - name: Process built JARs
         run: |
           mkdir -p build/processed
-          for jar in build/libs/*.jar; do
+          for jar in build/libs/*/*.jar; do
             if [[ ! "$jar" == *"dev"* ]]; then
               filename=$(basename "$jar")
               version=$(echo "$filename" | grep -o '1\.21\.[0-9]\+')
