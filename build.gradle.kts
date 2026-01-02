@@ -40,7 +40,6 @@ dependencies {
     shadow("omnicore".mc(mc))
     shadow("textile".mc(mc))
     shadow("vexel".mc(mc))
-    shadow(libs.classgraph)
     shadow(libs.commodore)
 
     modImplementation(libs.skyblock.api) {
