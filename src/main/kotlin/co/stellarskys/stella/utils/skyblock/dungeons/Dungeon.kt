@@ -21,13 +21,10 @@ import net.minecraft.world.level.block.entity.SkullBlockEntity
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonAPI
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.platform.properties
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
 import kotlin.math.roundToInt
-
-//#if MC >= 1.21.9
-//$$ import tech.thatgravyboat.skyblockapi.platform.properties
-//#endif
 
 /**
  * Central dungeon state manager.

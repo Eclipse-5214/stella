@@ -2,9 +2,9 @@ package co.stellarskys.stella.events.core
 
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.entity.state.PlayerRenderState
 import co.stellarskys.stella.events.api.Event
 import co.stellarskys.stella.utils.render.RenderContext
+import net.minecraft.client.renderer.entity.state.AvatarRenderState
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.network.chat.Component
 
@@ -47,7 +47,7 @@ sealed class RenderEvent {
 
     sealed class Player {
         class Pre(
-            val entity: PlayerRenderState,
+            val entity: AvatarRenderState,
             val matrices: PoseStack
         ) : Event(cancelable = true)
     }

@@ -9,6 +9,7 @@ import co.stellarskys.stella.events.core.*
 import co.stellarskys.stella.managers.events.EventBusManager
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
@@ -21,17 +22,9 @@ import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.utils.render.RenderContext
 import net.minecraft.network.protocol.Packet
-import net.minecraft.world.level.EmptyBlockGetter
-import net.minecraft.world.phys.shapes.CollisionContext
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
-
-//#if MC < 1.21.9
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-//#else
-//$$ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
-//#endif
 
 @Module
 object EventBus : EventBus() {
@@ -63,33 +56,18 @@ object EventBus : EventBus() {
         }
 
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
-            //#if MC >= 1.21.9
-            //$$ ScreenMouseEvents.allowMouseClick(screen).register { _, click ->
-            //$$    !post(GuiEvent.Click(click.x, click.y, click.button(), true, screen))
-            //$$ }
-            //$$
-            //$$ ScreenMouseEvents.allowMouseRelease(screen).register { _, click ->
-            //$$    !post(GuiEvent.Click(click.x, click.y, click.button(), false, screen))
-            //$$ }
-            //$$
-            //$$ ScreenKeyboardEvents.allowKeyPress(screen).register { _, keyInput ->
-            //$$    val charTyped = GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode)?.firstOrNull() ?: '\u0000'
-            //$$    !post(GuiEvent.Key(GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode), keyInput.key, charTyped, keyInput.key, screen))
-            //$$ }
-            //#else
-            ScreenMouseEvents.allowMouseClick(screen).register { _, mx, my, mouseButton ->
-                !post(GuiEvent.Click(mx, my, mouseButton, true, screen))
+            ScreenMouseEvents.allowMouseClick(screen).register { _, click ->
+               !post(GuiEvent.Click(click.x, click.y, click.button(), true, screen))
             }
 
-            ScreenMouseEvents.allowMouseRelease(screen).register { _, mx, my, mouseButton ->
-                !post(GuiEvent.Click(mx, my, mouseButton, false, screen))
+            ScreenMouseEvents.allowMouseRelease(screen).register { _, click ->
+               !post(GuiEvent.Click(click.x, click.y, click.button(), false, screen))
             }
 
-            ScreenKeyboardEvents.allowKeyPress(screen).register { _, key, scancode, modifiers ->
-                val charTyped = GLFW.glfwGetKeyName(key, scancode)?.firstOrNull() ?: '\u0000'
-                !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, charTyped, scancode, screen))
+            ScreenKeyboardEvents.allowKeyPress(screen).register { _, keyInput ->
+               val charTyped = GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode)?.firstOrNull() ?: '\u0000'
+               !post(GuiEvent.Key(GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode), keyInput.key, charTyped, keyInput.key, screen))
             }
-            //#endif
         }
 
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
@@ -100,39 +78,17 @@ object EventBus : EventBus() {
             post(RenderEvent.World.AfterEntities(RenderContext.fromContext(context)))
         }
 
-        //#if MC < 1.21.9
-        WorldRenderEvents.LAST.register { context ->
-            post(RenderEvent.World.Last(RenderContext.fromContext(context)))
+        WorldRenderEvents.END_MAIN.register { context ->
+           post(RenderEvent.World.Last(RenderContext.fromContext(context)))
         }
 
-        WorldRenderEvents.BLOCK_OUTLINE.register { context, blockContext ->
-            val ctx = RenderContext.fromContext(context).apply {
-                blockPos = blockContext.blockPos()
-                voxelShape = blockContext.blockState()
-                    ?.getShape(
-                        EmptyBlockGetter.INSTANCE,
-                        blockContext.blockPos(),
-                        CollisionContext.of(
-                            context.camera().entity
-                        )
-                    )
-            }
-
-            !post(RenderEvent.World.BlockOutline(ctx))
+        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
+           val ctx = RenderContext.fromContext(context).apply {
+               blockPos = outlineRenderState.pos
+               voxelShape = outlineRenderState.shape
+           }
+           !post(RenderEvent.World.BlockOutline(ctx))
         }
-        //#else
-        //$$ WorldRenderEvents.END_MAIN.register { context ->
-        //$$    post(RenderEvent.World.Last(RenderContext.fromContext(context)))
-        //$$ }
-        //$$
-        //$$ WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
-        //$$    val ctx = RenderContext.fromContext(context).apply {
-        //$$        blockPos = outlineRenderState.pos
-        //$$        voxelShape = outlineRenderState.shape
-        //$$    }
-        //$$    !post(RenderEvent.World.BlockOutline(ctx))
-        //$$ }
-        //#endif
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->
             post(GuiEvent.RenderHUD(context))

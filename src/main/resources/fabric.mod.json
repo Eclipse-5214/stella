@@ -1,8 +1,8 @@
 {
     "schemaVersion": 1,
-    "id": "${mod_id}",
-    "version": "${mod_version}",
-    "name": "${mod_name}",
+    "id": "${id}",
+    "version": "${version}",
+    "name": "${name}",
     "description": "QOL / Dungeons skyblock mod",
     "authors": [
         "Eclipse / NEXD_"
@@ -23,10 +23,10 @@
         ]
     },
     "mixins": [
-        "mixins.stella.json"
+      "stella.mixins.json"
     ],
     "depends": {
-        "minecraft": "~${minor_mc_version}",
+        "minecraft": "${minecraft}",
         "fabric": "*",
         "fabricloader": ">=0.15.11",
         "fabric-language-kotlin": "*"

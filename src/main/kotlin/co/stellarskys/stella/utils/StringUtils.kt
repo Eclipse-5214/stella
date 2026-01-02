@@ -4,10 +4,8 @@ import co.stellarskys.stella.Stella
 import net.minecraft.ChatFormatting
 import net.minecraft.resources.ResourceLocation
 import org.apache.commons.lang3.StringUtils as ApacheStringUtils
+import net.minecraft.network.chat.FontDescription
 
-//#if MC > 1.21.9
-//$$ import net.minecraft.network.chat.FontDescription
-//#endif
 
 fun CharSequence?.countMatches(subString: CharSequence): Int = ApacheStringUtils.countMatches(this, subString)
 fun String.stripControlCodes(): String = ChatFormatting.stripFormatting(this)!!
@@ -43,18 +41,8 @@ fun String.removeEmotes(): String = this.replace(emoteRegex, "")
 object Fonts {
     val montserrat = getFont("montserrat")
 
-    fun getFont(font: String):
-    //#if MC > 1.21.9
-    //$$ FontDescription
-    //#else
-    ResourceLocation
-    //#endif
-    {
+    fun getFont(font: String): FontDescription {
         val resource = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, font)
-        //#if MC > 1.21.9
-        //$$ return FontDescription.Resource(resource)
-        //#else
-        return resource
-        //#endif
+        return FontDescription.Resource(resource)
     }
 }

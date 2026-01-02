@@ -5,8 +5,8 @@ import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.utils.ChatUtils
-import co.stellarskys.stella.utils.clearCodes
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 @Module
 object termTracker : Feature("termTracker", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -16,7 +16,7 @@ object termTracker : Feature("termTracker", island = SkyBlockIsland.THE_CATACOMB
     override fun initialize() {
         completed = mutableMapOf()
         on<ChatEvent.Receive> { event ->
-            val msg = event.message.string.clearCodes()
+            val msg = event.message.stripped
             val matcher = pattern.find(msg)
 
             when {

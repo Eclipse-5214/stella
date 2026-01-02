@@ -6,11 +6,7 @@ import net.minecraft.client.Camera
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.shapes.VoxelShape
-//#if MC < 1.21.9
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
-//#else
-//$$ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext
-//#endif
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext
 
 /**
  * Stable render context abstraction.
@@ -27,12 +23,7 @@ data class RenderContext(
     companion object {
         fun fromContext(ctx: WorldRenderContext): RenderContext {
             return RenderContext(
-                //#if MC < 1.21.9
-                matrixStack = ctx.matrixStack(),
-                //#else
-                //$$ matrixStack = ctx.matrices(),
-                //#endif
-
+                matrixStack = ctx.matrices(),
                 camera       = client.gameRenderer.mainCamera,
                 consumers    = ctx.consumers(),
                 blockPos     = null,

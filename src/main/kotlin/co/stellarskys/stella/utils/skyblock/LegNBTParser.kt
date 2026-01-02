@@ -80,7 +80,7 @@ object LegNBTParser {
             val tag = CompoundTag()
             while (!racer.tryConsume("}")) {
                 skipWhitespace()
-                val key = parseIdentifier()
+                val key = parseResourceLocation()
                 skipWhitespace()
                 racer.expect(":", "Expected ':' after key")
                 skipWhitespace()
@@ -168,7 +168,7 @@ object LegNBTParser {
             }
         }
 
-        private fun parseIdentifier(): String {
+        private fun parseResourceLocation(): String {
             skipWhitespace()
             return if (racer.peek(1) == "\"") parseQuotedString()
             else racer.consumeWhile { it.last() != ':' && !it.last().isWhitespace() }

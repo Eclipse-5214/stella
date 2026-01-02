@@ -1,7 +1,44 @@
 [versions]
-textile = "1.0.0-beta.8"
-omnicore = "1.0.0-beta.38"
+loom = "1.14-SNAPSHOT"
+kotlin = "2.3.0"
+
+devauth = "1.2.1"
+
+fabric-loader = "0.17.3"
+fabric-language-kotlin = "1.13.8+kotlin.2.3.0"
+fabric-api-1-21-10 = "0.138.4+1.21.10"
+vexel = "135"
+
+skyblock-api = "4.0.2"
+classgraph = "4.8.184"
+omnicore = "1.0.0-beta.40"
+textile = "1.0.0-beta.10"
+commodore = "1.0.1"
+
+hypixel-modapi = "1.0.1"
+hypixel-modapi-fabric = "1.0.1+build.1+mc1.21"
 
 [libraries]
-textile = { group = "dev.deftu", name = "textile", version.ref = "textile" }
-omnicore = { group = "dev.deftu", name = "omnicore", version.ref = "omnicore" }
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+fabric-language-kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric-language-kotlin" }
+
+devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
+
+fabric-api-1-21-10 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-1-21-10" }
+
+omnicore-1-21-10 = { module = "dev.deftu:omnicore-1.21.10-fabric", version.ref = "omnicore" }
+
+textile-1-21-10 = { module = "dev.deftu:textile-1.21.10-fabric", version.ref = "textile" }
+
+vexel-1-21-10 = { module = "co.stellarskys:vexel-1.21.10-fabric", version.ref = "vexel" }
+
+skyblock-api = { module = "tech.thatgravyboat:skyblock-api", version.ref = "skyblock-api" }
+classgraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+commodore = { module = "com.github.stivais:Commodore", version.ref = "commodore" }
+
+hypixel-modapi = { module = "net.hypixel:mod-api", version.ref = "hypixel-modapi" }
+hypixel-modapi-fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixel-modapi-fabric" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+loom = { id = "fabric-loom", version.ref = "loom" }

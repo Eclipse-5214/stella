@@ -10,7 +10,6 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.PlayerFaceRenderer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.client.resources.PlayerSkin
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.SkullBlockEntity
@@ -18,10 +17,8 @@ import org.joml.Matrix3x2f
 import java.awt.Color
 import java.util.Optional
 import java.util.UUID
-
-//#if MC >= 1.21.9
-//$$ import com.mojang.authlib.GameProfile
-//#endif
+import tech.thatgravyboat.skyblockapi.platform.PlayerSkin
+import tech.thatgravyboat.skyblockapi.platform.texture
 
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
@@ -128,22 +125,10 @@ object Render2D {
         }
 
         val textures = textureCache.getOrElse(uuid) {
-            //#if MC >= 1.21.9
-            //$$ val profile = mc.connection?.getPlayerInfo(uuid)?.profile
-            //$$ val skin = if (profile != null) {
-            //$$     mc.skinManager.get(profile).getNow(Optional.empty()).orElseGet { DefaultPlayerSkin.get(uuid) }
-            //$$ } else {
-            //$$     DefaultPlayerSkin.get(uuid)
-            //$$ }
-            //#else
-            val skin = SkullBlockEntity.fetchGameProfile(uuid)
-                .getNow(Optional.empty())
-                .map(mc.skinManager::getInsecureSkin)
-                .orElseGet { DefaultPlayerSkin.get(uuid) }
-            //#endif
-
+            val profile = mc.connection?.getPlayerInfo(uuid)?.profile
+            val skin = if (profile != null) { mc.skinManager.get(profile).getNow(Optional.empty()).orElseGet { DefaultPlayerSkin.get(uuid) } } else { DefaultPlayerSkin.get(uuid) }
             val defaultSkin = DefaultPlayerSkin.get(uuid)
-            if (skin.texture() != defaultSkin.texture()) textureCache[uuid] = skin
+            if (skin.texture != defaultSkin.texture) textureCache[uuid] = skin
             skin
         }
 
