@@ -23,6 +23,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundEvents
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.setOf
 
 @Module
@@ -30,13 +31,14 @@ object RouteRecorder {
     var recording = false
         private set
 
-    private val route = mutableListOf<StepData>()
+    private val route = CopyOnWriteArrayList<StepData>()
     private var stepIndex = 0
     private var currentRoom: Room? = null
     private var lastPlayerPos: BlockPos? = null
 
     val currentStep: StepData get() = route[stepIndex]
     val lastStep: StepData? get() = route.getOrNull(stepIndex - 1)
+    val lastSecretPos: BlockPos get() = lastStep?.waypoints?.firstOrNull { it.type in WaypointType.SECRET }?.pos ?: BlockPos.ZERO
 
     init {
         EventBus.on<DungeonEvent.Room.Change>(SkyBlockIsland.THE_CATACOMBS) {
@@ -51,10 +53,9 @@ object RouteRecorder {
         EventBus.on<DungeonEvent.Secrets.Essence>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.ESSENCE, it.blockPos)}
 
         EventBus.on<DungeonEvent.Secrets.Item>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            if (!recording) return@on
+            if (!recording || currentRoom == null) return@on
             val pos = world?.getEntity(event.entityId)?.blockPosition() ?: return@on
-            val lastSecretPos = lastStep?.waypoints?.firstOrNull { it.type == WaypointType.CHEST }?.pos
-            if (lastSecretPos != null && calcDistanceSq(lastSecretPos, pos) < 2) return@on
+            if (calcDistanceSq(currentRoom!!.getRealCoord(lastSecretPos), pos) < 3) return@on
             addWaypoint(WaypointType.ITEM, pos)
         }
 
@@ -125,7 +126,7 @@ object RouteRecorder {
     fun nextStep() {
         stepIndex++
         if (stepIndex >= route.size) {
-            route.add(StepData(mutableListOf(), mutableListOf()))
+            route.add(StepData(CopyOnWriteArrayList(), CopyOnWriteArrayList()))
             val loc = player?.onPos ?: return
             val pos = currentRoom?.getRoomCoord(BlockPos(loc.x, loc.y + 1, loc.z)) ?: return
             currentStep.line += pos
@@ -148,7 +149,7 @@ object RouteRecorder {
         currentRoom = room
         route.clear()
         stepIndex = 0
-        route.add(StepData(mutableListOf(), mutableListOf()))
+        route.add(StepData(CopyOnWriteArrayList(), CopyOnWriteArrayList()))
         recording = true
 
         ChatUtils.fakeMessage("${Stella.PREFIX} §aStarted route recording for ${room.name}")
@@ -181,9 +182,14 @@ object RouteRecorder {
         val relPos = room.getRoomCoord(pos)
 
         val waypoint = WaypointData(relPos, type)
-        currentStep.waypoints += waypoint
+        if (type in WaypointType.SECRET) {
+            if (relPos == lastSecretPos) return
+            currentStep.waypoints += waypoint
+            nextStep()
+            return
+        }
 
-        if (type in WaypointType.SECRET) nextStep()
+        currentStep.waypoints += waypoint
     }
 
     fun hudPreview(context: GuiGraphics) {

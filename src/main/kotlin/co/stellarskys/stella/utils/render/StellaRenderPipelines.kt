@@ -26,16 +26,5 @@ object StellaRenderPipelines {
             .build()
     )
 
-    val ROUND_RECT: RenderPipeline = RenderPipelines.register(
-        RenderPipeline.builder(RenderPipelines.MATRICES_PROJECTION_SNIPPET)
-            .withLocation(id("round_rect"))
-            .withFragmentShader(id("round_rect"))
-            .withVertexShader(id("round_rect"))
-            .withBlend(BlendFunction.TRANSLUCENT)
-            .withUniform("u", UniformType.UNIFORM_BUFFER)
-            .withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS)
-            .build()
-    )
-
     private fun id(path: String) = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, path)
 }
