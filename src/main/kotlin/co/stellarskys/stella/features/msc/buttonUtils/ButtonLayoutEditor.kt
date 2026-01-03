@@ -49,7 +49,7 @@ class ButtonLayoutEditor : VexelScreen() {
 
                     ButtonManager.getAll().find { it.anchor == anchor && it.index == index }?.let { button ->
                         if (popup.shown) return@let
-                        val stack = RepoItemsAPI.getItem(button.iconId)
+                        val stack = ButtonManager.getItem(button.iconId)
 
                         val offsetX = (20f - 16f) / 2f
                         val offsetY = (20f - 16f) / 2f

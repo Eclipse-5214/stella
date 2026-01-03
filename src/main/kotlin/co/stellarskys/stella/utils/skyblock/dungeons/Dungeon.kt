@@ -14,7 +14,6 @@ import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
 import net.minecraft.sounds.SoundEvents
-import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.SkullBlockEntity
@@ -107,7 +106,7 @@ object Dungeon {
         EventBus.on<LocationEvent.IslandChange> { reset() }
 
         EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            val msg = event.message.string.clearCodes()
+            val msg = event.message.stripped
             if (WATCHER_PATTERN.containsMatchIn(msg)) bloodDone = true
             if (DUNGEON_COMPLETE_PATTERN.containsMatchIn(msg)) {
                 DungeonPlayerManager.updateAllSecrets()
@@ -268,7 +267,7 @@ object Dungeon {
     /** Updates leap detection based on held item */
     private fun updateHeldItem() {
         val item = player?.mainHandItem ?: return
-        holdingLeaps = "leap" in item.hoverName.string.clearCodes().lowercase()
+        holdingLeaps = "leap" in item.hoverName.stripped.lowercase()
     }
 
     // Room accessors

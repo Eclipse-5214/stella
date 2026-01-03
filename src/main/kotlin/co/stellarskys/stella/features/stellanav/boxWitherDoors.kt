@@ -10,9 +10,9 @@ import co.stellarskys.stella.utils.render.Render3D
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorState
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DoorType
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.config
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
 
 @Module
@@ -29,7 +29,7 @@ object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
 
     override fun initialize() {
         on<ChatEvent.Receive> { event ->
-            val msg = event.message.string.clearCodes()
+            val msg = event.message.stripped
 
             val doorMatch = openedDoor.find(msg)
             if (doorMatch != null){

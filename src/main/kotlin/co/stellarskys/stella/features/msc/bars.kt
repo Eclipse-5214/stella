@@ -6,6 +6,7 @@ import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.TimeUtils.millis
+import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
@@ -63,10 +64,10 @@ object bars : Feature("bars", true) {
     val mpBarWidth get() = ratioWidth(StatsAPI.mana, StatsAPI.maxMana)
     val ofBarWidth get() = ratioWidth(StatsAPI.overflowMana, StatsAPI.maxMana)
 
-    private var smoothHp = 0f
-    private var smoothAbs = 0f
-    private var smoothMp = 0f
-    private var smoothOf = 0f
+    private var smoothHp by Utils.lerped<Float>(0.15)
+    private var smoothAbs by Utils.lerped<Float>(0.15)
+    private var smoothMp by Utils.lerped<Float>(0.15)
+    private var smoothOf by Utils.lerped<Float>(0.15)
 
     override fun initialize() {
         HUDManager.registerCustom(HPHudName, 90, 15, this::hpHudPreview, "bars.healthBar")
@@ -129,8 +130,8 @@ object bars : Feature("bars", true) {
         val matrix = context.pose()
         matrix.translate(5f, 5f)
 
-        smoothHp = lerp(smoothHp, hpBarWidth, 0.15f)
-        smoothAbs = lerp(smoothAbs, absBarWidth, 0.15f)
+        smoothHp = hpBarWidth
+        smoothAbs = absBarWidth
 
         drawBar(context, smoothHp, smoothAbs, absorptionBar, healthColor, absorptionColor)
     }
@@ -167,8 +168,8 @@ object bars : Feature("bars", true) {
         val matrix = context.pose()
         matrix.translate(5f, 5f)
 
-        smoothMp = lerp(smoothMp, mpBarWidth, 0.15f)
-        smoothOf = lerp(smoothOf, ofBarWidth, 0.15f)
+        smoothMp = mpBarWidth
+        smoothOf = ofBarWidth
 
         drawBar(context, smoothMp, smoothOf, overflowManaBar, manaColor, ofmColor)
     }
@@ -195,11 +196,6 @@ object bars : Feature("bars", true) {
         Render2D.drawString(context, left.toString(), 0, 0, color = manaColor)
         Render2D.drawString(context, "§8/", left.toString().width(), 0)
         Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = manaColor)
-    }
-
-
-    private fun lerp(current: Float, target: Float, speed: Float): Float {
-        return current + (target - current) * speed
     }
 
     private fun updateHealthDelta() {

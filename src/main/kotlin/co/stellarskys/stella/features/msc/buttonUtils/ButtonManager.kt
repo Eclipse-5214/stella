@@ -13,11 +13,17 @@ import com.google.gson.reflect.TypeToken
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
 import java.io.File
+import kotlin.jvm.optionals.getOrNull
 
 object ButtonManager {
     private val buttons = mutableListOf<StellaButton>()
+    private val itemCache = mutableMapOf<String, ItemStack>()
 
     private val buttonFile: File get() = File("config/Stella/buttons.json")
 
@@ -56,8 +62,7 @@ object ButtonManager {
     }
 
     private fun renderButton(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int) {
-        val stack = RepoItemsAPI.getItem(button.iconId)
-
+        val stack = getItem(button.iconId)
         val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
 
         val offsetX = (20f - 16f) / 2f
@@ -192,4 +197,8 @@ object ButtonManager {
             Stella.LOGGER.error("Failed to load buttons", e)
         }
     }
+
+    fun getItem(id: String) = ResourceLocation.tryParse(if (":" in id) id.lowercase() else "minecraft:${id.lowercase()}")?.let {
+        BuiltInRegistries.ITEM.getOptional(it).getOrNull()?.defaultInstance
+    } ?: RepoItemsAPI.getItem(id.uppercase())
 }

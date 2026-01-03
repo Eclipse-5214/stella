@@ -1,6 +1,5 @@
 package co.stellarskys.stella.utils.render
 
-import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
 import dev.deftu.omnicore.api.client.client
@@ -12,13 +11,13 @@ import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.block.entity.SkullBlockEntity
 import org.joml.Matrix3x2f
 import java.awt.Color
 import java.util.Optional
 import java.util.UUID
 import tech.thatgravyboat.skyblockapi.platform.PlayerSkin
 import tech.thatgravyboat.skyblockapi.platform.texture
+import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 
 object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
@@ -138,7 +137,7 @@ object Render2D {
 
     fun String.width(): Int {
         val lines = split('\n')
-        return lines.maxOf { mc.font.width(it.clearCodes()) }
+        return lines.maxOf { mc.font.width(it.stripColor()) }
     }
 
     fun String.height(): Int {

@@ -26,9 +26,7 @@ repositories {
 dependencies {
     minecraft("com.mojang:minecraft:$mc")
     mappings(loom.officialMojangMappings())
-
     ksp(project(":stella-ksp"))
-
     modRuntimeOnly(libs.devauth)
 
     modImplementation("fabric-api".mc(mc))
@@ -83,7 +81,6 @@ tasks {
         filesMatching("fabric.mod.json") { expand(props) }
     }
 
-    // Builds the version into a shared folder in `build/libs/${mod version}/`
     register<Copy>("buildAndCollect") {
         group = "build"
         from(remapJar.map { it.archiveFile }, remapSourcesJar.map { it.archiveFile })
@@ -92,11 +89,5 @@ tasks {
     }
 }
 
-sourceSets.main { java.srcDir("build/generated/ksp/main/kotlin") }
-
 fun String.mc(mc: String): Provider<MinimalExternalModuleDependency> = project.extensions.getByType<VersionCatalogsExtension>().named("libs").findLibrary("$this-${mc.replace(".", "_")}").get()
-
-fun DependencyHandler.shadow(dep: Any) {
-    include(dep)
-    modImplementation(dep)
-}
+fun DependencyHandler.shadow(dep: Any) { include(dep);modImplementation(dep) }

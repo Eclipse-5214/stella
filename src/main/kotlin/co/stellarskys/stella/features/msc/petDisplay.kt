@@ -7,11 +7,11 @@ import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.DataUtils
-import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.stella.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
 import tech.thatgravyboat.skyblockapi.api.remote.RepoPetsAPI
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 @Module
 object petDisplay: Feature("petDisplay", true) {
@@ -63,7 +63,7 @@ object petDisplay: Feature("petDisplay", true) {
         }
 
         on<ChatEvent.Receive> { event ->
-            val msg = event.message.string.clearCodes()
+            val msg = event.message.stripped
 
             // Pet summon/despawn matcher
             val summonMatch = petSummon.find(msg)
@@ -103,7 +103,7 @@ object petDisplay: Feature("petDisplay", true) {
 
         on<TablistEvent.Change> { tabEvent ->
             tabEvent.new.flatten().forEach{ entry ->
-                val text = entry.string?.clearCodes() ?: return@forEach
+                val text = entry.stripped
 
                 val tabMatch = tab.find(text)
                 if (tabMatch != null) {

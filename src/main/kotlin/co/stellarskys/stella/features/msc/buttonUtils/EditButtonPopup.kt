@@ -116,7 +116,7 @@ class EditButtonPopup(window: VexelWindow) {
     fun renderPreviewItem(context: GuiGraphics) {
         if (!shown) return
 
-        val stack = RepoItemsAPI.getItem(itemIdInput.value)
+        val stack = ButtonManager.getItem(itemIdInput.value)
         val scale = OmniResolution.scaleFactor.toFloat()
 
         val x = itemPreview.scaled.left

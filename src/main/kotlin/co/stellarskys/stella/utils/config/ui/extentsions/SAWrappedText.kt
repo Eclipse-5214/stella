@@ -1,12 +1,12 @@
 package co.stellarskys.stella.utils.config.ui.extentsions
 
-import co.stellarskys.stella.utils.clearCodes
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.api.style.Font
 import co.stellarskys.vexel.components.base.enums.Pos
 import co.stellarskys.vexel.components.base.enums.Size
 import co.stellarskys.vexel.components.base.VexelElement
 import net.minecraft.world.entity.monster.Vex
+import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 import java.awt.Color
 
 class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<SAWrappedText>() {
@@ -129,7 +129,7 @@ class SAWrappedText(val text: String, val fontSize: Float = 12f): VexelElement<S
         val lineHeight = fontSize + 2f
         var lines = 1
         var cursorX = 0f
-        for (word in text.clearCodes().split(Regex("(?<=\\n)|(?=\\n)| "))) {
+        for (word in text.stripColor().split(Regex("(?<=\\n)|(?=\\n)| "))) {
             when {
                 word == "\n" -> { cursorX = 0f; lines++ }
                 word.isBlank() -> {
