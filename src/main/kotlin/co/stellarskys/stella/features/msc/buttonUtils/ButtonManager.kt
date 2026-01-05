@@ -6,6 +6,7 @@ import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
+import co.stellarskys.stella.utils.render.nvg.NVGRenderer
 import co.stellarskys.vexel.Vexel
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -75,7 +76,7 @@ object ButtonManager {
         if(!button.background) return
         val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
         context.drawNVG {
-            Vexel.renderer.hollowRect(
+            NVGRenderer.hollowRect(
                 x.toFloat(),
                 y.toFloat(),
                 20f,
