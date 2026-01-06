@@ -12,8 +12,10 @@ abstract class BaseElement {
 
     var x = 0f
     var y = 0f
-    var width = 0f
-    var height = 0f
+    var width = 120f
+    var height = 15f
+
+    var isAnimating = false
 
     open val absoluteX get() = x
     open val absoluteY get() = y

@@ -131,7 +131,7 @@ object Utils {
     }
 
     object Fonts {
-        val montserrat = getFont("montserrat")
+        val montserrat_bold = getFont("montserrat")
 
         fun getFont(font: String): FontDescription {
             val resource = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, font)

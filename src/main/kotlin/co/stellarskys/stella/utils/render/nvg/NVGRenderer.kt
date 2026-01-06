@@ -108,33 +108,6 @@ object NVGRenderer {
         nvgStroke(vg)
     }
 
-    fun drawHalfRoundedRect(x: Float, y: Float, w: Float, h: Float, color: Int, radius: Float, roundTop: Boolean) {
-        nvgBeginPath(vg)
-
-        if (roundTop) {
-            nvgMoveTo(vg, x, y + h)
-            nvgLineTo(vg, x + w, y + h)
-            nvgLineTo(vg, x + w, y + radius)
-            nvgArcTo(vg, x + w, y, x + w - radius, y, radius)
-            nvgLineTo(vg, x + radius, y)
-            nvgArcTo(vg, x, y, x, y + radius, radius)
-            nvgLineTo(vg, x, y + h)
-        } else {
-            nvgMoveTo(vg, x, y)
-            nvgLineTo(vg, x + w, y)
-            nvgLineTo(vg, x + w, y + h - radius)
-            nvgArcTo(vg, x + w, y + h, x + w - radius, y + h, radius)
-            nvgLineTo(vg, x + radius, y + h)
-            nvgArcTo(vg, x, y + h, x, y + h - radius, radius)
-            nvgLineTo(vg, x, y)
-        }
-
-        nvgClosePath(vg)
-        color(color)
-        nvgFillColor(vg, nvgColor)
-        nvgFill(vg)
-    }
-
     fun rect(x: Float, y: Float, w: Float, h: Float, color: Int, radius: Float, roundTop: Boolean) {
         nvgBeginPath(vg)
 
@@ -164,7 +137,7 @@ object NVGRenderer {
 
     fun rect(x: Float, y: Float, w: Float, h: Float, color: Int, radius: Float) {
         nvgBeginPath(vg)
-        nvgRoundedRect(vg, x, y, w, h + .5f, radius)
+        nvgRoundedRect(vg, x, y, w, h, radius)
         color(color)
         nvgFillColor(vg, nvgColor)
         nvgFill(vg)
@@ -172,7 +145,7 @@ object NVGRenderer {
 
     fun rect(x: Float, y: Float, w: Float, h: Float, color: Int) {
         nvgBeginPath(vg)
-        nvgRect(vg, x, y, w, h + .5f)
+        nvgRect(vg, x, y, w, h)
         color(color)
         nvgFillColor(vg, nvgColor)
         nvgFill(vg)
@@ -184,6 +157,44 @@ object NVGRenderer {
         color(color)
         nvgFillColor(vg, nvgColor)
         nvgFill(vg)
+    }
+
+    fun hollowRect(x: Float, y: Float, w: Float, h: Float, thickness: Float, color: Int, radius: Float, roundTop: Boolean) {
+        nvgBeginPath(vg)
+
+        if (roundTop) {
+            nvgMoveTo(vg, x, y + h)
+            nvgLineTo(vg, x + w, y + h)
+            nvgLineTo(vg, x + w, y + radius)
+            nvgArcTo(vg, x + w, y, x + w - radius, y, radius)
+            nvgLineTo(vg, x + radius, y)
+            nvgArcTo(vg, x, y, x, y + radius, radius)
+            nvgLineTo(vg, x, y + h)
+        } else {
+            nvgMoveTo(vg, x, y)
+            nvgLineTo(vg, x + w, y)
+            nvgLineTo(vg, x + w, y + h - radius)
+            nvgArcTo(vg, x + w, y + h, x + w - radius, y + h, radius)
+            nvgLineTo(vg, x + radius, y + h)
+            nvgArcTo(vg, x, y + h, x, y + h - radius, radius)
+            nvgLineTo(vg, x, y)
+        }
+
+        nvgClosePath(vg)
+        nvgStrokeWidth(vg, thickness)
+        color(color)
+        nvgStrokeColor(vg, nvgColor)
+        nvgStroke(vg)
+    }
+
+
+    fun hollowRect(x: Float, y: Float, w: Float, h: Float, thickness: Float, color: Int, topRight: Float, topLeft: Float, bottomRight: Float, bottomLeft: Float) {
+        nvgBeginPath(vg)
+        nvgRoundedRectVarying(vg, round(x), round(y), round(w), round(h), topRight, topLeft, bottomRight, bottomLeft)
+        nvgStrokeWidth(vg, thickness)
+        color(color)
+        nvgStrokeColor(vg, nvgColor)
+        nvgStroke(vg)
     }
 
     fun hollowRect(x: Float, y: Float, w: Float, h: Float, thickness: Float, color: Int, radius: Float) {

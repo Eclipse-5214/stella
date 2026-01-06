@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.config.ui
 import co.stellarskys.stella.utils.config.core.*
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.Panel
+import co.stellarskys.stella.utils.config.ui.base.Subcategory
 import co.stellarskys.stella.utils.config.ui.elements.*
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
@@ -25,11 +26,14 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private val panels =  mutableListOf<Panel>()
     private val elementContainers = mutableMapOf<String, VexelElement<*>>()
     private val elementRefs = mutableMapOf<String, ConfigElement>()
-    private var subcatRefs = mutableListOf<VexelElement<*>>()
     private var needsVisibilityUpdate = false
 
     init {
-        categories.forEach { title, catagory ->  }
+        var sx = 10f
+        categories.forEach { title, category ->
+            val panel = buildCategory(sx, 10f, category, title, config)
+            sx += panel.width + 10f
+        }
     }
 
     override val isPausingScreen: Boolean = false
@@ -56,31 +60,22 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
          */
     }
 
-    private fun buildCategory(x: Float, y: Float, category: ConfigCategory, title: String, config: Config) {
+    private fun buildCategory(x: Float, y: Float, category: ConfigCategory, title: String, config: Config): Panel {
         val panel = Panel(x, y, title)
-        // insert subcategory logic
+
+        var sy = 15f
+        category.subcategories.forEach { (key, subcategory) ->
+            val sub = buildSubcategory(0f, sy, panel, subcategory, config)
+            sy += sub.height
+        }
 
         panel.update()
         panels.add(panel)
+        return panel
     }
 
-    private fun buildSubcategory(root: VexelElement<*>, window: VexelWindow, subcategory: ConfigSubcategory, title: String, config: Config) {
-        val box = Rectangle(Palette.Purple.withAlpha(20).rgb, Palette.Purple.withAlpha(100).rgb, 5f, 2f)
-            .setSizing(90f, Size.Percent, 0f, Size.Auto)
-            .setPositioning(0f, Pos.ParentCenter, 10f, Pos.AfterSibling)
-            .childOf(root)
-
-        subcatRefs += box
-
-        val titlebox = Rectangle(Palette.Purple.withAlpha(100).rgb)
-            .setSizing(100f, Size.Percent, 40f, Size.Pixels)
-            .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentPixels)
-            .borderRadiusVarying(5f,  5f, 0f, 0f)
-            .childOf(box)
-
-        val titleText = Text(title, shadowEnabled = false, fontSize = 14f)
-            .setPositioning(5f, Pos.ParentPixels, 0f, Pos.ParentCenter)
-            .childOf(titlebox)
+    private fun buildSubcategory(x: Float, y: Float, panel: Panel, subcategory: ConfigSubcategory, config: Config): Subcategory {
+        val sub = Subcategory(x, y, subcategory)
 
         subcategory.elements.entries.forEachIndexed { index, (key, element) ->
             /*
@@ -106,6 +101,9 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             scheduleVisibilityUpdate(config)
              */
         }
+
+        panel.elements.add(sub)
+        return sub
     }
 
     fun updateUI(config: Config) {
@@ -118,10 +116,6 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
         elementContainers.keys.forEach { key ->
             updateElementVisibility(key, config)
-        }
-
-        subcatRefs.forEach { element ->
-            element.cache.sizeCacheValid = false
         }
 
         needsVisibilityUpdate = false

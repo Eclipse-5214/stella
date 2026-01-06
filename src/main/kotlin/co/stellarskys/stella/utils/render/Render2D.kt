@@ -145,19 +145,21 @@ object Render2D {
         return mc.font.lineHeight * lineCount
     }
 
-    fun GuiGraphics.drawNVG(block: (snapshot: Matrix3x2f) -> Unit) {
+    fun GuiGraphics.drawNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
         val snapshot = Matrix3x2f(this.pose())
 
         NVGSpecialRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
             val n = NVGRenderer
             val sf = OmniResolution.scaleFactor.toFloat()
 
-            n.resetTransform()
-            n.setTransform(
-                snapshot.m00 * sf, snapshot.m01 * sf,
-                snapshot.m10 * sf, snapshot.m11 * sf,
-                snapshot.m20 * sf, snapshot.m21 * sf
-            )
+            if (scaled) {
+                n.resetTransform()
+                n.setTransform(
+                    snapshot.m00 * sf, snapshot.m01 * sf,
+                    snapshot.m10 * sf, snapshot.m11 * sf,
+                    snapshot.m20 * sf, snapshot.m21 * sf
+                )
+            }
 
             block(snapshot)
         }

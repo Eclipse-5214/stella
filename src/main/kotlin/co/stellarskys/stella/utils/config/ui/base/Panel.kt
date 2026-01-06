@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.config.ui.base
 
 import co.stellarskys.stella.utils.config.ui.Palette
+import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color
 
@@ -10,13 +11,14 @@ class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
     init {
         x = initX
         y = initY
-        width = 100f
         height = 20f
     }
 
     fun update() {
-        height = elements.fold(0f) { acc, e -> acc + e.height }
+        height = getEH() + 20
     }
+
+    fun getEH() = elements.fold(0f) { acc, e -> acc + e.height }
 
     override fun render(
         context: GuiGraphics,
@@ -26,17 +28,23 @@ class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
     ) {
         nvg.push()
         nvg.translate(x, y)
-        nvg.hollowRect(0f, 0f, width, 20f, 2f, Palette.Purple.rgb, 0f)
-        nvg.rect(0f, 0f, width, 20f, Color.BLACK.rgb)
+        nvg.rect(0f, 0f, width, 15f, Color.BLACK.rgb, 5f, true)
 
-        val tw = nvg.textWidth(title, 16f, nvg.montserrat)
+        val tw = nvg.textWidth(title, 10f, nvg.montserrat)
         val tx = width / 2 - tw / 2
 
-        nvg.text(title, tx, 10f, 16f, Color.WHITE.rgb, nvg.montserrat)
+        nvg.text(title, tx, 2.5f, 10f, Color.WHITE.rgb, nvg.montserrat)
 
         elements.forEach {
             it.render(context, mouseX, mouseY, delta)
         }
+
+        val bodyHeight = getEH()
+        nvg.push()
+        nvg.translate(0f, bodyHeight + 15f)
+        nvg.rect(0f, 0f, width, 5f, Color.BLACK.withAlpha(150).rgb, 5f, false)
+        nvg.pop()
+        nvg.hollowRect(0f, 0f, width, bodyHeight + 20f, 1f , Palette.Purple.rgb, 5f)
         nvg.pop()
     }
 }
