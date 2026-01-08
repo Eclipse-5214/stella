@@ -144,6 +144,10 @@ class Config(
             // 1. Map the elements FIRST so fromJson has something to work with
             categories.values.forEach { cat ->
                 cat.subcategories.values.forEach { sub ->
+                    if (sub.configName.isNotBlank()) {
+                        elementMap[sub.configName] = sub
+                        valueCache[sub.configName] = sub.value
+                    }
                     sub.elements.values.forEach { el ->
                         if (el.configName.isNotBlank()) {
                             elementMap[el.configName] = el

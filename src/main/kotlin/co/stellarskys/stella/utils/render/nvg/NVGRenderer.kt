@@ -42,7 +42,7 @@ object NVGRenderer {
     private var drawing: Boolean = false
     private var vg = -1L
 
-    val montserrat = Font("Default", client.resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/font.ttf")).get().open())
+    val inter = Font("Default", client.resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/inter.ttf")).get().open())
 
     init {
         vg = nvgCreate(NVG_ANTIALIAS or NVG_STENCIL_STROKES)
@@ -349,6 +349,9 @@ object NVGRenderer {
         nvgTextBoxBounds(vg, 0f, 0f, w, text, bounds)
         return bounds // [minX, minY, maxX, maxY]
     }
+
+    fun createNVGImage(textureId: Int, textureWidth: Int, textureHeight: Int): Int =
+        nvglCreateImageFromHandle(vg, textureId, textureWidth, textureHeight, NVG_IMAGE_NEAREST or NVG_IMAGE_NODELETE)
 
     fun image(image: Int, textureWidth: Int, textureHeight: Int, subX: Int, subY: Int, subW: Int, subH: Int, x: Float, y: Float, w: Float, h: Float, radius: Float) {
         if (image == -1) return

@@ -11,11 +11,11 @@ class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
     init {
         x = initX
         y = initY
-        height = 20f
+        height = 25f
     }
 
     fun update() {
-        height = getEH() + 20
+        height = getEH() + 25
     }
 
     fun getEH() = elements.fold(0f) { acc, e -> acc + e.height }
@@ -28,12 +28,12 @@ class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
     ) {
         nvg.push()
         nvg.translate(x, y)
-        nvg.rect(0f, 0f, width, 15f, Color.BLACK.rgb, 5f, true)
+        nvg.rect(0f, 0f, width, 20f, Color.BLACK.rgb, 5f, true)
 
-        val tw = nvg.textWidth(title, 10f, nvg.montserrat)
+        val tw = nvg.textWidth(title, 10f, nvg.inter)
         val tx = width / 2 - tw / 2
 
-        nvg.text(title, tx, 2.5f, 10f, Color.WHITE.rgb, nvg.montserrat)
+        nvg.text(title, tx, 5f, 10f, Color.WHITE.rgb, nvg.inter)
 
         elements.forEach {
             it.render(context, mouseX, mouseY, delta)
@@ -41,10 +41,10 @@ class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
 
         val bodyHeight = getEH()
         nvg.push()
-        nvg.translate(0f, bodyHeight + 15f)
-        nvg.rect(0f, 0f, width, 5f, Color.BLACK.withAlpha(150).rgb, 5f, false)
+        nvg.translate(0f, bodyHeight + 20f)
+        nvg.rect(0f, 0f, width, 5f, Color.BLACK.rgb, 5f, false)
         nvg.pop()
-        nvg.hollowRect(0f, 0f, width, bodyHeight + 20f, 1f , Palette.Purple.rgb, 5f)
+        nvg.hollowRect(0f, 0f, width, bodyHeight + 25, 1f, Palette.Purple.rgb, 5f)
         nvg.pop()
     }
 }

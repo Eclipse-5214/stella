@@ -17,6 +17,7 @@ import java.util.Optional
 import java.util.UUID
 import tech.thatgravyboat.skyblockapi.platform.PlayerSkin
 import tech.thatgravyboat.skyblockapi.platform.texture
+import tech.thatgravyboat.skyblockapi.platform.textureUrl
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 
 object Render2D {
@@ -130,6 +131,8 @@ object Render2D {
             if (skin.texture != defaultSkin.texture) textureCache[uuid] = skin
             skin
         }
+
+        textures.textureUrl
 
         PlayerFaceRenderer.draw(context, textures, x, y, size)
     }

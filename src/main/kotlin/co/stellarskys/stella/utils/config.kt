@@ -80,13 +80,7 @@ val config = Config("Stella", "Stella") {
     }
 
     category("Dungeons") {
-        subcategory("Room Name") {
-            toggle {
-                configName = "showRoomName"
-                name = "Show Room Name"
-                description = "Shows the current map rooms name in a hud"
-            }
-
+        subcategory("Room Name", "showRoomName", "Shows the current map rooms name in a hud") {
             toggle {
                 configName = "roomNameChroma"
                 name = "Chroma Room Name"
@@ -280,18 +274,11 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Score Alerts") {
+        subcategory("Score Alerts", "scoreAlerts", "Enables alerts for dungeon score milestones") {
             toggle {
                 configName = "forcePaul"
                 name = "Force Paul"
                 description = "Forces Paul's EZPZ +10 score"
-                default = false
-            }
-
-            toggle {
-                configName = "scoreAlerts"
-                name = "Enable Score Alerts"
-                description = "Enables alerts for dungeon score milestones"
                 default = false
             }
 
@@ -412,14 +399,7 @@ val config = Config("Stella", "Stella") {
     }
 
     category("StellaNav") {
-        subcategory("General") {
-            toggle {
-                configName = "mapEnabled"
-                name = "Enable map"
-                description = "Enables the dungeon map"
-                default = false
-            }
-
+        subcategory("Map", "mapEnabled", "Enables the dungeon map") {
             toggle {
                 configName = "bossMapEnabled"
                 name = "Enable Boss map"
@@ -705,14 +685,7 @@ val config = Config("Stella", "Stella") {
     }
 
     category("Secrets") {
-        subcategory("Waypoints") {
-            toggle {
-                configName = "secretWaypoints"
-                name = "Show Waypoints"
-                description = "Renders Secret Waypoints"
-                default = false
-            }
-
+        subcategory("Waypoints", "secretWaypoints", "Renders Secret Waypoints") {
             toggle {
                 configName = "secretWaypoints.text"
                 name = "Show Waypoint Text"
@@ -772,14 +745,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Routes") {
-            toggle {
-                configName = "secretRoutes"
-                name = "Show Routes"
-                description = "Enable rendering of route waypoints."
-                default = false
-            }
-
+        subcategory("Routes","secretRoutes", "Enable rendering of route waypoints.") {
             toggle {
                 configName = "secretRoutes.onlyRenderAfterClear"
                 name = "Only Render After Clear"

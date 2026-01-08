@@ -16,7 +16,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     }
 
     fun update() {
-        height = if (open) getEH() + 15f else 15f
+        height = if (open) getEH() + 20f else 20f
     }
 
     fun getEH() = elements.fold(0f) { acc, e -> acc + e.height }
@@ -30,8 +30,8 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
         nvg.push()
         nvg.translate(x, y)
 
-        nvg.rect(0f, 0f, width, 15f, Color.BLACK.withAlpha(150).rgb)
-        nvg.text(subcategory.subName, 3f, 2.5f, 10f, Color.WHITE.rgb, nvg.montserrat)
+        nvg.rect(0f, 0f, width, 20f, Color.BLACK.rgb)
+        nvg.text(subcategory.subName, 3f, 6f, 8f, Color.WHITE.rgb, nvg.inter)
 
         if (open) {
             elements.forEach {

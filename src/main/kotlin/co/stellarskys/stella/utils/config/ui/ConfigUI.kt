@@ -5,19 +5,18 @@ import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.Panel
 import co.stellarskys.stella.utils.config.ui.base.Subcategory
 import co.stellarskys.stella.utils.config.ui.elements.*
-import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
+import co.stellarskys.stella.utils.render.nvg.NVGRenderer
 import co.stellarskys.vexel.components.base.VexelElement
-import co.stellarskys.vexel.components.base.enums.Pos
-import co.stellarskys.vexel.components.base.enums.Size
-import co.stellarskys.vexel.components.core.Rectangle
-import co.stellarskys.vexel.components.core.Text
-import co.stellarskys.vexel.core.VexelScreen
-import co.stellarskys.vexel.core.VexelWindow
+import com.mojang.blaze3d.opengl.GlTexture
+import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.input.OmniMouse
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import dev.deftu.omnicore.api.client.screen.OmniScreen
+import tech.thatgravyboat.skyblockapi.platform.texture
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -27,11 +26,15 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private val elementContainers = mutableMapOf<String, VexelElement<*>>()
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private var needsVisibilityUpdate = false
+    private val imageCacheMap = HashMap<String, Int>()
+    private val nvg get() = NVGRenderer
+    private val rez get() = OmniResolution
+    private val mouse = OmniMouse
 
     init {
         var sx = 10f
         categories.forEach { title, category ->
-            val panel = buildCategory(sx, 10f, category, title, config)
+            val panel = buildCategory(sx, 50f, category, title, config)
             sx += panel.width + 10f
         }
     }
@@ -43,14 +46,14 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
         val context = ctx.graphics ?: return
         context.drawNVG {
+            drawHeader()
             panels.forEach {
                 it.render(context, mouseX.toFloat(), mouseY.toFloat(), tickDelta)
             }
         }
 
         /*
-        val player = player ?: return
-        val uuid = player.gameProfile.id
+
         val size = (48 / OmniResolution.scaleFactor).toInt()
         val x = (head.raw.left / OmniResolution.scaleFactor).toInt()
         val y = (head.raw.top/ OmniResolution.scaleFactor).toInt()
@@ -63,7 +66,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private fun buildCategory(x: Float, y: Float, category: ConfigCategory, title: String, config: Config): Panel {
         val panel = Panel(x, y, title)
 
-        var sy = 15f
+        var sy = 20f
         category.subcategories.forEach { (key, subcategory) ->
             val sub = buildSubcategory(0f, sy, panel, subcategory, config)
             sy += sub.height
@@ -129,5 +132,28 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         if (visible) container.show() else container.hide()
 
         container.cache.positionCacheValid = false
+    }
+
+    fun drawHeader() {
+        val swx = rez.scaledWidth / 2
+        nvg.push()
+        nvg.translate(swx - 50f, 10f)
+        nvg.rect(0f, 0f, 100f, 30f, Color.BLACK.rgb, 15f)
+        drawPlayer(10f, 2.5f, 25f, 25f,  3f)
+        nvg.text(player?.name?.stripped ?: "",40f, 5f, 10f, Color.WHITE.rgb, nvg.inter)
+        nvg.text("Stella User",40f, 17f, 8f, Color.GRAY.rgb, nvg.inter)
+        nvg.hollowRect(0f, 0f, 100f, 30f, 1f, Palette.Purple.rgb, 15f)
+        nvg.pop()
+    }
+
+    fun drawPlayer(x: Float, y: Float, width: Float, height: Float, radius: Float) {
+        val skin = player?.skin?.texture ?: return
+        imageCacheMap.getOrPut(skin.path) {
+            val texture = client.textureManager.getTexture(skin)?.texture as? GlTexture
+            nvg.createNVGImage(texture?.glId() ?: 0, 64, 64)
+        }.let { id ->
+            nvg.image(id, 64, 64, 8, 8, 8, 8, x, y, width, height, radius)
+            nvg.image(id, 64, 64, 40, 8, 8, 8, x, y, width, height, radius)
+        }
     }
 }
