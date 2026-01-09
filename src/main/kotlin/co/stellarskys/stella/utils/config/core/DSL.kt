@@ -15,7 +15,7 @@ import java.awt.Color
 open class ConfigCategory(val name: String, val config: Config) {
     val subcategories = mutableMapOf<String, ConfigSubcategory>()
 
-    fun subcategory(name: String, configName: String = "", description: String = "" , builder: ConfigSubcategory.() -> Unit) {
+    fun subcategory(name: String, configName: String = "", description: String = "" , builder: ConfigSubcategory.() -> Unit = {}) {
         subcategories[name] = ConfigSubcategory(name, config, configName, description).apply(builder)
     }
 }

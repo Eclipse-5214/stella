@@ -13,7 +13,7 @@ abstract class BaseElement {
     var x = 0f
     var y = 0f
     var width = 120f
-    var height = 20f
+    var height = 30f
 
     var isAnimating = false
 

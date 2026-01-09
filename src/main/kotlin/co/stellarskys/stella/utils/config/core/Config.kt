@@ -63,6 +63,14 @@ class Config(
 
             category.subcategories.values.forEach { subcategory ->
                 val elementJson = JsonObject()
+                val id = subcategory.configName
+                val value = subcategory.value
+
+                if (id.isNotBlank() && value != null) {
+                    (value as? Boolean)?.let {
+                        elementJson.add(id, JsonPrimitive(value))
+                    }
+                }
 
                 subcategory.elements.values.forEach { element ->
                     val id = element.configName

@@ -64,10 +64,10 @@ object bars : Feature("bars", true) {
     val mpBarWidth get() = ratioWidth(StatsAPI.mana, StatsAPI.maxMana)
     val ofBarWidth get() = ratioWidth(StatsAPI.overflowMana, StatsAPI.maxMana)
 
-    private var smoothHp by Utils.lerped<Float>(0.15)
-    private var smoothAbs by Utils.lerped<Float>(0.15)
-    private var smoothMp by Utils.lerped<Float>(0.15)
-    private var smoothOf by Utils.lerped<Float>(0.15)
+    private var smoothHp by Utils.lerped<Float>(0.25)
+    private var smoothAbs by Utils.lerped<Float>(0.25)
+    private var smoothMp by Utils.lerped<Float>(0.25)
+    private var smoothOf by Utils.lerped<Float>(0.25)
 
     override fun initialize() {
         HUDManager.registerCustom(HPHudName, 90, 15, this::hpHudPreview, "bars.healthBar")

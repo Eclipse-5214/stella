@@ -42,7 +42,7 @@ object NVGRenderer {
     private var drawing: Boolean = false
     private var vg = -1L
 
-    val inter = Font("Default", client.resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/inter.ttf")).get().open())
+    val inter = Font("Default", client.resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/montserrat.ttf")).get().open())
 
     init {
         vg = nvgCreate(NVG_ANTIALIAS or NVG_STENCIL_STROKES)

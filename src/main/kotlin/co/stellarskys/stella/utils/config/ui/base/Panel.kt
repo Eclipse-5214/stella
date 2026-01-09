@@ -28,12 +28,12 @@ class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
     ) {
         nvg.push()
         nvg.translate(x, y)
-        nvg.rect(0f, 0f, width, 20f, Color.BLACK.rgb, 5f, true)
+        nvg.rect(0f, 0f, width, 20f, Palette.Crust.rgb, 5f, true)
 
         val tw = nvg.textWidth(title, 10f, nvg.inter)
         val tx = width / 2 - tw / 2
 
-        nvg.text(title, tx, 5f, 10f, Color.WHITE.rgb, nvg.inter)
+        nvg.text(title, tx, 5f, 10f, Palette.Text.rgb, nvg.inter)
 
         elements.forEach {
             it.render(context, mouseX, mouseY, delta)
@@ -42,7 +42,7 @@ class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
         val bodyHeight = getEH()
         nvg.push()
         nvg.translate(0f, bodyHeight + 20f)
-        nvg.rect(0f, 0f, width, 5f, Color.BLACK.rgb, 5f, false)
+        nvg.rect(0f, 0f, width, 5f, Palette.Crust.rgb, 5f, false)
         nvg.pop()
         nvg.hollowRect(0f, 0f, width, bodyHeight + 25, 1f, Palette.Purple.rgb, 5f)
         nvg.pop()

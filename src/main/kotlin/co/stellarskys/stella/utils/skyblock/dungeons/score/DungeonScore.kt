@@ -99,7 +99,7 @@ object DungeonScore {
 
     /** Computes final score and all derived metrics */
     private fun calculateScore() = with(data) {
-        if (Dungeon.floor == null) return
+        if (Dungeon.floor == null) return@with
 
         val missingPuzzles = puzzleCount - puzzlesDone
 

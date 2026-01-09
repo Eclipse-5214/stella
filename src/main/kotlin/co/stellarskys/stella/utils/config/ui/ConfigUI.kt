@@ -105,6 +105,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
              */
         }
 
+        sub.update()
         panel.elements.add(sub)
         return sub
     }
@@ -138,10 +139,10 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         val swx = rez.scaledWidth / 2
         nvg.push()
         nvg.translate(swx - 50f, 10f)
-        nvg.rect(0f, 0f, 100f, 30f, Color.BLACK.rgb, 15f)
+        nvg.rect(0f, 0f, 100f, 30f, Palette.Crust.rgb, 15f)
         drawPlayer(10f, 2.5f, 25f, 25f,  3f)
-        nvg.text(player?.name?.stripped ?: "",40f, 5f, 10f, Color.WHITE.rgb, nvg.inter)
-        nvg.text("Stella User",40f, 17f, 8f, Color.GRAY.rgb, nvg.inter)
+        nvg.text(player?.name?.stripped ?: "",40f, 5f, 10f, Palette.Text.rgb, nvg.inter)
+        nvg.text("Stella User",40f, 17f, 8f, Palette.Subtext1.rgb, nvg.inter)
         nvg.hollowRect(0f, 0f, 100f, 30f, 1f, Palette.Purple.rgb, 15f)
         nvg.pop()
     }

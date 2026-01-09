@@ -148,14 +148,35 @@ object Utils {
         private val current = DoubleArray(4)
         private val target  = DoubleArray(4)
         private var init = false
+        private var lastFrame = -1f
+
+
+        operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+            val frameTime = client.deltaTracker.getGameTimeDeltaPartialTick(true)
+
+            if (lastFrame != -1f && frameTime != lastFrame) {
+                val diff = (frameTime - lastFrame).toDouble()
+                val frameCoeff = (coeff * diff).coerceIn(0.0, 1.0)
+
+                val channels = if (isColor) 4 else 1
+                for (i in 0 until channels) {
+                    current[i] += (target[i] - current[i]) * frameCoeff
+                }
+            }
+            lastFrame = frameTime
+
+            return createValue(property)
+        }
 
         @Suppress("UNCHECKED_CAST")
-        operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-            val channels = if (isColor) 4 else 1
-            for (i in 0 until channels) current[i] += (target[i] - current[i]) * coeff
-
+        private fun createValue(property: KProperty<*>): T {
             return if (isColor) {
-                Color(current[0].toInt().coerceIn(0, 255), current[1].toInt().coerceIn(0, 255), current[2].toInt().coerceIn(0, 255), current[3].toInt().coerceIn(0, 255)) as T
+                Color(
+                    current[0].toInt().coerceIn(0, 255),
+                    current[1].toInt().coerceIn(0, 255),
+                    current[2].toInt().coerceIn(0, 255),
+                    current[3].toInt().coerceIn(0, 255)
+                ) as T
             } else {
                 when (property.returnType.classifier) {
                     Float::class -> current[0].toFloat() as T
@@ -179,6 +200,7 @@ object Utils {
             if (!init) { snap(); init = true }
         }
 
+        fun done() = current[0] == target[0] && current[1] == target[1] && current[2] == target[2] && current[3] == target[3]
         fun snap() { for (i in 0 until 4) current[i] = target[i] }
     }
 }

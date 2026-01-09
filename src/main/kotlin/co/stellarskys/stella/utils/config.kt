@@ -930,13 +930,7 @@ val config = Config("Stella", "Stella") {
     }
 
     category("Msc.") {
-        subcategory("Block Overlay") {
-            toggle {
-                configName = "overlayEnabled"
-                name = "Render Block Overlay"
-                description = "Highlights the block you are looking at"
-            }
-
+        subcategory("Block Overlay", "overlayEnabled", "Highlights the block you are looking at" ) {
             colorpicker {
                 configName = "blockHighlightColor"
                 name = "Block Highlight Color"
@@ -972,13 +966,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Inventory Buttons") {
-            toggle {
-                configName = "buttonsEnabled"
-                name = "Enabled"
-                description = "Enables the inventory buttons"
-            }
-
+        subcategory("Inventory Buttons", "buttonsEnabled", "Enables the inventory buttons") {
             button {
                 configName = "buttonEdit"
                 name = "Inventory Button Editor"
@@ -991,21 +979,9 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Pet Display") {
-            toggle {
-                configName = "petDisplay"
-                name = "Enabled"
-                description = "Enables the pet display"
-            }
-        }
+        subcategory("Pet Display", "petDisplay", "Enables the pet display")
 
-        subcategory("Health & Mana") {
-            toggle {
-                configName = "bars"
-                name = "Enabled"
-                description = "Enables the health & mana bars"
-            }
-
+        subcategory("Health & Mana",  "bars", "Enables the health & mana bars") {
             toggle {
                 configName = "bars.hideVanillaHealth"
                 name = "Hide Vanilla Health"
@@ -1127,13 +1103,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Soulflow Display") {
-            toggle {
-                configName = "soulflowDisplay"
-                name = "Enabled"
-                description = "Enables the soulflow display"
-            }
-        }
+        subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
 
         /*
         subcategory("Custom Nametags") {
