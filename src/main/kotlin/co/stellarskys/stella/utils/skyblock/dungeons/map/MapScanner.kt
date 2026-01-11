@@ -229,7 +229,6 @@ object MapScanner {
             }
 
             if (dplayer.inRender) continue
-            Stella.LOGGER.info("Updating player ${dplayer.name} to (${mapDecoration.mapX},${mapDecoration.mapZ}), yaw ${mapDecoration.yaw}")
 
             val iconX = Utils.mapRange(mapDecoration.mapX.toDouble() - MapUtils.mapCorners.first.toDouble(), 0.0, MapUtils.mapRoomSize.toDouble() * 6 + 20.0, 0.0, ScanUtils.defaultMapSize.first.toDouble())
             val iconZ = Utils.mapRange(mapDecoration.mapZ.toDouble() - MapUtils.mapCorners.second.toDouble(), 0.0, MapUtils.mapRoomSize.toDouble() * 6 + 20.0, 0.0, ScanUtils.defaultMapSize.second.toDouble())
