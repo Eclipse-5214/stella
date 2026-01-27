@@ -13,15 +13,18 @@ abstract class BaseElement {
     var x = 0f
     var y = 0f
     var width = 120f
-    var height = 30f
+    var height = 25f
+    var visible = true
+    var parent: BaseElement? = null
 
-    var isAnimating = false
+    open var isAnimating = false
 
-    open val absoluteX get() = x
-    open val absoluteY get() = y
+    val absoluteX: Float get() = (parent?.absoluteX ?: 0f) + x
+    val absoluteY: Float get() = (parent?.absoluteY ?: 0f) + y
 
-    fun isAreaHovered(mouseX: Float, mouseY: Float): Boolean =
-        mouseX >= absoluteX && mouseX <= absoluteX + width && mouseY >= absoluteY && mouseY <= absoluteY + height
+    fun isAreaHovered(rx: Float, ry: Float, rw: Float, rh: Float, mx: Float = mouse.scaledX.toFloat(), my: Float = mouse.scaledY.toFloat()) =
+        mx in (absoluteX + rx)..(absoluteX + rx + rw) && my in (absoluteY + ry)..(absoluteY + ry + rh)
+
 
     // Rendering
     abstract fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float)

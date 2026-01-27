@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.render.nvg
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.utils.Utils.toHex
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.alpha
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.red
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.green
@@ -448,11 +449,13 @@ object NVGRenderer {
     }
 
     private fun loadSVG(image: Image, svgWidth: Int, svgHeight: Int, color: Color): Int {
-        val vec = image.stream.use { it.bufferedReader().readText() }
+        var vec = image.stream.use { it.bufferedReader().readText() }
+        val hexColor = color.toHex()
+        vec = vec.replace("currentColor", hexColor)
         val svg = nsvgParse(vec, "px", 96f) ?: throw IllegalStateException("Failed to parse ${image.identifier}")
-
         val width = svg.width().toInt()
         val height = svg.height().toInt()
+
         val buffer = memAlloc(width * height * 4)
 
         try {

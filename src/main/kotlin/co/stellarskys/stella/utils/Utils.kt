@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.events.EventBus
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.player
 import net.minecraft.core.BlockPos
@@ -148,35 +149,19 @@ object Utils {
         private val current = DoubleArray(4)
         private val target  = DoubleArray(4)
         private var init = false
-        private var lastFrame = -1f
-
-
-        operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-            val frameTime = client.deltaTracker.getGameTimeDeltaPartialTick(true)
-
-            if (lastFrame != -1f && frameTime != lastFrame) {
-                val diff = (frameTime - lastFrame).toDouble()
-                val frameCoeff = (coeff * diff).coerceIn(0.0, 1.0)
-
-                val channels = if (isColor) 4 else 1
-                for (i in 0 until channels) {
-                    current[i] += (target[i] - current[i]) * frameCoeff
-                }
-            }
-            lastFrame = frameTime
-
-            return createValue(property)
-        }
+        private var currentFrame = 0L
 
         @Suppress("UNCHECKED_CAST")
-        private fun createValue(property: KProperty<*>): T {
+        operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+            val frame = EventBus.currentFrame
+            if (currentFrame != frame) {
+                val channels = if (isColor) 4 else 1
+                for (i in 0 until channels) current[i] += (target[i] - current[i]) * coeff
+                currentFrame = frame
+            }
+
             return if (isColor) {
-                Color(
-                    current[0].toInt().coerceIn(0, 255),
-                    current[1].toInt().coerceIn(0, 255),
-                    current[2].toInt().coerceIn(0, 255),
-                    current[3].toInt().coerceIn(0, 255)
-                ) as T
+                Color(current[0].toInt().coerceIn(0, 255), current[1].toInt().coerceIn(0, 255), current[2].toInt().coerceIn(0, 255), current[3].toInt().coerceIn(0, 255)) as T
             } else {
                 when (property.returnType.classifier) {
                     Float::class -> current[0].toFloat() as T

@@ -2,15 +2,19 @@ package co.stellarskys.stella.utils.config.ui
 
 import co.stellarskys.stella.utils.config.core.*
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
+import co.stellarskys.stella.utils.config.ui.base.BaseElement
 import co.stellarskys.stella.utils.config.ui.base.Panel
 import co.stellarskys.stella.utils.config.ui.base.Subcategory
 import co.stellarskys.stella.utils.config.ui.elements.*
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
+import co.stellarskys.stella.utils.render.nvg.Gradient
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
 import co.stellarskys.vexel.components.base.VexelElement
 import com.mojang.blaze3d.opengl.GlTexture
 import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.input.KeyboardModifiers
 import dev.deftu.omnicore.api.client.input.OmniMouse
+import dev.deftu.omnicore.api.client.input.OmniMouseButton
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.render.OmniResolution
@@ -23,7 +27,7 @@ import kotlin.collections.component2
 
 internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config): OmniScreen(dev.deftu.textile.Text.literal("Config")) {
     private val panels =  mutableListOf<Panel>()
-    private val elementContainers = mutableMapOf<String, VexelElement<*>>()
+    private val elementContainers = mutableMapOf<String, BaseElement>()
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private var needsVisibilityUpdate = false
     private val imageCacheMap = HashMap<String, Int>()
@@ -80,10 +84,10 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private fun buildSubcategory(x: Float, y: Float, panel: Panel, subcategory: ConfigSubcategory, config: Config): Subcategory {
         val sub = Subcategory(x, y, subcategory)
 
+        var ey = Subcategory.HEIGHT
         subcategory.elements.entries.forEachIndexed { index, (key, element) ->
-            /*
             val component = when (element) {
-                //is Button -> ButtonUIBuilder().build(box, element, window)
+                is Button -> ButtonUIBuilder().build(0f, ey,element)
                 //is ColorPicker -> ColorPickerUIBuilder().build(box, element, window)
                 //is Dropdown -> DropdownUIBuilder().build(box, element, window)
                 //is Keybind -> KeybindUIBuilder().build(box, element, window)
@@ -92,19 +96,24 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
                 //is TextInput -> TextInputUIBuilder().build(box, element, window)
                 //is TextParagraph -> TextParagraphUIBuilder().build(box, element)
                 //is Toggle -> ToggleUIBuilder().build(box, element, window)
-                //else -> null
+                else -> null
             }
 
             if (component == null) return@forEachIndexed
+
+            component.parent = sub
+            sub.elements.add(component)
 
             elementContainers[element.configName] = component
             elementRefs[element.configName] = element
 
             needsVisibilityUpdate = true
             scheduleVisibilityUpdate(config)
-             */
+
+            ey += component.height
         }
 
+        sub.parent = panel
         sub.update()
         panel.elements.add(sub)
         return sub
@@ -129,10 +138,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         val container = elementContainers[configKey] ?: return
         val element = elementRefs[configKey] ?: return
         val visible = element.isVisible(config)
-
-        if (visible) container.show() else container.hide()
-
-        container.cache.positionCacheValid = false
+        container.visible = visible
     }
 
     fun drawHeader() {
@@ -143,7 +149,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         drawPlayer(10f, 2.5f, 25f, 25f,  3f)
         nvg.text(player?.name?.stripped ?: "",40f, 5f, 10f, Palette.Text.rgb, nvg.inter)
         nvg.text("Stella User",40f, 17f, 8f, Palette.Subtext1.rgb, nvg.inter)
-        nvg.hollowRect(0f, 0f, 100f, 30f, 1f, Palette.Purple.rgb, 15f)
+        nvg.hollowGradientRect(0f, 0f, 100f, 30f, 1f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 15f)
         nvg.pop()
     }
 
@@ -156,5 +162,10 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             nvg.image(id, 64, 64, 8, 8, 8, 8, x, y, width, height, radius)
             nvg.image(id, 64, 64, 40, 8, 8, 8, x, y, width, height, radius)
         }
+    }
+
+    override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
+        for (panel in panels) panel.mouseClicked(x.toFloat(), y.toFloat(), button.code)
+        return super.onMouseClick(button, x, y, modifiers)
     }
 }

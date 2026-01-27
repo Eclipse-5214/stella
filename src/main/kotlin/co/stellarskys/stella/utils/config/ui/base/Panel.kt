@@ -2,23 +2,16 @@ package co.stellarskys.stella.utils.config.ui.base
 
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
+import co.stellarskys.stella.utils.render.nvg.Gradient
 import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color
 
-class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
-    val elements = mutableListOf<BaseElement>()
-
+class Panel(initX: Float, initY: Float, val title: String = ""): ParentElement() {
     init {
         x = initX
         y = initY
         height = 25f
     }
-
-    fun update() {
-        height = getEH() + 25
-    }
-
-    fun getEH() = elements.fold(0f) { acc, e -> acc + e.height }
 
     override fun render(
         context: GuiGraphics,
@@ -26,6 +19,8 @@ class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
         mouseY: Float,
         delta: Float
     ) {
+        if (isAnimating) update()
+
         nvg.push()
         nvg.translate(x, y)
         nvg.rect(0f, 0f, width, 20f, Palette.Crust.rgb, 5f, true)
@@ -44,7 +39,12 @@ class Panel(initX: Float, initY: Float, val title: String = ""): BaseElement() {
         nvg.translate(0f, bodyHeight + 20f)
         nvg.rect(0f, 0f, width, 5f, Palette.Crust.rgb, 5f, false)
         nvg.pop()
-        nvg.hollowRect(0f, 0f, width, bodyHeight + 25, 1f, Palette.Purple.rgb, 5f)
+        nvg.hollowGradientRect(0f, 0f, width, bodyHeight + 25, 1f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 5f)
         nvg.pop()
+    }
+
+    override fun update() {
+        height = getEH() + 25f
+        updateElements(20f)
     }
 }
