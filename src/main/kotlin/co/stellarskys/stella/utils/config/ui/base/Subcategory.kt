@@ -12,10 +12,10 @@ import java.util.UUID
 class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory): ParentElement() {
     var open = false
     val value get() = subcategory.value as Boolean
-    var buttonColor by Utils.lerped<Color>(0.15)
-    var textColor by Utils.lerped<Color>(0.15)
-    var dropdownRot by Utils.lerped<Double>(0.15)
-    val offsetDeleagte = Utils.lerped<Float>(0.15)
+    var buttonColor by Utils.animate<Color>(0.15)
+    var textColor by Utils.animate<Color>(0.15)
+    var dropdownRot by Utils.animate<Double>(0.15)
+    val offsetDeleagte = Utils.animate<Float>(0.15, error = 0.1)
     var elementOffset by offsetDeleagte
     private var dropdownPath = "/assets/stella/logos/dropdown.svg"
     private var image = nvg.createImage(dropdownPath,  10, 10, textColor, UUID.randomUUID().toString())
@@ -30,7 +30,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     }
 
     override fun update() {
-        height = if (open) getEH() + HEIGHT else HEIGHT
+        height = if (open || isAnimating) HEIGHT + elementOffset + getEH() else HEIGHT
     }
 
     override fun render(
@@ -39,7 +39,14 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
         mouseY: Float,
         delta: Float
     ) {
-        if (isAnimating) update()
+        if (isAnimating) {
+            update()
+            updateElements(elementOffset + HEIGHT)
+            println("Target: ${offsetDeleagte.getTarget(this::elementOffset)} Current: $elementOffset")
+            if (offsetDeleagte.done()) {
+                isAnimating = false
+            }
+        }
 
         nvg.push()
         nvg.translate(x, y)
@@ -55,9 +62,8 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
             nvg.pop()
         }
 
-        if (open && offsetDeleagte.done()) {
-            nvg.pushScissor(0f, 0f, width, getEH() + elementOffset + HEIGHT)
-            updateElements(elementOffset + HEIGHT)
+        if (open || isAnimating) {
+            nvg.pushScissor(0f, 0f + HEIGHT, width, getEH() + elementOffset)
             elements.forEach {
                 it.render(context, mouseX, mouseY, delta)
             }
@@ -89,9 +95,21 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
                     textColor = Palette.Text
                 }
             } else {
-                open = !open
-                dropdownRot = if (open) 0.0 else -90.0
-                elementOffset = if (open) 0f else -getEH()
+                if(open) {
+                    open = false
+                    dropdownRot = -90.0
+                    elementOffset = 0f
+                    offsetDeleagte.snap()
+                    elementOffset = -getEH()
+                } else {
+                    open = true
+                    dropdownRot = 0.0
+                    elementOffset = -getEH()
+                    offsetDeleagte.snap()
+                    elementOffset = 0f
+
+                }
+
                 isAnimating = true
             }
         }

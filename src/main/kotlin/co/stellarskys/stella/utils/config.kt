@@ -969,7 +969,7 @@ val config = Config("Stella", "Stella") {
         subcategory("Inventory Buttons", "buttonsEnabled", "Enables the inventory buttons") {
             button {
                 configName = "buttonEdit"
-                name = "Inventory Button Editor"
+                name = "Button Editor"
                 description = "Opens the inventory button editor"
                 placeholder = "Open"
 

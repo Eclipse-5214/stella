@@ -1,5 +1,7 @@
 package co.stellarskys.stella.utils.config.ui
 
+import co.stellarskys.stella.utils.Utils
+import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.*
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
@@ -31,16 +33,23 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private var needsVisibilityUpdate = false
     private val imageCacheMap = HashMap<String, Int>()
+    private val revealDelegate = Utils.animate<Float>(0.15, AnimType.EASE_OUT)
+    private var reveal by revealDelegate
+    private var opening = true
     private val nvg get() = NVGRenderer
     private val rez get() = OmniResolution
     private val mouse = OmniMouse
 
     init {
         var sx = 10f
-        categories.forEach { title, category ->
+        categories.forEach { (title, category) ->
             val panel = buildCategory(sx, 50f, category, title, config)
             sx += panel.width + 10f
         }
+
+        reveal = 0f
+        revealDelegate.snap()
+        reveal = rez.scaledWidth.toFloat()
     }
 
     override val isPausingScreen: Boolean = false
@@ -50,10 +59,14 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
         val context = ctx.graphics ?: return
         context.drawNVG {
+            applyOpeningScissor()
+
             drawHeader()
             panels.forEach {
                 it.render(context, mouseX.toFloat(), mouseY.toFloat(), tickDelta)
             }
+
+            nvg.popScissor()
         }
 
         /*
@@ -87,7 +100,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         var ey = Subcategory.HEIGHT
         subcategory.elements.entries.forEachIndexed { index, (key, element) ->
             val component = when (element) {
-                is Button -> ButtonUIBuilder().build(0f, ey,element)
+                is Button -> ButtonUI(0f, ey,element)
                 //is ColorPicker -> ColorPickerUIBuilder().build(box, element, window)
                 //is Dropdown -> DropdownUIBuilder().build(box, element, window)
                 //is Keybind -> KeybindUIBuilder().build(box, element, window)
@@ -163,6 +176,25 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             nvg.image(id, 64, 64, 40, 8, 8, 8, x, y, width, height, radius)
         }
     }
+
+    private fun applyOpeningScissor() {
+        if (opening && revealDelegate.done()) {
+            opening = false
+        }
+
+        val sw = rez.scaledWidth.toFloat()
+        val sh = rez.scaledHeight.toFloat()
+
+        val halfW = reveal / 2f
+        val cx = sw / 2f
+
+        val x = cx - halfW
+        val width = reveal
+
+        // Full height, only X is animated
+        nvg.pushScissor(x, 0f, width, sh)
+    }
+
 
     override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
         for (panel in panels) panel.mouseClicked(x.toFloat(), y.toFloat(), button.code)
