@@ -108,7 +108,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
                 //is StepSlider -> StepSliderUIBuilder().build(box, element, window)
                 //is TextInput -> TextInputUIBuilder().build(box, element, window)
                 //is TextParagraph -> TextParagraphUIBuilder().build(box, element)
-                //is Toggle -> ToggleUIBuilder().build(box, element, window)
+                is Toggle -> ToggleUI(0f, ey, element)
                 else -> null
             }
 
