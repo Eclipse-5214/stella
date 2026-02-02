@@ -6,6 +6,7 @@ import co.stellarskys.stella.utils.config.core.*
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
 import co.stellarskys.stella.utils.config.ui.base.Panel
+import co.stellarskys.stella.utils.config.ui.base.ParentElement
 import co.stellarskys.stella.utils.config.ui.base.Subcategory
 import co.stellarskys.stella.utils.config.ui.elements.*
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
@@ -68,16 +69,6 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
             nvg.popScissor()
         }
-
-        /*
-
-        val size = (48 / OmniResolution.scaleFactor).toInt()
-        val x = (head.raw.left / OmniResolution.scaleFactor).toInt()
-        val y = (head.raw.top/ OmniResolution.scaleFactor).toInt()
-
-
-        Render2D.drawPlayerHead(context, x, y, size, uuid)
-         */
     }
 
     private fun buildCategory(x: Float, y: Float, category: ConfigCategory, title: String, config: Config): Panel {
@@ -142,6 +133,11 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
         elementContainers.keys.forEach { key ->
             updateElementVisibility(key, config)
+        }
+
+        for (panel in panels) {
+            panel.update()
+            for(element in panel.elements) (element as? ParentElement)?.update()
         }
 
         needsVisibilityUpdate = false

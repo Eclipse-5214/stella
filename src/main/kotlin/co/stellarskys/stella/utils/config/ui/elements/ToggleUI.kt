@@ -48,9 +48,7 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
         if (!isAreaHovered(width - 40f, 4f, 32f, HEIGHT - 8)) return false
         toggle.value = !value
 
-        // animate track color
         trackColor = if (value) Palette.Purple else Palette.Crust
-        // animate thumb position
         thumbColor = if (value) Color.WHITE else Palette.Purple.withAlpha(100)
         thumbX = if (value)  17f else 2f
         return true

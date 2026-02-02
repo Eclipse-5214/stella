@@ -3,7 +3,6 @@ package co.stellarskys.stella.utils.config.ui.base
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config.core.ConfigSubcategory
 import co.stellarskys.stella.utils.config.ui.Palette
-import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.render.nvg.Image
 import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color
@@ -41,6 +40,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     ) {
         if (isAnimating) {
             update()
+            reload()
             updateElements(elementOffset + HEIGHT)
             println("Target: ${offsetDeleagte.getTarget(this::elementOffset)} Current: $elementOffset")
             if (offsetDeleagte.done()) {
@@ -54,7 +54,8 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.rgb)
         nvg.rect(2f, 2f, width - 4f, HEIGHT - 4, buttonColor.rgb, 5f)
         nvg.text(subcategory.subName, 6f, 8.5f, 8f, textColor.rgb, nvg.inter)
-        if (!elements.isEmpty()) {
+
+        if (!visibleElements.isEmpty()) {
             nvg.push()
             nvg.translate(width - 10f, 12.5f)
             nvg.rotate(Math.toRadians(dropdownRot).toFloat())
