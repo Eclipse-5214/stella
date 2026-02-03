@@ -14,10 +14,12 @@ abstract class BaseElement {
     var y = 0f
     var width = 120f
     var height = 25f
-    var visible = true
     var parent: BaseElement? = null
 
     open var isAnimating = false
+
+    var visible = true
+        get() = isAnimating || field
 
     val absoluteX: Float get() = (parent?.absoluteX ?: 0f) + x
     val absoluteY: Float get() = (parent?.absoluteY ?: 0f) + y

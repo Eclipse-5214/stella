@@ -18,7 +18,7 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
     init {
         trackColor = if (value) Palette.Purple else Palette.Crust
         thumbColor = if (value) Color.WHITE else Palette.Purple.withAlpha(100)
-        thumbX = if (value) 17f else 2f
+        thumbX = if (value) 11f else 1f
         x = initX
         y = initY
     }
@@ -36,21 +36,21 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
 
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
         nvg.text(toggle.name, 6f, 8.5f, 8f, Palette.Text.rgb, nvg.inter)
-        nvg.translate(width - 40f, 4f,)
-        nvg.rect(0f, 0f, 32f, HEIGHT - 8, trackColor.rgb, (HEIGHT - 8) / 2)
-        nvg.rect(thumbX, 2f, 13f, 13f, thumbColor.rgb, 6.5f)
+        nvg.translate(width - 30f, 7f,)
+        nvg.rect(0f, 0f, 21f, HEIGHT - 14, trackColor.rgb, (HEIGHT - 14) / 2)
+        nvg.rect(thumbX, 1f, 9f, 9f, thumbColor.rgb, 4.5f)
 
         nvg.pop()
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (parent?.isAnimating == true) return false
-        if (!isAreaHovered(width - 40f, 4f, 32f, HEIGHT - 8)) return false
+        if (!isAreaHovered(width - 30f, 7f, 21f, HEIGHT - 14)) return false
         toggle.value = !value
 
         trackColor = if (value) Palette.Purple else Palette.Crust
         thumbColor = if (value) Color.WHITE else Palette.Purple.withAlpha(100)
-        thumbX = if (value)  17f else 2f
+        thumbX = if (value)  11f else 1f
         return true
     }
 

@@ -13,7 +13,7 @@ import co.stellarskys.vexel.components.core.Text
 import co.stellarskys.vexel.core.VexelWindow
 import java.awt.Color
 
-class DropdownUIBuilder {
+class DropdownUI {
     fun build(root: VexelElement<*>, dropdown: Dropdown, window: VexelWindow): VexelElement<*> {
         val container = Rectangle(Color(0, 0, 0, 0).rgb)
             .setSizing(100f, Size.Percent, 40f, Size.Pixels)
