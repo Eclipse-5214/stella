@@ -11,9 +11,12 @@ import java.awt.Color
 
 class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
     private val delegate = Utils.animate<Color>(0.25, AnimType.SPRING)
+    private var offsetAnim = Utils.animate<Float>(0.15)
     private var buttonColor by delegate
+    private var offset by offsetAnim
 
     init {
+        offset = if (visible) 0f else -HEIGHT
         buttonColor = Palette.Base
         x = initX
         y = initY
@@ -25,10 +28,16 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
         mouseY: Float,
         delta: Float
     ) {
-        if (!visible) return
+        if (!visible && !isAnimating) return
+
+        if (isAnimating && offsetAnim.done()) {
+            isAnimating = false
+        }
 
         nvg.push()
         nvg.translate(x, y)
+        nvg.pushScissor(0f,0f, width, HEIGHT - offset)
+        nvg.translate(0f, offset)
 
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
         nvg.text(button.name, 6f, 8.5f, 8f, Palette.Text.rgb, nvg.inter)
@@ -37,7 +46,21 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
 
         val sw = nvg.textWidth(button.placeholder, 8f, nvg.inter)
         nvg.text(button.placeholder, 16f - sw / 2, 4.5f, 8f, Palette.Text.rgb, nvg.inter)
+
+        nvg.popScissor()
         nvg.pop()
+    }
+
+    override fun setVisibility(value: Boolean) {
+        super.setVisibility(value)
+
+        if (value) {
+            offset = 0f
+            isAnimating = true
+        } else {
+            offset = -HEIGHT
+            isAnimating = true
+        }
     }
 
     companion object {
@@ -51,5 +74,4 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
         this.button.onClick?.invoke()
         return true
     }
-
 }

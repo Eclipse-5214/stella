@@ -42,7 +42,6 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
             update()
             reload()
             updateElements(elementOffset + HEIGHT)
-            println("Target: ${offsetDeleagte.getTarget(this::elementOffset)} Current: $elementOffset")
             if (offsetDeleagte.done()) {
                 isAnimating = false
             }

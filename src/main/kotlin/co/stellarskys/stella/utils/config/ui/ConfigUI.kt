@@ -147,7 +147,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         val container = elementContainers[configKey] ?: return
         val element = elementRefs[configKey] ?: return
         val visible = element.isVisible(config)
-        container.visible = visible
+        container.setVisibility(visible)
     }
 
     fun drawHeader() {

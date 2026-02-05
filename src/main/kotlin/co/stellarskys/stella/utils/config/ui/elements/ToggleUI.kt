@@ -10,15 +10,18 @@ import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color
 
 class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
-    var trackColor by Utils.animate<Color>(0.2, AnimType.EASE_OUT)
-    var thumbColor by Utils.animate<Color>(0.2, AnimType.EASE_OUT)
-    var thumbX by Utils.animate<Float>(0.2, AnimType.EASE_OUT)
-    val value get() = toggle.value as Boolean
+    private var offsetAnim = Utils.animate<Float>(0.15)
+    private var trackColor by Utils.animate<Color>(0.2, AnimType.EASE_OUT)
+    private var thumbColor by Utils.animate<Color>(0.2, AnimType.EASE_OUT)
+    private var thumbX by Utils.animate<Float>(0.2, AnimType.EASE_OUT)
+    private var offset by offsetAnim
+    private val value get() = toggle.value as Boolean
 
     init {
         trackColor = if (value) Palette.Purple else Palette.Crust
         thumbColor = if (value) Color.WHITE else Palette.Purple.withAlpha(100)
         thumbX = if (value) 11f else 1f
+        offset = if (visible) 0f else -HEIGHT
         x = initX
         y = initY
     }
@@ -29,10 +32,16 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
         mouseY: Float,
         delta: Float
     ) {
-        if (!visible) return
+        if (!visible && !isAnimating) return
+
+        if (isAnimating && offsetAnim.done()) {
+            isAnimating = false
+        }
 
         nvg.push()
         nvg.translate(x, y)
+        nvg.pushScissor(0f,0f, width, ButtonUI.Companion.HEIGHT - offset)
+        nvg.translate(0f, offset)
 
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
         nvg.text(toggle.name, 6f, 8.5f, 8f, Palette.Text.rgb, nvg.inter)
@@ -40,6 +49,7 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
         nvg.rect(0f, 0f, 21f, HEIGHT - 14, trackColor.rgb, (HEIGHT - 14) / 2)
         nvg.rect(thumbX, 1f, 9f, 9f, thumbColor.rgb, 4.5f)
 
+        nvg.popScissor()
         nvg.pop()
     }
 
