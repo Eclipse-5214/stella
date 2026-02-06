@@ -29,7 +29,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     }
 
     override fun update() {
-        height = if (open || isAnimating) HEIGHT + elementOffset + getEH() else HEIGHT
+        height = if (open || !offsetDeleagte.done()) HEIGHT + elementOffset + getEH() else HEIGHT
     }
 
     override fun render(
@@ -62,7 +62,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
             nvg.pop()
         }
 
-        if (open || isAnimating) {
+        if (open || !offsetDeleagte.done()) {
             nvg.pushScissor(0f, 0f + HEIGHT, width, getEH() + elementOffset)
             elements.forEach {
                 it.render(context, mouseX, mouseY, delta)

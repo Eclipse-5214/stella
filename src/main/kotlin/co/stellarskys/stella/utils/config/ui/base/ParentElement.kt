@@ -2,7 +2,7 @@ package co.stellarskys.stella.utils.config.ui.base
 
 abstract class ParentElement: BaseElement() {
     val elements = mutableListOf<BaseElement>()
-    open val visibleElements get() = elements.filter { it.visible }
+    open val visibleElements get() = elements.filter { it.visible || it.isAnimating }
 
     override var isAnimating: Boolean = false
         get() = super.isAnimating || areElementsAnimating() || field

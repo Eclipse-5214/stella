@@ -28,7 +28,10 @@ abstract class BaseElement {
 
     // Rendering
     abstract fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float)
-    open fun setVisibility(value: Boolean) { visible = value }
+    open fun setVisibility(value: Boolean) {
+        if (visible == value) return
+        visible = value
+    }
 
     // Mouse input
     open fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean = false

@@ -16,7 +16,7 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
     private var offset by offsetAnim
 
     init {
-        offset = if (visible) 0f else -HEIGHT
+        offset = if (visible) 0f else HEIGHT
         buttonColor = Palette.Base
         x = initX
         y = initY
@@ -30,15 +30,14 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
     ) {
         if (!visible && !isAnimating) return
 
-        if (isAnimating && offsetAnim.done()) {
-            isAnimating = false
+        if (isAnimating) {
+            height = HEIGHT - offset
+            if (offsetAnim.done()) isAnimating = false
         }
 
         nvg.push()
         nvg.translate(x, y)
-        nvg.pushScissor(0f,0f, width, HEIGHT - offset)
-        nvg.translate(0f, offset)
-
+        nvg.pushScissor(0f, 0f, width, HEIGHT - offset)
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
         nvg.text(button.name, 6f, 8.5f, 8f, Palette.Text.rgb, nvg.inter)
         nvg.translate(width - 40f, 4f,)
@@ -58,7 +57,7 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
             offset = 0f
             isAnimating = true
         } else {
-            offset = -HEIGHT
+            offset = HEIGHT
             isAnimating = true
         }
     }
@@ -68,7 +67,7 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (parent?.isAnimating == true) return false
+        if (parent?.isAnimating == true || !visible) return false
         if (!isAreaHovered(width - 40f, 4f, 32f, HEIGHT - 8)) return false
         delegate.pulse(Palette.Purple)
         this.button.onClick?.invoke()
