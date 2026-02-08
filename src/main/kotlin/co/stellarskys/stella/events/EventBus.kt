@@ -29,6 +29,7 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
 @Module
 object EventBus : EventBus() {
     private val STELLA_HUDS = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stella_hud")
+    var currentFrame = 0L
 
     init {
         ClientReceiveMessageEvents.ALLOW_GAME.register { message, isActionBar ->
@@ -92,6 +93,7 @@ object EventBus : EventBus() {
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->
             post(GuiEvent.RenderHUD(context))
+            currentFrame ++
         }
     }
 

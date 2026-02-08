@@ -1,7 +1,7 @@
 package co.stellarskys.stella.utils.render
 
-import co.stellarskys.vexel.Vexel
-import co.stellarskys.vexel.api.nvg.NVGSpecialRenderer
+import co.stellarskys.stella.utils.render.nvg.NVGRenderer
+import co.stellarskys.stella.utils.render.nvg.NVGSpecialRenderer
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.ChatFormatting
@@ -17,6 +17,7 @@ import java.util.Optional
 import java.util.UUID
 import tech.thatgravyboat.skyblockapi.platform.PlayerSkin
 import tech.thatgravyboat.skyblockapi.platform.texture
+import tech.thatgravyboat.skyblockapi.platform.textureUrl
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 
 object Render2D {
@@ -131,6 +132,8 @@ object Render2D {
             skin
         }
 
+        textures.textureUrl
+
         PlayerFaceRenderer.draw(context, textures, x, y, size)
     }
 
@@ -145,19 +148,21 @@ object Render2D {
         return mc.font.lineHeight * lineCount
     }
 
-    fun GuiGraphics.drawNVG(block: (snapshot: Matrix3x2f) -> Unit) {
+    fun GuiGraphics.drawNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
         val snapshot = Matrix3x2f(this.pose())
 
         NVGSpecialRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
-            val n = Vexel.renderer
+            val n = NVGRenderer
             val sf = OmniResolution.scaleFactor.toFloat()
 
-            n.resetTransform()
-            n.setTransform(
-                snapshot.m00 * sf, snapshot.m01 * sf,
-                snapshot.m10 * sf, snapshot.m11 * sf,
-                snapshot.m20 * sf, snapshot.m21 * sf
-            )
+            if (scaled) {
+                n.resetTransform()
+                n.setTransform(
+                    snapshot.m00 * sf, snapshot.m01 * sf,
+                    snapshot.m10 * sf, snapshot.m11 * sf,
+                    snapshot.m20 * sf, snapshot.m21 * sf
+                )
+            }
 
             block(snapshot)
         }

@@ -3,45 +3,45 @@ package co.stellarskys.stella.utils.config.ui
 import java.awt.Color
 
 /**
- * Palette – Mutable color palette inspired by Catppuccin.
+ * Palette – Mutable color palette inspired by Catppuccin Mocha.
  */
 object Palette {
 
     // === Primary color palette ===
 
-    var Rosewater = Color.decode("#f2d5cf")
-    var Flamingo  = Color.decode("#eebebe")
-    var Pink      = Color.decode("#f4b8e4")
-    var Mauve     = Color.decode("#ca9ee6")
+    var Rosewater = Color.decode("#f5e0dc")
+    var Flamingo  = Color.decode("#f2cdcd")
+    var Pink      = Color.decode("#f5c2e7")
+    var Mauve     = Color.decode("#cba6f7")
     var Purple    = Color.decode("#865dd4")
-    var Red       = Color.decode("#e78284")
-    var Maroon    = Color.decode("#ea999c")
-    var Peach     = Color.decode("#ef9f76")
-    var Yellow    = Color.decode("#e5c890")
-    var Green     = Color.decode("#a6d189")
-    var Teal      = Color.decode("#81c8be")
-    var Sky       = Color.decode("#99d1db")
-    var Sapphire  = Color.decode("#85c1dc")
-    var Blue      = Color.decode("#8caaee")
-    var Lavender  = Color.decode("#babbf1")
+    var Red       = Color.decode("#f38ba8")
+    var Maroon    = Color.decode("#eba0ac")
+    var Peach     = Color.decode("#fab387")
+    var Yellow    = Color.decode("#f9e2af")
+    var Green     = Color.decode("#a6e3a1")
+    var Teal      = Color.decode("#94e2d5")
+    var Sky       = Color.decode("#89dceb")
+    var Sapphire  = Color.decode("#74c7ec")
+    var Blue      = Color.decode("#89b4fa")
+    var Lavender  = Color.decode("#b4befe")
 
     // === Foreground text and overlays ===
 
-    var Text      = Color.decode("#c6d0f5")
-    var Subtext1  = Color.decode("#b5bfe2")
-    var Subtext0  = Color.decode("#a5adce")
-    var Overlay2  = Color.decode("#949cbb")
-    var Overlay1  = Color.decode("#838ba7")
-    var Overlay0  = Color.decode("#737994")
+    var Text      = Color.decode("#cdd6f4")
+    var Subtext1  = Color.decode("#bac2de")
+    var Subtext0  = Color.decode("#a6adc8")
+    var Overlay2  = Color.decode("#9399b2")
+    var Overlay1  = Color.decode("#7f849c")
+    var Overlay0  = Color.decode("#6c7086")
 
     // === Background surfaces ===
 
-    var Surface2  = Color.decode("#626880")
-    var Surface1  = Color.decode("#51576d")
-    var Surface0  = Color.decode("#414559")
-    var Base      = Color.decode("#303446")
-    var Mantle    = Color.decode("#292c3c")
-    var Crust     = Color.decode("#232634")
+    var Surface2  = Color.decode("#585b70")
+    var Surface1  = Color.decode("#45475a")
+    var Surface0  = Color.decode("#313244")
+    var Base      = Color.decode("#1e1e2e")
+    var Mantle    = Color.decode("#181825")
+    var Crust     = Color.decode("#11111b")
 
     // === Extension function ===
 

@@ -62,8 +62,8 @@ val config = Config("Stella", "Stella") {
         subcategory("Shortcuts") {
             toggle {
                 configName = "loadMessage"
-                name = "Show Load Message"
-                description = "Showes Stella's loading message"
+                name = "Load Message"
+                description = "Shows Stella's loading message"
                 default = true
             }
 
@@ -80,16 +80,10 @@ val config = Config("Stella", "Stella") {
     }
 
     category("Dungeons") {
-        subcategory("Room Name") {
-            toggle {
-                configName = "showRoomName"
-                name = "Show Room Name"
-                description = "Shows the current map rooms name in a hud"
-            }
-
+        subcategory("Room Name", "showRoomName", "Shows the current map rooms name in a hud") {
             toggle {
                 configName = "roomNameChroma"
-                name = "Chroma Room Name"
+                name = "Chroma"
                 description = "Makes the room name chroma (Requires SBA or Skyhanni)"
             }
         }
@@ -141,7 +135,7 @@ val config = Config("Stella", "Stella") {
 
             toggle {
                 configName = "highlightTerms"
-                name = "Highlight Term Blocks"
+                name = "Highlight Term"
                 description = "Outlines terminals in the world."
                 default = false
                 shouldShow { it["termNumbers"] as Boolean }
@@ -280,7 +274,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Score Alerts") {
+        subcategory("Score Alerts", "scoreAlerts", "Enables alerts for dungeon score milestones") {
             toggle {
                 configName = "forcePaul"
                 name = "Force Paul"
@@ -289,18 +283,10 @@ val config = Config("Stella", "Stella") {
             }
 
             toggle {
-                configName = "scoreAlerts"
-                name = "Enable Score Alerts"
-                description = "Enables alerts for dungeon score milestones"
-                default = false
-            }
-
-            toggle {
                 configName = "scoreAlerts.alert270"
                 name = "270 Score Alert"
                 description = "Alerts you when your score reaches 270"
                 default = true
-                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
             }
 
             textinput {
@@ -308,29 +294,22 @@ val config = Config("Stella", "Stella") {
                 name = "270 Score Message"
                 description = "Message to display when reaching 270 score"
                 placeholder = "&d270 score!"
-                shouldShow { settings ->
-                    (settings["scoreAlerts"] as Boolean) &&
-                            (settings["scoreAlerts.alert270"] as Boolean)
-                }
+                shouldShow { settings -> settings["scoreAlerts.alert270"] as Boolean }
             }
 
             toggle {
                 configName = "scoreAlerts.chat270"
-                name = "270 Score Chat Alert"
+                name = "270 Chat Alert"
                 description = "Sends a chat message when reaching 270 score"
                 default = true
-                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
             }
 
             textinput {
                 configName = "scoreAlerts.chatMessage270"
-                name = "270 Score Chat Message"
+                name = "270 Chat Message"
                 description = "Chat message to send when reaching 270 score"
                 placeholder = "270 score!"
-                shouldShow { settings ->
-                    (settings["scoreAlerts"] as Boolean) &&
-                            (settings["scoreAlerts.chat270"] as Boolean)
-                }
+                shouldShow { settings -> settings["scoreAlerts.chat270"] as Boolean }
             }
 
             toggle {
@@ -338,7 +317,6 @@ val config = Config("Stella", "Stella") {
                 name = "300 Score Alert"
                 description = "Alerts you when your score reaches 300"
                 default = true
-                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
             }
 
             textinput {
@@ -346,29 +324,22 @@ val config = Config("Stella", "Stella") {
                 name = "300 Score Message"
                 description = "Message to display when reaching 300 score"
                 placeholder = "&d300 score!"
-                shouldShow { settings ->
-                    (settings["scoreAlerts"] as Boolean) &&
-                            (settings["scoreAlerts.alert300"] as Boolean)
-                }
+                shouldShow { settings -> settings["scoreAlerts.alert300"] as Boolean }
             }
 
             toggle {
                 configName = "scoreAlerts.chat300"
-                name = "300 Score Chat Alert"
+                name = "300 Chat Alert"
                 description = "Sends a chat message when reaching 300 score"
                 default = true
-                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
             }
 
             textinput {
                 configName = "scoreAlerts.chatMessage300"
-                name = "300 Score Chat Message"
+                name = "300 Chat Message"
                 description = "Chat message to send when reaching 300 score"
                 placeholder = "300 score!"
-                shouldShow { settings ->
-                    (settings["scoreAlerts"] as Boolean) &&
-                            (settings["scoreAlerts.chat300"] as Boolean)
-                }
+                shouldShow { settings -> settings["scoreAlerts.chat300"] as Boolean }
             }
 
             toggle {
@@ -376,7 +347,6 @@ val config = Config("Stella", "Stella") {
                 name = "5 Crypts Alert"
                 description = "Alerts you when your team reaches 5 crypts"
                 default = true
-                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
             }
 
             textinput {
@@ -384,10 +354,7 @@ val config = Config("Stella", "Stella") {
                 name = "5 Crypts Message"
                 description = "Message to display when reaching 5 crypts"
                 placeholder = "&d5 crypts!"
-                shouldShow { settings ->
-                    (settings["scoreAlerts"] as Boolean) &&
-                            (settings["scoreAlerts.alert5Crypts"] as Boolean)
-                }
+                shouldShow { settings -> settings["scoreAlerts.alert5Crypts"] as Boolean }
             }
 
             toggle {
@@ -395,7 +362,6 @@ val config = Config("Stella", "Stella") {
                 name = "5 Crypts Chat Alert"
                 description = "Sends a chat message when reaching 5 crypts"
                 default = true
-                shouldShow { settings -> settings["scoreAlerts"] as Boolean }
             }
 
             textinput {
@@ -403,66 +369,53 @@ val config = Config("Stella", "Stella") {
                 name = "5 Crypts Chat Message"
                 description = "Chat message to send when reaching 5 crypts"
                 placeholder = "5 crypts!"
-                shouldShow { settings ->
-                    (settings["scoreAlerts"] as Boolean) &&
-                            (settings["scoreAlerts.chat5Crypts"] as Boolean)
-                }
+                shouldShow { settings -> settings["scoreAlerts.chat5Crypts"] as Boolean }
             }
         }
     }
 
     category("StellaNav") {
-        subcategory("General") {
-            toggle {
-                configName = "mapEnabled"
-                name = "Enable map"
-                description = "Enables the dungeon map"
-                default = false
-            }
-
+        subcategory("Map", "mapEnabled", "Enables the dungeon map") {
             toggle {
                 configName = "bossMapEnabled"
-                name = "Enable Boss map"
+                name = "Enable Boss Map"
                 description = "Enables the map boss map"
                 default = false
-                shouldShow { settings -> settings["mapEnabled"] as Boolean }
             }
 
             toggle {
                 configName = "scoreMapEnabled"
-                name = "Enable Score map"
+                name = "Enable Score Map"
                 description = "Enables the map score map"
                 default = false
-                shouldShow { settings -> settings["mapEnabled"] as Boolean }
             }
 
             toggle {
                 configName = "mapInfoUnder"
-                name = "map Info Under map"
+                name = "Info Under Map"
                 description = "Renders map info below the map"
                 default = true
-                shouldShow { settings -> settings["mapEnabled"] as Boolean }
             }
         }
 
         subcategory("Display") {
             colorpicker {
                 configName = "mapBgColor"
-                name = "map Background Color"
+                name = "Background Color"
                 description = "Background color of the map"
                 default = Color(0, 0, 0, 100)
             }
 
             toggle {
                 configName = "mapBorder"
-                name = "map Border"
+                name = "Map Border"
                 description = "Renders a border around the map"
                 default = true
             }
 
             colorpicker {
                 configName = "mapBdColor"
-                name = "map Border Color"
+                name = "Border Color"
                 description = "Color of the map border"
                 default = Color(0, 0, 0, 255)
                 shouldShow { settings -> settings["mapBorder"] as Boolean }
@@ -481,7 +434,7 @@ val config = Config("Stella", "Stella") {
 
             dropdown {
                 configName = "roomCheckmarks"
-                name = "Room Checkmarks"
+                name = "Room Checks"
                 description = "Style of room checkmarks"
                 options = listOf("Checkmark", "Name", "Secrets", "Both")
                 default = 0
@@ -489,7 +442,7 @@ val config = Config("Stella", "Stella") {
 
             dropdown {
                 configName = "puzzleCheckmarks"
-                name = "Puzzle Checkmarks"
+                name = "Puzzle Checks"
                 description = "Style of puzzle checkmarks"
                 options = listOf("Checkmark", "Name", "Secrets", "Both")
                 default = 0
@@ -697,7 +650,7 @@ val config = Config("Stella", "Stella") {
 
             toggle {
                 configName = "dungeonBreakdown"
-                name = "Dungeon Breakdown"
+                name = "Clear Breakdown"
                 description = "Sends map info after run"
                 default = false
             }
@@ -705,20 +658,12 @@ val config = Config("Stella", "Stella") {
     }
 
     category("Secrets") {
-        subcategory("Waypoints") {
-            toggle {
-                configName = "secretWaypoints"
-                name = "Show Waypoints"
-                description = "Renders Secret Waypoints"
-                default = false
-            }
-
+        subcategory("Waypoints", "secretWaypoints", "Renders Secret Waypoints") {
             toggle {
                 configName = "secretWaypoints.text"
-                name = "Show Waypoint Text"
+                name = "Waypoint Text"
                 description = "Renders Secret Waypoints text"
                 default = true
-                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
             slider {
@@ -728,7 +673,6 @@ val config = Config("Stella", "Stella") {
                 min = 0.1f
                 max = 2f
                 default = 1f
-                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
             colorpicker {
@@ -736,7 +680,6 @@ val config = Config("Stella", "Stella") {
                 name = "Redstone Key Color"
                 description = "Highlight color for Redstone Key waypoints"
                 default = Color(255, 0, 0, 255) // red
-                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
             colorpicker {
@@ -744,7 +687,6 @@ val config = Config("Stella", "Stella") {
                 name = "Wither Color"
                 description = "Highlight color for Wither waypoints"
                 default = Color(0, 0, 255, 255) // blue
-                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
             colorpicker {
@@ -752,7 +694,6 @@ val config = Config("Stella", "Stella") {
                 name = "Bat Color"
                 description = "Highlight color for Bat waypoints"
                 default = Color(128, 128, 128, 255) // gray
-                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
             colorpicker {
@@ -760,7 +701,6 @@ val config = Config("Stella", "Stella") {
                 name = "Item Color"
                 description = "Highlight color for Item waypoints"
                 default = Color(0, 255, 0, 255) // green
-                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
 
             colorpicker {
@@ -768,32 +708,22 @@ val config = Config("Stella", "Stella") {
                 name = "Chest Color"
                 description = "Highlight color for Chest waypoints"
                 default = Color(255, 255, 0, 255) // yellow
-                shouldShow { settings -> settings["secretWaypoints"] as Boolean }
             }
         }
 
-        subcategory("Routes") {
-            toggle {
-                configName = "secretRoutes"
-                name = "Show Routes"
-                description = "Enable rendering of route waypoints."
-                default = false
-            }
-
+        subcategory("Routes","secretRoutes", "Enable rendering of route waypoints.") {
             toggle {
                 configName = "secretRoutes.onlyRenderAfterClear"
-                name = "Only Render After Clear"
+                name = "Only After Clear"
                 description = "Only show route waypoints after the room has been cleared."
                 default = false
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             toggle {
                 configName = "secretRoutes.stopRenderAfterGreen"
-                name = "Stop Render After Green"
+                name = "Stop After Green"
                 description = "Stop rendering route waypoints once the room is marked green."
                 default = false
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             textinput {
@@ -829,10 +759,9 @@ val config = Config("Stella", "Stella") {
         subcategory("Route Rendering") {
             toggle {
                 configName = "secretRoutes.text"
-                name = "Show Waypoint Text"
+                name = "Waypoint Text"
                 description = "Renders Secret Routes Waypoints text"
                 default = true
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             slider {
@@ -842,7 +771,6 @@ val config = Config("Stella", "Stella") {
                 min = 0.1f
                 max = 2f
                 default = 1f
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
 
             colorpicker {
@@ -913,7 +841,6 @@ val config = Config("Stella", "Stella") {
                 name = "Lever Color"
                 description = "Color for lever route waypoints."
                 default = Color(0, 255, 255, 255) // cyan
-                shouldShow { settings -> settings["secretRoutes"] as Boolean }
             }
         }
 
@@ -926,7 +853,7 @@ val config = Config("Stella", "Stella") {
 
             toggle {
                 configName = "secretRoutes.recordingHud.minimized"
-                name = "Minimize Recording Hud"
+                name = "Minimize Hud"
                 description = "Makes the hud A lot smaller"
             }
 
@@ -964,34 +891,26 @@ val config = Config("Stella", "Stella") {
     }
 
     category("Msc.") {
-        subcategory("Block Overlay") {
-            toggle {
-                configName = "overlayEnabled"
-                name = "Render Block Overlay"
-                description = "Highlights the block you are looking at"
-            }
-
+        subcategory("Block Overlay", "overlayEnabled", "Highlights the block you are looking at" ) {
             colorpicker {
                 configName = "blockHighlightColor"
-                name = "Block Highlight Color"
+                name = "Highlight Color"
                 description = "The color to highlight blocks"
                 default = Color(0, 255, 255, 255)
-                shouldShow { settings -> settings["overlayEnabled"] as Boolean }
             }
 
             toggle {
                 configName = "fillBlockOverlay"
                 name = "Fill blocks"
                 description = "Fills the blocks with the color"
-                shouldShow { settings -> settings["overlayEnabled"] as Boolean }
             }
 
             colorpicker {
                 configName = "blockFillColor"
-                name = "Block Fill Color"
+                name = "Fill Color"
                 description = "The color to fill blocks"
                 default = Color(0, 255, 255, 30)
-                shouldShow { settings -> settings["overlayEnabled"] as Boolean && settings["fillBlockOverlay"] as Boolean }
+                shouldShow { settings -> settings["fillBlockOverlay"] as Boolean }
             }
 
             stepslider {
@@ -1002,20 +921,13 @@ val config = Config("Stella", "Stella") {
                 max = 5
                 step = 1
                 default = 3
-                shouldShow { settings -> settings["overlayEnabled"] as Boolean }
             }
         }
 
-        subcategory("Inventory Buttons") {
-            toggle {
-                configName = "buttonsEnabled"
-                name = "Enabled"
-                description = "Enables the inventory buttons"
-            }
-
+        subcategory("Inventory Buttons", "buttonsEnabled", "Enables the inventory buttons") {
             button {
                 configName = "buttonEdit"
-                name = "Inventory Button Editor"
+                name = "Button Editor"
                 description = "Opens the inventory button editor"
                 placeholder = "Open"
 
@@ -1025,43 +937,28 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Pet Display") {
-            toggle {
-                configName = "petDisplay"
-                name = "Enabled"
-                description = "Enables the pet display"
-            }
-        }
+        subcategory("Pet Display", "petDisplay", "Enables the pet display")
 
-        subcategory("Health & Mana") {
-            toggle {
-                configName = "bars"
-                name = "Enabled"
-                description = "Enables the health & mana bars"
-            }
-
+        subcategory("Health & Mana",  "bars", "Enables the health & mana bars") {
             toggle {
                 configName = "bars.hideVanillaHealth"
-                name = "Hide Vanilla Health"
+                name = "Hide Health"
                 description = "Hides the vanilla Minecraft health bar"
                 default = false
-                shouldShow { it["bars"] as Boolean }
             }
 
             toggle {
                 configName = "bars.hideVanillaHunger"
-                name = "Hide Vanilla Hunger"
+                name = "Hide Hunger"
                 description = "Hides the vanilla hunger display"
                 default = false
-                shouldShow { it["bars"] as Boolean }
             }
 
             toggle {
                 configName = "bars.hideVanillaArmor"
-                name = "Hide Vanilla Mana"
+                name = "Hide Mana"
                 description = "Hides the vanilla armor display"
                 default = false
-                shouldShow { it["bars"] as Boolean }
             }
 
             toggle {
@@ -1069,7 +966,6 @@ val config = Config("Stella", "Stella") {
                 name = "Health Bar"
                 description = "Shows a custom health bar"
                 default = false
-                shouldShow { it["bars"] as Boolean }
             }
 
             toggle {
@@ -1077,23 +973,23 @@ val config = Config("Stella", "Stella") {
                 name = "Absorption Bar"
                 description = "Shows a custom absorption bar"
                 default = false
-                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
+                shouldShow { it["bars.healthBar"] as Boolean }
             }
 
             toggle {
                 configName = "bars.hpChange"
-                name = "Health Change HUD"
+                name = "HP Change HUD"
                 description = "Shows the health delta (damage/healing numbers)"
                 default = false
-                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
+                shouldShow { it["bars.healthBar"] as Boolean }
             }
 
             toggle {
                 configName = "bars.hpNum"
-                name = "Health Number HUD"
+                name = "HP Number HUD"
                 description = "Shows the numeric health value"
                 default = false
-                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
+                shouldShow { it["bars.healthBar"] as Boolean }
             }
 
             colorpicker {
@@ -1101,7 +997,7 @@ val config = Config("Stella", "Stella") {
                 name = "Health Bar Color"
                 description = "Color of the custom health bar"
                 default = Color(255, 0, 0, 255)
-                shouldShow { it["bars"] as Boolean && it["bars.healthBar"] as Boolean }
+                shouldShow { it["bars.healthBar"] as Boolean }
             }
 
             colorpicker {
@@ -1109,7 +1005,7 @@ val config = Config("Stella", "Stella") {
                 name = "Absorption Bar Color"
                 description = "Color of the custom absorption bar"
                 default = Color(255, 200, 0, 255)
-                shouldShow { it["bars"] as Boolean && it["bars.absorptionBar"] as Boolean && it["bars.healthBar"] as Boolean }
+                shouldShow { it["bars.absorptionBar"] as Boolean && it["bars.healthBar"] as Boolean }
             }
 
             toggle {
@@ -1117,23 +1013,22 @@ val config = Config("Stella", "Stella") {
                 name = "Mana Bar"
                 description = "Shows a custom mana bar"
                 default = false
-                shouldShow { it["bars"] as Boolean }
             }
 
             toggle {
                 configName = "bars.overflowManaBar"
-                name = "Overflow Mana Bar"
+                name = "OF Mana Bar"
                 description = "Shows a custom overflow mana bar"
                 default = false
-                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
+                shouldShow { it["bars.manaBar"] as Boolean }
             }
 
             toggle {
                 configName = "bars.ofMana"
-                name = "Overflow Mana HUD"
+                name = "OF Mana HUD"
                 description = "Shows your overflow mana value"
                 default = false
-                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
+                shouldShow { it["bars.manaBar"] as Boolean }
             }
 
             toggle {
@@ -1141,7 +1036,7 @@ val config = Config("Stella", "Stella") {
                 name = "Mana Number HUD"
                 description = "Shows the numeric mana value"
                 default = false
-                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
+                shouldShow { it["bars.manaBar"] as Boolean }
             }
 
             colorpicker {
@@ -1149,7 +1044,7 @@ val config = Config("Stella", "Stella") {
                 name = "Mana Bar Color"
                 description = "Color of the custom mana bar"
                 default = Color(0, 128, 255, 255)
-                shouldShow { it["bars"] as Boolean && it["bars.manaBar"] as Boolean }
+                shouldShow { it["bars.manaBar"] as Boolean }
             }
 
             colorpicker {
@@ -1157,17 +1052,11 @@ val config = Config("Stella", "Stella") {
                 name = "Overflow Mana Color"
                 description = "Color of the overflow mana bar"
                 default = Color(128, 0, 255, 255)
-                shouldShow { it["bars"] as Boolean && it["bars.overflowManaBar"] as Boolean && it["bars.manaBar"] as Boolean }
+                shouldShow { it["bars.overflowManaBar"] as Boolean && it["bars.manaBar"] as Boolean }
             }
         }
 
-        subcategory("Soulflow Display") {
-            toggle {
-                configName = "soulflowDisplay"
-                name = "Enabled"
-                description = "Enables the soulflow display"
-            }
-        }
+        subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
 
         /*
         subcategory("Custom Nametags") {

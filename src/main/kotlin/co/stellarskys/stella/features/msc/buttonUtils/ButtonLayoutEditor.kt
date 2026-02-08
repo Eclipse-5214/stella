@@ -2,6 +2,7 @@ package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
+import co.stellarskys.stella.utils.render.nvg.NVGRenderer
 import co.stellarskys.vexel.Vexel
 import co.stellarskys.vexel.core.VexelScreen
 import dev.deftu.omnicore.api.client.input.KeyboardModifiers
@@ -23,7 +24,7 @@ class ButtonLayoutEditor : VexelScreen() {
         val invY = (height - 166) / 2
 
         context.drawNVG {
-            Vexel.renderer.hollowRect(
+            NVGRenderer.hollowRect(
                 invX.toFloat(),
                 invY.toFloat(),
                 176f,
@@ -37,7 +38,7 @@ class ButtonLayoutEditor : VexelScreen() {
                 for (index in 0 until anchor.slots) {
                     val (x, y) = ButtonManager.resolveAnchorPosition(anchor, index, invX, invY)
 
-                    Vexel.renderer.hollowRect(
+                    NVGRenderer.hollowRect(
                         x.toFloat(),
                         y.toFloat(),
                         slotSize.toFloat(),

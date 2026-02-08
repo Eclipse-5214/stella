@@ -2,8 +2,6 @@ package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Command
-import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.api.EventBusBenchmark
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
@@ -83,24 +81,12 @@ object MainCommand : Commodore("stella", "sta", "sa") {
                 ChatUtils.fakeMessage("§d§m------------------------------------------")
                 ChatUtils.fakeMessage("                 §bScore: §6${data.score}")
                 ChatUtils.fakeMessage("")
-
                 ChatUtils.fakeMessage("§7Skill Score§8: §b${data.skillScore}")
                 ChatUtils.fakeMessage("§7Explore Score§8: §b${data.exploreScore}")
                 ChatUtils.fakeMessage("§7Speed Score§8: §b${data.speedScore}")
                 ChatUtils.fakeMessage("§7Bonus Score§8: §b${data.bonusScore}")
                 ChatUtils.fakeMessage("")
                 ChatUtils.fakeMessage("§d§m------------------------------------------")
-            }
-        }
-
-
-        literal("benchmark") {
-            runs {
-                    val regTime = EventBusBenchmark.benchmarkRegistration(EventBus, handlers = 1000)
-                    ChatUtils.fakeMessage("${Stella.PREFIX} Registered 1000 handlers in §b${regTime / 1_000_000.0} ms")
-
-                    val dispatchTime = EventBusBenchmark.benchmarkDispatch(EventBus, handlers = 100, iterations = 100_000)
-                    ChatUtils.fakeMessage("${Stella.PREFIX} Posted 100k events with 100 handlers in §b${dispatchTime / 1_000_000.0} ms")
             }
         }
 

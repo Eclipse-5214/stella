@@ -15,13 +15,21 @@ import java.awt.Color
 open class ConfigCategory(val name: String, val config: Config) {
     val subcategories = mutableMapOf<String, ConfigSubcategory>()
 
-    fun subcategory(name: String, builder: ConfigSubcategory.() -> Unit) {
-        subcategories[name] = ConfigSubcategory(name, config).apply(builder)
+    fun subcategory(name: String, configName: String = "", description: String = "" , builder: ConfigSubcategory.() -> Unit = {}) {
+        subcategories[name] = ConfigSubcategory(name, config, configName, description).apply(builder)
     }
 }
 
-open class ConfigSubcategory(val subName: String, val config: Config) {
+open class ConfigSubcategory(val subName: String, conf: Config, confName: String, desc: String): ConfigElement() {
     val elements = mutableMapOf<String, ConfigElement>()
+
+    init {
+        config = conf
+        name = subName
+        description = desc
+        configName = confName
+        value = false
+    }
 
     /**
      * Adds a [Button] element to the config category.
@@ -287,6 +295,7 @@ class StepSlider : ConfigElement() {
         value = default
     }
 }
+
 class TextInput : ConfigElement() {
     var placeholder: String = ""
         set(value) {

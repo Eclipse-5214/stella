@@ -43,7 +43,7 @@ class Config(
 
     // UI functions
     fun open() {
-        configUI = ConfigUI(categories, this)
+        if(configUI == null) configUI = ConfigUI(categories, this)
         TickSchedulers.client.post { client.setScreen(configUI) }
     }
 
@@ -63,6 +63,14 @@ class Config(
 
             category.subcategories.values.forEach { subcategory ->
                 val elementJson = JsonObject()
+                val id = subcategory.configName
+                val value = subcategory.value
+
+                if (id.isNotBlank() && value != null) {
+                    (value as? Boolean)?.let {
+                        elementJson.add(id, JsonPrimitive(value))
+                    }
+                }
 
                 subcategory.elements.values.forEach { element ->
                     val id = element.configName
@@ -144,6 +152,10 @@ class Config(
             // 1. Map the elements FIRST so fromJson has something to work with
             categories.values.forEach { cat ->
                 cat.subcategories.values.forEach { sub ->
+                    if (sub.configName.isNotBlank()) {
+                        elementMap[sub.configName] = sub
+                        valueCache[sub.configName] = sub.value
+                    }
                     sub.elements.values.forEach { el ->
                         if (el.configName.isNotBlank()) {
                             elementMap[el.configName] = el

@@ -97,17 +97,11 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
 
                     val labelText = when {
                         task.roles.size > 1 && showTermClass -> {
-                            // Create a list of labels for each role and join with newlines
-                            // Result will look like:
-                            // [ 1 ]
-                            // ( Tank )
-                            // ( Mage )
                             task.roles.joinToString("") { role ->
                                 "\n" + (termLabelMap[role]?.first ?: "")
                             }
                         }
                         task.roles.isNotEmpty() -> {
-                            // Single role display
                             "\n" + (termLabelMap[task.roles[0]]?.first ?: "")
                         }
                         else -> ""

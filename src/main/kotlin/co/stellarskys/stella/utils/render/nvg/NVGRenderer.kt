@@ -1,9 +1,13 @@
 package co.stellarskys.stella.utils.render.nvg
 
+import co.stellarskys.stella.Stella
+import co.stellarskys.stella.utils.Utils.toHex
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.alpha
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.red
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.green
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.blue
+import dev.deftu.omnicore.api.client.client
+import net.minecraft.resources.ResourceLocation
 import org.lwjgl.nanovg.NVGColor
 import org.lwjgl.nanovg.NVGPaint
 import org.lwjgl.nanovg.NanoSVG.*
@@ -33,12 +37,13 @@ object NVGRenderer {
 
     private val fontMap = HashMap<Font, NVGFont>()
     private val fontBounds = FloatArray(4)
-
     private val images = HashMap<Image, NVGImage>()
 
     private var scissor: Scissor? = null
     private var drawing: Boolean = false
     private var vg = -1L
+
+    val inter = Font("Default", client.resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/montserrat.ttf")).get().open())
 
     init {
         vg = nvgCreate(NVG_ANTIALIAS or NVG_STENCIL_STROKES)
@@ -84,14 +89,29 @@ object NVGRenderer {
     }
 
     fun pushScissor(x: Float, y: Float, w: Float, h: Float) {
-        scissor = Scissor(scissor, x, y, w + x, h + y)
-        scissor?.applyScissor()
+        // 1. We MUST save the state so that popScissor can restore the previous clip
+        nvgSave(vg)
+
+        // 2. If this is the first scissor, use nvgScissor.
+        // If it's a nested scissor, use nvgIntersectScissor.
+        if (scissor == null) {
+            nvgScissor(vg, x, y, w, h)
+        } else {
+            nvgIntersectScissor(vg, x, y, w, h)
+        }
+
+        // 3. Keep the stack just to track depth/existence
+        scissor = Scissor(scissor, x, y, x + w, y + h)
     }
 
     fun popScissor() {
-        nvgResetScissor(vg)
+        if (scissor == null) return
+
+        // 1. Restore NanoVG state (this automatically pops the scissor/matrix)
+        nvgRestore(vg)
+
+        // 2. Move up the stack
         scissor = scissor?.previous
-        scissor?.applyScissor()
     }
 
     fun line(x1: Float, y1: Float, x2: Float, y2: Float, thickness: Float, color: Int) {
@@ -133,7 +153,7 @@ object NVGRenderer {
 
     fun rect(x: Float, y: Float, w: Float, h: Float, color: Int, radius: Float) {
         nvgBeginPath(vg)
-        nvgRoundedRect(vg, x, y, w, h + .5f, radius)
+        nvgRoundedRect(vg, x, y, w, h, radius)
         color(color)
         nvgFillColor(vg, nvgColor)
         nvgFill(vg)
@@ -141,7 +161,7 @@ object NVGRenderer {
 
     fun rect(x: Float, y: Float, w: Float, h: Float, color: Int) {
         nvgBeginPath(vg)
-        nvgRect(vg, x, y, w, h + .5f)
+        nvgRect(vg, x, y, w, h)
         color(color)
         nvgFillColor(vg, nvgColor)
         nvgFill(vg)
@@ -153,6 +173,44 @@ object NVGRenderer {
         color(color)
         nvgFillColor(vg, nvgColor)
         nvgFill(vg)
+    }
+
+    fun hollowRect(x: Float, y: Float, w: Float, h: Float, thickness: Float, color: Int, radius: Float, roundTop: Boolean) {
+        nvgBeginPath(vg)
+
+        if (roundTop) {
+            nvgMoveTo(vg, x, y + h)
+            nvgLineTo(vg, x + w, y + h)
+            nvgLineTo(vg, x + w, y + radius)
+            nvgArcTo(vg, x + w, y, x + w - radius, y, radius)
+            nvgLineTo(vg, x + radius, y)
+            nvgArcTo(vg, x, y, x, y + radius, radius)
+            nvgLineTo(vg, x, y + h)
+        } else {
+            nvgMoveTo(vg, x, y)
+            nvgLineTo(vg, x + w, y)
+            nvgLineTo(vg, x + w, y + h - radius)
+            nvgArcTo(vg, x + w, y + h, x + w - radius, y + h, radius)
+            nvgLineTo(vg, x + radius, y + h)
+            nvgArcTo(vg, x, y + h, x, y + h - radius, radius)
+            nvgLineTo(vg, x, y)
+        }
+
+        nvgClosePath(vg)
+        nvgStrokeWidth(vg, thickness)
+        color(color)
+        nvgStrokeColor(vg, nvgColor)
+        nvgStroke(vg)
+    }
+
+
+    fun hollowRect(x: Float, y: Float, w: Float, h: Float, thickness: Float, color: Int, topRight: Float, topLeft: Float, bottomRight: Float, bottomLeft: Float) {
+        nvgBeginPath(vg)
+        nvgRoundedRectVarying(vg, round(x), round(y), round(w), round(h), topRight, topLeft, bottomRight, bottomLeft)
+        nvgStrokeWidth(vg, thickness)
+        color(color)
+        nvgStrokeColor(vg, nvgColor)
+        nvgStroke(vg)
     }
 
     fun hollowRect(x: Float, y: Float, w: Float, h: Float, thickness: Float, color: Int, radius: Float) {
@@ -194,10 +252,32 @@ object NVGRenderer {
         color1: Int,
         color2: Int,
         gradient: Gradient,
-        radius: Float
+        radius: Float = 0f
     ) {
         nvgBeginPath(vg)
         nvgRoundedRect(vg, x, y, w, h, radius)
+        gradient(color1, color2, x, y, w, h, gradient)
+        nvgFillPaint(vg, nvgPaint)
+        nvgFill(vg)
+    }
+
+    fun gradientRect(
+        x: Float,
+        y: Float,
+        w: Float,
+        h: Float,
+        color1: Int,
+        color2: Int,
+        gradient: Gradient,
+        topRight: Float,
+        topLeft: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    ) {
+        nvgBeginPath(vg)
+        // Use the varying version to support individual corner rounding
+        nvgRoundedRectVarying(vg, round(x), round(y), round(w), round(h), topLeft, topRight, bottomRight, bottomLeft)
+
         gradient(color1, color2, x, y, w, h, gradient)
         nvgFillPaint(vg, nvgPaint)
         nvgFill(vg)
@@ -308,6 +388,9 @@ object NVGRenderer {
         return bounds // [minX, minY, maxX, maxY]
     }
 
+    fun createNVGImage(textureId: Int, textureWidth: Int, textureHeight: Int): Int =
+        nvglCreateImageFromHandle(vg, textureId, textureWidth, textureHeight, NVG_IMAGE_NEAREST or NVG_IMAGE_NODELETE)
+
     fun image(image: Int, textureWidth: Int, textureHeight: Int, subX: Int, subY: Int, subW: Int, subH: Int, x: Float, y: Float, w: Float, h: Float, radius: Float) {
         if (image == -1) return
 
@@ -403,11 +486,13 @@ object NVGRenderer {
     }
 
     private fun loadSVG(image: Image, svgWidth: Int, svgHeight: Int, color: Color): Int {
-        val vec = image.stream.use { it.bufferedReader().readText() }
+        var vec = image.stream.use { it.bufferedReader().readText() }
+        val hexColor = color.toHex()
+        vec = vec.replace("currentColor", hexColor)
         val svg = nsvgParse(vec, "px", 96f) ?: throw IllegalStateException("Failed to parse ${image.identifier}")
-
         val width = svg.width().toInt()
         val height = svg.height().toInt()
+
         val buffer = memAlloc(width * height * 4)
 
         try {
@@ -464,18 +549,7 @@ object NVGRenderer {
         }.id
     }
 
-    private class Scissor(val previous: Scissor?, val x: Float, val y: Float, val maxX: Float, val maxY: Float) {
-        fun applyScissor() {
-            if (previous == null) nvgScissor(vg, x, y, maxX - x, maxY - y)
-            else {
-                val x = max(x, previous.x)
-                val y = max(y, previous.y)
-                val width = max(0f, (min(maxX, previous.maxX) - x))
-                val height = max(0f, (min(maxY, previous.maxY) - y))
-                nvgScissor(vg, x, y, width, height)
-            }
-        }
-    }
+    private class Scissor(val previous: Scissor?, val x: Float, val y: Float, val maxX: Float, val maxY: Float)
 
     fun drawMasked(x: Float, y: Float, w: Float, h: Float, radius: Float, block: () -> Unit) {
         push()

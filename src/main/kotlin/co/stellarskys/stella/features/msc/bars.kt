@@ -11,8 +11,8 @@ import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.Render2D.width
+import co.stellarskys.stella.utils.render.nvg.NVGRenderer
 import co.stellarskys.vexel.Vexel
-import co.stellarskys.vexel.api.nvg.NVGRenderer
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.profile.StatsAPI
@@ -64,10 +64,10 @@ object bars : Feature("bars", true) {
     val mpBarWidth get() = ratioWidth(StatsAPI.mana, StatsAPI.maxMana)
     val ofBarWidth get() = ratioWidth(StatsAPI.overflowMana, StatsAPI.maxMana)
 
-    private var smoothHp by Utils.lerped<Float>(0.15)
-    private var smoothAbs by Utils.lerped<Float>(0.15)
-    private var smoothMp by Utils.lerped<Float>(0.15)
-    private var smoothOf by Utils.lerped<Float>(0.15)
+    private var smoothHp by Utils.animate<Float>(0.15)
+    private var smoothAbs by Utils.animate<Float>(0.15)
+    private var smoothMp by Utils.animate<Float>(0.15)
+    private var smoothOf by Utils.animate<Float>(0.15)
 
     override fun initialize() {
         HUDManager.registerCustom(HPHudName, 90, 15, this::hpHudPreview, "bars.healthBar")
@@ -90,7 +90,7 @@ object bars : Feature("bars", true) {
     }
 
     fun hpHudPreview(context: GuiGraphics) = context.drawNVG {
-            Vexel.renderer.rect(5f, 5f, 80f, 5f, healthColor.rgb, 3f)
+        NVGRenderer.rect(5f, 5f, 80f, 5f, healthColor.rgb, 3f)
     }
 
 
@@ -109,7 +109,7 @@ object bars : Feature("bars", true) {
     }
 
     fun mpHudPreview(context: GuiGraphics) = context.drawNVG {
-            Vexel.renderer.rect(5f, 5f, 80f, 5f, manaColor.rgb, 3f)
+            NVGRenderer.rect(5f, 5f, 80f, 5f, manaColor.rgb, 3f)
     }
 
     fun mpNumPreview(context: GuiGraphics) {
@@ -215,10 +215,10 @@ object bars : Feature("bars", true) {
     private fun drawBar(context: GuiGraphics, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color) {
         context.drawNVG {
             NVGRenderer.drawMasked(0f, 0f, 80f, 5f, 3f) {
-                Vexel.renderer.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
-                Vexel.renderer.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
+                NVGRenderer.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
+                NVGRenderer.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
                 if (showSecondary) {
-                    Vexel.renderer.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.rgb, 3f)
+                    NVGRenderer.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.rgb, 3f)
                 }
             }
         }

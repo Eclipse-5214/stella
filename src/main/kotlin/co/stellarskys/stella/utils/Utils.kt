@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.utils.animation.*
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.player
 import net.minecraft.core.BlockPos
@@ -10,7 +11,6 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import java.awt.Color
 import kotlin.math.sqrt
-import kotlin.reflect.KProperty
 
 object Utils {
     /**
@@ -131,7 +131,7 @@ object Utils {
     }
 
     object Fonts {
-        val montserrat = getFont("montserrat")
+        val montserrat_bold = getFont("montserrat")
 
         fun getFont(font: String): FontDescription {
             val resource = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, font)
@@ -139,46 +139,6 @@ object Utils {
         }
     }
 
-    inline fun <reified T : Any> lerped(coeff: Double = 0.2) = LerpedDelegate<T>(coeff, isColor = (T::class == Color::class))
-
-    class LerpedDelegate<T : Any>(
-        private val coeff: Double,
-        private val isColor: Boolean
-    ) {
-        private val current = DoubleArray(4)
-        private val target  = DoubleArray(4)
-        private var init = false
-
-        @Suppress("UNCHECKED_CAST")
-        operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-            val channels = if (isColor) 4 else 1
-            for (i in 0 until channels) current[i] += (target[i] - current[i]) * coeff
-
-            return if (isColor) {
-                Color(current[0].toInt().coerceIn(0, 255), current[1].toInt().coerceIn(0, 255), current[2].toInt().coerceIn(0, 255), current[3].toInt().coerceIn(0, 255)) as T
-            } else {
-                when (property.returnType.classifier) {
-                    Float::class -> current[0].toFloat() as T
-                    Double::class -> current[0] as T
-                    else -> current[0].toInt() as T
-                }
-            }
-        }
-
-        operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-            if (isColor) {
-                value as Color
-                target[0] = value.red.toDouble()
-                target[1] = value.green.toDouble()
-                target[2] = value.blue.toDouble()
-                target[3] = value.alpha.toDouble()
-            } else {
-                target[0] = (value as Number).toDouble()
-            }
-
-            if (!init) { snap(); init = true }
-        }
-
-        fun snap() { for (i in 0 until 4) current[i] = target[i] }
-    }
+    inline fun <reified T : Any> animate(coeff: Double = 0.2, type: AnimType = AnimType.LINEAR, error: Double = 0.001) =
+        Animation<T>(coeff, error, type, isColor = (T::class == Color::class))
 }

@@ -1,221 +1,124 @@
 package co.stellarskys.stella.utils.config.ui
 
+import co.stellarskys.stella.utils.Utils
+import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.*
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
+import co.stellarskys.stella.utils.config.ui.base.*
 import co.stellarskys.stella.utils.config.ui.elements.*
-import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.vexel.components.base.VexelElement
-import co.stellarskys.vexel.components.base.enums.Pos
-import co.stellarskys.vexel.components.base.enums.Size
-import co.stellarskys.vexel.components.core.Rectangle
-import co.stellarskys.vexel.components.core.Text
-import co.stellarskys.vexel.core.VexelScreen
-import co.stellarskys.vexel.core.VexelWindow
+import co.stellarskys.stella.utils.render.Render2D.drawNVG
+import co.stellarskys.stella.utils.render.nvg.Gradient
+import co.stellarskys.stella.utils.render.nvg.NVGRenderer
+import com.mojang.blaze3d.opengl.GlTexture
+import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.input.*
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.render.OmniResolution
+import dev.deftu.omnicore.api.client.screen.KeyPressEvent
+import dev.deftu.omnicore.api.client.screen.OmniScreen
+import tech.thatgravyboat.skyblockapi.platform.texture
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
 import kotlin.collections.component1
 import kotlin.collections.component2
 
-internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config): VexelScreen("Config") {
-    private var selectedCategory = categories.entries.firstOrNull()?.value
-    private val elementContainers = mutableMapOf<String, VexelElement<*>>()
+internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config): OmniScreen(dev.deftu.textile.Text.literal("Config")) {
+    private val panels =  mutableListOf<Panel>()
+    private val elementContainers = mutableMapOf<String, BaseElement>()
     private val elementRefs = mutableMapOf<String, ConfigElement>()
-    private var subcatRefs = mutableListOf<VexelElement<*>>()
     private var needsVisibilityUpdate = false
-
-    val head = Rectangle(Color(0,0,0,0).rgb)
+    private val imageCacheMap = HashMap<String, Int>()
+    private val revealDelegate = Utils.animate<Float>(0.15, AnimType.EASE_OUT)
+    private var reveal by revealDelegate
+    private var opening = true
+    private val nvg get() = NVGRenderer
+    private val rez get() = OmniResolution
+    private val mouse = OmniMouse
 
     init {
-        val bg = Rectangle(Color.BLACK.rgb,Palette.Purple.withAlpha(100).rgb, 5f, 2f)
-            .setSizing(50f, Size.Percent, 50f, Size.Percent)
-            .setPositioning(Pos.ScreenCenter, Pos.ScreenCenter)
-            .childOf(window)
-
-        val list = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
-            .setSizing(20f, Size.Percent, 100f, Size.Percent)
-            .setPositioning(0f, Pos.ParentPixels,0f, Pos.ParentPixels)
-            .childOf(bg)
-
-        val card = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
-            .setSizing(80f, Size.Percent, 100f, Size.Percent)
-            .setPositioning(0f,Pos.AfterSibling,0f, Pos.ParentPixels)
-            .scrollable( true)
-            .scrollbarColor(Palette.Purple.withAlpha(100).rgb)
-            .childOf(bg)
-
-        val top = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f, borderThickness = 0f)
-            .setSizing(100f, Size.Percent, 30f, Size.Percent)
-            .setPositioning(0f, Pos.ParentPixels,0f, Pos.ParentPixels)
-            .childOf(list)
-
-        head
-            .setSizing(48f, Size.Pixels, 48f, Size.Pixels)
-            .setPositioning(10f, Pos.ParentPercent, 10f, Pos.ParentPercent)
-            .childOf(top)
-
-        val username = Text(player?.name?.string ?: "null", shadowEnabled = false, fontSize = 16f)
-            .setPositioning(60f, Pos.ParentPixels, 2f, Pos.ParentPixels)
-            .childOf(head)
-
-        val tag = Text("Stella User", Color.gray.rgb, shadowEnabled = false, fontSize = 14f)
-            .setPositioning(60f, Pos.ParentPixels, 20f, Pos.ParentPixels)
-            .childOf(head)
-
-
-        // === Category Button Panel ===
-
-        val categoryLabels = mutableMapOf<ConfigCategory, VexelElement<co.stellarskys.vexel.elements.Button>>()
-
-
-        categories.entries.forEachIndexed { _, category ->
-            // Actual button surface
-            val button = co.stellarskys.vexel.elements.Button(
-                category.key,
-                if (selectedCategory == category.value) Palette.Purple.rgb else Color.WHITE.rgb,
-                backgroundColor = if (selectedCategory == category.value) Palette.Purple.withAlpha(50).rgb else Color(0,0, 0,0).rgb,
-                borderRadius = 5f,
-                borderThickness = 0f,
-                fontSize = 16f
-            )
-                .setSizing(80f, Size.Percent, 8f, Size.Percent)
-                .setPositioning(0f, Pos.ParentCenter,20f, Pos.AfterSibling)
-                .childOf(list)
-
-            categoryLabels[category.value] = button
-
-            // Click handler to change category view
-            button.onMouseClick { _->
-                if (selectedCategory != category) {
-                    selectedCategory = category.value
-
-                    // Update label highlight colors
-                    categoryLabels.forEach { (cat, btn) ->
-                        btn as co.stellarskys.vexel.elements.Button
-                        btn.textColor(if (cat == selectedCategory) Palette.Purple.rgb else Color.WHITE.rgb)
-                        btn.backgroundColor( if (cat == selectedCategory) Palette.Purple.withAlpha(50).rgb else Color(0,0, 0,0).rgb)
-                    }
-                    // Destroy left over window ui
-                    FloatingUIManager.clearAll()
-
-                    // Swap out current category panel
-                    card.children.toList().forEach { it.destroy() }
-
-                    // Reset scroll
-                    card.scrollOffset = 0f
-
-                    buildCategory(card, window, category.value, config)
-                }
-                true
-            }
+        var sx = 10f
+        categories.forEach { (title, category) ->
+            val panel = buildCategory(sx, 50f, category, title, config)
+            sx += panel.width + 10f
         }
-
-        buildCategory(card, window, selectedCategory!!, config)
     }
 
     override val isPausingScreen: Boolean = false
 
+    override fun onInitialize(width: Int, height: Int) {
+        reveal = 0f
+        revealDelegate.snap()
+        reveal = rez.scaledWidth.toFloat()
+        super.onInitialize(width, height)
+    }
+
     override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
         super.onRender(ctx, mouseX, mouseY, tickDelta)
 
-        val player = player ?: return
-        val uuid = player.gameProfile.id
-        val size = (48 / OmniResolution.scaleFactor).toInt()
-        val x = (head.raw.left / OmniResolution.scaleFactor).toInt()
-        val y = (head.raw.top/ OmniResolution.scaleFactor).toInt()
-
         val context = ctx.graphics ?: return
-        Render2D.drawPlayerHead(context, x, y, size, uuid)
-    }
+        context.drawNVG {
+            applyOpeningScissor()
 
-    private fun buildCategory(root: VexelElement<*>, window: VexelWindow, category: ConfigCategory, config: Config) {
-        val column1 = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-            .setSizing(50f, Size.Percent, 0f, Size.Auto)
-            .setPositioning(0f,Pos.ParentPixels,0f, Pos.ParentPixels)
-            .childOf(root)
-
-        val column2 = Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-            .setSizing(50f, Size.Percent, 0f, Size.Auto)
-            .setPositioning(0f,Pos.AfterSibling,0f, Pos.ParentPixels)
-            .childOf(root)
-
-        //spacers
-        Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-            .setSizing(100f, Size.Percent, 20f, Size.Pixels)
-            .setPositioning(Pos.ParentCenter, Pos.AfterSibling)
-            .childOf(column1)
-
-        Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-            .setSizing(100f, Size.Percent, 20f, Size.Pixels)
-            .setPositioning(Pos.ParentCenter, Pos.AfterSibling)
-            .childOf(column2)
-
-        elementRefs.clear()
-        elementContainers.clear()
-        subcatRefs.clear()
-
-        category.subcategories.entries.forEachIndexed { index, (name, subcategory) ->
-            if (index % 2 == 0) {
-                buildSubcategory(column1, window, subcategory, name, config)
-            } else {
-                buildSubcategory(column2, window, subcategory, name, config)
+            drawHeader()
+            panels.forEach {
+                it.render(context, mouseX.toFloat(), mouseY.toFloat(), tickDelta)
             }
 
+            nvg.popScissor()
         }
-
-        // more spaces
-        Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-            .setSizing(100f, Size.Percent, 40f, Size.Pixels)
-            .setPositioning(Pos.ParentCenter, Pos.AfterSibling)
-            .childOf(column1)
-
-        Rectangle(Color(0,0,0,0).rgb, borderRadius = 5f)
-            .setSizing(100f, Size.Percent, 40f, Size.Pixels)
-            .setPositioning(Pos.ParentCenter, Pos.AfterSibling)
-            .childOf(column2)
     }
 
-    private fun buildSubcategory(root: VexelElement<*>, window: VexelWindow, subcategory: ConfigSubcategory, title: String, config: Config) {
-        val box = Rectangle(Palette.Purple.withAlpha(20).rgb, Palette.Purple.withAlpha(100).rgb, 5f, 2f)
-            .setSizing(90f, Size.Percent, 0f, Size.Auto)
-            .setPositioning(0f, Pos.ParentCenter, 10f, Pos.AfterSibling)
-            .childOf(root)
+    private fun buildCategory(x: Float, y: Float, category: ConfigCategory, title: String, config: Config): Panel {
+        val panel = Panel(x, y, title)
 
-        subcatRefs += box
+        var sy = 20f
+        category.subcategories.forEach { (key, subcategory) ->
+            val sub = buildSubcategory(0f, sy, panel, subcategory, config)
+            sy += sub.height
+        }
 
-        val titlebox = Rectangle(Palette.Purple.withAlpha(100).rgb)
-            .setSizing(100f, Size.Percent, 40f, Size.Pixels)
-            .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentPixels)
-            .borderRadiusVarying(5f,  5f, 0f, 0f)
-            .childOf(box)
+        panel.update()
+        panels.add(panel)
+        return panel
+    }
 
-        val titleText = Text(title, shadowEnabled = false, fontSize = 14f)
-            .setPositioning(5f, Pos.ParentPixels, 0f, Pos.ParentCenter)
-            .childOf(titlebox)
+    private fun buildSubcategory(x: Float, y: Float, panel: Panel, subcategory: ConfigSubcategory, config: Config): Subcategory {
+        val sub = Subcategory(x, y, subcategory)
 
+        var ey = Subcategory.HEIGHT
         subcategory.elements.entries.forEachIndexed { index, (key, element) ->
             val component = when (element) {
-                is Button -> ButtonUIBuilder().build(box, element, window)
-                is ColorPicker -> ColorPickerUIBuilder().build(box, element, window)
-                is Dropdown -> DropdownUIBuilder().build(box, element, window)
-                is Keybind -> KeybindUIBuilder().build(box, element, window)
-                is Slider -> SliderUIBuilder().build(box, element, window)
-                is StepSlider -> StepSliderUIBuilder().build(box, element, window)
-                is TextInput -> TextInputUIBuilder().build(box, element, window)
-                is TextParagraph -> TextParagraphUIBuilder().build(box, element)
-                is Toggle -> ToggleUIBuilder().build(box, element, window)
+                is Button -> ButtonUI(0f, ey,element)
+                is ColorPicker -> ColorPickerUI(0f, ey, element)
+                is Dropdown -> DropdownUI(0f, ey, element)
+                is Keybind -> KeybindUI(0f, ey, element)
+                is Slider -> SliderUI(0f, ey, element)
+                is StepSlider -> StepSliderUI(0f, ey, element)
+                is TextInput -> TextInputUI(0f, ey, element)
+                is TextParagraph -> TextParagraphUI(0f, ey, element)
+                is Toggle -> ToggleUI(0f, ey, element)
                 else -> null
             }
 
             if (component == null) return@forEachIndexed
+
+            component.parent = sub
+            sub.elements.add(component)
 
             elementContainers[element.configName] = component
             elementRefs[element.configName] = element
 
             needsVisibilityUpdate = true
             scheduleVisibilityUpdate(config)
+
+            ey += component.height
         }
+
+        sub.parent = panel
+        sub.update()
+        panel.elements.add(sub)
+        return sub
     }
 
     fun updateUI(config: Config) {
@@ -230,8 +133,9 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             updateElementVisibility(key, config)
         }
 
-        subcatRefs.forEach { element ->
-            element.cache.sizeCacheValid = false
+        for (panel in panels) {
+            panel.update()
+            for(element in panel.elements) (element as? ParentElement)?.update()
         }
 
         needsVisibilityUpdate = false
@@ -241,9 +145,79 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         val container = elementContainers[configKey] ?: return
         val element = elementRefs[configKey] ?: return
         val visible = element.isVisible(config)
+        container.setVisibility(visible)
+    }
 
-        if (visible) container.show() else container.hide()
+    fun drawHeader() {
+        val swx = rez.scaledWidth / 2
+        nvg.push()
+        nvg.translate(swx - 50f, 10f)
+        nvg.rect(0f, 0f, 100f, 30f, Palette.Crust.rgb, 15f)
+        drawPlayer(10f, 2.5f, 25f, 25f,  3f)
+        nvg.text(player?.name?.stripped ?: "",40f, 5f, 10f, Palette.Text.rgb, nvg.inter)
+        nvg.text("Stella User",40f, 17f, 8f, Palette.Subtext1.rgb, nvg.inter)
+        nvg.hollowGradientRect(0f, 0f, 100f, 30f, 1f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 15f)
+        nvg.pop()
+    }
 
-        container.cache.positionCacheValid = false
+    fun drawPlayer(x: Float, y: Float, width: Float, height: Float, radius: Float) {
+        val skin = player?.skin?.texture ?: return
+        imageCacheMap.getOrPut(skin.path) {
+            val texture = client.textureManager.getTexture(skin)?.texture as? GlTexture
+            nvg.createNVGImage(texture?.glId() ?: 0, 64, 64)
+        }.let { id ->
+            nvg.image(id, 64, 64, 8, 8, 8, 8, x, y, width, height, radius)
+            nvg.image(id, 64, 64, 40, 8, 8, 8, x, y, width, height, radius)
+        }
+    }
+
+    private fun applyOpeningScissor() {
+        if (opening && revealDelegate.done()) {
+            opening = false
+        }
+
+        val sw = rez.scaledWidth.toFloat()
+        val sh = rez.scaledHeight.toFloat()
+
+        val halfW = reveal / 2f
+        val cx = sw / 2f
+
+        val x = cx - halfW
+        val width = reveal
+
+        nvg.pushScissor(x, 0f, width, sh)
+    }
+
+
+    override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
+        for (panel in panels) panel.mouseClicked(x.toFloat(), y.toFloat(), button.code)
+        return super.onMouseClick(button, x, y, modifiers)
+    }
+
+    override fun onMouseScroll(x: Double, y: Double, amount: Double, horizontalAmount: Double): Boolean {
+        for (panel in panels) panel.mouseScrolled(x.toFloat(), y.toFloat(), amount.toFloat(), horizontalAmount.toFloat())
+        return super.onMouseScroll(x, y, amount, horizontalAmount)
+    }
+
+    override fun onMouseRelease(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
+        for (panel in panels) panel.mouseReleased(x.toFloat(), y.toFloat(), button.code)
+        return super.onMouseRelease(button, x, y, modifiers)
+    }
+
+    override fun onKeyPress(
+        key: OmniKey,
+        scanCode: Int,
+        typedChar: Char,
+        modifiers: KeyboardModifiers,
+        event: KeyPressEvent
+    ): Boolean {
+        val modInt = modifiers.toMods()
+        val handled = when (event) {
+            KeyPressEvent.TYPED -> panels.any { it.charTyped(typedChar, modInt) }
+            KeyPressEvent.PRESSED -> panels.any { it.keyPressed(key.code, modInt) }
+        }
+
+        if (handled) return true
+        return super.onKeyPress(key, scanCode, typedChar, modifiers, event)
     }
 }
