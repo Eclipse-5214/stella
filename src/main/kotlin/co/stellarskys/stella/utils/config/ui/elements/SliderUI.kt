@@ -44,9 +44,9 @@ class SliderUI(initX: Float, initY: Float, val slider: Slider) : BaseElement() {
         if (dragging || !valueInput.isFocused) valueInput.setText(String.format("%.2f", slider.value as Float))
         lastFocusState = valueInput.isFocused
 
-
-        if (isAnimating && offsetAnim.done().also { if (it) isAnimating = false }) {
+        if (isAnimating) {
             height = (HEIGHT - offset).coerceAtLeast(0f)
+            if (offsetAnim.done()) isAnimating = false
         }
 
         visualProgress = (slider.value as Float - slider.min) / (slider.max - slider.min)
@@ -81,6 +81,12 @@ class SliderUI(initX: Float, initY: Float, val slider: Slider) : BaseElement() {
         slider.value = slider.min + percent * (slider.max - slider.min)
     }
 
+    override fun setVisibility(value: Boolean) {
+        super.setVisibility(value)
+        offset = if (value) 0f else HEIGHT
+        isAnimating = true
+    }
+
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible || offset > 1f) return false
 
@@ -92,7 +98,7 @@ class SliderUI(initX: Float, initY: Float, val slider: Slider) : BaseElement() {
         }
 
         valueInput.isFocused = false
-        return false
+        return super.mouseClicked(mouseX, mouseY, button)
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) {

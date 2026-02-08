@@ -61,8 +61,9 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
         if (dragging || !valueInput.isFocused) valueInput.setText((slider.value as Int).toString())
         lastFocusState = valueInput.isFocused
 
-        if (isAnimating && offsetAnim.done().also { if (it) isAnimating = false }) {
+        if (isAnimating) {
             height = (HEIGHT - offset).coerceAtLeast(0f)
+            if (offsetAnim.done()) isAnimating = false
         }
 
         visualProgress = getProgress()
@@ -98,6 +99,12 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
         slider.value = snapValue(rawValue)
     }
 
+    override fun setVisibility(value: Boolean) {
+        super.setVisibility(value)
+        offset = if (value) 0f else HEIGHT
+        isAnimating = true
+    }
+
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible || offset > 1f) return false
         if (valueInput.mouseClicked(mouseX , mouseY , button)) return true
@@ -109,7 +116,7 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
             return true
         }
         valueInput.isFocused = false
-        return false
+        return super.mouseClicked(mouseX, mouseY, button)
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) {

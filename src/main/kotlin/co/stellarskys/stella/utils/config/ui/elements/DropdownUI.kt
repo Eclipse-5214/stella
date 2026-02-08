@@ -99,7 +99,7 @@ class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown) : BaseEleme
             isAnimating = true
             return true
         }
-        return false
+        return super.mouseClicked(mouseX, mouseY, button)
     }
 
     fun reload() = nvg.deleteImage(caretImage).also { caretImage = nvg.createImage(dropdownPath, 10, 10, Palette.Text, UUID.randomUUID().toString()) }

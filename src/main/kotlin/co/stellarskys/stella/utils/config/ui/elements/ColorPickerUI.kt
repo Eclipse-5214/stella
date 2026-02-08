@@ -114,7 +114,7 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         else if (isAreaHovered(8f + PICKER_SIZE + GAP, startY, SLIDER_WIDTH, PICKER_SIZE)) draggingHue = true
         else if (isAreaHovered(8f + PICKER_SIZE + GAP + SLIDER_WIDTH + GAP, startY, SLIDER_WIDTH, PICKER_SIZE)) draggingAlpha = true
         else return false
-        return true
+        return super.mouseClicked(mouseX, mouseY, button)
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) {

@@ -37,8 +37,9 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
     override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible && !isAnimating) return
 
-        if (isAnimating && offsetAnim.done().also { if (it) isAnimating = false }) {
+        if (isAnimating) {
             height = (HEIGHT - offset).coerceAtLeast(0f)
+            if (offsetAnim.done()) isAnimating = false
         }
 
         nvg.push(); nvg.translate(x, y); nvg.pushScissor(0f, 0f, width, height)
@@ -52,7 +53,13 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible || offset > 1f) return false
         if (textField.mouseClicked(mouseX , mouseY , button)) return true
-        return isAreaHovered(0f, 0f, width, HEIGHT, mouseX, mouseY)
+        return super.mouseClicked(mouseX, mouseY, button)
+    }
+
+    override fun setVisibility(value: Boolean) {
+        super.setVisibility(value)
+        offset = if (value) 0f else HEIGHT
+        isAnimating = true
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) {
