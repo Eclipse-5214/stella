@@ -11,10 +11,10 @@ import net.minecraft.client.gui.GuiGraphics
 import kotlin.math.roundToInt
 
 class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseElement() {
-    private var offsetAnim = Utils.animate<Float>(0.15)
-    private var offset by offsetAnim
     private var visualProgressAnim = Utils.animate<Float>(0.2, AnimType.EASE_OUT)
+    private var offsetAnim = Utils.animate<Float>(0.15)
     private var visualProgress by visualProgressAnim
+    private var offset by offsetAnim
     private var dragging = false
     private var lastFocusState = false
 

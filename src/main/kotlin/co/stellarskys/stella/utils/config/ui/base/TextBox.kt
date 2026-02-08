@@ -20,7 +20,7 @@ class TextBox(
     val onType: (String) -> Unit
 ) : BaseElement() {
     private var padding = borderWidth + 3f
-    private var currentText = initialText
+    var currentText = initialText
 
     init {
         this.x = x

@@ -17,10 +17,11 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     private var offsetAnim = Utils.animate<Float>(0.15)
     private var expansion by expansionAnim
     private var offset by offsetAnim
-
     private var hsb = FloatArray(3)
     private var alpha = (picker.value as Color).alpha / 255f
-    private var draggingArea = false; private var draggingHue = false; private var draggingAlpha = false
+    private var draggingArea = false
+    private var draggingHue = false
+    private var draggingAlpha = false
     private val recentColors = mutableListOf<Color>()
 
     private val hexBox = TextBox(
@@ -32,9 +33,9 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     }
 
     init {
-        x = initX;
-        y = initY;
-        width = 120f;
+        x = initX
+        y = initY
+        width = 120f
         offset = if (visible) 0f else HEIGHT
         height = HEIGHT - offset
         expansion = 0f

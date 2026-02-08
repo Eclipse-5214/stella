@@ -4,21 +4,14 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.*
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
-import co.stellarskys.stella.utils.config.ui.base.BaseElement
-import co.stellarskys.stella.utils.config.ui.base.Panel
-import co.stellarskys.stella.utils.config.ui.base.ParentElement
-import co.stellarskys.stella.utils.config.ui.base.Subcategory
+import co.stellarskys.stella.utils.config.ui.base.*
 import co.stellarskys.stella.utils.config.ui.elements.*
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.nvg.Gradient
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
-import co.stellarskys.vexel.components.base.VexelElement
 import com.mojang.blaze3d.opengl.GlTexture
 import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.input.KeyboardModifiers
-import dev.deftu.omnicore.api.client.input.OmniKey
-import dev.deftu.omnicore.api.client.input.OmniMouse
-import dev.deftu.omnicore.api.client.input.OmniMouseButton
+import dev.deftu.omnicore.api.client.input.*
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.render.OmniResolution
@@ -102,7 +95,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
                 //is Keybind -> KeybindUIBuilder().build(box, element, window)
                 is Slider -> SliderUI(0f, ey, element)
                 is StepSlider -> StepSliderUI(0f, ey, element)
-                //is TextInput -> TextInputUIBuilder().build(box, element, window)
+                is TextInput -> TextInputUI(0f, ey, element)
                 //is TextParagraph -> TextParagraphUIBuilder().build(box, element)
                 is Toggle -> ToggleUI(0f, ey, element)
                 else -> null
@@ -192,7 +185,6 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         val x = cx - halfW
         val width = reveal
 
-        // Full height, only X is animated
         nvg.pushScissor(x, 0f, width, sh)
     }
 
@@ -220,19 +212,12 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         event: KeyPressEvent
     ): Boolean {
         val modInt = modifiers.toMods()
-
-        // 1. Try to let the UI panels handle the input first
         val handled = when (event) {
             KeyPressEvent.TYPED -> panels.any { it.charTyped(typedChar, modInt) }
             KeyPressEvent.PRESSED -> panels.any { it.keyPressed(key.code, modInt) }
         }
 
-        // 2. If a TextBox handled it, we return true so the game doesn't
-        // trigger other shortcuts (like 'E' to close inventory)
         if (handled) return true
-
-        // 3. IMPORTANT: If the UI didn't handle it, call SUPER.
-        // This allows Minecraft to see the Escape key and close the menu.
         return super.onKeyPress(key, scanCode, typedChar, modifiers, event)
     }
 }

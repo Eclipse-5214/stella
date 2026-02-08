@@ -42,8 +42,6 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
         nvg.push()
         nvg.translate(x, y)
         nvg.pushScissor(0f,0f, width, HEIGHT - offset)
-        //nvg.translate(0f, offset)
-
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
         nvg.text(toggle.name, 6f, 8.5f, 8f, Palette.Text.rgb, nvg.inter)
         nvg.translate(width - 30f, 7f,)
