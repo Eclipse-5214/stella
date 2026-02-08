@@ -62,7 +62,7 @@ class TextBox(
         nvg.pop()
     }
 
-    fun setText(newText: String) { currentText = newText; handler.updateCaretPosition() }
+    fun setText(newText: String) { currentText = newText; handler.onExternalTextUpdate() }
     var isFocused: Boolean by handler::isFocused
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int) = handler.mouseClicked(mouseX, mouseY, button)

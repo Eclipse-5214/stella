@@ -5,6 +5,15 @@ import co.stellarskys.stella.utils.TimeUtils.millis
 import co.stellarskys.stella.utils.render.nvg.Font
 import net.minecraft.client.gui.GuiGraphics
 
+/*
+ * Adapted from TextInputHandler.kt in OdinFabric
+ * https://github.com/odtheking/OdinFabric
+ *
+ * BSD 3-Clause License
+ * Copyright (c) 2025, odtheking
+ * See full license at: https://opensource.org/licenses/BSD-3-Clause
+ */
+
 class TextHandler(
     private val textProvider: () -> String,
     private val textSetter: (String) -> Unit,
@@ -114,6 +123,12 @@ class TextHandler(
         if (caretX - textOffset < 0f) textOffset = caretX
     }
 
+    fun onExternalTextUpdate() {
+        caret = caret.coerceIn(0, text.length)
+        selection = selection.coerceIn(0, text.length)
+        updateCaretPosition()
+    }
+
     private fun insert(string: String) {
         if (selection != caret) deleteSelection()
         val result = text.substring(0, caret) + string + text.substring(caret)
@@ -143,6 +158,7 @@ class TextHandler(
         history.add(text)
         historyIndex = history.size - 1
     }
+
 
     private fun undo() {
         if (historyIndex > 0) {
