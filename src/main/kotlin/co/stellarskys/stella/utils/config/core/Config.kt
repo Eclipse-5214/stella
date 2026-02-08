@@ -43,7 +43,7 @@ class Config(
 
     // UI functions
     fun open() {
-        configUI = ConfigUI(categories, this)
+        if(configUI == null) configUI = ConfigUI(categories, this)
         TickSchedulers.client.post { client.setScreen(configUI) }
     }
 

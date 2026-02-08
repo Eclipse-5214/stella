@@ -14,7 +14,9 @@ import java.awt.Color
 
 class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseElement() {
     private var expansionAnim = Utils.animate<Float>(0.2, AnimType.EASE_OUT)
+    private var offsetAnim = Utils.animate<Float>(0.15)
     private var expansion by expansionAnim
+    private var offset by offsetAnim
 
     private var hsb = FloatArray(3)
     private var alpha = (picker.value as Color).alpha / 255f
@@ -33,10 +35,17 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         x = initX;
         y = initY;
         width = 120f;
-        height = HEIGHT
+        offset = if (visible) 0f else HEIGHT
+        height = HEIGHT - offset
         expansion = 0f
         Color.RGBtoHSB((picker.value as Color).red, (picker.value as Color).green, (picker.value as Color).blue, hsb)
         hexBox.parent = this
+    }
+
+    override fun setVisibility(value: Boolean) {
+        super.setVisibility(value)
+        offset = if (value) 0f else (HEIGHT + (CONTENT_HEIGHT * expansion))
+        isAnimating = true
     }
 
     private fun applyColor(color: Color, updateHex: Boolean = true) {
@@ -48,13 +57,18 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
 
     override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible && !isAnimating) return
+
+        val currentFullHeight = HEIGHT + (CONTENT_HEIGHT * expansion)
+
         if (isAnimating) {
-            height = HEIGHT + (CONTENT_HEIGHT * expansion)
-            if (expansionAnim.done()) isAnimating = false
+            height = (currentFullHeight - offset).coerceAtLeast(0f)
+            if (expansionAnim.done() && offsetAnim.done()) isAnimating = false
         }
 
         nvg.push()
         nvg.translate(x, y)
+        nvg.pushScissor(0f, 0f, width, height)
+
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
         nvg.text(picker.name, 6f, 8.5f, 8f, Palette.Text.rgb, nvg.inter)
         nvg.rect(width - 20f, 5.5f, 14f, 14f, (picker.value as Color).rgb, 7f)
@@ -78,7 +92,10 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
             recentColors.forEach { nvg.rect(rx, rowY + 1f, 12f, 12f, it.rgb, 6f); nvg.hollowRect(rx, rowY + 1f, 12f, 12f, 1f, Palette.Purple.withAlpha(150).rgb, 6f); rx += 16f }
             nvg.popScissor()
         }
+
+        nvg.popScissor()
         nvg.pop()
+
         if (draggingArea || draggingHue || draggingAlpha) updateFromMouse(mouseX, mouseY)
     }
 
@@ -100,7 +117,7 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     }
 
     override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) {
-        if (parent?.isAnimating == true || !visible) return
+        if (!visible) return
         if (draggingArea || draggingHue || draggingAlpha) saveToHistory(picker.value as Color)
         draggingArea = false; draggingHue = false; draggingAlpha = false
         hexBox.mouseReleased(mouseX, mouseY, button)

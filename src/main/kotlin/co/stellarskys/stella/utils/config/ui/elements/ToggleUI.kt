@@ -67,7 +67,7 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (parent?.isAnimating == true) return false
+        if (!visible) return false
         if (!isAreaHovered(width - 30f, 7f, 21f, HEIGHT - 14)) return false
         toggle.value = !value
 

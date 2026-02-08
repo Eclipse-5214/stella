@@ -49,13 +49,16 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             val panel = buildCategory(sx, 50f, category, title, config)
             sx += panel.width + 10f
         }
-
-        reveal = 0f
-        revealDelegate.snap()
-        reveal = rez.scaledWidth.toFloat()
     }
 
     override val isPausingScreen: Boolean = false
+
+    override fun onInitialize(width: Int, height: Int) {
+        reveal = 0f
+        revealDelegate.snap()
+        reveal = rez.scaledWidth.toFloat()
+        super.onInitialize(width, height)
+    }
 
     override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
         super.onRender(ctx, mouseX, mouseY, tickDelta)
@@ -95,7 +98,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             val component = when (element) {
                 is Button -> ButtonUI(0f, ey,element)
                 is ColorPicker -> ColorPickerUI(0f, ey, element)
-                //is Dropdown -> DropdownUIBuilder().build(box, element, window)
+                is Dropdown -> DropdownUI(0f, ey, element)
                 //is Keybind -> KeybindUIBuilder().build(box, element, window)
                 //is Slider -> SliderUIBuilder().build(box, element, window)
                 //is StepSlider -> StepSliderUIBuilder().build(box, element, window)
