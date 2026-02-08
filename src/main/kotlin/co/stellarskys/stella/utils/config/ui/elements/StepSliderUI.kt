@@ -106,7 +106,7 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (!visible || offset > 1f) return false
+        if (!visible || offset > 1f || parent?.isAnimating == true) return false
         if (valueInput.mouseClicked(mouseX , mouseY , button)) return true
 
         if (isAreaHovered(6f, HEIGHT / 2f, width - 12f, HEIGHT / 2f, mouseX, mouseY)) {

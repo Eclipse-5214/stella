@@ -83,7 +83,7 @@ class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown) : BaseEleme
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (!visible || offset > 1f) return false
+        if (!visible || offset > 1f || parent?.isAnimating == true) return false
         if (isAreaHovered(BOX_X, BOX_Y, BOX_W, BOX_H, mouseX, mouseY)) {
             val opening = expansion < 0.5f
             expansion = if (opening) 1f else 0f

@@ -92,11 +92,11 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
                 is Button -> ButtonUI(0f, ey,element)
                 is ColorPicker -> ColorPickerUI(0f, ey, element)
                 is Dropdown -> DropdownUI(0f, ey, element)
-                //is Keybind -> KeybindUIBuilder().build(box, element, window)
+                is Keybind -> KeybindUI(0f, ey, element)
                 is Slider -> SliderUI(0f, ey, element)
                 is StepSlider -> StepSliderUI(0f, ey, element)
                 is TextInput -> TextInputUI(0f, ey, element)
-                //is TextParagraph -> TextParagraphUIBuilder().build(box, element)
+                is TextParagraph -> TextParagraphUI(0f, ey, element)
                 is Toggle -> ToggleUI(0f, ey, element)
                 else -> null
             }

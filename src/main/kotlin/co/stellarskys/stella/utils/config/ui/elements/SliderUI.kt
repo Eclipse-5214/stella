@@ -88,7 +88,7 @@ class SliderUI(initX: Float, initY: Float, val slider: Slider) : BaseElement() {
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (!visible || offset > 1f) return false
+        if (!visible || offset > 1f || parent?.isAnimating == true) return false
 
         if (valueInput.mouseClicked(mouseX, mouseY, button)) return true
 
