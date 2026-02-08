@@ -16,11 +16,13 @@ import co.stellarskys.vexel.components.base.VexelElement
 import com.mojang.blaze3d.opengl.GlTexture
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.input.KeyboardModifiers
+import dev.deftu.omnicore.api.client.input.OmniKey
 import dev.deftu.omnicore.api.client.input.OmniMouse
 import dev.deftu.omnicore.api.client.input.OmniMouseButton
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.render.OmniResolution
+import dev.deftu.omnicore.api.client.screen.KeyPressEvent
 import dev.deftu.omnicore.api.client.screen.OmniScreen
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
@@ -92,7 +94,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         subcategory.elements.entries.forEachIndexed { index, (key, element) ->
             val component = when (element) {
                 is Button -> ButtonUI(0f, ey,element)
-                //is ColorPicker -> ColorPickerUIBuilder().build(box, element, window)
+                is ColorPicker -> ColorPickerUI(0f, ey, element)
                 //is Dropdown -> DropdownUIBuilder().build(box, element, window)
                 //is Keybind -> KeybindUIBuilder().build(box, element, window)
                 //is Slider -> SliderUIBuilder().build(box, element, window)
@@ -195,5 +197,39 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
         for (panel in panels) panel.mouseClicked(x.toFloat(), y.toFloat(), button.code)
         return super.onMouseClick(button, x, y, modifiers)
+    }
+
+    override fun onMouseScroll(x: Double, y: Double, amount: Double, horizontalAmount: Double): Boolean {
+        for (panel in panels) panel.mouseScrolled(x.toFloat(), y.toFloat(), amount.toFloat(), horizontalAmount.toFloat())
+        return super.onMouseScroll(x, y, amount, horizontalAmount)
+    }
+
+    override fun onMouseRelease(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
+        for (panel in panels) panel.mouseReleased(x.toFloat(), y.toFloat(), button.code)
+        return super.onMouseRelease(button, x, y, modifiers)
+    }
+
+    override fun onKeyPress(
+        key: OmniKey,
+        scanCode: Int,
+        typedChar: Char,
+        modifiers: KeyboardModifiers,
+        event: KeyPressEvent
+    ): Boolean {
+        val modInt = modifiers.toMods()
+
+        // 1. Try to let the UI panels handle the input first
+        val handled = when (event) {
+            KeyPressEvent.TYPED -> panels.any { it.charTyped(typedChar, modInt) }
+            KeyPressEvent.PRESSED -> panels.any { it.keyPressed(key.code, modInt) }
+        }
+
+        // 2. If a TextBox handled it, we return true so the game doesn't
+        // trigger other shortcuts (like 'E' to close inventory)
+        if (handled) return true
+
+        // 3. IMPORTANT: If the UI didn't handle it, call SUPER.
+        // This allows Minecraft to see the Escape key and close the menu.
+        return super.onKeyPress(key, scanCode, typedChar, modifiers, event)
     }
 }

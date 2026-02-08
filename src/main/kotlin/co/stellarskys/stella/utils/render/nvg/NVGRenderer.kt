@@ -252,10 +252,32 @@ object NVGRenderer {
         color1: Int,
         color2: Int,
         gradient: Gradient,
-        radius: Float
+        radius: Float = 0f
     ) {
         nvgBeginPath(vg)
         nvgRoundedRect(vg, x, y, w, h, radius)
+        gradient(color1, color2, x, y, w, h, gradient)
+        nvgFillPaint(vg, nvgPaint)
+        nvgFill(vg)
+    }
+
+    fun gradientRect(
+        x: Float,
+        y: Float,
+        w: Float,
+        h: Float,
+        color1: Int,
+        color2: Int,
+        gradient: Gradient,
+        topRight: Float,
+        topLeft: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    ) {
+        nvgBeginPath(vg)
+        // Use the varying version to support individual corner rounding
+        nvgRoundedRectVarying(vg, round(x), round(y), round(w), round(h), topLeft, topRight, bottomRight, bottomLeft)
+
         gradient(color1, color2, x, y, w, h, gradient)
         nvgFillPaint(vg, nvgPaint)
         nvgFill(vg)
