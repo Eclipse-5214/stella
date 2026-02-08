@@ -956,7 +956,7 @@ val config = Config("Stella", "Stella") {
 
             toggle {
                 configName = "bars.hideVanillaArmor"
-                name = "Hide Mana"
+                name = "Hide Armor"
                 description = "Hides the vanilla armor display"
                 default = false
             }

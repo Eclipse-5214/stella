@@ -75,7 +75,7 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
         nvg.text(slider.name, 6f, 7f, 8f, Palette.Text.rgb, nvg.inter)
 
-        valueInput.render(context, mouseX , mouseY - absoluteY, delta)
+        valueInput.render(context, mouseX, mouseY, delta)
 
         // Slider Track
         nvg.rect(trackX, trackY, trackW, 2f, Palette.Base.rgb, 1f)
