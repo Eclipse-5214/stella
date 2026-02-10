@@ -55,7 +55,6 @@ value class SimpleTimeMark(val millis: Long) : Comparable<SimpleTimeMark> {
 }
 
 object TimeUtils {
-    inline val highResNow get() = SimpleTimeMark(System.nanoTime())
     inline val now get() = SimpleTimeMark(System.currentTimeMillis())
     inline val zero get() = SimpleTimeMark(0)
     inline val max get() = SimpleTimeMark(Long.MAX_VALUE)

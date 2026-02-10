@@ -3,8 +3,8 @@ package co.stellarskys.stella.utils.animation
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.TimeUtils.millis
 
-class DeltaTracker(val targetFps: Float = 240f) {
-    private var tracker = TimeUtils.highResNow
+class DeltaTracker(val targetFps: Float = 120f) {
+    private var tracker = TimeUtils.now
     private val msPerFrame = 1000.0 / targetFps
 
     var currentDelta = 0.0
@@ -15,8 +15,8 @@ class DeltaTracker(val targetFps: Float = 240f) {
      * Use this in your Animation class.
      */
     fun getDelta(): Double {
-        val elapsed = tracker.since.millis.toDouble() / 1_000_000.0
-        tracker = TimeUtils.highResNow
+        val elapsed = tracker.since.millis.toDouble()
+        tracker = TimeUtils.now
         return elapsed / msPerFrame
     }
 
