@@ -2,7 +2,7 @@ package co.stellarskys.stella.utils.config.ui.base
 
 abstract class ParentElement: BaseElement() {
     val elements = mutableListOf<BaseElement>()
-    open val visibleElements get() = elements.filter { it.visible }
+    open val visibleElements get() = elements.filter { it.visible || it.isAnimating }
 
     override var isAnimating: Boolean = false
         get() = super.isAnimating || areElementsAnimating() || field
@@ -16,6 +16,6 @@ abstract class ParentElement: BaseElement() {
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int) = visibleElements.any { it.mouseClicked(mouseX, mouseY, button) }
     override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) { for (element in elements) element.mouseReleased(mouseX, mouseY, button) }
 
-    override fun charTyped(char: Char) = elements.any { it.charTyped(char) }
-    override fun keyPressed(keyCode: Int) = elements.any { it.keyPressed(keyCode) }
+    override fun charTyped(char: Char, modifiers: Int) = elements.any { it.charTyped(char, modifiers) }
+    override fun keyPressed(keyCode: Int, modifiers: Int) = elements.any { it.keyPressed(keyCode, modifiers) }
 }

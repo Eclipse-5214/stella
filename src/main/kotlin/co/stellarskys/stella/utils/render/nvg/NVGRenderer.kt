@@ -89,14 +89,29 @@ object NVGRenderer {
     }
 
     fun pushScissor(x: Float, y: Float, w: Float, h: Float) {
-        scissor = Scissor(scissor, x, y, w + x, h + y)
-        scissor?.applyScissor()
+        // 1. We MUST save the state so that popScissor can restore the previous clip
+        nvgSave(vg)
+
+        // 2. If this is the first scissor, use nvgScissor.
+        // If it's a nested scissor, use nvgIntersectScissor.
+        if (scissor == null) {
+            nvgScissor(vg, x, y, w, h)
+        } else {
+            nvgIntersectScissor(vg, x, y, w, h)
+        }
+
+        // 3. Keep the stack just to track depth/existence
+        scissor = Scissor(scissor, x, y, x + w, y + h)
     }
 
     fun popScissor() {
-        nvgResetScissor(vg)
+        if (scissor == null) return
+
+        // 1. Restore NanoVG state (this automatically pops the scissor/matrix)
+        nvgRestore(vg)
+
+        // 2. Move up the stack
         scissor = scissor?.previous
-        scissor?.applyScissor()
     }
 
     fun line(x1: Float, y1: Float, x2: Float, y2: Float, thickness: Float, color: Int) {
@@ -237,10 +252,32 @@ object NVGRenderer {
         color1: Int,
         color2: Int,
         gradient: Gradient,
-        radius: Float
+        radius: Float = 0f
     ) {
         nvgBeginPath(vg)
         nvgRoundedRect(vg, x, y, w, h, radius)
+        gradient(color1, color2, x, y, w, h, gradient)
+        nvgFillPaint(vg, nvgPaint)
+        nvgFill(vg)
+    }
+
+    fun gradientRect(
+        x: Float,
+        y: Float,
+        w: Float,
+        h: Float,
+        color1: Int,
+        color2: Int,
+        gradient: Gradient,
+        topRight: Float,
+        topLeft: Float,
+        bottomRight: Float,
+        bottomLeft: Float
+    ) {
+        nvgBeginPath(vg)
+        // Use the varying version to support individual corner rounding
+        nvgRoundedRectVarying(vg, round(x), round(y), round(w), round(h), topLeft, topRight, bottomRight, bottomLeft)
+
         gradient(color1, color2, x, y, w, h, gradient)
         nvgFillPaint(vg, nvgPaint)
         nvgFill(vg)
@@ -512,18 +549,7 @@ object NVGRenderer {
         }.id
     }
 
-    private class Scissor(val previous: Scissor?, val x: Float, val y: Float, val maxX: Float, val maxY: Float) {
-        fun applyScissor() {
-            if (previous == null) nvgScissor(vg, x, y, maxX - x, maxY - y)
-            else {
-                val x = max(x, previous.x)
-                val y = max(y, previous.y)
-                val width = max(0f, (min(maxX, previous.maxX) - x))
-                val height = max(0f, (min(maxY, previous.maxY) - y))
-                nvgScissor(vg, x, y, width, height)
-            }
-        }
-    }
+    private class Scissor(val previous: Scissor?, val x: Float, val y: Float, val maxX: Float, val maxY: Float)
 
     fun drawMasked(x: Float, y: Float, w: Float, h: Float, radius: Float, block: () -> Unit) {
         push()

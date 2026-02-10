@@ -21,7 +21,7 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
         trackColor = if (value) Palette.Purple else Palette.Crust
         thumbColor = if (value) Color.WHITE else Palette.Purple.withAlpha(100)
         thumbX = if (value) 11f else 1f
-        offset = if (visible) 0f else -HEIGHT
+        offset = if (visible) 0f else HEIGHT
         x = initX
         y = initY
     }
@@ -34,15 +34,14 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
     ) {
         if (!visible && !isAnimating) return
 
-        if (isAnimating && offsetAnim.done()) {
-            isAnimating = false
+        if (isAnimating) {
+            height = HEIGHT - offset
+            if (offsetAnim.done()) isAnimating = false
         }
 
         nvg.push()
         nvg.translate(x, y)
-        nvg.pushScissor(0f,0f, width, ButtonUI.Companion.HEIGHT - offset)
-        nvg.translate(0f, offset)
-
+        nvg.pushScissor(0f,0f, width, HEIGHT - offset)
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
         nvg.text(toggle.name, 6f, 8.5f, 8f, Palette.Text.rgb, nvg.inter)
         nvg.translate(width - 30f, 7f,)
@@ -53,8 +52,20 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
         nvg.pop()
     }
 
+    override fun setVisibility(value: Boolean) {
+        super.setVisibility(value)
+
+        if (value) {
+            offset = 0f
+            isAnimating = true
+        } else {
+            offset = HEIGHT
+            isAnimating = true
+        }
+    }
+
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (parent?.isAnimating == true) return false
+        if (!visible) return false
         if (!isAreaHovered(width - 30f, 7f, 21f, HEIGHT - 14)) return false
         toggle.value = !value
 

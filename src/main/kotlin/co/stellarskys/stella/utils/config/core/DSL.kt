@@ -295,6 +295,7 @@ class StepSlider : ConfigElement() {
         value = default
     }
 }
+
 class TextInput : ConfigElement() {
     var placeholder: String = ""
         set(value) {

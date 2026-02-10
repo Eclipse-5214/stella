@@ -4,23 +4,18 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.*
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
-import co.stellarskys.stella.utils.config.ui.base.BaseElement
-import co.stellarskys.stella.utils.config.ui.base.Panel
-import co.stellarskys.stella.utils.config.ui.base.ParentElement
-import co.stellarskys.stella.utils.config.ui.base.Subcategory
+import co.stellarskys.stella.utils.config.ui.base.*
 import co.stellarskys.stella.utils.config.ui.elements.*
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.nvg.Gradient
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
-import co.stellarskys.vexel.components.base.VexelElement
 import com.mojang.blaze3d.opengl.GlTexture
 import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.input.KeyboardModifiers
-import dev.deftu.omnicore.api.client.input.OmniMouse
-import dev.deftu.omnicore.api.client.input.OmniMouseButton
+import dev.deftu.omnicore.api.client.input.*
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.render.OmniResolution
+import dev.deftu.omnicore.api.client.screen.KeyPressEvent
 import dev.deftu.omnicore.api.client.screen.OmniScreen
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
@@ -47,13 +42,16 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             val panel = buildCategory(sx, 50f, category, title, config)
             sx += panel.width + 10f
         }
-
-        reveal = 0f
-        revealDelegate.snap()
-        reveal = rez.scaledWidth.toFloat()
     }
 
     override val isPausingScreen: Boolean = false
+
+    override fun onInitialize(width: Int, height: Int) {
+        reveal = 0f
+        revealDelegate.snap()
+        reveal = rez.scaledWidth.toFloat()
+        super.onInitialize(width, height)
+    }
 
     override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
         super.onRender(ctx, mouseX, mouseY, tickDelta)
@@ -92,13 +90,13 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         subcategory.elements.entries.forEachIndexed { index, (key, element) ->
             val component = when (element) {
                 is Button -> ButtonUI(0f, ey,element)
-                //is ColorPicker -> ColorPickerUIBuilder().build(box, element, window)
-                //is Dropdown -> DropdownUIBuilder().build(box, element, window)
-                //is Keybind -> KeybindUIBuilder().build(box, element, window)
-                //is Slider -> SliderUIBuilder().build(box, element, window)
-                //is StepSlider -> StepSliderUIBuilder().build(box, element, window)
-                //is TextInput -> TextInputUIBuilder().build(box, element, window)
-                //is TextParagraph -> TextParagraphUIBuilder().build(box, element)
+                is ColorPicker -> ColorPickerUI(0f, ey, element)
+                is Dropdown -> DropdownUI(0f, ey, element)
+                is Keybind -> KeybindUI(0f, ey, element)
+                is Slider -> SliderUI(0f, ey, element)
+                is StepSlider -> StepSliderUI(0f, ey, element)
+                is TextInput -> TextInputUI(0f, ey, element)
+                is TextParagraph -> TextParagraphUI(0f, ey, element)
                 is Toggle -> ToggleUI(0f, ey, element)
                 else -> null
             }
@@ -187,7 +185,6 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         val x = cx - halfW
         val width = reveal
 
-        // Full height, only X is animated
         nvg.pushScissor(x, 0f, width, sh)
     }
 
@@ -195,5 +192,32 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
         for (panel in panels) panel.mouseClicked(x.toFloat(), y.toFloat(), button.code)
         return super.onMouseClick(button, x, y, modifiers)
+    }
+
+    override fun onMouseScroll(x: Double, y: Double, amount: Double, horizontalAmount: Double): Boolean {
+        for (panel in panels) panel.mouseScrolled(x.toFloat(), y.toFloat(), amount.toFloat(), horizontalAmount.toFloat())
+        return super.onMouseScroll(x, y, amount, horizontalAmount)
+    }
+
+    override fun onMouseRelease(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
+        for (panel in panels) panel.mouseReleased(x.toFloat(), y.toFloat(), button.code)
+        return super.onMouseRelease(button, x, y, modifiers)
+    }
+
+    override fun onKeyPress(
+        key: OmniKey,
+        scanCode: Int,
+        typedChar: Char,
+        modifiers: KeyboardModifiers,
+        event: KeyPressEvent
+    ): Boolean {
+        val modInt = modifiers.toMods()
+        val handled = when (event) {
+            KeyPressEvent.TYPED -> panels.any { it.charTyped(typedChar, modInt) }
+            KeyPressEvent.PRESSED -> panels.any { it.keyPressed(key.code, modInt) }
+        }
+
+        if (handled) return true
+        return super.onKeyPress(key, scanCode, typedChar, modifiers, event)
     }
 }
