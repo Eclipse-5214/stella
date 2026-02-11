@@ -26,6 +26,9 @@ object scoreAlerts : Feature("scoreAlerts", island = SkyBlockIsland.THE_CATACOMB
     private val chat5Crypts by config.property<Boolean>("scoreAlerts.chat5Crypts")
     private val chatMessage5Crypts by config.property<String>("scoreAlerts.chatMessage5Crypts")
 
+    private val alertBatDead by config.property<Boolean>("scoreAlerts.alertBatDead")
+    private val messageBatDead by config.property<String>("scoreAlerts.messageBatDead")
+
     override fun initialize() {
         on<DungeonEvent.Score.On270> {
             if (alert270) Utils.alert(message270.replace("&", "§"), SoundEvents.NOTE_BLOCK_PLING.value())
@@ -36,9 +39,14 @@ object scoreAlerts : Feature("scoreAlerts", island = SkyBlockIsland.THE_CATACOMB
             if (alert300) Utils.alert(message300.replace("&", "§"), SoundEvents.NOTE_BLOCK_PLING.value())
             if (chat300) ChatUtils.sendCommand("pc $chatMessage300")
         }
+
         on<DungeonEvent.Score.AllCrypts> {
             if (alert5Crypts) Utils.alert(message5Crypts.replace("&", "§"), SoundEvents.NOTE_BLOCK_PLING.value())
             if (chat5Crypts) ChatUtils.sendCommand("pc $chatMessage5Crypts")
+        }
+
+        on<DungeonEvent.Secrets.Bat> {
+            if (alertBatDead) Utils.alert(messageBatDead.replace("&", "§"), SoundEvents.NOTE_BLOCK_PLING.value())
         }
     }
 }

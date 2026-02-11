@@ -371,6 +371,20 @@ val config = Config("Stella", "Stella") {
                 placeholder = "5 crypts!"
                 shouldShow { settings -> settings["scoreAlerts.chat5Crypts"] as Boolean }
             }
+
+            toggle {
+                configName = "scoreAlerts.alertBatDead"
+                name = "Bat Dead Alert"
+                description = "Alerts you when a bat dies"
+            }
+
+            textinput {
+                configName = "scoreAlerts.messageBatDead"
+                name = "Bat Dead Message"
+                description = "Message to display when a bat dies"
+                placeholder = "&cBat Dead"
+                shouldShow { settings -> settings["scoreAlerts.alertBatDead"] as Boolean }
+            }
         }
     }
 
@@ -944,7 +958,13 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Pet Display", "petDisplay", "Enables the pet display")
+        subcategory("Pet Display", "petDisplay", "Enables the pet display") {
+            toggle {
+                configName = "autopetMessages"
+                name = "Announce AutoPet"
+                description = "Announces when AutoPet Activates"
+            }
+        }
 
         subcategory("Health & Mana",  "bars", "Enables the health & mana bars") {
             toggle {
