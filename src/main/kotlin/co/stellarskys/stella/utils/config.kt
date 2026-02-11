@@ -507,6 +507,13 @@ val config = Config("Stella", "Stella") {
                 default = false
             }
 
+            toggle {
+                configName = "ownDefault"
+                name = "Default Self"
+                description = "Use default marker for yourself"
+                shouldShow { settings -> settings["showPlayerHeads"] as Boolean }
+            }
+
             slider {
                 configName = "iconBorderWidth"
                 name = "Border Width"

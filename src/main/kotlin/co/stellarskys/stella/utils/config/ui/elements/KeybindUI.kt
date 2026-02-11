@@ -68,7 +68,7 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (!visible || offset > 1f || parent?.isAnimating == true) return false
+        if (parent?.canReceiveInput  == false || !visible || offset > 1f || parent?.isAnimating == true) return false
 
         val boxW = 40f
         val boxH = 28f

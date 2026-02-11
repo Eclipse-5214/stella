@@ -65,7 +65,7 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (!visible) return false
+        if (parent?.canReceiveInput  == false || !visible) return false
         if (!isAreaHovered(width - 60f, 14f, 42f, HEIGHT - 28)) return false
         toggle.value = !value
 

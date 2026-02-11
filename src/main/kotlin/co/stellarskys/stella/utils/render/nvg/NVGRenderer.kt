@@ -44,6 +44,7 @@ object NVGRenderer {
     private var vg = -1L
 
     val inter = Font("Default", client.resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/montserrat.ttf")).get().open())
+    var dpr = devicePixelRatio()
 
     init {
         vg = nvgCreate(NVG_ANTIALIAS or NVG_STENCIL_STROKES)
@@ -63,8 +64,7 @@ object NVGRenderer {
 
     fun beginFrame(width: Float, height: Float) {
         if (drawing) throw IllegalStateException("[NVGRenderer] Already drawing, but called beginFrame")
-
-        val dpr = devicePixelRatio()
+        dpr = devicePixelRatio()
 
         nvgBeginFrame(vg, width / dpr, height / dpr, dpr)
         nvgTextAlign(vg, NVG_ALIGN_LEFT or NVG_ALIGN_TOP)

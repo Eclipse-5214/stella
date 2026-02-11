@@ -19,17 +19,7 @@ object HUDManager {
         var x: Float,
         var y: Float,
         var scale: Float = 1f
-    ) {
-        companion object {
-            val CODEC: Codec<HudLayoutData> = RecordCodecBuilder.create { instance ->
-                instance.group(
-                    Codec.FLOAT.fieldOf("x").forGetter { it.x },
-                    Codec.FLOAT.fieldOf("y").forGetter { it.y },
-                    Codec.FLOAT.optionalFieldOf("scale", 1f).forGetter { it.scale }
-                ).apply(instance, ::HudLayoutData)
-            }
-        }
-    }
+    )
 
     private val layoutStore = DataUtils(
         fileName = "hud_positions",
@@ -75,8 +65,8 @@ object HUDManager {
         }
     }
 
-    fun getX(id: String): Float = elements[id]?.x ?: 0f
-    fun getY(id: String): Float = elements[id]?.y ?: 0f
+    fun getX(id: String): Float = elements[id]?.let { if (id in customRenderers) it.x else it.x + 2f } ?: 0f
+    fun getY(id: String): Float = elements[id]?.let { if (id in customRenderers) it.y else it.y + 3f } ?: 0f
     fun getScale(id: String): Float = elements[id]?.scale ?: 1f
 
     inline fun renderHud(name: String, context: GuiGraphics, block: () -> Unit) {

@@ -67,7 +67,7 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (parent?.isAnimating == true || !visible) return false
+        if (parent?.canReceiveInput == false ||parent?.isAnimating == true || !visible) return false
         if (!isAreaHovered(width - 80f, 8f, 64f, HEIGHT - 16)) return false
         delegate.pulse(Palette.Purple)
         this.button.onClick?.invoke()

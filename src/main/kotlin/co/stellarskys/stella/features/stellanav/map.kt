@@ -56,6 +56,7 @@ object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     val iconScale by config.property<Float>("iconScale")
     val smoothMovement by config.property<Boolean>("smoothMovement")
     val showPlayerHead by config.property<Boolean>("showPlayerHeads")
+    val ownDefault by config.property<Boolean>("ownDefault")
     val iconBorderWidth by config.property<Float>("iconBorderWidth")
     val iconBorderColor by config.property<Color>("iconBorderColor")
     val iconClassColors by config.property<Boolean>("iconClassColors")
