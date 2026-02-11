@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils.config.ui.base
 
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
 import dev.deftu.omnicore.api.client.input.OmniMouse
 import dev.deftu.omnicore.api.client.render.OmniResolution
@@ -12,8 +13,8 @@ abstract class BaseElement {
 
     var x = 0f
     var y = 0f
-    var width = 120f
-    var height = 25f
+    var width = 240f
+    var height = 50f
     var visible = true
     var parent: BaseElement? = null
 
@@ -22,7 +23,7 @@ abstract class BaseElement {
     open val absoluteX: Float get() = (parent?.absoluteX ?: 0f) + x
     open val absoluteY: Float get() = (parent?.absoluteY ?: 0f) + y
 
-    open fun isAreaHovered(rx: Float, ry: Float, rw: Float, rh: Float, mx: Float = mouse.scaledX.toFloat(), my: Float = mouse.scaledY.toFloat()) =
+    open fun isAreaHovered(rx: Float, ry: Float, rw: Float, rh: Float, mx: Float = mouse.rawX.toFloat() / ConfigUI.UI_SCALE, my: Float = mouse.rawY.toFloat()  / ConfigUI.UI_SCALE) =
         mx in (absoluteX + rx)..(absoluteX + rx + rw) && my in (absoluteY + ry)..(absoluteY + ry + rh)
 
 

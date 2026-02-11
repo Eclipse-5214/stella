@@ -3,12 +3,11 @@ package co.stellarskys.stella.utils.config.ui
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.*
-import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.*
 import co.stellarskys.stella.utils.config.ui.elements.*
-import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.nvg.Gradient
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
+import co.stellarskys.stella.utils.render.nvg.NVGSpecialRenderer
 import com.mojang.blaze3d.opengl.GlTexture
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.input.*
@@ -19,9 +18,6 @@ import dev.deftu.omnicore.api.client.screen.KeyPressEvent
 import dev.deftu.omnicore.api.client.screen.OmniScreen
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
-import java.awt.Color
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config): OmniScreen(dev.deftu.textile.Text.literal("Config")) {
     private val panels =  mutableListOf<Panel>()
@@ -29,18 +25,20 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private var needsVisibilityUpdate = false
     private val imageCacheMap = HashMap<String, Int>()
-    private val revealDelegate = Utils.animate<Float>(0.15, AnimType.EASE_OUT)
+    private val revealDelegate = Utils.animate<Float>(0.3, AnimType.EASE_OUT)
     private var reveal by revealDelegate
     private var opening = true
     private val nvg get() = NVGRenderer
     private val rez get() = OmniResolution
     private val mouse = OmniMouse
+    private val mx get() = mouse.rawX.toFloat() / UI_SCALE
+    private val my get() = mouse.rawY.toFloat() / UI_SCALE
 
     init {
-        var sx = 10f
+        var sx = 20f
         categories.forEach { (title, category) ->
-            val panel = buildCategory(sx, 50f, category, title, config)
-            sx += panel.width + 10f
+            val panel = buildCategory(sx, 100f, category, title, config)
+            sx += panel.width + 20f
         }
     }
 
@@ -49,30 +47,39 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     override fun onInitialize(width: Int, height: Int) {
         reveal = 0f
         revealDelegate.snap()
-        reveal = rez.scaledWidth.toFloat()
+        reveal = rez.windowWidth.toFloat()
         super.onInitialize(width, height)
+    }
+
+    override fun onResize(width: Int, height: Int) {
+        reveal = rez.windowWidth.toFloat()
+        revealDelegate.snap()
+        super.onResize(width, height)
     }
 
     override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
         super.onRender(ctx, mouseX, mouseY, tickDelta)
 
         val context = ctx.graphics ?: return
-        context.drawNVG {
+        NVGSpecialRenderer.draw(context, 0, 0, context.guiWidth(), context.guiHeight()) {
+            nvg.push()
             applyOpeningScissor()
+            nvg.scale(UI_SCALE, UI_SCALE)
 
             drawHeader()
             panels.forEach {
-                it.render(context, mouseX.toFloat(), mouseY.toFloat(), tickDelta)
+                it.render(context, mx, my, tickDelta)
             }
 
             nvg.popScissor()
+            nvg.pop()
         }
     }
 
     private fun buildCategory(x: Float, y: Float, category: ConfigCategory, title: String, config: Config): Panel {
         val panel = Panel(x, y, title)
 
-        var sy = 20f
+        var sy = 40f
         category.subcategories.forEach { (key, subcategory) ->
             val sub = buildSubcategory(0f, sy, panel, subcategory, config)
             sy += sub.height
@@ -149,14 +156,14 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     }
 
     fun drawHeader() {
-        val swx = rez.scaledWidth / 2
+        val swx = (rez.windowWidth / UI_SCALE) / 2
         nvg.push()
-        nvg.translate(swx - 50f, 10f)
-        nvg.rect(0f, 0f, 100f, 30f, Palette.Crust.rgb, 15f)
-        drawPlayer(10f, 2.5f, 25f, 25f,  3f)
-        nvg.text(player?.name?.stripped ?: "",40f, 5f, 10f, Palette.Text.rgb, nvg.inter)
-        nvg.text("Stella User",40f, 17f, 8f, Palette.Subtext1.rgb, nvg.inter)
-        nvg.hollowGradientRect(0f, 0f, 100f, 30f, 1f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 15f)
+        nvg.translate(swx - 100f, 20f)
+        nvg.rect(0f, 0f, 200f, 60f, Palette.Crust.rgb, 30f)
+        drawPlayer(20f, 5f, 50f, 50f,  6f)
+        nvg.text(player?.name?.stripped ?: "",80f, 10f, 20f, Palette.Text.rgb, nvg.inter)
+        nvg.text("Stella User",80f, 34f, 16f, Palette.Subtext1.rgb, nvg.inter)
+        nvg.hollowGradientRect(0f, 0f, 200f, 60f, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 30f)
         nvg.pop()
     }
 
@@ -176,8 +183,8 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             opening = false
         }
 
-        val sw = rez.scaledWidth.toFloat()
-        val sh = rez.scaledHeight.toFloat()
+        val sw = rez.windowWidth.toFloat()
+        val sh = rez.windowHeight.toFloat()
 
         val halfW = reveal / 2f
         val cx = sw / 2f
@@ -190,17 +197,17 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
 
     override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
-        for (panel in panels) panel.mouseClicked(x.toFloat(), y.toFloat(), button.code)
+        for (panel in panels) panel.mouseClicked(mx, my, button.code)
         return super.onMouseClick(button, x, y, modifiers)
     }
 
     override fun onMouseScroll(x: Double, y: Double, amount: Double, horizontalAmount: Double): Boolean {
-        for (panel in panels) panel.mouseScrolled(x.toFloat(), y.toFloat(), amount.toFloat(), horizontalAmount.toFloat())
+        for (panel in panels) panel.mouseScrolled(mx, my, amount.toFloat(), horizontalAmount.toFloat())
         return super.onMouseScroll(x, y, amount, horizontalAmount)
     }
 
     override fun onMouseRelease(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
-        for (panel in panels) panel.mouseReleased(x.toFloat(), y.toFloat(), button.code)
+        for (panel in panels) panel.mouseReleased(mx, my, button.code)
         return super.onMouseRelease(button, x, y, modifiers)
     }
 
@@ -223,5 +230,6 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
     companion object {
         val caretImage = NVGRenderer.createImage( "/assets/stella/logos/dropdown.svg")
+        val UI_SCALE get() = (OmniResolution.windowWidth.toFloat() / 1920f).coerceAtLeast(0.5f)
     }
 }

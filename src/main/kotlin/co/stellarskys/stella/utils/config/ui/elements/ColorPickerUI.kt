@@ -25,8 +25,8 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     private val recentColors = mutableListOf<Color>()
 
     private val hexBox = TextBox(
-        8f, 0f, 48f, 12f, (picker.value as Color).toHex(),
-        fontSize = 8f, borderColor = Palette.Purple.withAlpha(150).rgb, focusColor = Palette.Purple.rgb,
+        16f, 0f, 96f, 24f, (picker.value as Color).toHex(),
+        fontSize = 16f, borderColor = Palette.Purple.withAlpha(150).rgb, focusColor = Palette.Purple.rgb,
         filter = { it.isDigit() || it.lowercaseChar() in 'a'..'f' || it == '#' }, maxLength = 9
     ) { newHex ->
         try { applyColor(Utils.colorFromHex(newHex), false) } catch (_: Exception) {}
@@ -35,7 +35,7 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     init {
         x = initX
         y = initY
-        width = 120f
+        width = 240f
         offset = if (visible) 0f else HEIGHT
         height = HEIGHT - offset
         expansion = 0f
@@ -71,26 +71,26 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         nvg.pushScissor(0f, 0f, width, height)
 
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
-        nvg.text(picker.name, 6f, 8.5f, 8f, Palette.Text.rgb, nvg.inter)
-        nvg.rect(width - 20f, 5.5f, 14f, 14f, (picker.value as Color).rgb, 7f)
+        nvg.text(picker.name, 12f, 17f, 16f, Palette.Text.rgb, nvg.inter)
+        nvg.rect(width - 40f, 11f, 28f, 28f, (picker.value as Color).rgb, 14f)
 
         if (expansion > 0.01f) {
             nvg.pushScissor(0f, HEIGHT, width, height - HEIGHT)
             nvg.rect(0f, HEIGHT, width, height - HEIGHT, Palette.Crust.withAlpha(100).rgb)
-            val startY = HEIGHT + 6f
+            val startY = HEIGHT + 12f
 
             nvg.push()
-            nvg.translate(8f, startY)
+            nvg.translate(16f, startY)
             drawRoundedSBArea(PICKER_SIZE)
             nvg.translate(PICKER_SIZE + GAP, 0f); drawVerticalHueSlider(SLIDER_WIDTH, PICKER_SIZE)
             nvg.translate(SLIDER_WIDTH + GAP, 0f); drawVerticalAlphaSlider(SLIDER_WIDTH, PICKER_SIZE)
             nvg.pop()
 
-            val rowY = startY + PICKER_SIZE + 8f
+            val rowY = startY + PICKER_SIZE + 16f
             hexBox.apply { y = rowY; render(context, mouseX, mouseY, delta) }
 
-            var rx = 8f + hexBox.width + 10f
-            recentColors.forEach { nvg.rect(rx, rowY + 1f, 12f, 12f, it.rgb, 6f); nvg.hollowRect(rx, rowY + 1f, 12f, 12f, 1f, Palette.Purple.withAlpha(150).rgb, 6f); rx += 16f }
+            var rx = 16f + hexBox.width + 20f
+            recentColors.forEach { nvg.rect(rx, rowY + 2f, 24f, 24f, it.rgb, 12f); nvg.hollowRect(rx, rowY + 2f, 24f, 24f, 2f, Palette.Purple.withAlpha(150).rgb, 12f); rx += 32f }
             nvg.popScissor()
         }
 
@@ -106,13 +106,13 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         if (expansion <= 0.5f) return false
         if (hexBox.mouseClicked(mouseX, mouseY, button)) return true
 
-        val startY = HEIGHT + 6f; val rowY = startY + PICKER_SIZE + 8f
-        var rx = 8f + hexBox.width + 10f
-        recentColors.forEach { if (isAreaHovered(rx, rowY, 12f, 12f, mouseX, mouseY)) { applyColor(it); return true }; rx += 16f }
+        val startY = HEIGHT + 12f; val rowY = startY + PICKER_SIZE + 16f
+        var rx = 16f + hexBox.width + 20f
+        recentColors.forEach { if (isAreaHovered(rx, rowY, 24f, 24f, mouseX, mouseY)) { applyColor(it); return true }; rx += 32f }
 
-        if (isAreaHovered(8f, startY, PICKER_SIZE, PICKER_SIZE)) draggingArea = true
-        else if (isAreaHovered(8f + PICKER_SIZE + GAP, startY, SLIDER_WIDTH, PICKER_SIZE)) draggingHue = true
-        else if (isAreaHovered(8f + PICKER_SIZE + GAP + SLIDER_WIDTH + GAP, startY, SLIDER_WIDTH, PICKER_SIZE)) draggingAlpha = true
+        if (isAreaHovered(16f, startY, PICKER_SIZE, PICKER_SIZE)) draggingArea = true
+        else if (isAreaHovered(16f + PICKER_SIZE + GAP, startY, SLIDER_WIDTH, PICKER_SIZE)) draggingHue = true
+        else if (isAreaHovered(16f + PICKER_SIZE + GAP + SLIDER_WIDTH + GAP, startY, SLIDER_WIDTH, PICKER_SIZE)) draggingAlpha = true
         else return false
         return super.mouseClicked(mouseX, mouseY, button)
     }
@@ -132,10 +132,10 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     }
 
     private fun updateFromMouse(mx: Float, my: Float) {
-        val startY = HEIGHT + 6f
+        val startY = HEIGHT + 12f
         val localY = (my - (absoluteY + startY)).coerceIn(0f, PICKER_SIZE)
         if (draggingArea) {
-            hsb[1] = (mx - (absoluteX + 8f)).coerceIn(0f, PICKER_SIZE) / PICKER_SIZE
+            hsb[1] = (mx - (absoluteX + 16f)).coerceIn(0f, PICKER_SIZE) / PICKER_SIZE
             hsb[2] = 1f - (localY / PICKER_SIZE)
         } else if (draggingHue) hsb[0] = localY / PICKER_SIZE
         else if (draggingAlpha) alpha = localY / PICKER_SIZE
@@ -152,15 +152,15 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     override fun keyPressed(keyCode: Int, modifiers: Int) = hexBox.keyPressed(keyCode, modifiers)
 
     private fun drawRoundedSBArea(s: Float) {
-        nvg.gradientRect(0f, 0f, s, s, -1, Color.HSBtoRGB(hsb[0], 1f, 1f), Gradient.LeftToRight, 3f)
-        nvg.gradientRect(0f, 0f, s, s, 0, 0xFF000000.toInt(), Gradient.TopToBottom, 3f)
-        nvg.hollowRect(hsb[1] * s - 1.5f, (1f - hsb[2]) * s - 1.5f, 3f, 3f, 1f, -1, 3.5f)
+        nvg.gradientRect(0f, 0f, s, s, -1, Color.HSBtoRGB(hsb[0], 1f, 1f), Gradient.LeftToRight, 6f)
+        nvg.gradientRect(0f, 0f, s, s, 0, 0xFF000000.toInt(), Gradient.TopToBottom, 6f)
+        nvg.hollowRect(hsb[1] * s - 3f, (1f - hsb[2]) * s - 3f, 6f, 6f, 2f, -1, 7f)
     }
 
     private fun drawVerticalHueSlider(w: Float, h: Float) {
         val s = h / 6f
-        for (i in 0..5) nvg.gradientRect(0f, i * s, w, s + 0.5f, Color.HSBtoRGB(i/6f, 1f, 1f), Color.HSBtoRGB((i+1)/6f, 1f, 1f), Gradient.TopToBottom)
-        nvg.rect(-1f, hsb[0] * h - 1.5f, w + 2f, 3f, -1, 1f)
+        for (i in 0..5) nvg.gradientRect(0f, i * s, w, s + 1f, Color.HSBtoRGB(i/6f, 1f, 1f), Color.HSBtoRGB((i+1)/6f, 1f, 1f), Gradient.TopToBottom)
+        nvg.rect(-2f, hsb[0] * h - 3f, w + 4f, 6f, -1, 2f)
     }
 
     private fun drawVerticalAlphaSlider(w: Float, h: Float) {
@@ -170,16 +170,16 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         for (i in 0..(h / (w / 2f)).toInt()) nvg.rect(if (i % 2 == 0) 0f else w / 2f, i * (w / 2f), w / 2f, w / 2f, 0xFFCCCCCC.toInt())
         nvg.pop()
         nvg.gradientRect(0f, 0f, w, h, Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2])).withAlpha(0).rgb, Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2])).withAlpha(255).rgb, Gradient.TopToBottom)
-        nvg.rect(-1f, alpha * h - 1.5f, w + 2f, 3f, -1, 1f)
+        nvg.rect(-2f, alpha * h - 3f, w + 4f, 6f, -1, 2f)
         nvg.popScissor()
     }
 
     companion object {
-        const val HEIGHT = 25f;
-        const val CONTENT_HEIGHT = 110f;
-        const val PICKER_SIZE = 72f
-        const val SLIDER_WIDTH = 10f;
-        const val GAP = 6f;
+        const val HEIGHT = 50f;
+        const val CONTENT_HEIGHT = 220f;
+        const val PICKER_SIZE = 144f
+        const val SLIDER_WIDTH = 20f;
+        const val GAP = 12f;
         const val MAX_RECENT = 3
     }
 }

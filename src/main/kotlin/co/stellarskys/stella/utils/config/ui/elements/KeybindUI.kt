@@ -16,7 +16,7 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
     private val handler = keybind.value as Keybind.Handler
 
     init {
-        x = initX; y = initY; width = 120f
+        x = initX; y = initY
         offset = if (visible) 0f else HEIGHT; height = HEIGHT - offset
     }
 
@@ -39,12 +39,12 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
 
         // Background
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
-        nvg.text(keybind.name, 6f, 8f, 8f, Palette.Text.rgb, nvg.inter)
+        nvg.text(keybind.name, 12f, 16f, 16f, Palette.Text.rgb, nvg.inter)
 
         // Keybind Box
-        val boxW = 20f
-        val boxH = 14f
-        val boxX = width - boxW - 6f
+        val boxW = 40f
+        val boxH = 28f
+        val boxX = width - boxW - 12f
         val boxY = (HEIGHT - boxH) / 2f
 
         val isHovered = isAreaHovered(boxX, boxY, boxW, boxH, mouseX, mouseY)
@@ -53,13 +53,13 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
         val bgColor = if (isListening) Palette.Purple.withAlpha(100).rgb else Palette.Base.rgb
         val borderColor = if (isListening || isHovered) Palette.Purple.rgb else Palette.Purple.withAlpha(80).rgb
 
-        nvg.rect(boxX, boxY, boxW, boxH, bgColor, 3f)
-        nvg.hollowRect(boxX, boxY, boxW, boxH, 1f, borderColor, 3f)
+        nvg.rect(boxX, boxY, boxW, boxH, bgColor, 6f)
+        nvg.hollowRect(boxX, boxY, boxW, boxH, 2f, borderColor, 6f)
 
         // Key Text
         val displayStr = if (isListening) "..." else getKeyStringName(handler.keyCode())
-        val textWidth = nvg.textWidth(displayStr, 7f, nvg.inter)
-        nvg.text(displayStr, boxX + (boxW - textWidth) / 2f, boxY + 4f, 7f, Palette.Text.rgb, nvg.inter)
+        val textWidth = nvg.textWidth(displayStr, 14f, nvg.inter)
+        nvg.text(displayStr, boxX + (boxW - textWidth) / 4f, boxY + 8f, 14f, Palette.Text.rgb, nvg.inter)
 
         nvg.popScissor(); nvg.pop()
     }
@@ -67,10 +67,10 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible || offset > 1f || parent?.isAnimating == true) return false
 
-        val boxW = 20f
-        val boxH = 14f
-        val boxX = width - boxW - 6f
-        val boxY = (HEIGHT - boxH) / 2f
+        val boxW = 40f
+        val boxH = 28f
+        val boxX = width - boxW - 12f
+        val boxY = (HEIGHT - boxH) / 4f
 
         if (isAreaHovered(boxX, boxY, boxW, boxH, mouseX, mouseY)) {
             isListening = !isListening
@@ -112,5 +112,5 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
         }
     }
 
-    companion object { const val HEIGHT = 26f }
+    companion object { const val HEIGHT = 52f }
 }

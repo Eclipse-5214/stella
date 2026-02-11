@@ -10,16 +10,16 @@ class TextBox(
     var color: Int = 0xAA111111.toInt(),
     var textColor: Int = 0xFFFFFFFF.toInt(),
     var font: Font = NVGRenderer.inter,
-    var fontSize: Float = 9f,
+    var fontSize: Float = 18f,
     var radius: Float = 4f,
     var borderColor: Int = 0xFF333333.toInt(),
     var focusColor: Int = 0xFF5555FF.toInt(),
-    var borderWidth: Float = 1f,
+    var borderWidth: Float = 2f,
     var maxLength: Int = 32,
     var filter: (Char) -> Boolean = { true },
     val onType: (String) -> Unit
 ) : BaseElement() {
-    private var padding = borderWidth + 3f
+    private var padding = borderWidth + 6f // Doubled from 3f
     var currentText = initialText
 
     init {
@@ -42,10 +42,12 @@ class TextBox(
         maxLength = maxLength
     ).apply {
         this.parent = this@TextBox
-        this.width = w - (padding * 2f)
-        this.height = fontSize
-        this.x = padding
-        this.y = (this@TextBox.height / 2f) - (fontSize / 2)
+        this.width = w // Set width to the FULL box width
+        this.height = this@TextBox.height // Set height to the FULL box height
+        this.x = 0f // Start at 0 relative to parent
+        this.y = 0f // Start at 0 relative to parent
+        this.padding = 0f // Disable internal handler padding since we handle it here
+        this.textSidePadding = this@TextBox.padding // Add a new variable for internal text offset
     }
 
     override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {

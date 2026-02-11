@@ -2,23 +2,16 @@ package co.stellarskys.stella.utils.config.ui.base
 
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.TimeUtils.millis
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.render.nvg.Font
 import net.minecraft.client.gui.GuiGraphics
-
-/*
- * Adapted from TextInputHandler.kt in OdinFabric
- * https://github.com/odtheking/OdinFabric
- *
- * BSD 3-Clause License
- * Copyright (c) 2025, odtheking
- * See full license at: https://opensource.org/licenses/BSD-3-Clause
- */
 
 class TextHandler(
     private val textProvider: () -> String,
     private val textSetter: (String) -> Unit,
     var font: Font, var fontSize: Float, var textColor: Int,
-    var filter: (Char) -> Boolean, var maxLength: Int
+    var filter: (Char) -> Boolean, var maxLength: Int,
+    var centerIfSmall: Boolean = true
 ) : BaseElement() {
     private val text get() = textProvider()
 
@@ -37,7 +30,8 @@ class TextHandler(
     private var caretBlinkTime = TimeUtils.zero
     private var dragging = false
     var isFocused = false
-    var padding = 2f
+    var padding = 8f
+    var textSidePadding = 8f
 
     private val history = mutableListOf<String>()
     private var historyIndex = -1
@@ -55,27 +49,32 @@ class TextHandler(
 
         nvg.pushScissor(x, y, width, height)
 
-        // Render Selection
+        val totalTextWidth = nvg.textWidth(text, fontSize, font)
+        val availableWidth = width - (textSidePadding * 2f)
+        val centeringOffset = if (centerIfSmall && totalTextWidth < availableWidth) {
+            (availableWidth - totalTextWidth) / 2f
+        } else 0f
+
+        val renderX = x - textOffset + centeringOffset + textSidePadding
+        val textY = y + (height / 2f) - (fontSize / 2f)
+
         if (selectionWidth != 0f) {
             val selX = nvg.textWidth(text.substring(0, minOf(selection, caret)), fontSize, font)
-            nvg.rect(x + selX - textOffset, y, kotlin.math.abs(selectionWidth), height, 0x665555FF)
+            nvg.rect(renderX + selX, textY, kotlin.math.abs(selectionWidth), fontSize, 0x665555FF)
         }
 
-        // Render Text (Centered vertically)
-        val textY = y + (height / 2f) - (fontSize / 2f)
-        nvg.text(text, x - textOffset, textY, fontSize, textColor, font)
+        nvg.text(text, renderX, textY, fontSize, textColor, font)
 
-        // Render Caret
         if (isFocused && caretBlinkTime.since.millis % 1000 < 500) {
-            val cx = x + caretX - textOffset
-            if (cx in x..(x + width)) nvg.rect(cx, textY, 1f, fontSize, textColor, 1f)
+            val cx = renderX + caretX
+            if (cx in x..(x + width)) nvg.rect(cx, textY, 2f, fontSize, textColor, 1f)
         }
 
         nvg.popScissor()
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        isFocused = isAreaHovered(x - padding, y - padding, width + padding * 2, height + padding * 2, mouseX, mouseY)
+        isFocused = isAreaHovered(0f, 0f, width, height, mouseX, mouseY)
         if (isFocused && button == 0) {
             dragging = true
             caretFromMouse(mouseX)
@@ -149,7 +148,13 @@ class TextHandler(
     }
 
     private fun caretFromMouse(mouseX: Float) {
-        val localX = mouseX - (absoluteX - textOffset)
+        val totalTextWidth = nvg.textWidth(text, fontSize, font)
+        val availableWidth = width - (textSidePadding * 2f)
+        val centeringOffset = if (centerIfSmall && totalTextWidth < availableWidth) {
+            (availableWidth - totalTextWidth) / 2f
+        } else 0f
+
+        val localX = mouseX - (absoluteX - textOffset + centeringOffset + textSidePadding)
         caret = (0..text.length).minByOrNull { kotlin.math.abs(nvg.textWidth(text.substring(0, it), fontSize, font) - localX) } ?: 0
     }
 
@@ -158,7 +163,6 @@ class TextHandler(
         history.add(text)
         historyIndex = history.size - 1
     }
-
 
     private fun undo() {
         if (historyIndex > 0) {

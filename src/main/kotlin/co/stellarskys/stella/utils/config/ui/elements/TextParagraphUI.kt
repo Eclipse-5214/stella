@@ -33,11 +33,11 @@ class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) 
     )
 
     init {
-        x = initX; y = initY; width = 120f
+        x = initX; y = initY
 
-        val titleH = calculateMinecraftHeight("§f${paragraph.name}", 8f, width - 12f)
-        val descH = calculateMinecraftHeight("§7${paragraph.description}", 7f, width - 12f)
-        calculatedHeight = titleH + descH + 12f // Base padding
+        val titleH = calculateMinecraftHeight("§f${paragraph.name}", 16f, width - 24f)
+        val descH = calculateMinecraftHeight("§7${paragraph.description}", 14f, width - 24f)
+        calculatedHeight = titleH + descH + 24f // Base padding
 
         offset = if (visible) 0f else calculatedHeight
         height = (calculatedHeight - offset).coerceAtLeast(0f)
@@ -61,10 +61,10 @@ class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) 
         nvg.rect(0f, 0f, width, calculatedHeight, Palette.Crust.withAlpha(150).rgb)
 
         // Render Title
-        val titleHeight = drawMinecraftText("§f${paragraph.name}", 6f, 6f, 8f, width - 12f)
+        val titleHeight = drawMinecraftText("§f${paragraph.name}", 12f, 12f, 16f, width - 24f)
 
         // Render Description starting after the title
-        drawMinecraftText("§7${paragraph.description}", 6f, 6f + titleHeight + 2f, 7f, width - 12f)
+        drawMinecraftText("§7${paragraph.description}", 12f, 12f + titleHeight + 4f, 14f, width - 24f)
 
         nvg.popScissor(); nvg.pop()
     }
@@ -72,7 +72,7 @@ class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) 
     private fun drawMinecraftText(text: String, xPos: Float, yPos: Float, size: Float, maxWidth: Float): Float {
         var currentColor = Color.WHITE.rgb
         var cursorY = yPos
-        val lineHeight = size + 2f
+        val lineHeight = size + 4f
         val tokens = Regex("§.|\\s+|[^\\s§]+").findAll(text).map { it.value }.toList()
         val lineWords = mutableListOf<Pair<String, Int>>()
         var lineWidth = 0f
@@ -110,7 +110,7 @@ class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) 
     }
 
     private fun calculateMinecraftHeight(text: String, size: Float, maxWidth: Float): Float {
-        val lineHeight = size + 2f
+        val lineHeight = size + 4f
         var lines = 1
         var cursorX = 0f
         val clean = text.replace(Regex("§."), "")

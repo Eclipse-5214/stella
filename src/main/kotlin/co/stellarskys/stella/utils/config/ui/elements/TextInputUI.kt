@@ -13,16 +13,16 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
     private var offset by offsetAnim
 
     private val textField: TextBox = TextBox(
-        x = 8f,
-        y = 17f,
-        w = 104f,
-        h = 12f,
+        x = 16f,
+        y = 34f,
+        w = 208f,
+        h = 24f,
         initialText = input.value as String,
         onType = { str ->
             input.value = str
             input.onValueChanged?.invoke(str)
         },
-        fontSize = 7f,
+        fontSize = 14f,
         color = Palette.Base.rgb,
         borderColor = Palette.Purple.withAlpha(50).rgb,
         focusColor = Palette.Purple.rgb,
@@ -30,7 +30,7 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
     ).apply { parent = this@TextInputUI }
 
     init {
-        x = initX; y = initY; width = 120f
+        x = initX; y = initY
         offset = if (visible) 0f else HEIGHT; height = HEIGHT - offset
     }
 
@@ -44,7 +44,7 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
 
         nvg.push(); nvg.translate(x, y); nvg.pushScissor(0f, 0f, width, height)
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
-        nvg.text(input.name, 6f, 7f, 8f, Palette.Text.rgb, nvg.inter)
+        nvg.text(input.name, 12f, 14f, 16f, Palette.Text.rgb, nvg.inter)
         textField.render(context, mouseX , mouseY , delta)
 
         nvg.popScissor(); nvg.pop()
@@ -69,5 +69,5 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
     override fun charTyped(char: Char, modifiers: Int) = textField.charTyped(char, modifiers)
     override fun keyPressed(keyCode: Int, modifiers: Int) = textField.keyPressed(keyCode, modifiers)
 
-    companion object { const val HEIGHT = 36f }
+    companion object { const val HEIGHT = 72f }
 }

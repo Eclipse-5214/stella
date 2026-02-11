@@ -39,12 +39,12 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
         nvg.translate(x, y)
         nvg.pushScissor(0f, 0f, width, HEIGHT - offset)
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
-        nvg.text(button.name, 6f, 8.5f, 8f, Palette.Text.rgb, nvg.inter)
-        nvg.translate(width - 40f, 4f,)
-        nvg.rect(0f, 0f, 32f, HEIGHT - 8, buttonColor.rgb, 5f)
+        nvg.text(button.name, 12f, 17f, 16f, Palette.Text.rgb, nvg.inter)
+        nvg.translate(width - 80f, 8f,)
+        nvg.rect(0f, 0f, 64f, HEIGHT - 16, buttonColor.rgb, 10f)
 
-        val sw = nvg.textWidth(button.placeholder, 8f, nvg.inter)
-        nvg.text(button.placeholder, 16f - sw / 2, 4.5f, 8f, Palette.Text.rgb, nvg.inter)
+        val sw = nvg.textWidth(button.placeholder, 16f, nvg.inter)
+        nvg.text(button.placeholder, 32f - sw / 2, 9f, 16f, Palette.Text.rgb, nvg.inter)
 
         nvg.popScissor()
         nvg.pop()
@@ -63,12 +63,12 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
     }
 
     companion object {
-        const val HEIGHT = 25f
+        const val HEIGHT = 50f
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (parent?.isAnimating == true || !visible) return false
-        if (!isAreaHovered(width - 40f, 4f, 32f, HEIGHT - 8)) return false
+        if (!isAreaHovered(width - 80f, 8f, 64f, HEIGHT - 16)) return false
         delegate.pulse(Palette.Purple)
         this.button.onClick?.invoke()
         return true

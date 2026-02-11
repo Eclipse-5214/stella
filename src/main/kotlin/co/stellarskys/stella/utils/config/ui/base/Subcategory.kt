@@ -38,7 +38,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     ) {
         if (isAnimating) {
             update()
-            updateElements(elementOffset + HEIGHT)
+            updateElements(HEIGHT)
             if (offsetDeleagte.done()) {
                 isAnimating = false
             }
@@ -48,19 +48,19 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
         nvg.translate(x, y)
 
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.rgb)
-        nvg.rect(2f, 2f, width - 4f, HEIGHT - 4, buttonColor.rgb, 5f)
-        nvg.text(subcategory.subName, 6f, 8.5f, 8f, textColor.rgb, nvg.inter)
+        nvg.rect(4f, 4f, width - 8f, HEIGHT - 8, buttonColor.rgb, 10f)
+        nvg.text(subcategory.subName, 12f, 17f, 16f, textColor.rgb, nvg.inter)
 
         if (!visibleElements.isEmpty()) {
             nvg.push()
-            nvg.translate(width - 10f, 12.5f)
+            nvg.translate(width - 20f, 25f)
             nvg.rotate(Math.toRadians(dropdownRot).toFloat())
-            nvg.image(ConfigUI.caretImage, -5f, -5f, 10f, 10f, textColor.rgb)
+            nvg.image(ConfigUI.caretImage, -10f, -10f, 20f, 20f, textColor.rgb)
             nvg.pop()
         }
 
         if (open || !offsetDeleagte.done()) {
-            nvg.pushScissor(0f, 0f + HEIGHT, width, getEH() + elementOffset)
+            nvg.pushScissor(0f, HEIGHT, width, getEH() + elementOffset)
             elements.forEach {
                 it.render(context, mouseX, mouseY, delta)
             }
@@ -71,11 +71,11 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     }
 
     companion object {
-        const val HEIGHT = 25f
+        const val HEIGHT = 50f
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (isAreaHovered(2f, 2f, width - 4f, HEIGHT - 4)) {
+        if (isAreaHovered(4f, 4f, width - 8f, HEIGHT - 8)) {
             if (button == 0 && !subcategory.configName.isEmpty()) {
                 subcategory.value = !value
                 if (value) {

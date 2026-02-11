@@ -34,13 +34,12 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource) : Pict
             GlStateManager._viewport(0, 0, width, height)
         }
 
-        val guiScale = if(state.rawPixels) 1f else OmniResolution.scaleFactor.toFloat()
-
-        NVGRenderer.beginFrame(width.toFloat(), height.toFloat(), guiScale)
+        NVGRenderer.beginFrame(width.toFloat(), height.toFloat())
         state.renderContent()
         NVGRenderer.endFrame()
 
         GlStateManager._disableDepthTest()
+        GlStateManager._disableCull()
         GlStateManager._enableBlend()
         GlStateManager._blendFuncSeparate(770, 771, 1, 0)
     }
@@ -58,7 +57,6 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource) : Pict
         private val poseMatrix: Matrix3x2f,
         private val scissor: ScreenRectangle?,
         private val bounds: ScreenRectangle?,
-        val rawPixels: Boolean = true,
         val renderContent: () -> Unit
     ) : PictureInPictureRenderState {
 
@@ -88,7 +86,6 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource) : Pict
             y: Int,
             width: Int,
             height: Int,
-            rawPixels: Boolean = true,
             renderContent: () -> Unit
         ) {
             val scissor = context.scissorStack.peek()
@@ -98,7 +95,7 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource) : Pict
             val state = NVGRenderState(
                 x, y, width, height,
                 pose, scissor, bounds,
-                rawPixels, renderContent
+                renderContent
             )
             context.guiRenderState.submitPicturesInPictureState(state)
         }
