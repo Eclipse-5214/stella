@@ -58,8 +58,11 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
 
         // Key Text
         val displayStr = if (isListening) "..." else getKeyStringName(handler.keyCode())
-        val textWidth = nvg.textWidth(displayStr, 14f, nvg.inter)
-        nvg.text(displayStr, boxX + (boxW - textWidth) / 4f, boxY + 8f, 14f, Palette.Text.rgb, nvg.inter)
+        val fontSize = 14f
+        val textWidth = nvg.textWidth(displayStr, fontSize, nvg.inter)
+        val textX = boxX + (boxW - textWidth) / 2f
+        val textY = boxY + (boxH / 2f) - (fontSize / 2f)
+        nvg.text(displayStr, textX, textY, fontSize, Palette.Text.rgb, nvg.inter)
 
         nvg.popScissor(); nvg.pop()
     }

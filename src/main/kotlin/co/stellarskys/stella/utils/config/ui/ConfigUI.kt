@@ -25,7 +25,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private var needsVisibilityUpdate = false
     private val imageCacheMap = HashMap<String, Int>()
-    private val revealDelegate = Utils.animate<Float>(0.3, AnimType.EASE_OUT)
+    private val revealDelegate = Utils.animate<Float>(0.0375, AnimType.EASE_OUT)
     private var reveal by revealDelegate
     private var opening = true
     private val nvg get() = NVGRenderer
