@@ -427,6 +427,18 @@ object NVGRenderer {
         nvgFill(vg)
     }
 
+    fun image(image: Image, x: Float, y: Float, w: Float, h: Float, color: Int) {
+        nvgImagePattern(vg, x, y, w, h, 0f, getImage(image), 1f, nvgPaint)
+        color(color)
+        nvgPaint.innerColor(nvgColor)
+        nvgPaint.outerColor(nvgColor)
+
+        nvgBeginPath(vg)
+        nvgRect(vg, x, y, w, h + .5f)
+        nvgFillPaint(vg, nvgPaint)
+        nvgFill(vg)
+    }
+
     fun svg(id: String, x: Float, y: Float, w: Float, h: Float, a: Float) {
         val nvg = getImage(Image(id))
 
@@ -437,14 +449,12 @@ object NVGRenderer {
         nvgFill(vg)
     }
 
-    fun createImage(resourcePath: String, width: Int, height: Int, color: Color, id: String): Image {
-        val image = Image(resourcePath)
-
-        if (image.isSVG) {
-            images.getOrPut(image) { NVGImage(0, loadSVG(image, width, height, color)) }.count++
-        } else {
-            images.getOrPut(image) { NVGImage(0, loadImage(image)) }.count++
-        }
+    fun createImage(resourcePath: String): Image {
+        val image = images.keys.find { it.identifier == resourcePath } ?: Image(resourcePath)
+        images.getOrPut(image) {
+            val nvgId = if (image.isSVG) loadSVG(image) else loadImage(image)
+            NVGImage(0, nvgId)
+        }.count++
         return image
     }
 
@@ -485,14 +495,12 @@ object NVGRenderer {
         return nvgCreateImageRGBA(vg, w[0], h[0], 0, buffer)
     }
 
-    private fun loadSVG(image: Image, svgWidth: Int, svgHeight: Int, color: Color): Int {
-        var vec = image.stream.use { it.bufferedReader().readText() }
-        val hexColor = color.toHex()
-        vec = vec.replace("currentColor", hexColor)
+    private fun loadSVG(image: Image): Int {
+        val vec = image.stream.use { it.bufferedReader().readText() }
         val svg = nsvgParse(vec, "px", 96f) ?: throw IllegalStateException("Failed to parse ${image.identifier}")
+
         val width = svg.width().toInt()
         val height = svg.height().toInt()
-
         val buffer = memAlloc(width * height * 4)
 
         try {
@@ -506,6 +514,7 @@ object NVGRenderer {
             memFree(buffer)
         }
     }
+
 
     private fun color(color: Int) {
         nvgRGBA(color.red.toByte(), color.green.toByte(), color.blue.toByte(), color.alpha.toByte(), nvgColor)

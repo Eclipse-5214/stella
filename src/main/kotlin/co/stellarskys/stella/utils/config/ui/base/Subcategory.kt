@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils.config.ui.base
 
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config.core.ConfigSubcategory
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.render.nvg.Image
 import net.minecraft.client.gui.GuiGraphics
@@ -16,8 +17,6 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     var dropdownRot by Utils.animate<Double>(0.15)
     val offsetDeleagte = Utils.animate<Float>(0.15, error = 0.1)
     var elementOffset by offsetDeleagte
-    private var dropdownPath = "/assets/stella/logos/dropdown.svg"
-    private var image = nvg.createImage(dropdownPath,  10, 10, textColor, UUID.randomUUID().toString())
 
     init {
         x = initX
@@ -25,7 +24,6 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
         buttonColor = if (value) Palette.Purple else Palette.Mantle
         textColor = if (value) Palette.Mantle else Palette.Text
         dropdownRot = if (open) 0.0 else -90.0
-        reload()
     }
 
     override fun update() {
@@ -40,7 +38,6 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     ) {
         if (isAnimating) {
             update()
-            reload()
             updateElements(elementOffset + HEIGHT)
             if (offsetDeleagte.done()) {
                 isAnimating = false
@@ -58,7 +55,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
             nvg.push()
             nvg.translate(width - 10f, 12.5f)
             nvg.rotate(Math.toRadians(dropdownRot).toFloat())
-            nvg.image(image, -5f, -5f, 10f, 10f)
+            nvg.image(ConfigUI.caretImage, -5f, -5f, 10f, 10f, textColor.rgb)
             nvg.pop()
         }
 
@@ -75,12 +72,6 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
 
     companion object {
         const val HEIGHT = 25f
-    }
-
-    fun reload(): Image {
-        nvg.deleteImage(image)
-        image = nvg.createImage(dropdownPath,  10, 10, textColor, UUID.randomUUID().toString())
-        return image
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {

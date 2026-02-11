@@ -3,11 +3,11 @@ package co.stellarskys.stella.utils.config.ui.elements
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.Dropdown
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
 import net.minecraft.client.gui.GuiGraphics
-import java.util.*
 
 class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown) : BaseElement() {
     private var expansionAnim = Utils.animate<Float>(0.2, AnimType.EASE_OUT)
@@ -16,8 +16,6 @@ class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown) : BaseEleme
     private var offset by offsetAnim
     private var caretRot by Utils.animate<Double>(0.15)
     private var hoveredIndex = -1
-    private val dropdownPath = "/assets/stella/logos/dropdown.svg"
-    private var caretImage = nvg.createImage(dropdownPath, 10, 10, Palette.Text, UUID.randomUUID().toString())
 
     init {
         x = initX
@@ -39,7 +37,6 @@ class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown) : BaseEleme
         if (!visible && !isAnimating) return
         val contentHeight = dropdown.options.size * OPTION_HEIGHT
         if (isAnimating) {
-            reload()
             height = (HEIGHT + (contentHeight * expansion) - offset).coerceAtLeast(0f)
             if (expansionAnim.done() && offsetAnim.done()) isAnimating = false
         }
@@ -59,7 +56,7 @@ class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown) : BaseEleme
         nvg.push()
         nvg.translate(BOX_X + BOX_W - 7f, BOX_Y + (BOX_H / 2f))
         nvg.rotate(Math.toRadians(caretRot).toFloat())
-        nvg.image(caretImage, -3.5f, -3.5f, 7f, 7f)
+        nvg.image(ConfigUI.caretImage, -3.5f, -3.5f, 7f, 7f, Palette.Text.rgb)
         nvg.pop()
 
         if (expansion > 0.01f) {
@@ -101,8 +98,6 @@ class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown) : BaseEleme
         }
         return super.mouseClicked(mouseX, mouseY, button)
     }
-
-    fun reload() = nvg.deleteImage(caretImage).also { caretImage = nvg.createImage(dropdownPath, 10, 10, Palette.Text, UUID.randomUUID().toString()) }
 
     companion object {
         const val HEIGHT = 25f

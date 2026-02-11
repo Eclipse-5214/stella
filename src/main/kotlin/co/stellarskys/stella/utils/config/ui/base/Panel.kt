@@ -3,10 +3,8 @@ package co.stellarskys.stella.utils.config.ui.base
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.ui.Palette
-import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.render.nvg.Gradient
 import net.minecraft.client.gui.GuiGraphics
-import java.awt.Color
 
 class Panel(initX: Float, initY: Float, val title: String = ""): ParentElement() {
     private var scrollOffset by Utils.animate<Float>(0.25, AnimType.EASE_OUT)

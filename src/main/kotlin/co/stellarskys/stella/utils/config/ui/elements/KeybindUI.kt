@@ -7,7 +7,6 @@ import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
 import net.minecraft.client.gui.GuiGraphics
 import org.lwjgl.glfw.GLFW
-import java.awt.Color
 
 class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement() {
     private var offsetAnim = Utils.animate<Float>(0.15)

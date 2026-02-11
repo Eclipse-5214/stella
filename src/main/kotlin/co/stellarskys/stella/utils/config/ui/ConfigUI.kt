@@ -220,4 +220,8 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         if (handled) return true
         return super.onKeyPress(key, scanCode, typedChar, modifiers, event)
     }
+
+    companion object {
+        val caretImage = NVGRenderer.createImage( "/assets/stella/logos/dropdown.svg")
+    }
 }
