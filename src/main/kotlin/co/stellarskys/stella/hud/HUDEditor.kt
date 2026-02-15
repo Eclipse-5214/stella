@@ -75,14 +75,14 @@ class HUDEditor : OmniScreen(Text.literal("HUD Editor")) {
                 custom(context)
             } else {
                 if (element.width == 0 && element.height == 0) {
-                    element.width = element.text.width() + 2
-                    element.height = element.text.height() + 2
+                    element.width = element.text.width() + 4
+                    element.height = element.text.height() + 6
                 }
 
-                drawHollowRect(context, -2, -3, element.width, element.height, borderColor)
-                context.fill(-2,-3, element.width, element.height, Color(30, 35, 45, alpha).rgb)
+                drawHollowRect(context, 0,  0, element.width, element.height, borderColor)
+                context.fill(0,0, element.width, element.height, Color(30, 35, 45, alpha).rgb)
 
-                Render2D.drawString(context, element.text, 0, 0, shadow = false)
+                Render2D.drawString(context, element.text, 2, 3, shadow = false)
             }
 
             context.pose().popMatrix()

@@ -30,6 +30,9 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
         height = if (open || !offsetDeleagte.done()) HEIGHT + elementOffset + getEH() else HEIGHT
     }
 
+    override val canReceiveInput: Boolean
+        get() = super.canReceiveInput && open
+
     override fun render(
         context: GuiGraphics,
         mouseX: Float,
@@ -98,7 +101,6 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
                     elementOffset = -getEH()
                     offsetDeleagte.snap()
                     elementOffset = 0f
-
                 }
 
                 isAnimating = true

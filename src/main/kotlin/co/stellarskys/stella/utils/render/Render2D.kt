@@ -153,7 +153,7 @@ object Render2D {
 
         NVGSpecialRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
             val n = NVGRenderer
-            val sf = OmniResolution.scaleFactor.toFloat()
+            val sf = OmniResolution.scaleFactor.toFloat() / n.dpr
 
             if (scaled) {
                 n.resetTransform()

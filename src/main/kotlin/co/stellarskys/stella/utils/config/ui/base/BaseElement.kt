@@ -18,6 +18,9 @@ abstract class BaseElement {
     var visible = true
     var parent: BaseElement? = null
 
+    open val canReceiveInput: Boolean
+        get() = visible && (parent?.canReceiveInput ?: true)
+
     open var isAnimating = false
 
     open val absoluteX: Float get() = (parent?.absoluteX ?: 0f) + x

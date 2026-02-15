@@ -130,6 +130,14 @@ object Utils {
         player?.playSound(sound, volume, pitch)
     }
 
+    fun alert(title: Component, sound: SoundEvent? = null, volume: Float = 1f, pitch: Float = 1f) {
+        client.gui.setTimes(0, 20, 5)
+        client.gui.setTitle(title)
+
+        if (sound == null) return
+        player?.playSound(sound, volume, pitch)
+    }
+
     object Fonts {
         val montserrat_bold = getFont("montserrat")
 

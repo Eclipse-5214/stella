@@ -86,7 +86,7 @@ object MapRenderer {
         matrix.rotate((rotation * (PI / 180)).toFloat())
         matrix.scale(map.iconScale, map.iconScale)
 
-        if (map.showPlayerHead) {
+        if (map.showPlayerHead && !(map.ownDefault && you)) {
             Render2D.drawRect(context, -6, -6, 12, 12,  if (map.iconClassColors) p.dclass.color ?: map.iconBorderColor else map.iconBorderColor)
             matrix.scale(1f - map.iconBorderWidth, 1f - map.iconBorderWidth)
             Render2D.drawPlayerHead(context, -6, -6, 12, p.uuid ?: UUID(0, 0))

@@ -101,7 +101,7 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (parent?.isAnimating == true || !visible) return false
+        if (parent?.canReceiveInput  == false || parent?.isAnimating == true || !visible) return false
         if (isAreaHovered(0f, 0f, width, HEIGHT)) { expansion = if (expansion > 0.5f) 0f else 1f; isAnimating = true; return true }
         if (expansion <= 0.5f) return false
         if (hexBox.mouseClicked(mouseX, mouseY, button)) return true
