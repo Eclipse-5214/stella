@@ -231,6 +231,7 @@ object Dungeon {
         DungeonPlayerManager.reset()
         DungeonScore.reset()
         MapUtils.reset()
+        RoomRegistry.resetSecrets()
     }
 
     /** Updates HUD lines for map overlay */

@@ -50,6 +50,18 @@ object RoomRegistry {
         }
     }
 
+    fun resetSecrets() {
+        allRooms.forEach { room ->
+            room.secretCoords?.let { coords ->
+                coords.redstoneKey.forEach { it.collected = false }
+                coords.wither.forEach { it.collected = false }
+                coords.bat.forEach { it.collected = false }
+                coords.item.forEach { it.collected = false }
+                coords.chest.forEach { it.collected = false }
+            }
+        }
+    }
+
     fun getByCore(core: Int): RoomMetadata? = byCore[core]
     fun getAll(): List<RoomMetadata> = allRooms
 }
