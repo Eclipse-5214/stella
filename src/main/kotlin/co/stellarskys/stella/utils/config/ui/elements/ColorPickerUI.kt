@@ -104,7 +104,7 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         if (parent?.canReceiveInput  == false || parent?.isAnimating == true || !visible) return false
         if (isAreaHovered(0f, 0f, width, HEIGHT)) { expansion = if (expansion > 0.5f) 0f else 1f; isAnimating = true; return true }
         if (expansion <= 0.5f) return false
-        if (hexBox.mouseClicked(mouseX, mouseY, button)) return true
+        hexBox.mouseClicked(mouseX, mouseY, button)
 
         val startY = HEIGHT + 12f; val rowY = startY + PICKER_SIZE + 16f
         var rx = 16f + hexBox.width + 20f

@@ -52,7 +52,7 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (parent?.canReceiveInput  == false || !visible || offset > 1f || parent?.isAnimating == true) return false
-        if (textField.mouseClicked(mouseX , mouseY , button)) return true
+        textField.mouseClicked(mouseX , mouseY , button)
         return super.mouseClicked(mouseX, mouseY, button)
     }
 

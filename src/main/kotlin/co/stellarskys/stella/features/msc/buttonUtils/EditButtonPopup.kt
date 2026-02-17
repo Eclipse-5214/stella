@@ -88,8 +88,8 @@ class EditButtonPopup : BaseElement() {
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible) return false
-        if (itemIdInput.mouseClicked(mouseX, mouseY, button)) return true
-        if (commandInput.mouseClicked(mouseX, mouseY, button)) return true
+        itemIdInput.mouseClicked(mouseX, mouseY, button)
+        commandInput.mouseClicked(mouseX, mouseY, button)
 
         if (isAreaHovered(width - 60f, 20f, 40f, 40f, mouseX, mouseY)) close()
         if (isAreaHovered(40f, 520f, 230f, 60f, mouseX, mouseY)) save()
