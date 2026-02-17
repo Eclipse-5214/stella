@@ -5,9 +5,9 @@ import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.*
 import co.stellarskys.stella.utils.config.ui.base.*
 import co.stellarskys.stella.utils.config.ui.elements.*
+import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.nvg.Gradient
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
-import co.stellarskys.stella.utils.render.nvg.NVGSpecialRenderer
 import com.mojang.blaze3d.opengl.GlTexture
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.input.*
@@ -61,7 +61,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         super.onRender(ctx, mouseX, mouseY, tickDelta)
 
         val context = ctx.graphics ?: return
-        NVGSpecialRenderer.draw(context, 0, 0, context.guiWidth(), context.guiHeight()) {
+        context.drawNVG(false) {
             nvg.push()
             applyOpeningScissor()
             nvg.scale(UI_SCALE, UI_SCALE)

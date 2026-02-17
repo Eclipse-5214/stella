@@ -1,19 +1,23 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
+import co.stellarskys.stella.utils.config.ui.ConfigUI.Companion.UI_SCALE
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
-import co.stellarskys.vexel.Vexel
-import co.stellarskys.vexel.core.VexelScreen
 import dev.deftu.omnicore.api.client.input.KeyboardModifiers
+import dev.deftu.omnicore.api.client.input.OmniKey
+import dev.deftu.omnicore.api.client.input.OmniMouse
 import dev.deftu.omnicore.api.client.input.OmniMouseButton
 import dev.deftu.omnicore.api.client.render.OmniRenderingContext
-import dev.deftu.omnicore.api.client.render.OmniResolution
-import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
+import dev.deftu.omnicore.api.client.screen.KeyPressEvent
+import dev.deftu.omnicore.api.client.screen.OmniScreen
 
-class ButtonLayoutEditor : VexelScreen() {
+class ButtonLayoutEditor : OmniScreen() {
     private val slotSize = 20
-    private val popup = EditButtonPopup(window)
+    private val popup = EditButtonPopup()
+    private val mouse = OmniMouse
+    private val mx get() = mouse.rawX.toFloat() / UI_SCALE
+    private val my get() = mouse.rawY.toFloat() / UI_SCALE
 
     override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
         val context = ctx.graphics ?: return
@@ -62,8 +66,31 @@ class ButtonLayoutEditor : VexelScreen() {
             }
         }
 
+        context.drawNVG(false) {
+            NVGRenderer.push()
+            NVGRenderer.scale(UI_SCALE, UI_SCALE)
+            popup.render(context, mx, my, tickDelta)
+            NVGRenderer.pop()
+        }
+
         super.onRender(ctx, mouseX, mouseY, tickDelta)
-        popup.renderPreviewItem(context)
+    }
+
+    override fun onKeyPress(
+        key: OmniKey,
+        scanCode: Int,
+        typedChar: Char,
+        modifiers: KeyboardModifiers,
+        event: KeyPressEvent
+    ): Boolean {
+        val modInt = modifiers.toMods()
+        val handled = when (event) {
+            KeyPressEvent.TYPED -> popup.charTyped(typedChar, modInt)
+            KeyPressEvent.PRESSED -> popup.keyPressed(key.code, modInt)
+        }
+
+        if (handled) return true
+        return super.onKeyPress(key, scanCode, typedChar, modifiers, event)
     }
 
     override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
@@ -80,9 +107,17 @@ class ButtonLayoutEditor : VexelScreen() {
                     }
                 }
             }
+        } else {
+            popup.mouseClicked(mx, my, button.code)
+            return super.onMouseClick(button, x, y, modifiers)
         }
 
         return super.onMouseClick(button, x, y, modifiers)
+    }
+
+    override fun onMouseRelease(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
+        popup.mouseReleased(mx, my, button.code)
+        return super.onMouseRelease(button, x, y, modifiers)
     }
 
     override fun onBackgroundRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {}

@@ -12,7 +12,6 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
-import co.stellarskys.vexel.Vexel
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.profile.StatsAPI

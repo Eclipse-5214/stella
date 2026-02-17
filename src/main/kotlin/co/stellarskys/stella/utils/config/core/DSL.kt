@@ -3,13 +3,6 @@ package co.stellarskys.stella.utils.config.core
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.KeyEvent
-import co.stellarskys.vexel.Vexel
-import co.stellarskys.vexel.components.base.enums.Pos
-import co.stellarskys.vexel.components.base.enums.Size
-import co.stellarskys.vexel.components.base.VexelElement
-import co.stellarskys.vexel.components.core.Rectangle
-import co.stellarskys.vexel.components.core.Text
-import co.stellarskys.vexel.core.VexelWindow
 import java.awt.Color
 
 open class ConfigCategory(val name: String, val config: Config) {
@@ -323,41 +316,3 @@ class Toggle : ConfigElement() {
         value = default
     }
 }
-
-object FloatingUIManager {
-    private val floatingComponents = mutableListOf<VexelElement<*>>()
-
-    fun register(component: VexelElement<*>) {
-        floatingComponents += component
-    }
-
-    fun clearAll() {
-        floatingComponents.forEach { it.destroy() }
-        floatingComponents.clear()
-    }
-}
-
-fun attachTooltip(window: VexelWindow, anchor: VexelElement<*>, description: String) {
-    if (description == "") return
-
-    val fs = 14f
-    val width = Vexel.renderer.textWidth(description, fs, Vexel.defaultFont)
-
-    val tooltip = Rectangle(Color.black.rgb, borderRadius = 5f, borderThickness = 0f)
-        .setPositioning(Pos.ScreenCenter, Pos.ScreenCenter)
-        .setSizing(width + 10f, Size.Pixels, fs + 10f, Size.Pixels)
-        .setOffset(0f, 300f)
-        .childOf(window)
-
-    val tooltipText = Text(description, fontSize = fs)
-        .setPositioning(Pos.ParentCenter, Pos.ParentCenter)
-        .childOf(tooltip)
-
-    tooltip.hide()
-
-    anchor.onMouseEnter { _ -> tooltip.show() }
-    anchor.onMouseExit { _ -> tooltip.hide() }
-
-    FloatingUIManager.register(tooltip)
-}
-

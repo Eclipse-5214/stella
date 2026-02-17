@@ -37,7 +37,6 @@ dependencies {
 
     shadow("omnicore".mc(mc))
     shadow("textile".mc(mc))
-    shadow("vexel".mc(mc))
     shadow(libs.commodore)
 
     modImplementation(libs.skyblock.api) {
@@ -46,6 +45,11 @@ dependencies {
 
     include(libs.skyblock.api) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc-remapped") }
+    }
+
+    shadow(libs.lwjgl.nanovg)
+    listOf("windows", "linux", "macos", "macos-arm64").forEach { os ->
+        shadow("${libs.lwjgl.nanovg.get()}:natives-$os")
     }
 }
 

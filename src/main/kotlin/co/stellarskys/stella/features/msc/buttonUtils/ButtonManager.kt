@@ -7,7 +7,6 @@ import co.stellarskys.stella.utils.ChatUtils
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
-import co.stellarskys.vexel.Vexel
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -17,15 +16,12 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
 import java.io.File
 import kotlin.jvm.optionals.getOrNull
 
 object ButtonManager {
     private val buttons = mutableListOf<StellaButton>()
-    private val itemCache = mutableMapOf<String, ItemStack>()
-
     private val buttonFile: File get() = File("config/Stella/buttons.json")
 
     val width = OmniResolution.scaledWidth.toFloat()
