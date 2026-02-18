@@ -2,9 +2,17 @@ package co.stellarskys.stella.utils.config.ui.base
 
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.TimeUtils.millis
-import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.render.nvg.Font
 import net.minecraft.client.gui.GuiGraphics
+
+/*
+ * Adapted from TextInputHandler.kt in OdinFabric
+ * https://github.com/odtheking/OdinFabric
+ *
+ * BSD 3-Clause License
+ * Copyright (c) 2025, odtheking
+ * See full license at: https://opensource.org/licenses/BSD-3-Clause
+ */
 
 class TextHandler(
     private val textProvider: () -> String,

@@ -14,17 +14,17 @@ object RoomRegistry {
     private val LOCAL_ROOMS_FILE = File("config/stella/rooms.json")
 
     fun loadFromRemote() {
-        NetworkUtils.fetchJson<List<RoomMetadata>>(
-            url = ROOM_DATA_URL,
-            onSuccess = { rooms ->
+        NetworkUtils.fetch<List<RoomMetadata>>(ROOM_DATA_URL) { result ->
+            result.onSuccess { rooms ->
                 populateRooms(rooms)
                 Stella.LOGGER.info("RoomRegistry: Loaded ${rooms.size} rooms from NoamAddons")
-            },
-            onError = { error ->
+            }
+
+            result.onFailure { error ->
                 Stella.LOGGER.info("RoomRegistry: Failed to load room data — ${error.message}")
                 loadFromLocal()
             }
-        )
+        }
     }
 
     fun loadFromLocal() {

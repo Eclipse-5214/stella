@@ -67,6 +67,7 @@ object dungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE
 
         for ((_, info) in greenRooms) {
             allRooms += info
+            info.room.name?.let { visitedGreenNames.add(it) }
         }
         for ((_, info) in whiteRooms) {
             if (info.room.name !in visitedGreenNames) {

@@ -7,6 +7,7 @@ import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import kotlinx.coroutines.*
 
 object Stella: ClientModInitializer {
     @JvmStatic val LOGGER: Logger = LogManager.getLogger("stella")
@@ -14,6 +15,7 @@ object Stella: ClientModInitializer {
     @JvmStatic val PREFIX: String = "§7[§dStella§7]"
     @JvmStatic val SHORTPREFIX: String = "§d[SA]"
     @JvmStatic val DELTA: DeltaTracker = DeltaTracker()
+    @JvmStatic val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     override fun onInitializeClient() {
         FeatureManager.loadFeatures()

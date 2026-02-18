@@ -1,6 +1,6 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.players
 
-import co.stellarskys.stella.utils.skyblock.HypixelApi
+import co.stellarskys.stella.utils.skyblock.api.HypixelApi
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner.RoomClearInfo
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonClass
@@ -37,16 +37,16 @@ class DungeonPlayer(val name: String) {
     )
 
     init {
-        HypixelApi.fetchSecrets(uuid.toString(), 120_000) { secrets ->
-            initSecrets = secrets
-            currSecrets = secrets
+        HypixelApi.fetchSkyblockProfile(uuid.toString(), 120_000) { profile ->
+            initSecrets = profile?.dungeons?.secrets?.toInt() ?: -1
+            currSecrets = profile?.dungeons?.secrets?.toInt() ?: -1
         }
     }
 
     fun updateSecrets() {
         if (uuid == null) return
-        HypixelApi.fetchSecrets(uuid.toString(), cacheMs = 0) { secrets ->
-            currSecrets = secrets
+        HypixelApi.fetchSkyblockProfile(uuid.toString(), force = true) { profile ->
+            currSecrets = profile?.dungeons?.secrets?.toInt() ?: -1
         }
     }
 

@@ -5,7 +5,6 @@ import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.ScoreboardEvent
 import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.utils.skyblock.HypixelApi
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import tech.thatgravyboat.skyblockapi.api.data.Perk
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland

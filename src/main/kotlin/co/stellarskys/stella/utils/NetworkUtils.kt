@@ -1,248 +1,46 @@
 package co.stellarskys.stella.utils
 
+import co.stellarskys.stella.Stella
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dev.deftu.omnicore.api.client.client
 import kotlinx.coroutines.*
-import kotlinx.serialization.json.Json.Default.parseToJsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import java.io.BufferedReader
-import java.io.File
-import java.net.*
+import java.net.URI
+import java.net.http.*
+import java.time.Duration
+import kotlin.coroutines.resume
 
 object NetworkUtils {
-    fun createConnection(url: String, headers: Map<String, String> = emptyMap()): URLConnection {
-        return URL(url).openConnection().apply {
-            setRequestProperty("User-Agent", "Mozilla/5.0 (Stella)")
-            headers.forEach { (key, value) -> setRequestProperty(key, value) }
-            connectTimeout = 10_000
-            readTimeout = 30_000
-        }
-    }
+    val gson = Gson()
+    private val httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()
 
-    // Original: https://github.com/Noamm9/NoammAddons/blob/master/src/main/kotlin/noammaddons/utils/WebUtils.kt#L50
-    inline fun <reified T> fetchJson(
-        url: String,
-        headers: Map<String, String> = emptyMap(),
-        crossinline onSuccess: (T) -> Unit,
-        crossinline onError: (Exception) -> Unit = {}
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            runCatching {
-                val connection = createConnection(url, headers + ("Accept" to "application/json")) as HttpURLConnection
-                connection.requestMethod = "GET"
+    private fun request(url: String) = HttpRequest.newBuilder()
+        .uri(URI.create(url))
+        .header("User-Agent", "Stella-Mod")
+        .timeout(Duration.ofSeconds(10))
 
-                when (connection.responseCode) {
-                    200 -> {
-                        val response = connection.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
-                        val type = object : TypeToken<T>() {}.type
-                        val data: T = Gson().fromJson(response, type)
-                        onSuccess(data)
-                    }
-                    else -> throw HttpRetryableException("HTTP ${connection.responseCode}", connection.responseCode, connection.url)
-                }
-                connection.disconnect()
-            }.onFailure { onError(it as? Exception ?: Exception(it)) }
-        }
-    }
-
-    fun getJson(
-        url: String,
-        headers: Map<String, String> = emptyMap(),
-        onSuccess: (JsonObject) -> Unit,
-        onError: (Exception) -> Unit = {}
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            runCatching {
-                val connection = createConnection(url, headers + ("Accept" to "application/json")) as HttpURLConnection
-                connection.requestMethod = "GET"
-
-                if (connection.responseCode == 200) {
-                    val response = connection.inputStream.bufferedReader().use(BufferedReader::readText)
-                    val jsonObject = parseToJsonElement(response).jsonObject
-                    onSuccess(jsonObject)
-                } else {
-                    throw HttpRetryableException("HTTP ${connection.responseCode}", connection.responseCode, connection.url)
-                }
-                connection.disconnect()
-            }.onFailure { onError(it as? Exception ?: Exception(it)) }
-        }
-    }
-
-    fun getText(
-        url: String,
-        headers: Map<String, String> = emptyMap(),
-        onSuccess: (String) -> Unit,
-        onError: (Exception) -> Unit = {}
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            runCatching {
-                val connection = createConnection(url, headers) as HttpURLConnection
-                connection.requestMethod = "GET"
-
-                if (connection.responseCode == 200) {
-                    val response = connection.inputStream.bufferedReader().use { it.readText() }
-                    onSuccess(response)
-                } else {
-                    throw HttpRetryableException("HTTP ${connection.responseCode}", connection.responseCode, connection.url)
-                }
-                connection.disconnect()
-            }.onFailure { onError(it as? Exception ?: Exception(it)) }
-        }
-    }
-
-    fun downloadFile(
-        url: String,
-        outputFile: File,
-        headers: Map<String, String> = emptyMap(),
-        onProgress: (bytesDownloaded: Long, totalBytes: Long) -> Unit = { _, _ -> },
-        onComplete: (File) -> Unit = {},
-        onError: (Exception) -> Unit = {}
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            runCatching {
-                val connection = createConnection(url, headers) as HttpURLConnection
-                connection.requestMethod = "GET"
-
-                if (connection.responseCode == 200) {
-                    val totalBytes = connection.contentLengthLong
-                    var bytesDownloaded = 0L
-
-                    connection.inputStream.use { input ->
-                        outputFile.outputStream().use { output ->
-                            val buffer = ByteArray(8192)
-                            var bytesRead: Int
-                            while (input.read(buffer).also { bytesRead = it } != -1) {
-                                output.write(buffer, 0, bytesRead)
-                                bytesDownloaded += bytesRead
-                                onProgress(bytesDownloaded, totalBytes)
-                            }
-                        }
-                    }
-                    onComplete(outputFile)
-                } else {
-                    throw HttpRetryableException("HTTP ${connection.responseCode}", connection.responseCode, connection.url)
-                }
-                connection.disconnect()
-            }.onFailure { onError(it as? Exception ?: Exception(it)) }
-        }
-    }
-
-    fun postData(
-        url: String,
-        body: Any,
-        headers: Map<String, String> = emptyMap(),
-        onSuccess: (String) -> Unit = {},
-        onError: (Exception) -> Unit = {}
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            runCatching {
-                val connection = createConnection(url, headers + ("Content-Type" to "application/json")) as HttpURLConnection
-                connection.requestMethod = "POST"
-                connection.doOutput = true
-
-                connection.outputStream.use {
-                    it.write(body.toString().toByteArray(Charsets.UTF_8))
-                }
-
-                val response = if (connection.responseCode in 200..299) {
-                    connection.inputStream.bufferedReader().use { it.readText() }
-                } else {
-                    connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                }
-
-                if (connection.responseCode in 200..299) {
-                    onSuccess(response)
-                } else {
-                    throw HttpRetryableException("HTTP ${connection.responseCode}: $response", connection.responseCode, connection.url)
-                }
-                connection.disconnect()
-            }.onFailure { onError(it as? Exception ?: Exception(it)) }
-        }
-    }
-
-    fun putData(
-        url: String,
-        body: Any,
-        headers: Map<String, String> = emptyMap(),
-        onSuccess: (String) -> Unit = {},
-        onError: (Exception) -> Unit = {}
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            runCatching {
-                val connection = createConnection(url, headers + ("Content-Type" to "application/json")) as HttpURLConnection
-                connection.requestMethod = "PUT"
-                connection.doOutput = true
-
-                connection.outputStream.use {
-                    it.write(body.toString().toByteArray(Charsets.UTF_8))
-                }
-
-                val response = if (connection.responseCode in 200..299) {
-                    connection.inputStream.bufferedReader().use { it.readText() }
-                } else {
-                    connection.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                }
-
-                if (connection.responseCode in 200..299) {
-                    onSuccess(response)
-                } else {
-                    throw HttpRetryableException("HTTP ${connection.responseCode}: $response", connection.responseCode, connection.url)
-                }
-                connection.disconnect()
-            }.onFailure { onError(it as? Exception ?: Exception(it)) }
-        }
-    }
-
-    fun headRequest(
-        url: String,
-        headers: Map<String, String> = emptyMap(),
-        onSuccess: (Map<String, List<String>>) -> Unit = {},
-        onError: (Exception) -> Unit = {}
-    ) {
-        CoroutineScope(Dispatchers.IO).launch {
-            runCatching {
-                val connection = createConnection(url, headers) as HttpURLConnection
-                connection.requestMethod = "HEAD"
-
-                if (connection.responseCode in 200..299) {
-                    onSuccess(connection.headerFields)
-                } else {
-                    throw HttpRetryableException("HTTP ${connection.responseCode}", connection.responseCode, connection.url)
-                }
-                connection.disconnect()
-            }.onFailure { onError(it as? Exception ?: Exception(it)) }
-        }
-    }
-
-    suspend fun <T> withRetry(
-        maxRetries: Int = 3,
-        delay: Long = 1000,
-        backoffMultiplier: Double = 2.0,
-        operation: suspend () -> T
-    ): T {
-        var currentDelay = delay
-        repeat(maxRetries) { attempt ->
-            try {
-                return operation()
-            } catch (e: Exception) {
-                if (attempt == maxRetries - 1) throw e
-                delay(currentDelay)
-                currentDelay = (currentDelay * backoffMultiplier).toLong()
+    suspend fun fetchString(url: String): Result<String> = suspendCancellableCoroutine { cont ->
+        val future = httpClient.sendAsync(request(url).GET().build(), HttpResponse.BodyHandlers.ofString())
+        cont.invokeOnCancellation { future.cancel(true) }
+        future.whenComplete { res, err ->
+            val result = when {
+                err != null -> Result.failure(err)
+                res.statusCode() in 200..299 -> Result.success(res.body())
+                else -> Result.failure(Exception("HTTP ${res.statusCode()} at $url"))
             }
+            cont.resume(result)
         }
-        throw IllegalStateException("Retry failed")
     }
 
-    fun isUrlReachable(url: String, timeoutMs: Int = 5000): Boolean {
-        return runCatching {
-            val connection = createConnection(url, headers = emptyMap()) as HttpURLConnection
-            connection.requestMethod = "HEAD"
-            connection.connectTimeout = timeoutMs
-            connection.readTimeout = timeoutMs
-            connection.responseCode in 200..399
-        }.getOrElse { false }
+    inline fun <reified T> fetch(
+        url: String,
+        scope: CoroutineScope = Stella.scope,
+        crossinline onResult: (Result<T>) -> Unit
+    ) {
+        val type = object : TypeToken<T>() {}.type
+        scope.launch {
+            val res = fetchString(url).mapCatching { gson.fromJson<T>(it, type) }
+            client.execute { onResult(res) }
+        }
     }
 }
-
-data class HttpRetryableException(override val message: String, val code: Int, val url: URL) : Exception(message)
