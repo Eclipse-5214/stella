@@ -48,7 +48,7 @@ dependencies {
     }
 
     shadow(libs.lwjgl.nanovg)
-    listOf("windows", "linux", "macos", "macos-arm64").forEach { os ->
+    listOf("windows", "linux", "linux-arm64", "macos", "macos-arm64").forEach { os ->
         shadow("${libs.lwjgl.nanovg.get()}:natives-$os")
     }
 }
