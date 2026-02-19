@@ -57,11 +57,7 @@ object Dungeon {
     // Floor info
     val floor: DungeonFloor? get() = DungeonAPI.dungeonFloor
     val floorNumber: Int? get() = floor?.floorNumber
-    val inBoss: Boolean
-        get() = floor != null && player?.let {
-            val (x, z) = WorldScanUtils.realCoordToComponent(it.x.toInt(), it.z.toInt())
-            6 * z + x > 35
-        } == true
+    val inBoss: Boolean get() = DungeonAPI.inBoss
 
     // HUD lines
     var mapLine1 = ""

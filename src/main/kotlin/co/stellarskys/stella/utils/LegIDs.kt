@@ -566,5 +566,4 @@ object LegIDs {
         Stella.LOGGER.warn("[LegacyID] Unmatched state: ${state.block} → ${state.values}")
         return -1
     }
-
 }
