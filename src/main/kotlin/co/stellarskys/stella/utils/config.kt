@@ -169,6 +169,15 @@ val config = Config("Stella", "Stella") {
             }
         }
 
+        subcategory("Leap Announce", "leapAnnounce", "Announces when you leap to someone") {
+            textinput {
+                configName = "leapAnnounce.message"
+                name = "Message"
+                description = "The message to send on leap"
+                placeholder = "Leaping to"
+            }
+        }
+
         /*
         subcategory("Block Overlay") {
             toggle {
