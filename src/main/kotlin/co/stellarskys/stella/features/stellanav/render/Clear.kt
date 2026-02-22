@@ -148,6 +148,7 @@ object Clear {
     }
 
     private fun renderPlayers(context: GuiGraphics) {
+        if (Dungeon.inBoss) return
         val me = player ?: return
 
         DungeonPlayerManager.players.forEach { p ->

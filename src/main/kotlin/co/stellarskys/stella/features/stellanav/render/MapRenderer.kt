@@ -24,10 +24,10 @@ object MapRenderer {
             matrix.translate(5f, 5f)
 
             when {
-                !Dungeon.inBoss && !Dungeon.complete -> MapMode.CLEAR
-                !Dungeon.complete && map.bossMapEnabled -> MapMode.BOSS
-                Dungeon.complete && map.scoreMapEnabled -> MapMode.SCORE
-                else -> null
+                Dungeon.inBoss && map.bossMapEnabled && !Dungeon.complete -> MapMode.BOSS
+                map.scoreMapEnabled && Dungeon.complete -> MapMode.SCORE
+                Dungeon.inBoss && map.hideInBoss -> null
+                else -> MapMode.CLEAR
             }?.let { mode ->
                 renderBackground(context)
                 mode.renderer(context)

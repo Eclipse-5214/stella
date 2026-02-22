@@ -23,6 +23,7 @@ object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
 
     // main map configs
     val bossMapEnabled by config.property<Boolean>("bossMapEnabled")
+    val hideInBoss by config.property<Boolean>("hideInBoss")
     val scoreMapEnabled by config.property<Boolean>("scoreMapEnabled")
 
     val mapBgColor by config.property<Color>("mapBgColor")

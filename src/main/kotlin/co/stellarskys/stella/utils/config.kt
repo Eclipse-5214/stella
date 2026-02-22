@@ -427,6 +427,14 @@ val config = Config("Stella", "Stella") {
             }
 
             toggle {
+                configName = "hideInBoss"
+                name = "Hide in Boss"
+                description = "Hides the map in the boss"
+                default = true
+                shouldShow { settings -> !(settings["bossMapEnabled"] as Boolean) }
+            }
+
+            toggle {
                 configName = "scoreMapEnabled"
                 name = "Enable Score Map"
                 description = "Enables the map score map"
