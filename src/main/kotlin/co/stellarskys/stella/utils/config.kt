@@ -178,6 +178,8 @@ val config = Config("Stella", "Stella") {
             }
         }
 
+        subcategory("Alert Missing", "teammateMissing", "Alerts you when less than 5 people are in your dungeon")
+
         /*
         subcategory("Block Overlay") {
             toggle {
