@@ -178,7 +178,7 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Alert Missing", "teammateMissing", "Alerts you when less than 5 people are in your dungeon")
+        subcategory("Teammate Missing Alert", "teammateMissing", "Alerts you when less than 5 people are in your dungeon")
 
         /*
         subcategory("Block Overlay") {
@@ -395,6 +395,24 @@ val config = Config("Stella", "Stella") {
                 description = "Message to display when a bat dies"
                 placeholder = "&cBat Dead"
                 shouldShow { settings -> settings["scoreAlerts.alertBatDead"] as Boolean }
+            }
+
+        }
+
+        subcategory("Crypt Reminder", "cryptReminder", "reminds you to do your crypts") {
+            stepslider {
+                name = "Delay"
+                configName = "cryptReminder.delay"
+                description = "Message delay in minutes"
+                min = 1
+                max = 5
+                default = 2
+            }
+
+            toggle {
+                name = "Send to Party"
+                configName = "cryptReminder.sendParty"
+                description = "Send message to the party"
             }
         }
     }
