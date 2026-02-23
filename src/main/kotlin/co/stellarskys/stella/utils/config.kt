@@ -297,7 +297,7 @@ val config = Config("Stella", "Stella") {
                 configName = "scoreAlerts.alert270"
                 name = "270 Score Alert"
                 description = "Alerts you when your score reaches 270"
-                default = true
+                default = false
             }
 
             textinput {
@@ -312,7 +312,7 @@ val config = Config("Stella", "Stella") {
                 configName = "scoreAlerts.chat270"
                 name = "270 Chat Alert"
                 description = "Sends a chat message when reaching 270 score"
-                default = true
+                default = false
             }
 
             textinput {
@@ -327,7 +327,7 @@ val config = Config("Stella", "Stella") {
                 configName = "scoreAlerts.alert300"
                 name = "300 Score Alert"
                 description = "Alerts you when your score reaches 300"
-                default = true
+                default = false
             }
 
             textinput {
@@ -342,7 +342,7 @@ val config = Config("Stella", "Stella") {
                 configName = "scoreAlerts.chat300"
                 name = "300 Chat Alert"
                 description = "Sends a chat message when reaching 300 score"
-                default = true
+                default = false
             }
 
             textinput {
@@ -357,7 +357,7 @@ val config = Config("Stella", "Stella") {
                 configName = "scoreAlerts.alert5Crypts"
                 name = "5 Crypts Alert"
                 description = "Alerts you when your team reaches 5 crypts"
-                default = true
+                default = false
             }
 
             textinput {
@@ -372,7 +372,7 @@ val config = Config("Stella", "Stella") {
                 configName = "scoreAlerts.chat5Crypts"
                 name = "5 Crypts Chat Alert"
                 description = "Sends a chat message when reaching 5 crypts"
-                default = true
+                default = false
             }
 
             textinput {
@@ -445,7 +445,7 @@ val config = Config("Stella", "Stella") {
                 configName = "mapInfoUnder"
                 name = "Info Under Map"
                 description = "Renders map info below the map"
-                default = true
+                default = false
             }
         }
 
@@ -514,7 +514,7 @@ val config = Config("Stella", "Stella") {
                 configName = "mtextshadow"
                 name = "Text Shadow"
                 description = "Gives the text a cool shadow"
-                default = true
+                default = false
             }
         }
 
@@ -562,7 +562,7 @@ val config = Config("Stella", "Stella") {
                 name = "Checkmark Anchor"
                 description = "Which component anchor to prioritize when rendering checkmarks"
                 options = listOf("First", "Middle", "Last", "Center")
-                default = 0
+                default = 0 // First
             }
 
             dropdown {
@@ -570,7 +570,7 @@ val config = Config("Stella", "Stella") {
                 name = "Name Anchor"
                 description = "Which component anchor to prioritize when rendering room name"
                 options = listOf("First", "Middle", "Last", "Center")
-                default = 3
+                default = 3 // Center
             }
 
             dropdown {
@@ -578,7 +578,7 @@ val config = Config("Stella", "Stella") {
                 name = "Secrets Anchor"
                 description = "Which component anchor to prioritize when rendering room secrets"
                 options = listOf("First", "Middle", "Last", "Center")
-                default = 3
+                default = 3 // Center
             }
 
             toggle {
