@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.config.ui.elements
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.Slider
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
@@ -48,6 +49,9 @@ class SliderUI(initX: Float, initY: Float, val slider: Slider) : BaseElement() {
             height = (HEIGHT - offset).coerceAtLeast(0f)
             if (offsetAnim.done()) isAnimating = false
         }
+
+        if (isTextHovered(slider.name,12f, 14f)) ConfigUI.tooltip.show(slider)
+        else ConfigUI.tooltip.hide(slider)
 
         visualProgress = (slider.value as Float - slider.min) / (slider.max - slider.min)
 

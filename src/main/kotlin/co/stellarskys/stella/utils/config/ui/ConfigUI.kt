@@ -48,6 +48,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         reveal = 0f
         revealDelegate.snap()
         reveal = rez.windowWidth.toFloat()
+        tooltip = Tooltip()
         super.onInitialize(width, height)
     }
 
@@ -70,6 +71,8 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             panels.forEach {
                 it.render(context, mx, my, tickDelta)
             }
+
+            tooltip.render(context, mx, my, tickDelta)
 
             nvg.popScissor()
             nvg.pop()
@@ -231,5 +234,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     companion object {
         val caretImage = NVGRenderer.createImage( "/assets/stella/logos/dropdown.svg")
         val UI_SCALE get() = (OmniResolution.windowWidth.toFloat() / 1920f).coerceAtLeast(0.5f)
+        lateinit var tooltip: Tooltip
+            private set
     }
 }

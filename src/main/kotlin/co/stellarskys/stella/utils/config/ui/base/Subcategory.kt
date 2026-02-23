@@ -50,6 +50,9 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
         nvg.push()
         nvg.translate(x, y)
 
+        if (isTextHovered(subcategory.subName,12f, 17f)) ConfigUI.tooltip.show(subcategory)
+        else ConfigUI.tooltip.hide(subcategory)
+
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.rgb)
         nvg.rect(4f, 4f, width - 8f, HEIGHT - 8, buttonColor.rgb, 10f)
         nvg.text(subcategory.subName, 12f, 17f, 16f, textColor.rgb, nvg.inter)

@@ -89,7 +89,7 @@ object Clear {
             if (!show) return@forEach
             val tex = room.checkmark.texture ?: return@forEach
             val anchor = Anchor.fromInt(map.checkAnchor)
-            val coords = room.getAnchorPos(anchor, map.prioMiddle)
+            val coords = room.getAnchorPos(anchor)
             val cx = coords.first.toFloat() * SPACING + HALF
             val cz = coords.second.toFloat() * SPACING + HALF
 
@@ -115,7 +115,7 @@ object Clear {
 
             if (if (isNormal) map.roomName else map.puzzleName) {
                 val anchor = Anchor.fromInt(map.nameAnchor)
-                val pos = room.getAnchorPos(anchor, map.prioMiddle)
+                val pos = room.getAnchorPos(anchor)
                 room.name?.split(" ")?.forEach {
                     posGroups.getOrPut(pos) { mutableListOf() }.add(it to 0.75f * map.nameScale)
                 }
@@ -123,7 +123,7 @@ object Clear {
 
             if (room.secrets != 0 && (if (isNormal) map.roomSecrets else map.puzzleSecrets)) {
                 val anchor = Anchor.fromInt(map.secretsAnchor)
-                val pos = room.getAnchorPos(anchor, map.prioMiddle)
+                val pos = room.getAnchorPos(anchor)
                 val count = if (room.checkmark == Checkmark.GREEN) room.secrets else room.secretsFound
                 posGroups.getOrPut(pos) { mutableListOf() }.add("$count/${room.secrets}" to 0.75f * map.secretScale)
             }
@@ -185,7 +185,7 @@ object Clear {
         return ((minX + maxX) / 2.0) to cz
     }
 
-    private fun Room.getAnchorPos(anchor: Anchor, prioritizeMiddle: Boolean): Pair<Double, Double> {
+    private fun Room.getAnchorPos(anchor: Anchor): Pair<Double, Double> {
         val sorted = components
             .sortedWith(compareBy({ it.second }, { it.first }))
             .map { it.toDouble()}
@@ -198,7 +198,7 @@ object Clear {
             Anchor.LAST -> sorted.last()
             Anchor.CENTER -> {
                 val isIrregular = shape in setOf("L", "1x2")
-                if (isIrregular && prioritizeMiddle) if (size > 1) sorted[1] else sorted.first()
+                if (isIrregular && map.prioMiddle) if (size > 1) sorted[1] else sorted.first()
                 else this.center()
             }
         }

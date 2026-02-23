@@ -40,6 +40,9 @@ class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown) : BaseEleme
             if (expansionAnim.done() && offsetAnim.done()) isAnimating = false
         }
 
+        if (isTextHovered(dropdown.name,12f, 17f)) ConfigUI.tooltip.show(dropdown)
+        else ConfigUI.tooltip.hide(dropdown)
+
         nvg.push()
         nvg.translate(x, y)
         nvg.pushScissor(0f, 0f, width, height)

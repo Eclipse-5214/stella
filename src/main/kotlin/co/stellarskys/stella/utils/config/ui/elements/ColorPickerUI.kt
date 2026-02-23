@@ -4,6 +4,7 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.Utils.toHex
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.ColorPicker
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
@@ -65,6 +66,9 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
             height = (currentFullHeight - offset).coerceAtLeast(0f)
             if (expansionAnim.done() && offsetAnim.done()) isAnimating = false
         }
+
+        if (isTextHovered(picker.name,12f, 17f)) ConfigUI.tooltip.show(picker)
+        else ConfigUI.tooltip.hide(picker)
 
         nvg.push()
         nvg.translate(x, y)

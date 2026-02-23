@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.config.ui.base
 
 import co.stellarskys.stella.utils.config.ui.ConfigUI
+import co.stellarskys.stella.utils.render.nvg.Font
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
 import dev.deftu.omnicore.api.client.input.OmniMouse
 import dev.deftu.omnicore.api.client.render.OmniResolution
@@ -28,6 +29,9 @@ abstract class BaseElement {
 
     open fun isAreaHovered(rx: Float, ry: Float, rw: Float, rh: Float, mx: Float = mouse.rawX.toFloat() / ConfigUI.UI_SCALE, my: Float = mouse.rawY.toFloat()  / ConfigUI.UI_SCALE) =
         mx in (absoluteX + rx)..(absoluteX + rx + rw) && my in (absoluteY + ry)..(absoluteY + ry + rh)
+
+    open fun isTextHovered(text: String, rx: Float, ry: Float, size: Float = 16f, font: Font = nvg.inter, mx: Float = mouse.rawX.toFloat() / ConfigUI.UI_SCALE, my: Float = mouse.rawY.toFloat()  / ConfigUI.UI_SCALE) =
+        isAreaHovered(rx, ry, nvg.textWidth(text, size, font), size, mx, my)
 
 
     // Rendering

@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.config.ui.elements
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.Button
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
@@ -34,6 +35,9 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
             height = HEIGHT - offset
             if (offsetAnim.done()) isAnimating = false
         }
+
+        if (isTextHovered(button.name,12f, 17f)) ConfigUI.tooltip.show(button)
+        else ConfigUI.tooltip.hide(button)
 
         nvg.push()
         nvg.translate(x, y)

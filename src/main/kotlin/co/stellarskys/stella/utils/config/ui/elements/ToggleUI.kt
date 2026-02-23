@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.config.ui.elements
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.Toggle
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
@@ -38,6 +39,9 @@ class ToggleUI(initX: Float, initY: Float, val toggle: Toggle): BaseElement() {
             height = HEIGHT - offset
             if (offsetAnim.done()) isAnimating = false
         }
+
+        if (isTextHovered(toggle.name,12f, 17f)) ConfigUI.tooltip.show(toggle)
+        else ConfigUI.tooltip.hide(toggle)
 
         nvg.push()
         nvg.translate(x, y)

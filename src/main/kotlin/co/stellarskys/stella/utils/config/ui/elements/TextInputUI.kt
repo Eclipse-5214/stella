@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils.config.ui.elements
 
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config.core.TextInput
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
@@ -41,6 +42,9 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
             height = (HEIGHT - offset).coerceAtLeast(0f)
             if (offsetAnim.done()) isAnimating = false
         }
+
+        if (isTextHovered(input.name,12f, 14f)) ConfigUI.tooltip.show(input)
+        else ConfigUI.tooltip.hide(input)
 
         nvg.push(); nvg.translate(x, y); nvg.pushScissor(0f, 0f, width, height)
         nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)

@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils.config.ui.elements
 
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config.core.Keybind
+import co.stellarskys.stella.utils.config.ui.ConfigUI
 import co.stellarskys.stella.utils.config.ui.Palette
 import co.stellarskys.stella.utils.config.ui.Palette.withAlpha
 import co.stellarskys.stella.utils.config.ui.base.BaseElement
@@ -34,6 +35,9 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
             height = (HEIGHT - offset).coerceAtLeast(0f)
             if (offsetAnim.done()) isAnimating = false
         }
+
+        if (isTextHovered(keybind.name,12f, 16f)) ConfigUI.tooltip.show(keybind)
+        else ConfigUI.tooltip.hide(keybind)
 
         nvg.push(); nvg.translate(x, y); nvg.pushScissor(0f, 0f, width, height)
 
