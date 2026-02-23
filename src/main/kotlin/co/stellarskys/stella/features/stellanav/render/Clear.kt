@@ -79,15 +79,21 @@ object Clear {
 
     private fun renderCheckmarks(context: GuiGraphics) {
         val scale = map.checkmarkScale
-        Dungeon.discoveredRooms.values.forEach { drawIcon(context, it.x.toFloat() * SPACING + HALF, it.z.toFloat() * SPACING + HALF, scale, Checkmark.UNEXPLORED.texture!!, 10, 12, -5f) }
+        Dungeon.discoveredRooms.values.forEach {
+            drawIcon(context, it.x.toFloat() * SPACING + HALF, it.z.toFloat() * SPACING + HALF, scale, Checkmark.UNEXPLORED.texture!!, 10, 12, -5f)
+        }
 
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored || room.type == RoomType.ENTRANCE) return@forEach
+            val show = if (room.type.isNormal) map.roomCheck else map.puzzleCheck
+            if (!show) return@forEach
             val tex = room.checkmark.texture ?: return@forEach
-            if ((room.type.isNormal && map.roomCheckmarks > 0 && room.secrets != 0) || (room.type.isPuzzle && map.puzzleCheckmarks > 0)) return@forEach
+            val anchor = Anchor.fromInt(map.checkAnchor)
+            val coords = room.getAnchorPos(anchor, map.prioMiddle)
+            val cx = coords.first.toFloat() * SPACING + HALF
+            val cz = coords.second.toFloat() * SPACING + HALF
 
-            val (cx, cz) = room.center()
-            drawIcon(context, cx.toFloat() * SPACING + HALF, cz.toFloat() * SPACING + HALF, scale, tex, 12, 12, -6f)
+            drawIcon(context, cx, cz, scale, tex, 12, 12, -6f)
         }
     }
 
@@ -100,50 +106,49 @@ object Clear {
     }
 
     private fun renderLabels(context: GuiGraphics) {
-        val puzzleMode = map.puzzleCheckmarks
-        val roomMode = map.roomCheckmarks
-        if (puzzleMode == 0 && roomMode == 0) return
-
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored) return@forEach
+            if (!room.type.isNormal && !room.type.isPuzzle) return@forEach
+            if (map.replaceText && room.checkmark == Checkmark.GREEN) return@forEach
+            val posGroups = mutableMapOf<Pair<Double, Double>, MutableList<Pair<String, Float>>>()
+            val isNormal = room.type.isNormal
 
-            val type = room.type
-            val mode = when {
-                type.isPuzzle -> puzzleMode
-                type.isNormal -> roomMode
-                else -> 0
-            }
-            if (mode == 0) return@forEach
-
-            val lines = buildList {
-                if (mode and 1 != 0) addAll(room.name?.split(" ") ?: listOf("???"))
-                if (mode and 2 != 0 && room.secrets != 0) {
-                    val count = if (room.checkmark == Checkmark.GREEN) room.secrets else room.secretsFound
-                    add("$count/${room.secrets}")
+            if (if (isNormal) map.roomName else map.puzzleName) {
+                val anchor = Anchor.fromInt(map.nameAnchor)
+                val pos = room.getAnchorPos(anchor, map.prioMiddle)
+                room.name?.split(" ")?.forEach {
+                    posGroups.getOrPut(pos) { mutableListOf() }.add(it to 0.75f * map.nameScale)
                 }
             }
-            if (lines.isEmpty()) return@forEach
 
-            val (cx, cz) = room.center()
-            val x = cx * SPACING + HALF
-            val y = cz * SPACING + HALF
-            val scale = 0.75f * if (type.isNormal) map.rcsize else map.pcsize
-            val matrix = context.pose()
+            if (room.secrets != 0 && (if (isNormal) map.roomSecrets else map.puzzleSecrets)) {
+                val anchor = Anchor.fromInt(map.secretsAnchor)
+                val pos = room.getAnchorPos(anchor, map.prioMiddle)
+                val count = if (room.checkmark == Checkmark.GREEN) room.secrets else room.secretsFound
+                posGroups.getOrPut(pos) { mutableListOf() }.add("$count/${room.secrets}" to 0.75f * map.secretScale)
+            }
 
+            posGroups.forEach { (coords, lines) ->
+                val x = (coords.first * SPACING + HALF).toFloat()
+                val y = (coords.second * SPACING + HALF).toFloat()
+                renderStack(context, lines, x, y, room.checkmark.colorCode)
+            }
+        }
+    }
+
+    private fun renderStack(context: GuiGraphics, lines: List<Pair<String, Float>>, x: Float, y: Float, color: String) {
+        val visualHeight = lines.sumOf { (it.second * 7).toDouble() }.toFloat()
+        var currentY = -visualHeight / 2f
+        lines.forEach { (text, scale) ->
+            val tw = text.width()
             context.pushPop {
-                matrix.translate(x.toFloat(), y.toFloat())
-                matrix.scale(scale, scale)
-
-                val color = room.checkmark.colorCode
-                var dy = -(lines.size * 9) / 2
-
-                for (line in lines) {
-                    val dx = -line.width() / 2
-                    MapRenderer.drawShadowedText(context,  line, dx, dy, scale)
-                    Render2D.drawString(context, color + line, dx, dy)
-                    dy += 9
-                }
+                context.pose().translate(x, y + currentY)
+                context.pose().scale(scale, scale)
+                context.pose().translate(-tw / 2f, 0f)
+                MapRenderer.drawShadowedText(context, text, 0, 0, scale)
+                Render2D.drawString(context, color + text, 0, 0)
             }
+            currentY += scale * 9f
         }
     }
 
@@ -180,5 +185,36 @@ object Clear {
         return ((minX + maxX) / 2.0) to cz
     }
 
+    private fun Room.getAnchorPos(anchor: Anchor, prioritizeMiddle: Boolean): Pair<Double, Double> {
+        val sorted = components
+            .sortedWith(compareBy({ it.second }, { it.first }))
+            .map { it.toDouble()}
+
+        val size = sorted.size
+
+        return when (anchor) {
+            Anchor.FIRST -> sorted.first()
+            Anchor.MIDDLE -> if (size > 1) sorted[1] else sorted.first()
+            Anchor.LAST -> sorted.last()
+            Anchor.CENTER -> {
+                val isIrregular = shape in setOf("L", "1x2")
+                if (isIrregular && prioritizeMiddle) if (size > 1) sorted[1] else sorted.first()
+                else this.center()
+            }
+        }
+    }
+
     private fun floorScale(floor: Int) = if (floor == 0) 1.5f else if (floor <= 3) 1.2f else 1f
+    private fun Pair<Int, Int>.toDouble() = Pair(first.toDouble(), second.toDouble())
+
+    enum class Anchor(val id: Int) {
+        FIRST(0),
+        MIDDLE(1),
+        LAST(2),
+        CENTER(3);
+
+        companion object {
+            fun fromInt(value: Int) = entries.find { it.id == value } ?: FIRST
+        }
+    }
 }

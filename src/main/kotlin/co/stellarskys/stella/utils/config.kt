@@ -483,22 +483,6 @@ val config = Config("Stella", "Stella") {
                 shouldShow { settings -> settings["mapBorder"] as Boolean }
             }
 
-            dropdown {
-                configName = "roomCheckmarks"
-                name = "Room Checks"
-                description = "Style of room checkmarks"
-                options = listOf("Checkmark", "Name", "Secrets", "Both")
-                default = 0
-            }
-
-            dropdown {
-                configName = "puzzleCheckmarks"
-                name = "Puzzle Checks"
-                description = "Style of puzzle checkmarks"
-                options = listOf("Checkmark", "Name", "Secrets", "Both")
-                default = 0
-            }
-
             slider {
                 configName = "checkmarkScale"
                 name = "Checkmark Size"
@@ -509,18 +493,18 @@ val config = Config("Stella", "Stella") {
             }
 
             slider {
-                configName = "rcsize"
-                name = "Room Text"
-                description = "Size of room text"
+                configName = "nameScale"
+                name = "Name Size"
+                description = "Size of room name text"
                 min = 0.1f
                 max = 2f
                 default = 1f
             }
 
             slider {
-                configName = "pcsize"
-                name = "Puzzle Text"
-                description = "Size of puzzle text"
+                configName = "secretScale"
+                name = "Secret Size"
+                description = "Size of room secret text"
                 min = 0.1f
                 max = 2f
                 default = 1f
@@ -531,6 +515,82 @@ val config = Config("Stella", "Stella") {
                 name = "Text Shadow"
                 description = "Gives the text a cool shadow"
                 default = true
+            }
+        }
+
+        subcategory("Behavior") {
+            toggle {
+                configName = "roomCheck"
+                name = "Room Checkmarks"
+                description = "Displays room checkmarks"
+                default = true
+            }
+
+            toggle {
+                configName = "roomName"
+                name = "Room Name"
+                description = "Displays room name"
+            }
+
+            toggle {
+                configName = "roomSecrets"
+                name = "Room Secrets"
+                description = "Displays room secrets"
+            }
+
+            toggle {
+                configName = "puzzleCheck"
+                name = "Puzzle Checkmarks"
+                description = "Displays puzzle checkmarks"
+                default = true
+            }
+
+            toggle {
+                configName = "puzzleName"
+                name = "Puzzle Name"
+                description = "Displays puzzle name"
+            }
+
+            toggle {
+                configName = "puzzleSecrets"
+                name = "Puzzle Secrets"
+                description = "Displays puzzle secrets"
+            }
+
+            dropdown {
+                configName = "checkAnchor"
+                name = "Checkmark Anchor"
+                description = "Which component anchor to prioritize when rendering checkmarks"
+                options = listOf("First", "Middle", "Last", "Center")
+                default = 0
+            }
+
+            dropdown {
+                configName = "nameAnchor"
+                name = "Name Anchor"
+                description = "Which component anchor to prioritize when rendering room name"
+                options = listOf("First", "Middle", "Last", "Center")
+                default = 3
+            }
+
+            dropdown {
+                configName = "secretsAnchor"
+                name = "Secrets Anchor"
+                description = "Which component anchor to prioritize when rendering room secrets"
+                options = listOf("First", "Middle", "Last", "Center")
+                default = 3
+            }
+
+            toggle {
+                configName = "prioMiddle"
+                name = "Prioritize middle"
+                description = "Move center anchors to middle in 1x2 and L shaped rooms"
+            }
+
+            toggle {
+                configName = "replaceText"
+                name = "Replace Text"
+                description = "Replace room text with checkmark on complete (overrides checkmark)"
             }
         }
 

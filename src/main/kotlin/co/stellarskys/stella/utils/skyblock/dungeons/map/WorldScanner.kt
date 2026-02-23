@@ -209,7 +209,6 @@ object WorldScanner {
         if (entity == null) return
         entity.inRender = true
 
-
         val iconX = Utils.mapRange(x, -200.0, -10.0, 0.0, ScanUtils.defaultMapSize.first.toDouble())
         val iconZ = Utils.mapRange(z, -200.0, -10.0, 0.0, ScanUtils.defaultMapSize.second.toDouble())
         entity.pos.updatePosition(x, z, yaw + 180f, iconX, iconZ)

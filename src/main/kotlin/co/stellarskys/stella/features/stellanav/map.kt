@@ -25,19 +25,33 @@ object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     val bossMapEnabled by config.property<Boolean>("bossMapEnabled")
     val hideInBoss by config.property<Boolean>("hideInBoss")
     val scoreMapEnabled by config.property<Boolean>("scoreMapEnabled")
+    val mapInfoUnder by config.property<Boolean>("mapInfoUnder")
 
+    // display
     val mapBgColor by config.property<Color>("mapBgColor")
     val mapBorder by config.property<Boolean>("mapBorder")
     val mapBdColor by config.property<Color>("mapBdColor")
     val mapBdWidth by config.property<Int>("mapBdWidth")
+    val nameScale by config.property<Float>("nameScale")
+    val secretScale by config.property<Float>("secretScale")
     val checkmarkScale by config.property<Float>("checkmarkScale")
-    val roomCheckmarks by config.property<Int>("roomCheckmarks")
-    val rcsize by config.property<Float>("rcsize")
-    val puzzleCheckmarks by config.property<Int>("puzzleCheckmarks")
-    val pcsize by config.property<Float>("pcsize")
     val textShadow by config.property<Boolean>("mtextshadow")
 
-    val mapInfoUnder by config.property<Boolean>("mapInfoUnder")
+    // behavior
+    val roomCheck by config.property<Boolean>("roomCheck")
+    val roomName by config.property<Boolean>("roomName")
+    val roomSecrets by config.property<Boolean>("roomSecrets")
+
+    val puzzleCheck by config.property<Boolean>("puzzleCheck")
+    val puzzleName by config.property<Boolean>("puzzleName")
+    val puzzleSecrets by config.property<Boolean>("puzzleSecrets")
+
+    val checkAnchor by config.property<Int>("checkAnchor")
+    val nameAnchor by config.property<Int>("nameAnchor")
+    val secretsAnchor by config.property<Int>("secretsAnchor")
+
+    val prioMiddle by config.property<Boolean>("prioMiddle")
+    val replaceText by config.property<Boolean>("replaceText")
 
     // map colors
     val NormalColor by config.property<Color>("normalRoomColor")
