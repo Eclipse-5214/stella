@@ -94,7 +94,10 @@ class SliderUI(initX: Float, initY: Float, val slider: Slider) : BaseElement() {
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (parent?.canReceiveInput  == false || !visible || offset > 1f || parent?.isAnimating == true) return false
 
-        valueInput.mouseClicked(mouseX, mouseY, button)
+        if (valueInput.mouseClicked(mouseX, mouseY, button)) {
+            dragging = false
+            return true
+        }
 
         if (isAreaHovered(12f, HEIGHT / 2f, width - 24f, HEIGHT / 2f, mouseX, mouseY)) {
             valueInput.isFocused = false

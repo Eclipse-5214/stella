@@ -559,7 +559,7 @@ val config = Config("Stella", "Stella") {
 
             dropdown {
                 configName = "checkAnchor"
-                name = "Checkmark Anchor"
+                name = "Check Anchor"
                 description = "Which component anchor to prioritize when rendering checkmarks"
                 options = listOf("First", "Middle", "Last", "Center")
                 default = 0 // First

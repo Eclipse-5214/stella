@@ -85,7 +85,7 @@ object Clear {
 
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored || room.type == RoomType.ENTRANCE) return@forEach
-            val show = if (room.type.isNormal) map.roomCheck else map.puzzleCheck
+            val show = if (room.type.isNormal) map.roomCheck else if (room.type.isPuzzle) map.puzzleCheck else true
             if (!show) return@forEach
             val tex = room.checkmark.texture ?: return@forEach
             val anchor = Anchor.fromInt(map.checkAnchor)
@@ -137,7 +137,7 @@ object Clear {
     }
 
     private fun renderStack(context: GuiGraphics, lines: List<Pair<String, Float>>, x: Float, y: Float, color: String) {
-        val visualHeight = lines.sumOf { (it.second * 7).toDouble() }.toFloat()
+        val visualHeight = lines.sumOf { (it.second * 9).toDouble() }.toFloat()
         var currentY = -visualHeight / 2f
         lines.forEach { (text, scale) ->
             val tw = text.width()

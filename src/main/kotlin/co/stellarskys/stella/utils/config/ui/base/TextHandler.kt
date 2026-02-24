@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils.config.ui.base
 import co.stellarskys.stella.utils.TimeUtils
 import co.stellarskys.stella.utils.TimeUtils.millis
 import co.stellarskys.stella.utils.render.nvg.Font
+import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.gui.GuiGraphics
 
 /*
@@ -103,6 +104,7 @@ class TextHandler(
         if (!isFocused) return false
         val ctrl = (modifiers and 2) != 0
         val shift = (modifiers and 1) != 0
+        val kh = client.keyboardHandler
 
         when (keyCode) {
             256 -> isFocused = false
@@ -115,6 +117,23 @@ class TextHandler(
             263 -> { if (caret > 0) caret--; if (!shift) selection = caret }
             262 -> { if (caret < text.length) caret++; if (!shift) selection = caret }
             65 -> if (ctrl) { selection = 0; caret = text.length }
+            67 -> if (ctrl && selection != caret) {
+                val start = minOf(caret, selection)
+                val end = maxOf(caret, selection)
+                kh.clipboard = text.substring(start, end)
+            }
+            88 -> if (ctrl && selection != caret) {
+                val start = minOf(caret, selection)
+                val end = maxOf(caret, selection)
+                kh.clipboard = text.substring(start, end)
+                deleteSelection()
+            }
+            86 -> if (ctrl) { // Ctrl + V (Paste)
+                val content = kh.clipboard
+                    .replace("\n", "")
+                    .replace("\r", "")
+                insert(content)
+            }
             90 -> if (ctrl) undo()
         }
         updateCaretPosition()
