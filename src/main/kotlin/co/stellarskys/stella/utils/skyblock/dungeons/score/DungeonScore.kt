@@ -6,6 +6,7 @@ import co.stellarskys.stella.events.core.ScoreboardEvent
 import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
+import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
 import tech.thatgravyboat.skyblockapi.api.data.Perk
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
@@ -18,7 +19,6 @@ import kotlin.math.floor
  */
 object DungeonScore {
     // Enums
-    val puzzleStates = mapOf("✦" to 0, "✔" to 1, "✖" to 2)
     val milestones = listOf("⓿", "❶", "❷", "❸", "❹", "❺", "❻", "❼", "❽", "❾")
     val floorSecrets = mapOf("F1" to 0.3, "F2" to 0.4, "F3" to 0.5, "F4" to 0.6, "F5" to 0.7, "F6" to 0.85)
     val floorTimes = mapOf("F3" to 120, "F4" to 240, "F5" to 120, "F6" to 240, "F7" to 360, "M6" to 120, "M7" to 360)
@@ -29,11 +29,8 @@ object DungeonScore {
     val MILESTONES_PATTERN = Regex("""^Your Milestone: .(.)$""")
     val COMPLETED_ROOMS_PATTERN =  Regex("""^Completed Rooms: (\d+)$""")
     val TEAM_DEATHS_PATTERN = Regex("""^Team Deaths: (\d+)$""")
-    val PUZZLE_COUNT_PATTERN = Regex("""^Puzzles: \((\d+)\)$""")
     val CRYPTS_PATTERN = Regex("""^Crypts: (\d+)$""")
-    val PUZZLE_STATE_PATTERN = Regex("""^([\w ]+): \[([✦✔✖])]\s?\(?(\w{1,16})?\)?$""")
     val OPENED_ROOMS_PATTERN = Regex("""^Opened Rooms: (\d+)$""")
-    val CLEARED_ROOMS_PATTERN = Regex("""^Completed Rooms: (\d+)$""")
     val CLEAR_PERCENT_PATTERN =  Regex("""^Cleared: (\d+)% \(\d+\)$""")
     val DUNGEON_TIME_PATTERN =  Regex("""^Time: (?:(\d+)h)?\s?(?:(\d+)m)?\s?(?:(\d+)s)?$""")
 
@@ -75,17 +72,9 @@ object DungeonScore {
         crypts              = msg.extractInt(CRYPTS_PATTERN, crypts)
         milestone           = msg.extractString(MILESTONES_PATTERN, milestone)
         completedRooms      = msg.extractInt(COMPLETED_ROOMS_PATTERN, completedRooms)
-        puzzleCount         = msg.extractInt(PUZZLE_COUNT_PATTERN, puzzleCount)
         teamDeaths          = msg.extractInt(TEAM_DEATHS_PATTERN, teamDeaths)
         openedRooms         = msg.extractInt(OPENED_ROOMS_PATTERN, openedRooms)
-        clearedRooms        = msg.extractInt(CLEARED_ROOMS_PATTERN, clearedRooms)
-
-        msg.match(PUZZLE_STATE_PATTERN)?.let {
-            val (_, state, _) = it.destructured
-            if (puzzleStates[state] == 1) puzzlesDone++
-        }
-
-        calculateScore()
+        calculateScore2()
     }
 
     /** Parses a single sidebar line and updates percent-based metrics */
@@ -97,40 +86,39 @@ object DungeonScore {
     }
 
     /** Computes final score and all derived metrics */
-    private fun calculateScore() = with(data) {
-        if (Dungeon.floor == null) return@with
+    private fun calculateScore2() = with(data) {
+        val currentFloor = Dungeon.floor ?: return@with
 
-        val missingPuzzles = puzzleCount - puzzlesDone
+        totalRooms = if (clearedPercent == 0) 36 else ((100.0 / clearedPercent) * completedRooms + 0.4).toInt()
+        val projectedRooms = (completedRooms + (if (!Dungeon.bloodClear) 1 else 0) + (if (!Dungeon.inBoss) 1 else 0)).coerceAtMost(totalRooms)
+        val roomRatio = projectedRooms.toDouble() / totalRooms.coerceAtLeast(1)
+        val actualDeathPenalty = ((teamDeaths * 2) - (if (hasSpiritPet) 1 else 0)).coerceAtLeast(0)
+        val puzzlePenalty = Dungeon.puzzles.count { it.checkmark !in setOf(Checkmark.GREEN, Checkmark.WHITE) } * 10
 
-        totalSecrets = ((100.0 / secretsFoundPercent) * secretsFound + 0.5).toInt()
-        secretsRemaining = totalSecrets - secretsFound
-
-        val estimatedRooms = ((100.0 / clearedPercent) * completedRooms + 0.4)
-        totalRooms = estimatedRooms.toInt().takeIf { it > 0 } ?: 36
-        adjustedRooms = completedRooms + if (!Dungeon.bloodClear || !Dungeon.inBoss) 1 else 0
-        if (completedRooms <= totalRooms - 1 && !Dungeon.bloodClear) adjustedRooms++
-
-        deathPenalty = (teamDeaths * -2) + if (hasSpiritPet && teamDeaths > 0) 1 else 0
-        completionRatio = adjustedRooms.toDouble() / totalRooms
-        roomsScore = (80 * completionRatio).coerceIn(0.0, 80.0)
-        skillScore = (20 + roomsScore - 10 * missingPuzzles + deathPenalty).coerceIn(20.0, 100.0)
-
+        skillScore = (20 + (80 * roomRatio) - puzzlePenalty - actualDeathPenalty).coerceIn(20.0, 100.0)
         secretsScore = (40 * ((secretsFoundPercent / 100.0) / secretsPercentNeeded)).coerceIn(0.0, 40.0)
-        exploreScore = if (clearedPercent == 0) 0.0 else (60 * completionRatio + secretsScore).coerceIn(0.0, 100.0)
-        bonusScore = crypts.coerceAtMost(5) + if (MimicTrigger.mimicDead) 2 else 0 + if (MimicTrigger.princeDead) 1 else 0 +  if (hasPaul) 10 else 0
-        val timeOffset = dungeonSeconds - (floorTimes[Dungeon.floor?.name] ?: 0)
-        speedScore = calculateSpeedScore(timeOffset, if (Dungeon.floor?.name == "E") 0.7 else 1.0)
+        exploreScore = ( (60 * roomRatio) + secretsScore ).coerceIn(0.0, 100.0)
+
+        val mimicBonus = if (MimicTrigger.mimicDead) 2 else 0
+        val princeBonus = if (MimicTrigger.princeDead) 1 else 0
+        val paulBonus = if (hasPaul || forcePaul) 10 else 0
+        bonusScore = crypts.coerceAtMost(5) + mimicBonus + princeBonus + paulBonus
+
+        val timeOffset = dungeonSeconds - (floorTimes[currentFloor.name] ?: 0)
+        speedScore = calculateSpeedScore(timeOffset, if (currentFloor.name == "E") 0.7 else 1.0)
 
         score = (skillScore + exploreScore + speedScore + bonusScore).toInt()
+        totalSecrets = if (secretsFoundPercent == 0.0) 0 else floor(100.0 / secretsFoundPercent * secretsFound + 0.5).toInt()
         maxSecrets = ceil(totalSecrets * secretsPercentNeeded).toInt()
-        minSecrets = floor(maxSecrets * ((40.0 - bonusScore + deathPenalty) / 40.0)).toInt()
+        minSecrets = ceil(totalSecrets * secretsPercentNeeded * (40.0 - bonusScore + actualDeathPenalty) / 40.0).toInt()
+        secretsRemaining = (minSecrets - secretsFound).coerceAtLeast(0)
 
         if (score >= 270 && lastScore < 270) EventBus.post(DungeonEvent.Score.On270())
         if (score >= 300 && lastScore < 300) EventBus.post(DungeonEvent.Score.On300())
         if (crypts >= 5 && lastCrypts < 5) EventBus.post(DungeonEvent.Score.AllCrypts())
 
-        lastScore = score
-        lastCrypts = crypts
+        lastScore = maxOf(lastScore, score)
+        lastCrypts = maxOf(lastCrypts, crypts)
     }
 
 

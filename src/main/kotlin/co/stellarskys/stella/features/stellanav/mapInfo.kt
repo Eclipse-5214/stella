@@ -50,8 +50,8 @@ object mapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS
         var mapLine2 = Dungeon.mapLine2
 
         if (preview) {
-            mapLine1 = "§7Secrets: §b?    §7Crypts: §c0    §7Mimic: §c✘";
-            mapLine2 = "§7Min Secrets: §b?    §7Deaths: §a0    §7Score: §c0";
+            mapLine1 = "§7Secrets: §b?§8-§e?§8-§c?        §7Score: §c0"
+            mapLine2 = "§7Deaths: §a0 §8| §7M: §c✘ §8| §7P: §c✘ §8| §7Crypts: §c0"
         }
         val w1 = mapLine1.width()
         val w2 = mapLine2.width()

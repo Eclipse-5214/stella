@@ -51,8 +51,8 @@ object MapRenderer {
 
     fun renderInfoUnder(context: GuiGraphics, preview: Boolean) {
         val (l1, l2) = if (preview) {
-            "&7Secrets: &b?    &7Crypts: &c0    &7Mimic: &c✘" to
-                    "&7Min Secrets: &b?    &7Deaths: &a0    &7Score: &c0"
+            "§7Secrets: §b?§8-§e?§8-§c?        §7Score: §c0"  to
+            "§7Deaths: §a0 §8| §7M: §c✘ §8| §7P: §c✘ §8| §7Crypts: §c0"
         } else Dungeon.mapLine1 to Dungeon.mapLine2
 
         context.pushPop {

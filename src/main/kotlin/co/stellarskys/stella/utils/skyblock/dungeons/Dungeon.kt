@@ -46,6 +46,7 @@ object Dungeon {
     val uniqueRooms = mutableSetOf<Room>()
     val uniqueDoors = mutableSetOf<Door>()
     val discoveredRooms = mutableMapOf<String, DiscoveredRoom>()
+    val puzzles: List<Room> get() = uniqueRooms.filter { it.type == RoomType.PUZZLE }
 
     // Dungeon state
     var bloodClear = false
@@ -240,25 +241,18 @@ object Dungeon {
             run.crypts > 0  -> "§e${run.crypts}"
             else            -> "§c0"
         }
-        val dMimic = if (floorNumber in listOf(6, 7)) {
-            "§7Mimic: " + if (MimicTrigger.mimicDead) "§a✔" else "§c✘"
-        } else ""
-
-        val minSecrets = "§7Min Secrets: " + when {
-            run.secretsFound == 0 -> "§b?"
-            run.minSecrets > run.secretsFound -> "§e${run.minSecrets}"
-            else -> "§a${run.minSecrets}"
-        }
-
-        val dDeaths = "§7Deaths: " + if (run.teamDeaths < 0) "§c${run.teamDeaths}" else "§a0"
+        val mMimic = if (MimicTrigger.mimicDead) "§a✔" else "§c✘"
+        val mPrince = if (MimicTrigger.princeDead) "§a✔" else "§c✘"
+        val dMimicPrince = "§7M: $mMimic §8| §7P: $mPrince"
+        val dDeaths = "§7Deaths: " + if (run.teamDeaths > 0) "§c${run.teamDeaths}" else "§a0"
         val dScore = "§7Score: " + when {
             run.score >= 300 -> "§a${run.score}"
             run.score >= 270 -> "§e${run.score}"
             else             -> "§c${run.score}"
         } + if (DungeonScore.hasPaul) " §b★" else ""
 
-        mapLine1 = "$dSecrets    $dCrypts    $dMimic".trim()
-        mapLine2 = "$minSecrets    $dDeaths    $dScore".trim()
+        mapLine1 = "$dSecrets        $dScore".trim()
+        mapLine2 = "$dDeaths §8| $dMimicPrince §8| $dCrypts".trim()
     }
 
     /** Updates leap detection based on held item */
