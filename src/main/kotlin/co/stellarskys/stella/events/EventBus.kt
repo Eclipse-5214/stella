@@ -21,6 +21,7 @@ import net.minecraft.resources.ResourceLocation
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.utils.render.RenderContext
+import dev.deftu.omnicore.api.client.*
 import net.minecraft.network.protocol.Packet
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
@@ -91,6 +92,7 @@ object EventBus : EventBus() {
         }
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->
+            if (client.options.hideGui || world == null || player == null) return@attachElementBefore
             post(GuiEvent.RenderHUD(context))
             Stella.DELTA.updateDelta()
         }
