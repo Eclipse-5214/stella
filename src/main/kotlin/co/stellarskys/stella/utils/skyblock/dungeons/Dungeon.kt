@@ -10,10 +10,9 @@ import co.stellarskys.stella.utils.skyblock.dungeons.score.*
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.*
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
-import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
-import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.SkullBlockEntity
@@ -23,7 +22,6 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.platform.properties
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
-import kotlin.math.roundToInt
 
 /**
  * Central dungeon state manager.
@@ -188,19 +186,18 @@ object Dungeon {
             }
         }
 
-        EventBus.on<SoundEvent.Play>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            val sound = event.sound
-            if (sound.location == SoundEvents.BAT_DEATH.location) {
-                val pos = BlockPos(sound.x.roundToInt(), sound.y.roundToInt(), sound.z.roundToInt())
-                EventBus.post(DungeonEvent.Secrets.Bat(pos))
+        EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            val entity = event.entity
+            if (entity.type != EntityType.BAT) return@on
+            val pos = entity.blockPosition()
+            EventBus.post(DungeonEvent.Secrets.Bat(pos, entity))
 
-                currentRoom?.roomData?.secretCoords?.bat?.find {
-                    Utils.calcDistance(
-                        currentRoom!!.getRealCoord(it.toBlockPos()),
-                        pos
-                    ) < 100
-                }?.collected = true
-            }
+            currentRoom?.roomData?.secretCoords?.bat?.find {
+                Utils.calcDistance(
+                    currentRoom!!.getRealCoord(it.toBlockPos()),
+                    pos
+                ) < 100
+            }?.collected = true
         }
 
         RoomRegistry.loadFromRemote()

@@ -74,7 +74,7 @@ object DungeonScore {
         completedRooms      = msg.extractInt(COMPLETED_ROOMS_PATTERN, completedRooms)
         teamDeaths          = msg.extractInt(TEAM_DEATHS_PATTERN, teamDeaths)
         openedRooms         = msg.extractInt(OPENED_ROOMS_PATTERN, openedRooms)
-        calculateScore2()
+        calculateScore()
     }
 
     /** Parses a single sidebar line and updates percent-based metrics */
@@ -86,7 +86,7 @@ object DungeonScore {
     }
 
     /** Computes final score and all derived metrics */
-    private fun calculateScore2() = with(data) {
+    private fun calculateScore() = with(data) {
         val currentFloor = Dungeon.floor ?: return@with
 
         totalRooms = if (clearedPercent == 0) 36 else ((100.0 / clearedPercent) * completedRooms + 0.4).toInt()
@@ -101,7 +101,7 @@ object DungeonScore {
 
         val mimicBonus = if (MimicTrigger.mimicDead) 2 else 0
         val princeBonus = if (MimicTrigger.princeDead) 1 else 0
-        val paulBonus = if (hasPaul || forcePaul) 10 else 0
+        val paulBonus = if (hasPaul) 10 else 0
         bonusScore = crypts.coerceAtMost(5) + mimicBonus + princeBonus + paulBonus
 
         val timeOffset = dungeonSeconds - (floorTimes[currentFloor.name] ?: 0)
