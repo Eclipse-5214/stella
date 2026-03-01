@@ -26,6 +26,9 @@ class Room(
     private val OFFSETS = arrayOf(Pair(-hs, -hs), Pair(hs, -hs), Pair(hs, hs), Pair(-hs, hs))
     private val componentSet = mutableSetOf<Pair<Int, Int>>()
     private var lastUpdatedSize = 0
+    private val rot get() = rotation ?: 0
+    private val cx get() = corner?.x ?: 0
+    private val cz get() = corner?.z ?: 0
 
     val components = mutableListOf<Pair<Int, Int>>()
     val realComponents = mutableListOf<Pair<Int, Int>>()
@@ -112,33 +115,38 @@ class Room(
         return this
     }
 
-    fun findRotation(): Room {
-        if (rotation != null || height == null) return this
-        val h = height!!
+    fun findRotation() = apply {
+        val h = height ?: return@apply
+        if (rotation != null || (shape == "1x4" && components.size < 4)) return@apply
 
         if (type == RoomType.FAIRY) {
             rotation = 0
             val (x, z) = realComponents.first()
             corner = BlockPos(x - hs, h, z - hs)
-            return this
+            return@apply
         }
 
-        val targets = if (components.size > 1) listOf(realComponents.first(), realComponents.last()) else realComponents
+        val minX = components.minOf { it.first }
+        val maxX = components.maxOf { it.first }
+        val minZ = components.minOf { it.second }
+        val maxZ = components.maxOf { it.second }
 
-        for ((x, z) in targets) {
-            OFFSETS.forEachIndexed { i, (dx, dz) ->
-                val nx = x + dx; val nz = z + dz
-                if (WorldScanUtils.isChunkLoaded(nx, h, nz) &&
-                    WorldUtils.getBlockStateAt(nx, h, nz)?.`is`(Blocks.BLUE_TERRACOTTA) == true) {
-                    rotation = i * 90
-                    corner = BlockPos(nx, h, nz)
-                    return@findRotation this
-                }
+        components.firstNotNullOfOrNull { (cx, cz) ->
+            OFFSETS.indices.firstOrNull { i ->
+                val isX = if (i == 0 || i == 3) cx == minX else cx == maxX
+                val isZ = if (i == 0 || i == 1) cz == minZ else cz == maxZ
+                if (!isX || !isZ) return@firstOrNull false
+
+                val (nx, nz) = WorldScanUtils.componentToRealCoords(cx, cz).let { it.first + OFFSETS[i].first to it.second + OFFSETS[i].second }
+                WorldScanUtils.isChunkLoaded(nx, h, nz) && WorldUtils.getBlockStateAt(nx, h, nz)?.`is`(Blocks.BLUE_TERRACOTTA) == true
+            }?.let { i ->
+                rotation = i * 90
+                val (rx, rz) = WorldScanUtils.componentToRealCoords(cx, cz)
+                corner = BlockPos(rx + OFFSETS[i].first, h, rz + OFFSETS[i].second)
             }
         }
-        return this
     }
 
-    fun getRoomCoord(pos: BlockPos)   = pos.subtract(Vec3i(corner?.x ?: 0, 0, corner?.z ?: 0)).rotate(rotation ?: 0)
-    fun getRealCoord(local: BlockPos) = local.unrotate(rotation ?: 0).offset(Vec3i(corner?.x ?: 0, 0, corner?.z ?: 0))
+    fun getRoomCoord(pos: BlockPos)   = pos.subtract(Vec3i(cx, 0,cz)).rotate(rot)
+    fun getRealCoord(local: BlockPos) = local.unrotate(rot).offset(Vec3i(cx, 0, cz))
 }

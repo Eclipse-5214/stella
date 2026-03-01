@@ -1,6 +1,7 @@
 package co.stellarskys.stella.features.stellanav.render
 
 import co.stellarskys.stella.features.stellanav.map
+import co.stellarskys.stella.utils.Utils.darken
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
@@ -41,23 +42,22 @@ object Clear {
     }
 
     private fun renderRooms(context: GuiGraphics) {
-        Dungeon.discoveredRooms.values.forEach { Render2D.drawRect(context, it.x * SPACING, it.z * SPACING, ROOM, ROOM, DISCOVERED) }
+        if(!map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
+            Render2D.drawRect(context, it.x * SPACING, it.z * SPACING, ROOM, ROOM, DISCOVERED)
+        }
 
         Dungeon.uniqueRooms.forEach { room ->
-            if (!room.explored) return@forEach
-            renderRoom(context, room, room.type.color ?: return@forEach)
+            if (!room.explored && !map.hiddenRooms) return@forEach
+            val baseColor = room.type.color ?: return@forEach
+            renderRoom(context, room, if (!room.explored) baseColor.darken(map.tint) else baseColor)
         }
 
         Dungeon.uniqueDoors.forEach { door ->
-            if (door.state != DoorState.DISCOVERED) return@forEach
+            if (door.state != DoorState.DISCOVERED && !map.hiddenRooms) return@forEach
             val vert = door.rotation == 0
             val (cx, cz) = door.getComp()
-            Render2D.drawRect(context,
-                (cx / 2 * SPACING) + if (vert) 6 else 18,
-                (cz / 2 * SPACING) + if (vert) 18 else 6,
-                if (vert) 6 else 4, if (vert) 4 else 6,
-                (if (door.opened) DoorType.NORMAL else door.type).color
-            )
+            val finalColor = (if (door.opened) DoorType.NORMAL else door.type).color.let { if (door.state != DoorState.DISCOVERED) it.darken(map.tint) else it }
+            Render2D.drawRect(context, (cx / 2 * SPACING) + if (vert) 6 else 18, (cz / 2 * SPACING) + if (vert) 18 else 6, if (vert) 6 else 4, if (vert) 4 else 6, finalColor)
         }
     }
 
@@ -79,13 +79,13 @@ object Clear {
 
     private fun renderCheckmarks(context: GuiGraphics) {
         val scale = map.checkmarkScale
-        Dungeon.discoveredRooms.values.forEach {
+        if(!map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
             drawIcon(context, it.x.toFloat() * SPACING + HALF, it.z.toFloat() * SPACING + HALF, scale, Checkmark.UNEXPLORED.texture!!, 10, 12, -5f)
         }
 
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored || room.type == RoomType.ENTRANCE) return@forEach
-            val show = if (room.type.isNormal) map.roomCheck else if (room.type.isPuzzle) map.puzzleCheck else true
+            val show = if (room.type.isNormal && room.secrets > 0) map.roomCheck else if (room.type.isPuzzle) map.puzzleCheck else true
             if (!show) return@forEach
             val tex = room.checkmark.texture ?: return@forEach
             val anchor = Anchor.fromInt(map.checkAnchor)
@@ -107,7 +107,7 @@ object Clear {
 
     private fun renderLabels(context: GuiGraphics) {
         Dungeon.uniqueRooms.forEach { room ->
-            if (!room.explored) return@forEach
+            if (!room.explored && !map.hiddenRooms) return@forEach
             if (!room.type.isNormal && !room.type.isPuzzle) return@forEach
             if (map.replaceText && room.checkmark == Checkmark.GREEN) return@forEach
             val posGroups = mutableMapOf<Pair<Double, Double>, MutableList<Pair<String, Float>>>()
@@ -208,11 +208,7 @@ object Clear {
     private fun Pair<Int, Int>.toDouble() = Pair(first.toDouble(), second.toDouble())
 
     enum class Anchor(val id: Int) {
-        FIRST(0),
-        MIDDLE(1),
-        LAST(2),
-        CENTER(3);
-
+        FIRST(0), MIDDLE(1), LAST(2), CENTER(3);
         companion object {
             fun fromInt(value: Int) = entries.find { it.id == value } ?: FIRST
         }

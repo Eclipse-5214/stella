@@ -46,7 +46,7 @@ enum class RoomType(
     NORMAL("Normal", "7", { map.NormalColor }),
     PUZZLE("Puzzle", "d", { map.PuzzleColor }),
     TRAP("Trap", "6", { map.TrapColor }),
-    YELLOW("Yellow", "e", { map.MinibossColor }),
+    YELLOW("Champion", "e", { map.MinibossColor }),
     BLOOD("Blood", "c", { map.BloodColor }),
     FAIRY("Fairy", "d", { map.FairyColor }),
     RARE("Rare", "b", { null }),

@@ -10,6 +10,7 @@ import net.minecraft.network.chat.FontDescription
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import java.awt.Color
+import kotlin.math.max
 import kotlin.math.sqrt
 
 object Utils {
@@ -94,6 +95,17 @@ object Utils {
     }
 
     fun Color.getNormalized(): FloatArray = this.getRGBComponents(null)
+
+    /**
+     * Darkens the color by a given factor.
+     * @param factor The multiplier (0.0 to 1.0).
+     */
+    fun Color.darken(factor: Double): Color {
+        val r = max(0, (red * factor).toInt())
+        val g = max(0, (green * factor).toInt())
+        val b = max(0, (blue * factor).toInt())
+        return Color(r, g, b, alpha)
+    }
 
     fun decodeRoman(roman: String): Int {
         val values = mapOf(

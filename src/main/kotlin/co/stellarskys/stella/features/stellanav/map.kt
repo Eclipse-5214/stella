@@ -78,6 +78,10 @@ object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     val showNames by config.property<Boolean>("showNames")
     val dontShowOwn by config.property<Boolean>("dontShowOwn")
 
+    // other
+    val hiddenRooms = false
+    val tint = 0.7
+
     override fun initialize() {
         HUDManager.registerCustom(name, 148, 148, this::HUDEditorRender)
 

@@ -59,7 +59,7 @@ object WorldScanner {
                     EventBus.post(DungeonEvent.Room.Change(prevRoom, currRoom))
                 }
 
-                if (lastIdx == idx) return@on
+                //if (lastIdx == idx) return@on
 
                 lastIdx = idx
                 Dungeon.currentRoom = Dungeon.getRoomAt(player.x.toInt(), player.z.toInt())
@@ -91,8 +91,8 @@ object WorldScanner {
                 continue
             }
 
-            val room = addRoom(cx, cz, rx, rz, roofHeight)
-            checkAdjacent(room, cx, cz, rx, rz, rx, rz, roofHeight)
+            val room = addRoom(cx, cz,  roofHeight)
+            checkAdjacent(room, cx, cz, rx, rz, roofHeight)
         }
     }
 
@@ -113,7 +113,7 @@ object WorldScanner {
     }
 
     // Adds a room
-    fun addRoom(cx: Int, cz: Int, rx: Int, rz: Int, roofHeight: Int): Room {
+    fun addRoom(cx: Int, cz: Int, roofHeight: Int): Room {
         val x = cx / 2
         val z = cz / 2
         val idx = Dungeon.getRoomIdx(x to z)
@@ -133,16 +133,17 @@ object WorldScanner {
     }
 
     // Scan neighbors *before* claiming this room index
-    fun checkAdjacent(room: Room, cx: Int, cz: Int, x: Int, z: Int, rx: Int, rz: Int, roofHeight: Int){
+    fun checkAdjacent(room: Room, cx: Int, cz: Int, rx: Int, rz: Int, roofHeight: Int){
+        val x = cx / 2
+        val z = cz / 2
+
         for ((dx, dz, cxoff, zoff) in ScanUtils.directions.map { it }) {
             val nx = rx + dx
             val nz = rz + dz
             val blockBelow = WorldUtils.getBlockNumericId(nx, roofHeight, nz)
             val blockAbove = WorldUtils.getBlockNumericId(nx, roofHeight + 1, nz)
 
-            if (room.type == RoomType.ENTRANCE && blockBelow != 0) {
-                continue
-            }
+            if (room.type == RoomType.ENTRANCE && blockBelow != 0) continue
             if (blockBelow == 0 || blockAbove != 0) continue
 
             val neighborComp = Pair(x + cxoff, z + zoff)
@@ -155,6 +156,7 @@ object WorldScanner {
                 room.addComponent(neighborComp)
                 rooms[neighborIdx] = room
             } else if (neighborRoom != room && neighborRoom.type != RoomType.ENTRANCE) {
+                println("DEBUG: Merging ${room.name} with ${neighborRoom.name} at $neighborIdx")
                 Dungeon.mergeRooms(neighborRoom, room)
             }
         }
