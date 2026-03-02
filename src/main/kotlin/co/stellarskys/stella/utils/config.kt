@@ -1181,6 +1181,7 @@ val config = Config("Stella", "Stella") {
         }
 
         subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
+        subcategory("Sword Blocking", "swordBlocking", "Enables 1.8.9 style sword blocking")
 
         /*
         subcategory("Custom Nametags") {
