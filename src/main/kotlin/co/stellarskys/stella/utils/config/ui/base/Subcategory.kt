@@ -102,6 +102,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
+        if (!visible) return false
         if (isAreaHovered(4f, 4f, width - 8f, HEIGHT - 8)) {
             if (button == 0 && !subcategory.configName.isEmpty()) {
                 subcategory.value = !value
