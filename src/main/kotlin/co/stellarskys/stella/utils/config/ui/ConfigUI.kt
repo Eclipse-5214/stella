@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils.config.ui
 
+import co.stellarskys.stella.hud.HUDEditor
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.animation.AnimType
 import co.stellarskys.stella.utils.config.core.*
@@ -16,11 +17,14 @@ import dev.deftu.omnicore.api.client.render.OmniRenderingContext
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import dev.deftu.omnicore.api.client.screen.KeyPressEvent
 import dev.deftu.omnicore.api.client.screen.OmniScreen
+import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config): OmniScreen(dev.deftu.textile.Text.literal("Config")) {
     private val panels =  mutableListOf<Panel>()
+    private val subcategoryContainers = mutableMapOf<String, Subcategory>()
+    private val subcategoryRefs = mutableMapOf<String, ConfigSubcategory>()
     private val elementContainers = mutableMapOf<String, BaseElement>()
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private var needsVisibilityUpdate = false
@@ -33,6 +37,26 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private val mouse = OmniMouse
     private val mx get() = mouse.rawX.toFloat() / UI_SCALE
     private val my get() = mouse.rawY.toFloat() / UI_SCALE
+    private var searchQuery = ""
+
+    private val searchHandler = TextHandler(
+        textProvider = { searchQuery },
+        textSetter = {
+            searchQuery = it
+            needsVisibilityUpdate = true
+            scheduleVisibilityUpdate(config)
+        },
+        font = nvg.inter,
+        fontSize = 18f,
+        textColor = Palette.Text.rgb,
+        filter = { it.isLetterOrDigit() || it.isWhitespace() },
+        maxLength = 32,
+        centerIfSmall = false
+    ).apply {
+        this.width = 250f
+        this.height = 40f
+        this.textSidePadding = 10f
+    }
 
     init {
         var sx = 20f
@@ -49,6 +73,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         revealDelegate.snap()
         reveal = rez.windowWidth.toFloat()
         tooltip = Tooltip()
+        searchQuery = ""
         super.onInitialize(width, height)
     }
 
@@ -74,6 +99,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
             tooltip.render(context, mx, my, tickDelta)
 
+            drawSearchBar(context, tickDelta)
             nvg.popScissor()
             nvg.pop()
         }
@@ -128,6 +154,8 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         sub.parent = panel
         sub.update()
         panel.elements.add(sub)
+        subcategoryContainers[subcategory.name] = sub
+        subcategoryRefs[subcategory.name] = subcategory
         return sub
     }
 
@@ -143,6 +171,10 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             updateElementVisibility(key, config)
         }
 
+        subcategoryContainers.keys.forEach { key->
+            updateSubcategoryVisibility(key, config)
+        }
+
         for (panel in panels) {
             panel.update()
             for(element in panel.elements) (element as? ParentElement)?.update()
@@ -154,7 +186,26 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private fun updateElementVisibility(configKey: String, config: Config) {
         val container = elementContainers[configKey] ?: return
         val element = elementRefs[configKey] ?: return
-        val visible = element.isVisible(config)
+        val predicateVisible = element.isVisible(config)
+        val searchVisible = if (searchQuery.isEmpty()) {
+            true
+        } else {
+            element.name.contains(searchQuery, ignoreCase = true) || element.description.contains(searchQuery, ignoreCase = true)
+        }
+
+        container.setVisibility(predicateVisible && searchVisible)
+    }
+
+    private fun updateSubcategoryVisibility(configKey: String, config: Config) {
+        val container = subcategoryContainers[configKey] ?: return
+        val element = subcategoryRefs[configKey] ?: return
+        val visible = if (searchQuery.isEmpty()) {
+            true
+        } else {
+            element.name.contains(searchQuery, ignoreCase = true) || element.description.contains(searchQuery, ignoreCase = true)
+                    || element.elements.any { it.value.name.contains(searchQuery, ignoreCase = true) || it.value.description.contains(searchQuery, ignoreCase = true) }
+        }
+
         container.setVisibility(visible)
     }
 
@@ -168,6 +219,45 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         nvg.text("Stella User",80f, 34f, 16f, Palette.Subtext1.rgb, nvg.inter)
         nvg.hollowGradientRect(0f, 0f, 200f, 60f, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 30f)
         nvg.pop()
+    }
+
+    fun drawSearchBar(context: GuiGraphics, delta: Float) {
+        val swx = (rez.windowWidth / UI_SCALE) / 2
+        val bx = swx - 150f
+        val by = (rez.windowHeight / UI_SCALE) - 100f
+
+        nvg.push()
+        nvg.translate(bx, by)
+        nvg.rect(0f, 0f, 250f, 40f, Palette.Crust.rgb, 8f)
+        nvg.hollowGradientRect(
+            0f, 0f, 250f, 40f, 2f,
+            Palette.Purple.rgb, Palette.Mauve.rgb,
+            Gradient.LeftToRight, 8f
+        )
+
+        if (searchQuery.isEmpty() && !searchHandler.isFocused) nvg.text("Search settings...", 10f, 11f, 18f, Palette.Overlay0.rgb, nvg.inter)
+
+        nvg.translate(260f, 0f)
+        nvg.rect(0f, 0f, 40f, 40f, Palette.Crust.rgb, 8f)
+        nvg.hollowGradientRect(
+            0f, 0f, 40f, 40f, 2f,
+            Palette.Purple.rgb, Palette.Mauve.rgb,
+            Gradient.LeftToRight, 8f
+        )
+
+        nvg.image(pencilImage, 2.5f, 2.5f, 35f, 35f, Palette.Text.rgb)
+        nvg.pop()
+
+        searchHandler.x = bx
+        searchHandler.y = by
+        searchHandler.render(context, mx, my, delta)
+    }
+
+    fun editHudHovered(): Boolean {
+        val swx = (rez.windowWidth / UI_SCALE) / 2
+        val bx = swx - 150f + 260
+        val by = (rez.windowHeight / UI_SCALE) - 100f
+        return mx > bx && mx < bx + 40 && my > by && my < by + 40
     }
 
     fun drawPlayer(x: Float, y: Float, width: Float, height: Float, radius: Float) {
@@ -200,6 +290,13 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
 
     override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
+        if (searchHandler.mouseClicked(mx, my, button.code)) return true
+
+        if (editHudHovered()) {
+            client.setScreen(HUDEditor())
+            return true
+        }
+
         for (panel in panels) panel.mouseClicked(mx, my, button.code)
         return super.onMouseClick(button, x, y, modifiers)
     }
@@ -222,6 +319,15 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         event: KeyPressEvent
     ): Boolean {
         val modInt = modifiers.toMods()
+
+        if (searchHandler.isFocused) {
+            val handled = when (event) {
+                KeyPressEvent.TYPED -> searchHandler.charTyped(typedChar, modInt)
+                KeyPressEvent.PRESSED -> searchHandler.keyPressed(key.code, modInt)
+            }
+            if (handled) return true
+        }
+
         val handled = when (event) {
             KeyPressEvent.TYPED -> panels.any { it.charTyped(typedChar, modInt) }
             KeyPressEvent.PRESSED -> panels.any { it.keyPressed(key.code, modInt) }
@@ -233,6 +339,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
     companion object {
         val caretImage = NVGRenderer.createImage( "/assets/stella/logos/dropdown.svg")
+        val pencilImage = NVGRenderer.createImage( "/assets/stella/logos/editLocations.svg")
         val UI_SCALE get() = (OmniResolution.windowWidth.toFloat() / 1920f).coerceAtLeast(0.5f)
         lateinit var tooltip: Tooltip
             private set

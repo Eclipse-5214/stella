@@ -58,6 +58,8 @@ object DungeonScore {
         EventBus.on<ScoreboardEvent.Update>(SkyBlockIsland.THE_CATACOMBS) { event ->
             event.new.forEach { parseSidebar(it.stripColor().trim()) }
         }
+
+        MimicTrigger.init()
     }
 
     /** Parses a single tablist line and updates score data */

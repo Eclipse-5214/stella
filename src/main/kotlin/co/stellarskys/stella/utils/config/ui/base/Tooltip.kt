@@ -9,7 +9,7 @@ import net.minecraft.client.gui.GuiGraphics
 class Tooltip: BaseElement() {
     init {
         x = (rez.windowWidth / ConfigUI.UI_SCALE) / 2
-        y = (rez.windowHeight / ConfigUI.UI_SCALE) * 0.8f
+        y = (rez.windowHeight / ConfigUI.UI_SCALE) - 150f
     }
 
     var text = ""

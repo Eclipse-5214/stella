@@ -246,6 +246,7 @@ object MapScanner {
         val players = room.players
         val isGreen = check == Checkmark.GREEN
         val roomKey = room.name ?: "unknown"
+        if (room.clearTime == TimeUtils.zero) room.clearTime = TimeUtils.now
 
         players.forEach { player ->
             val alreadyCleared = player.getWhiteChecks().containsKey(roomKey) || player.getGreenChecks().containsKey(roomKey)

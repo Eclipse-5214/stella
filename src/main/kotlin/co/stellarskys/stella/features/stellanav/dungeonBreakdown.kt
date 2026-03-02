@@ -59,7 +59,7 @@ object dungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE
                 else ", Stacked with ${others.joinToString(", ")}."
             }
 
-            val line = "§$color$name §7(§$color$type§7) §7[§$checkColor✔§7]§$color in ${time}s$stackStr"
+            val line = "§$color$name §7(§$color$type§7) §7[§$checkColor✔§7]§$color in ${time}$stackStr"
             return if (isLast) line else "$line\n"
         }
 

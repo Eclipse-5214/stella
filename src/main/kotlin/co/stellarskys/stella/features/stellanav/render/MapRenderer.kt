@@ -111,13 +111,17 @@ object MapRenderer {
         }
     }
 
-    fun drawShadowedText(context: GuiGraphics, text: String, x: Int, y: Int, scale: Float) {
+    fun drawShadowedText(context: GuiGraphics, text: String, x: Int, y: Int, offset: Float) {
         if (!map.textShadow) return
         val s = "§0$text"
-        Render2D.drawString(context, s, (x + scale).toInt(), y)
-        Render2D.drawString(context, s, (x - scale).toInt(), y)
-        Render2D.drawString(context, s, x, (y + scale).toInt())
-        Render2D.drawString(context, s, x, (y - scale).toInt())
+        for (i in 0..3) {
+            context.pushPop {
+                val dx = if (i < 2) (if (i == 0) offset else -offset) else 0f
+                val dy = if (i >= 2) (if (i == 2) offset else -offset) else 0f
+                context.pose().translate(dx, dy)
+                Render2D.drawString(context, s, x, y)
+            }
+        }
     }
 
     private enum class MapMode(val renderer: (GuiGraphics) -> Unit) {

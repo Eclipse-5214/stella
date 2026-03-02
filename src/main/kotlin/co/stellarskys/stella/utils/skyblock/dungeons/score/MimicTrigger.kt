@@ -41,10 +41,9 @@ object MimicTrigger {
         EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
             if (Dungeon.floor?.floorNumber !in listOf(6, 7) || mimicDead || Dungeon.inBoss) return@on
             val entity = event.entity as? Zombie ?: return@on
-            if (entity.isBaby && (0 .. 3).all { entity.getArmor(it).isEmpty }) {
-                mimicDead = true
-                EventBus.post(DungeonEvent.Score.MimicDead())
-            }
+            if (!entity.isBaby || entity.hasItemInSlot(EquipmentSlot.HEAD)) return@on
+            mimicDead = true
+            EventBus.post(DungeonEvent.Score.MimicDead())
         }
     }
 
@@ -52,13 +51,4 @@ object MimicTrigger {
         mimicDead = false
         princeDead = false
     }
-
-    fun LivingEntity.getArmor(index: Int): ItemStack =
-        when (index) {
-            0 -> getItemBySlot(EquipmentSlot.FEET)
-            1 -> getItemBySlot(EquipmentSlot.LEGS)
-            2 -> getItemBySlot(EquipmentSlot.CHEST)
-            3 -> getItemBySlot(EquipmentSlot.HEAD)
-            else -> ItemStack.EMPTY
-        }
 }
