@@ -174,8 +174,8 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         for (i in 0..(h / (w / 2f)).toInt()) nvg.rect(if (i % 2 == 0) 0f else w / 2f, i * (w / 2f), w / 2f, w / 2f, 0xFFCCCCCC.toInt())
         nvg.pop()
         nvg.gradientRect(0f, 0f, w, h, Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2])).withAlpha(0).rgb, Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2])).withAlpha(255).rgb, Gradient.TopToBottom)
-        nvg.rect(-2f, alpha * h - 3f, w + 4f, 6f, -1, 2f)
         nvg.popScissor()
+        nvg.rect(-2f, alpha * h - 3f, w + 4f, 6f, -1, 2f)
     }
 
     companion object {
