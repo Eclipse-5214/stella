@@ -54,6 +54,7 @@ class ButtonLayoutEditor : OmniScreen() {
 
                     ButtonManager.getAll().find { it.anchor == anchor && it.index == index }?.let { button ->
                         if (popup.shown) return@let
+                        if (button.iconId == "NONE") return@let
                         val stack = ButtonManager.getItem(button.iconId)
 
                         val offsetX = (20f - 16f) / 2f

@@ -40,8 +40,8 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         offset = if (visible) 0f else HEIGHT
         height = HEIGHT - offset
         expansion = 0f
-        hexBox.parent = this
         Color.RGBtoHSB((picker.value as Color).red, (picker.value as Color).green, (picker.value as Color).blue, hsb)
+        hexBox.parent = this
     }
 
     override fun setVisibility(value: Boolean) {

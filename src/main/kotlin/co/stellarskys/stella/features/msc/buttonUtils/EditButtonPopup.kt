@@ -75,7 +75,7 @@ class EditButtonPopup : BaseElement() {
         context.pushPop {
             context.translate(-8f, 0f)
             context.scale(1 / mcScale / UI_SCALE, 1 / mcScale / UI_SCALE)
-            Render2D.renderItem(context, stack, itemX + x, previewY + y, 10f)
+            if(itemIdInput.currentText != "NONE") Render2D.renderItem(context, stack, itemX + x, previewY + y, 10f)
         }
     }
 
@@ -96,6 +96,11 @@ class EditButtonPopup : BaseElement() {
         if (isAreaHovered(290f, 520f, 230f, 60f, mouseX, mouseY)) delete()
 
         return true
+    }
+
+    override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) {
+        itemIdInput.mouseReleased(mouseX, mouseY, button)
+        commandInput.mouseReleased(mouseX, mouseY, button)
     }
 
     override fun charTyped(char: Char, modifiers: Int) = itemIdInput.charTyped(char, modifiers) || commandInput.charTyped(char, modifiers)

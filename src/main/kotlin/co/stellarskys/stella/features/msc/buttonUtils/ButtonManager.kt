@@ -59,6 +59,7 @@ object ButtonManager {
     }
 
     private fun renderButton(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int) {
+        if (button.iconId == "NONE") return
         val stack = getItem(button.iconId)
         val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
 
