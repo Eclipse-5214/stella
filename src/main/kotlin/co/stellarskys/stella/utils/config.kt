@@ -173,7 +173,7 @@ val config = Config("Stella", "Stella") {
             textinput {
                 configName = "leapAnnounce.message"
                 name = "Message"
-                description = "The message to send on leap"
+                description = $$"The message to send on leap ($player will be replaced with player name)"
                 placeholder = "Leaping to"
             }
         }
