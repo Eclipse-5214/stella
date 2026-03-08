@@ -50,7 +50,7 @@ object HypixelApi {
             }
         }
 
-        val apiUrl = "https://api.stellarskys.co/profiles?uuid=$uuid"
+        val apiUrl = "https://api.stellarskys.co/skyblock/profiles?uuid=$uuid"
         val url = if (force) "$apiUrl&t=${System.currentTimeMillis()}" else apiUrl
 
         NetworkUtils.fetch<SkyblockResponse>(url) { result ->
@@ -60,6 +60,34 @@ object HypixelApi {
                     ProfileCache.put(uuid, member)
                 }
                 onResult(member)
+            }.onFailure {
+                onResult(null)
+            }
+        }
+    }
+
+    fun fetchSecrets(
+        uuid: String,
+        cacheMs: Long = 300_000L, // Default 5 minutes
+        force: Boolean = false,
+        onResult: (Int?) -> Unit
+    ) {
+        if (!force) {
+            SecretsCache.get(uuid, cacheMs)?.let {
+                onResult(it)
+                return
+            }
+        }
+
+        val apiUrl = "https://api.stellarskys.co/secrets?uuid=$uuid"
+        val url = if (force) "$apiUrl&t=${System.currentTimeMillis()}" else apiUrl
+
+        NetworkUtils.fetch<Int>(url) { result ->
+            result.onSuccess { text ->
+                if (text != -1) {
+                    SecretsCache.put(uuid, text)
+                }
+                onResult(text)
             }.onFailure {
                 onResult(null)
             }
@@ -85,6 +113,28 @@ object HypixelApi {
 
         fun cleanup() {
             data.entries.removeIf { it.value.first.since.millis > EXPIRY_MS }
+        }
+    }
+
+    object SecretsCache {
+        private val data = mutableMapOf<String, Pair<SimpleTimeMark, Int>>()
+        private const val DEFAULT_EXPIRY = 5 * 60 * 1000L
+
+        fun get(uuid: String, cacheMs: Long): Int? {
+            val entry = data[uuid] ?: return null
+            if (entry.first.since.millis > cacheMs) {
+                data.remove(uuid)
+                return null
+            }
+            return entry.second
+        }
+
+        fun put(uuid: String, count: Int) {
+            data[uuid] = TimeUtils.now to count
+        }
+
+        fun cleanup() {
+            data.entries.removeIf { it.value.first.since.millis > DEFAULT_EXPIRY }
         }
     }
 }

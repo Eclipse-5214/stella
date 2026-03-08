@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.skyblock.dungeons.players
 
 import co.stellarskys.stella.utils.skyblock.api.HypixelApi
+import co.stellarskys.stella.utils.skyblock.api.SkyblockResponse
 import co.stellarskys.stella.utils.skyblock.dungeons.map.MapScanner.RoomClearInfo
 import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
 import co.stellarskys.stella.utils.skyblock.dungeons.utils.DungeonClass
@@ -31,22 +32,28 @@ class DungeonPlayer(val name: String) {
     var currRoom: Room? = null
     var lastRoom: Room? = null
 
+    var profile: SkyblockResponse.SkyblockMember? = null
+
     val clearedRooms = mutableMapOf(
         "WHITE" to mutableMapOf<String, RoomClearInfo>(),
         "GREEN" to mutableMapOf<String, RoomClearInfo>()
     )
 
     init {
+        HypixelApi.fetchSecrets(uuid.toString(), 120_000) { secrets ->
+            initSecrets = secrets
+            currSecrets = secrets
+        }
+
         HypixelApi.fetchSkyblockProfile(uuid.toString(), 120_000) { profile ->
-            initSecrets = profile?.dungeons?.secrets?.toInt() ?: -1
-            currSecrets = profile?.dungeons?.secrets?.toInt() ?: -1
+            this.profile = profile
         }
     }
 
     fun updateSecrets() {
         if (uuid == null) return
-        HypixelApi.fetchSkyblockProfile(uuid.toString(), force = true) { profile ->
-            currSecrets = profile?.dungeons?.secrets?.toInt() ?: -1
+        HypixelApi.fetchSecrets(uuid.toString(), force = true) { secrets ->
+            currSecrets = secrets
         }
     }
 
