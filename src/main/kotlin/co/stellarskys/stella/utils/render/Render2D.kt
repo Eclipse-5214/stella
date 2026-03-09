@@ -1,7 +1,7 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.utils.render.nvg.NVGRenderer
-import co.stellarskys.stella.utils.render.nvg.NVGSpecialRenderer
+import co.stellarskys.stella.utils.render.nvg.NVGPIPRenderer
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.ChatFormatting
@@ -151,7 +151,7 @@ object Render2D {
     fun GuiGraphics.drawNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
         val snapshot = Matrix3x2f(this.pose())
 
-        NVGSpecialRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
+        NVGPIPRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
             val n = NVGRenderer
             val sf = OmniResolution.scaleFactor.toFloat() / n.dpr
 

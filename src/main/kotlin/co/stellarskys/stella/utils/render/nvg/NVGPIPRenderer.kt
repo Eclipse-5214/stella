@@ -6,13 +6,16 @@ import com.mojang.blaze3d.opengl.GlStateManager
 import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
-import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.MultiBufferSource
 import org.joml.Matrix3x2f
+
+//? if > 1.21.10 {
+/*import org.lwjgl.opengl.GL33C
+*///?}
 
 /*
  * Adapted from NVGSpecialRenderer.kt in OdinFabric
@@ -22,7 +25,7 @@ import org.joml.Matrix3x2f
  * Copyright (c) 2025, odtheking
  * See full license at: https://opensource.org/licenses/BSD-3-Clause
  */
-class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource) : PictureInPictureRenderer<NVGSpecialRenderer.NVGRenderState>(vertexConsumers) {
+class NVGPIPRenderer(vertexConsumers: MultiBufferSource.BufferSource) : PictureInPictureRenderer<NVGPIPRenderer.NVGRenderState>(vertexConsumers) {
     override fun renderToTexture(state: NVGRenderState, poseStack: PoseStack) {
         val colorTex = RenderSystem.outputColorTextureOverride ?: return
         val bufferManager = (RenderSystem.getDevice() as? GlDevice)?.directStateAccess() ?: return
@@ -34,9 +37,14 @@ class NVGSpecialRenderer(vertexConsumers: MultiBufferSource.BufferSource) : Pict
             GlStateManager._viewport(0, 0, width, height)
         }
 
+        //? if > 1.21.10 {
+        /*GL33C.glBindSampler(0, 0)
+        *///?}
+
         NVGRenderer.beginFrame(width.toFloat(), height.toFloat())
         state.renderContent()
         NVGRenderer.endFrame()
+
 
         GlStateManager._disableDepthTest()
         GlStateManager._disableCull()
