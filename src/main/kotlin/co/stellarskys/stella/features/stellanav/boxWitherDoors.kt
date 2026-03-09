@@ -61,11 +61,10 @@ object boxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
 
                 val (x, y, z) = door.getPos()
 
-                Render3D.renderBox(
-                    event.context,
+                Render3D.drawBox(
                     x.toDouble(), y.toDouble(), z.toDouble(),
                     3.0, 4.0,
-                    color, true, doorLW.toDouble()
+                    color, false, doorLW.toFloat()
                 )
             }
         }

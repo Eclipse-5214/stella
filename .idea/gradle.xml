@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/stella-ksp" />
             <option value="$PROJECT_DIR$/versions/1.21.10" />
+            <option value="$PROJECT_DIR$/versions/1.21.11" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="true" />

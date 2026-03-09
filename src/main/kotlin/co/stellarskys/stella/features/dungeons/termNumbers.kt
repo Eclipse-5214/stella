@@ -8,7 +8,6 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render3D
-import co.stellarskys.stella.utils.render.RenderContext
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -120,14 +119,13 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
                         TaskType.TERMINAL -> "${task.id}"
                     }
 
-                    renderTask(event.context, coord, displayNum, labelText, displayColor, playerPos)
+                    renderTask(coord, displayNum, labelText, displayColor, playerPos)
                 }
             }
         }
     }
 
     private fun renderTask(
-        context: RenderContext,
         coord: TermRegistry.Vec3i,
         displayNum: String,
         label: String,
@@ -143,17 +141,17 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
             else ->  " \n§l§8[ §f$displayNum §8]"
         }
 
-        Render3D.renderString(
+        Render3D.drawText(
             text,
             coord.x + 0.5, coord.y + 1.95, coord.z + 0.5,
             bgBox = false,
             increase = pdistance > 13,
-            phase = true
+            depth = false
         )
 
         if (highlightTerms) {
             val renderColor = if (classColor) color else termColor
-            Render3D.outlineBlock(context, coord.toBlockPos(), renderColor, 1.0, false)
+            Render3D.outlineBlock( coord.toBlockPos(), renderColor, 1f, false)
         }
     }
 

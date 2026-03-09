@@ -6,6 +6,7 @@ import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.GameType
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.Vec3
 
 object WorldUtils {
     fun getBlockStateAt(x: Int, y: Int, z: Int): BlockState? {
@@ -40,4 +41,6 @@ object WorldUtils {
     @JvmStatic
     val players: List<PlayerInfo>
         get() = tablist.filter { it.profile.id.version() == 4 }
+
+    fun BlockPos.toVec3() = Vec3(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
 }

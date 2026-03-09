@@ -8,12 +8,12 @@
     "mixins": [
     ],
     "client": [
+      "MixinClientLevel",
       "MixinNetworkManager",
       "MixinInGameHud",
       "MixinStatusEffectsDisplay",
       "MixinLivingEntity",
       "MixinContainer",
-      "MixinSoundManager",
       "MixinKeyboardHandler",
       "MixinChatListener",
       "MixinItemInHandRenderer",

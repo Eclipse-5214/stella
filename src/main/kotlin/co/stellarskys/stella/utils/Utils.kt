@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FontDescription
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
+import net.minecraft.world.phys.Vec3
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.sqrt

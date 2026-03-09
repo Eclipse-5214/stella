@@ -18,7 +18,7 @@ object secretWaypoints: Feature("secretWaypoints", island = SkyBlockIsland.THE_C
             if(room.checkmark == Checkmark.GREEN) return@on
 
             data.toWaypoints(config, room).forEach { waypoint ->
-                waypoint.render(event.context)
+                waypoint.render()
             }
         }
     }

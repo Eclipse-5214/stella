@@ -3,23 +3,26 @@ package co.stellarskys.stella.events.core
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import co.stellarskys.stella.events.api.Event
-import co.stellarskys.stella.utils.render.RenderContext
 import net.minecraft.client.renderer.entity.state.AvatarRenderState
 import net.minecraft.client.renderer.entity.state.EntityRenderState
+import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
+import net.minecraft.world.phys.shapes.VoxelShape
 
 sealed class RenderEvent {
     sealed class World {
         class Last(
-            val context: RenderContext
+            val matrices: PoseStack
         ) : Event()
 
         class AfterEntities(
-            val context: RenderContext
+            val matrices: PoseStack
         ) : Event()
 
         class BlockOutline(
-            val context: RenderContext,
+            val matrices: PoseStack,
+            var blockPos: BlockPos,
+            var voxelShape: VoxelShape
         ) : Event(cancelable = true)
     }
 

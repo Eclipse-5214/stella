@@ -37,8 +37,11 @@ object ChatUtils {
     }
 
     @JvmStatic
+    fun width() = client.options.chatWidth().get().toInt()
+
+    @JvmStatic
     fun getChatBreak(): String {
-        val chatWidth = client.gui?.chat?.width ?: return ""
+        val chatWidth = width()
         val textRenderer = client.font
         val dashWidth = textRenderer.width("-")
 
@@ -48,7 +51,7 @@ object ChatUtils {
 
     @JvmStatic
     fun getCenteredText(text: String): String {
-        val chatWidth = client.gui?.chat?.width ?: return text
+        val chatWidth = width()
         val textRenderer = client.font
         val textWidth = textRenderer.width(text)
         if (textWidth >= chatWidth) return text

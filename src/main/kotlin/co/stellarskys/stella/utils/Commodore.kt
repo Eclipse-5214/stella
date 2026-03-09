@@ -15,8 +15,7 @@ open class Commodore(val root: LiteralNode) {
      */
     fun runs(block: () -> Unit) = root.runs(block)
     fun literal(string: String, block: LiteralNode.() -> Unit = {}): LiteralNode = root.literal(string, block)
-    fun literal(vararg names: String, block: LiteralNode.() -> Unit = {}): LiteralNode =
-        root.literal(*names, block = block)
+    fun literal(vararg names: String, block: LiteralNode.() -> Unit = {}): LiteralNode = root.literal(*names, block = block)
 
     fun executable(block: Executable.() -> Unit): Executable = root.executable(block)
 

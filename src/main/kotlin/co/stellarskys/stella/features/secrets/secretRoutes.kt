@@ -87,12 +87,11 @@ object secretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
             route = RouteRegistry.getRoute(currentRoom?.name ?: return@on) ?: emptyList()
         }
 
-        on<RenderEvent.World.Last> { event ->
+        on<RenderEvent.World.Last> {
             if (currentRoom == null || route.isEmpty() || currentStep == null) return@on
             if (onlyRenderAfterClear && currentRoom?.checkmark in setOf(Checkmark.NONE, Checkmark.UNEXPLORED, Checkmark.UNDISCOVERED)) return@on
             if (stopRenderAfterGreen && currentRoom?.checkmark == Checkmark.GREEN) return@on
-
-            RoutePlayer.renderRoute(currentStep!!, firstStep, event.context)
+            RoutePlayer.renderRoute(currentStep!!, firstStep)
         }
 
         nextStepBind.onPress {

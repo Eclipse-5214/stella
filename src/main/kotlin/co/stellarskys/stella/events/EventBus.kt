@@ -20,8 +20,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.resources.ResourceLocation
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
-import co.stellarskys.stella.utils.render.RenderContext
 import dev.deftu.omnicore.api.client.*
+import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.network.protocol.Packet
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
@@ -76,19 +76,15 @@ object EventBus : EventBus() {
         }
 
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
-            post(RenderEvent.World.AfterEntities(RenderContext.fromContext(context)))
+            post(RenderEvent.World.AfterEntities(context.matrices()))
         }
 
         WorldRenderEvents.END_MAIN.register { context ->
-           post(RenderEvent.World.Last(RenderContext.fromContext(context)))
+           post(RenderEvent.World.Last(context.matrices()))
         }
 
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
-           val ctx = RenderContext.fromContext(context).apply {
-               blockPos = outlineRenderState.pos
-               voxelShape = outlineRenderState.shape
-           }
-           !post(RenderEvent.World.BlockOutline(ctx))
+           !post(RenderEvent.World.BlockOutline(context.matrices(), outlineRenderState.pos(), outlineRenderState.shape))
         }
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->

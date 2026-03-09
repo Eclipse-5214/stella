@@ -6,10 +6,15 @@ import co.stellarskys.stella.features.secrets.utils.RouteRegistry
 import co.stellarskys.stella.hud.HUDEditor
 import co.stellarskys.stella.utils.config.core.Config
 import dev.deftu.omnicore.api.client.client
-import kotlinx.coroutines.supervisorScope
-import net.minecraft.Util
 import java.awt.Color
 import java.net.URI
+
+//? if <= 1.21.10 {
+import net.minecraft.Util
+//?} else {
+ /*import net.minecraft.util.Util
+*///?}
+
 
 val config = Config("Stella", "Stella") {
     category("General") {

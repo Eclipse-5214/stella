@@ -74,29 +74,30 @@ object RouteRecorder {
 
             val healdItem = player?.mainHandItem?.hoverName?.stripped ?: ""
             val sound = event.sound
+            val pos = event.pos
 
-            if (sound.location == SoundEvents.ENDER_DRAGON_HURT.location) {
-                val pos = BlockPos((sound.x - 0.5).toInt(), (sound.y - 1).toInt(), (sound.z - 0.5).toInt())
+            if (sound == SoundEvents.ENDER_DRAGON_HURT) {
+                val pos = BlockPos((pos.x - 0.5).toInt(), (pos.y - 1).toInt(), (pos.z - 0.5).toInt())
                 addWaypoint(WaypointType.ETHERWARP, pos)
             }
 
-            if (sound.location == SoundEvents.GENERIC_EXPLODE.value().location) {
+            if (sound == SoundEvents.GENERIC_EXPLODE.value()) {
                 if (setOf("boom TNT", "Explosive Bow").none { healdItem.contains(it) }) return@on
-                val pos = BlockPos((sound.x - 0.5).toInt(), (sound.y - 0.5).toInt(), (sound.z - 0.5).toInt())
+                val pos = BlockPos((pos.x - 0.5).toInt(), (pos.y - 0.5).toInt(), (pos.z - 0.5).toInt())
                 addWaypoint(WaypointType.SUPERBOOM, pos)
             }
 
             if (sound.location.toString().contains("break")) {
                 if(!healdItem.contains("Dungeonbreaker")) return@on
-                val pos = BlockPos((sound.x - 0.5).toInt(), (sound.y - 0.5).toInt(), (sound.z - 0.5).toInt())
+                val pos = BlockPos((pos.x - 0.5).toInt(), (pos.y - 0.5).toInt(), (pos.z - 0.5).toInt())
                 addWaypoint(WaypointType.MINE, pos)
             }
 
-            if (sound.location in setOf(SoundEvents.ARROW_SHOOT.location, SoundEvents.ENDERMAN_TELEPORT.location) ) {
+            if (sound in setOf(SoundEvents.ARROW_SHOOT, SoundEvents.ENDERMAN_TELEPORT) ) {
                 if (!healdItem.contains("Ender Pearl")) return@on
-                val land = sound.location == SoundEvents.ENDERMAN_TELEPORT.location
+                val land = sound == SoundEvents.ENDERMAN_TELEPORT
                 TickSchedulers.client.post {
-                    var pos = player?.onPos ?: BlockPos((sound.x - 0.5).toInt(), (sound.y - 1).toInt(), (sound.z - 0.5).toInt())
+                    var pos = player?.onPos ?: BlockPos((pos.x - 0.5).toInt(), (pos.y - 1).toInt(), (pos.z - 0.5).toInt())
                     if (land) pos = player?.onPos?.below(1) ?: pos
                     addWaypoint(WaypointType.PEARL, pos)
                 }
@@ -116,10 +117,9 @@ object RouteRecorder {
             }
         }
 
-        EventBus.on<RenderEvent.World.Last>(SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.on<RenderEvent.World.Last>(SkyBlockIsland.THE_CATACOMBS) {
             if (!recording) return@on
-
-            RoutePlayer.renderRecordingRoute(currentStep, lastStep, event.context)
+            RoutePlayer.renderRecordingRoute(currentStep, lastStep)
         }
     }
 

@@ -3,54 +3,40 @@ package co.stellarskys.stella.features.msc
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.utils.Utils.getNormalized
+import co.stellarskys.stella.utils.WorldUtils.toVec3
 import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.utils.render.StellaRenderLayers
-import net.minecraft.client.renderer.ShapeRenderer
+import co.stellarskys.stella.utils.render.RenderQue
 import java.awt.Color
 
 @Module
 object blockOverlay : Feature("overlayEnabled") {
+    val outlineColor by config.property<Color>("blockHighlightColor")
+    val outlineWidth by config.property<Int>("overlayLineWidth")
+    val fillColor by config.property<Color>("blockFillColor")
+    val fill by config.property<Boolean>("fillBlockOverlay")
+
     override fun initialize() {
         on<RenderEvent.World.BlockOutline> { event ->
-            val blockPos = event.context.blockPos ?: return@on
-            val mstack = event.context.matrixStack ?: return@on
-            val consumers = event.context.consumers ?: return@on
-            val camera = event.context.camera
-            val camPos = camera.position
-            val blockShape = event.context.voxelShape ?: return@on
+            val blockPos = event.blockPos.toVec3()
+            val blockShape = event.voxelShape
             if (blockShape.isEmpty) return@on
-
-            val outlineColor by config.property<Color>("blockHighlightColor")
-            val outlineWidth by config.property<Int>("overlayLineWidth")
-            val fillColor by config.property<Color>("blockFillColor")
-
             event.cancel()
 
-            val x = blockPos.x - camPos.x
-            val y = blockPos.y - camPos.y
-            val z = blockPos.z - camPos.z
-
-            ShapeRenderer.renderShape(
-                mstack,
-                consumers.getBuffer(StellaRenderLayers.getLines(outlineWidth.toDouble())),
+            RenderQue.queueVoxelOutline(
                 blockShape,
-                x, y, z,
-                outlineColor.rgb
+                blockPos,
+                outlineColor,
+                true,
+                outlineWidth.toFloat()
             )
 
-            if (config["fillBlockOverlay"] as Boolean) {
-                val (r, g, b, a) = fillColor.getNormalized()
-
-                blockShape.forAllBoxes { minX, minY, minZ, maxX, maxY, maxZ ->
-                    ShapeRenderer.addChainedFilledBoxVertices(
-                        mstack,
-                        consumers.getBuffer( StellaRenderLayers.FILLED),
-                        x + minX, y + minY, z + minZ,
-                        x + maxX, y + maxY, z + maxZ,
-                        r,g,b,a
-                    )
-                }
+            if (fill) {
+                RenderQue.queueVoxelFill(
+                    blockShape,
+                    blockPos,
+                    fillColor,
+                    true
+                )
             }
         }
     }

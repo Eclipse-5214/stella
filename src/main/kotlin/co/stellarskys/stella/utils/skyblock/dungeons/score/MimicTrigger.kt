@@ -7,10 +7,13 @@ import co.stellarskys.stella.events.core.EntityEvent
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import net.minecraft.world.entity.EquipmentSlot
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.monster.Zombie
-import net.minecraft.world.item.ItemStack
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+
+//? if <= 1.21.10 {
+import net.minecraft.world.entity.monster.Zombie
+//?} else {
+/*import net.minecraft.world.entity.monster.zombie.Zombie
+*///?}
 
 /**
  * Tracks whether the Mimic miniboss has been killed in F6/F7.
