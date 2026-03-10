@@ -37,6 +37,7 @@ object RenderQue {
 
     init {
         EventBus.on<RenderEvent.World.Last> { event ->
+            if (lineQueue.isEmpty() && textQueue.isEmpty() && outlineVoxelQueue.isEmpty() && filledVoxelQueue.isEmpty()) return@on
             cam = client.gameRenderer.mainCamera
             flush(event.matrices)
         }
