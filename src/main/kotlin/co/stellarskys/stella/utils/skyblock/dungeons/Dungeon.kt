@@ -12,7 +12,7 @@ import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
-import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.ambient.Bat
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.SkullBlockEntity
@@ -188,7 +188,8 @@ object Dungeon {
 
         EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val entity = event.entity
-            if (entity.type != EntityType.BAT) return@on
+            if (entity !is Bat) return@on
+            if (entity.maxHealth != 100f) return@on
             val pos = entity.blockPosition()
             EventBus.post(DungeonEvent.Secrets.Bat(pos, entity))
 
