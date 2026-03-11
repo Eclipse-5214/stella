@@ -1,18 +1,11 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.Stella
-import com.mojang.blaze3d.pipeline.BlendFunction
-import com.mojang.blaze3d.pipeline.RenderPipeline
-import com.mojang.blaze3d.platform.DepthTestFunction
-import com.mojang.blaze3d.shaders.UniformType
-import com.mojang.blaze3d.vertex.DefaultVertexFormat
-import com.mojang.blaze3d.vertex.VertexFormat
 import dev.deftu.omnicore.api.client.render.DrawMode
 import dev.deftu.omnicore.api.client.render.pipeline.IrisShaderType
 import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipeline
 import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelineSnippets
 import dev.deftu.omnicore.api.client.render.pipeline.OmniRenderPipelines
-import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.ResourceLocation
 
 object StellaRenderPipelines {

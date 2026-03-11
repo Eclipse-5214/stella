@@ -8,6 +8,9 @@ import co.stellarskys.stella.utils.render.nvg.Color.Companion.green
 import co.stellarskys.stella.utils.render.nvg.Color.Companion.blue
 import dev.deftu.omnicore.api.client.client
 import net.minecraft.resources.ResourceLocation
+import org.joml.Matrix3x2f
+import org.joml.Matrix3x2fc
+import org.joml.Matrix4f
 import org.lwjgl.nanovg.NVGColor
 import org.lwjgl.nanovg.NVGPaint
 import org.lwjgl.nanovg.NanoSVG.*
@@ -95,35 +98,37 @@ object NVGRenderer {
         nvgTransform(vg, m00, m01, m10, m11, m20, m21)
     }
 
-    // Optional but very helpful: resets the matrix to identity
     fun resetTransform() {
         if (!drawing) return
         nvgResetTransform(vg)
     }
 
+    fun getTransform(): Matrix3x2f {
+        if (!drawing) return Matrix3x2f()
+        val nvgMatrix = FloatArray(6)
+        nvgCurrentTransform(vg, nvgMatrix)
+        return Matrix3x2f(
+            nvgMatrix[0], nvgMatrix[1],
+            nvgMatrix[2], nvgMatrix[3],
+            nvgMatrix[4] * dpr, nvgMatrix[5] * dpr
+        )
+    }
+
     fun pushScissor(x: Float, y: Float, w: Float, h: Float) {
-        // 1. We MUST save the state so that popScissor can restore the previous clip
         nvgSave(vg)
 
-        // 2. If this is the first scissor, use nvgScissor.
-        // If it's a nested scissor, use nvgIntersectScissor.
         if (scissor == null) {
             nvgScissor(vg, x, y, w, h)
         } else {
             nvgIntersectScissor(vg, x, y, w, h)
         }
 
-        // 3. Keep the stack just to track depth/existence
         scissor = Scissor(scissor, x, y, x + w, y + h)
     }
 
     fun popScissor() {
         if (scissor == null) return
-
-        // 1. Restore NanoVG state (this automatically pops the scissor/matrix)
         nvgRestore(vg)
-
-        // 2. Move up the stack
         scissor = scissor?.previous
     }
 

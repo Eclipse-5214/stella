@@ -70,12 +70,17 @@ class EditButtonPopup : BaseElement() {
         nvg.pop()
 
         val stack = ButtonManager.getItem(itemIdInput.currentText)
+        val centerX = x + previewX + (previewSize / 2f)
+        val centerY = y + previewY + (previewSize / 2f)
         val mcScale = rez.scaleFactor.toFloat()
-        val itemX = width / 2
+        val finalX = (centerX * UI_SCALE * nvg.dpr) / mcScale
+        val finalY = (centerY * UI_SCALE * nvg.dpr) / mcScale
+        val targetSizeInContext = (previewSize * UI_SCALE * nvg.dpr) / mcScale
+        val itemScale = targetSizeInContext / 16f
         context.pushPop {
-            context.translate(-8f, 0f)
-            context.scale(1 / mcScale / UI_SCALE, 1 / mcScale / UI_SCALE)
-            if(itemIdInput.currentText != "NONE") Render2D.renderItem(context, stack, itemX + x, previewY + y, 10f)
+            context.pose().translate(finalX, finalY)
+            context.pose().scale(itemScale, itemScale)
+            if(itemIdInput.currentText != "NONE") Render2D.renderItem(context, stack, -8f, -8f, 1f)
         }
     }
 
