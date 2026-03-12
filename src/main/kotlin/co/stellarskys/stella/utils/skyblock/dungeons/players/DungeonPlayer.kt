@@ -52,7 +52,7 @@ class DungeonPlayer(val name: String) {
 
     fun updateSecrets() {
         if (uuid == null) return
-        HypixelApi.fetchSecrets(uuid.toString(), force = true) { secrets ->
+        HypixelApi.fetchSecrets(uuid.toString(), 0) { secrets ->
             currSecrets = secrets
         }
     }

@@ -1,7 +1,7 @@
 package co.stellarskys.stella.utils.render.astrum
 
 //? if > 1.21.10 {
-/* import net.minecraft.client.renderer.rendertype.LayeringTransform
+ /*import net.minecraft.client.renderer.rendertype.LayeringTransform
    import net.minecraft.client.renderer.rendertype.OutputTarget
    import net.minecraft.client.renderer.rendertype.RenderSetup
    import net.minecraft.client.renderer.rendertype.RenderType
@@ -21,7 +21,7 @@ object AstrumLayers {
     val FILLED: RenderType = RenderType.create(
         "filled",
         //? if > 1.21.10 {
-        /* RenderSetup.builder(AstrumPipelines.FILLED)
+         /*RenderSetup.builder(AstrumPipelines.FILLED)
             .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
             .sortOnUpload()
             .createRenderSetup()
@@ -38,7 +38,7 @@ object AstrumLayers {
     val FILLED_THROUGH_WALLS: RenderType = RenderType.create(
         "filled_through_walls",
         //? if > 1.21.10 {
-        /* RenderSetup.builder(AstrumPipelines.FILLED_THROUGH_WALLS)
+         /*RenderSetup.builder(AstrumPipelines.FILLED_THROUGH_WALLS)
             .sortOnUpload()
             .createRenderSetup()
          *///? } else {
@@ -51,7 +51,7 @@ object AstrumLayers {
     )
 
     //? if > 1.21.10 {
-    /* private val LINES_THROUGH_WALLS = RenderType.create(
+     /*private val LINES_THROUGH_WALLS = RenderType.create(
         "lines_through_walls",
         RenderSetup.builder(AstrumPipelines.LINES_THROUGH_WALLS)
             .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
@@ -82,7 +82,7 @@ object AstrumLayers {
 
     fun getLines(width: Double, depth: Boolean): RenderType =
         //? if > 1.21.10 {
-        /* if (depth) LINES else LINES_THROUGH_WALLS
+         /*if (depth) LINES else LINES_THROUGH_WALLS
          *///? } else {
         (if (depth) linesCache else linesThroughWallsCache).computeIfAbsent(width.hashCode()) { createLineLayer(width, depth) }
         //? }

@@ -16,7 +16,7 @@ import net.minecraft.world.phys.shapes.VoxelShape
 import java.awt.Color
 
 //?if > 1.21.10 {
-/* import net.minecraft.client.renderer.rendertype.RenderType
+ /*import net.minecraft.client.renderer.rendertype.RenderType
  *///? } else {
 import net.minecraft.client.renderer.RenderType
 //? }
@@ -186,8 +186,8 @@ object Astrum {
             val sx = (x1 + pos.x).toFloat(); val sy = (y1 + pos.y).toFloat(); val sz = (z1 + pos.z).toFloat()
             val ex = (x2 + pos.x).toFloat(); val ey = (y2 + pos.y).toFloat(); val ez = (z2 + pos.z).toFloat()
 
-            buffer.addVertex(pose, sx, sy, sz).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz)
-            buffer.addVertex(pose, ex, ey, ez).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz)
+            buffer.addVertex(pose, sx, sy, sz).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz) /*? if > 1.21.10 { *//*.setLineWidth(queued.lineWidth) *//*?}*/
+            buffer.addVertex(pose, ex, ey, ez).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz) /*? if > 1.21.10 { *//*.setLineWidth(queued.lineWidth) *//*?}*/
         }
     }
 
@@ -213,8 +213,8 @@ object Astrum {
         val ny = e.yf - s.yf
         val nz = e.zf - s.zf
 
-        buffer.addVertex(pose, s.xf, s.yf, s.zf).setColor(color).setNormal(pose, nx, ny, nz)
-        buffer.addVertex(pose, e.xf, e.yf, e.zf).setColor(color).setNormal(pose, nx, ny, nz)
+        buffer.addVertex(pose, s.xf, s.yf, s.zf).setColor(color).setNormal(pose, nx, ny, nz) /*? if > 1.21.10 { *//*.setLineWidth(line.width) *//*?}*/
+        buffer.addVertex(pose, e.xf, e.yf, e.zf).setColor(color).setNormal(pose, nx, ny, nz) /*? if > 1.21.10 { *//*.setLineWidth(line.width) *//*?}*/
     }
 
     fun addFilledBoxVertices(
