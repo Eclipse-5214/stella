@@ -9,26 +9,31 @@ import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.Camera
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 import java.awt.Color
 
+//?if > 1.21.10 {
+/* import net.minecraft.client.renderer.rendertype.RenderType
+ *///? } else {
+import net.minecraft.client.renderer.RenderType
+//? }
+
 @Module
 object Astrum {
     data class QueuedText(val text: String, val pos: Vec3, val color: Int, val scale: Float, val shadow: Boolean, val depth: Boolean, val bgColor: Int = 0)
     data class QueuedVoxel(val shape: VoxelShape, val pos: Vec3, val color: Color, val depth: Boolean, val lineWidth: Float = 1f)
     data class QueuedLine(val start: Vec3, val end: Vec3, val color: Color, val width: Float, val depth: Boolean)
-    data class Vec3f(val x: Float, val y: Float, val z: Float)
 
     private val outlineVoxelQueue = mutableListOf<QueuedVoxel>()
     private val filledVoxelQueue = mutableListOf<QueuedVoxel>()
     private val lineQueue = mutableListOf<QueuedLine>()
     private val textQueue = mutableListOf<QueuedText>()
-    lateinit var cam: Camera
+
     lateinit var buffers: MultiBufferSource.BufferSource
+    lateinit var cam: Camera
 
     init {
         EventBus.on<RenderEvent.World.Last> { event ->
@@ -174,18 +179,15 @@ object Astrum {
 
     // Vertex Processors
     fun addVoxelOutlineVertices(buffer: VertexConsumer, pose: PoseStack.Pose, queued: QueuedVoxel) {
-        val (shape, pos, color) = queued
-        shape.forAllEdges { x1, y1, z1, x2, y2, z2 ->
-            val startX = (x1 + pos.x).toFloat(); val startY = (y1 + pos.y).toFloat()
-            val startZ = (z1 + pos.z).toFloat(); val endX = (x2 + pos.x).toFloat()
-            val endY = (y2 + pos.y).toFloat(); val endZ = (z2 + pos.z).toFloat()
+        val pos = queued.pos
+        val color = queued.color.rgb
 
-            val nx = endX - startX
-            val ny = endY - startY
-            val nz = endZ - startZ
+        queued.shape.forAllEdges { x1, y1, z1, x2, y2, z2 ->
+            val sx = (x1 + pos.x).toFloat(); val sy = (y1 + pos.y).toFloat(); val sz = (z1 + pos.z).toFloat()
+            val ex = (x2 + pos.x).toFloat(); val ey = (y2 + pos.y).toFloat(); val ez = (z2 + pos.z).toFloat()
 
-            buffer.addVertex(pose, startX, startY, startZ).setColor(color.rgb).setNormal(pose, nx, ny, nz).setLineWidth(queued.lineWidth)
-            buffer.addVertex(pose, endX, endY, endZ).setColor(color.rgb).setNormal(pose, nx, ny, nz).setLineWidth(queued.lineWidth)
+            buffer.addVertex(pose, sx, sy, sz).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz)
+            buffer.addVertex(pose, ex, ey, ez).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz)
         }
     }
 
@@ -203,16 +205,16 @@ object Astrum {
     }
 
     fun addLineVertices(buffer: VertexConsumer, pose: PoseStack.Pose, line: QueuedLine) {
-        val start = line.start.toFloat()
-        val end = line.end.toFloat()
+        val s = line.start
+        val e = line.end
         val color = line.color.rgb
 
-        val nx = end.x - start.x
-        val ny = end.y - start.y
-        val nz =end.z - start.z
+        val nx = e.xf - s.xf
+        val ny = e.yf - s.yf
+        val nz = e.zf - s.zf
 
-        buffer.addVertex(pose, start.x, start.y, start.z).setColor(color).setNormal(pose, nx, ny, nz)
-        buffer.addVertex(pose, end.x, end.y, end.z).setColor(color).setNormal(pose, nx, ny, nz)
+        buffer.addVertex(pose, s.xf, s.yf, s.zf).setColor(color).setNormal(pose, nx, ny, nz)
+        buffer.addVertex(pose, e.xf, e.yf, e.zf).setColor(color).setNormal(pose, nx, ny, nz)
     }
 
     fun addFilledBoxVertices(
@@ -245,5 +247,7 @@ object Astrum {
         }
     }
 
-    fun Vec3.toFloat() = Vec3f(this.x.toFloat(), this.y.toFloat(), this.z.toFloat())
+    inline val Vec3.xf: Float get() = x.toFloat()
+    inline val Vec3.yf: Float get() = y.toFloat()
+    inline val Vec3.zf: Float get() = z.toFloat()
 }
