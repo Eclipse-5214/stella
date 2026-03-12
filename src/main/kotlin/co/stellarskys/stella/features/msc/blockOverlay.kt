@@ -5,7 +5,7 @@ import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.utils.WorldUtils.toVec3
 import co.stellarskys.stella.utils.config
-import co.stellarskys.stella.utils.render.RenderQue
+import co.stellarskys.stella.utils.render.astrum.Astrum
 import java.awt.Color
 
 @Module
@@ -22,22 +22,8 @@ object blockOverlay : Feature("overlayEnabled") {
             if (blockShape.isEmpty) return@on
             event.cancel()
 
-            RenderQue.queueVoxelOutline(
-                blockShape,
-                blockPos,
-                outlineColor,
-                true,
-                outlineWidth.toFloat()
-            )
-
-            if (fill) {
-                RenderQue.queueVoxelFill(
-                    blockShape,
-                    blockPos,
-                    fillColor,
-                    true
-                )
-            }
+            Astrum.queueVoxelOutline(blockShape, blockPos, outlineColor, true, outlineWidth.toFloat())
+            if (fill) Astrum.queueVoxelFill(blockShape, blockPos,fillColor, true)
         }
     }
 }

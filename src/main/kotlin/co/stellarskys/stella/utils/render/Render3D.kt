@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils.render
 
+import co.stellarskys.stella.utils.render.astrum.Astrum
 import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.Camera
 import net.minecraft.core.BlockPos
@@ -25,7 +26,7 @@ object Render3D {
             return
         }
 
-        RenderQue.queueVoxelOutline(shape, Vec3.atLowerCornerOf(pos), color, depth, lineWidth)
+        Astrum.queueVoxelOutline(shape, Vec3.atLowerCornerOf(pos), color, depth, lineWidth)
     }
 
     fun fillBlock(pos: BlockPos, color: Color, depth: Boolean = true, state: BlockState? = null) {
@@ -38,29 +39,29 @@ object Render3D {
             return
         }
 
-        RenderQue.queueVoxelFill(shape, Vec3.atLowerCornerOf(pos), color, depth)
+        Astrum.queueVoxelFill(shape, Vec3.atLowerCornerOf(pos), color, depth)
     }
 
     fun drawBox(x: Double, y: Double, z: Double, width: Double, height: Double, color: Color, depth: Boolean = true, lineWidth: Float = 1f) {
         val hw = width / 2.0
         val aabb = AABB(x + 0.5 - hw, y, z + 0.5 - hw, x + 0.5 + hw, y + height, z + 0.5 + hw)
-        RenderQue.queueBox(aabb, color, filled = false, depth = depth, lineWidth = lineWidth)
+        Astrum.queueBox(aabb, color, filled = false, depth = depth, lineWidth = lineWidth)
     }
 
     fun drawFilledBox(x: Double, y: Double, z: Double, width: Double, height: Double, color: Color, depth: Boolean = true) {
         val hw = width / 2.0
         val aabb = AABB(x + 0.5 - hw, y, z + 0.5 - hw, x + 0.5 + hw, y + height, z + 0.5 + hw)
-        RenderQue.queueBox(aabb, color, filled = true, depth = depth)
+        Astrum.queueBox(aabb, color, filled = true, depth = depth)
     }
 
     fun drawLine(start: Vec3, finish: Vec3, thickness: Float, color: Color, depth: Boolean = true) {
-        RenderQue.queueLine(start, finish, color, thickness, depth)
+        Astrum.queueLine(start, finish, color, thickness, depth)
     }
 
     fun drawLineFromCursor(target: Vec3, color: Color, width: Float = 1f) {
-        val cam = RenderQue.cam
+        val cam = Astrum.cam
         val start = cam.position().add(Vec3.directionFromRotation(cam.xRot(), cam.yRot()).scale(0.5))
-        RenderQue.queueLine(start, target, color, width, depth = false)
+        Astrum.queueLine(start, target, color, width, depth = false)
     }
 
     fun drawText(
@@ -88,7 +89,7 @@ object Render3D {
     ) {
         var finalScale = scale
         if (increase) {
-            val dist = RenderQue.cam.position().distanceTo(pos)
+            val dist = Astrum.cam.position().distanceTo(pos)
             finalScale *= (dist.toFloat() / 120f) / 0.025f
         }
 
@@ -98,7 +99,7 @@ object Render3D {
             val linePos = pos.subtract(0.0, yOffset, 0.0)
             val bgColor = if (bgBox) (client.options.getBackgroundOpacity(0.25f) * 255).toInt() shl 24 else 0
 
-            RenderQue.queueText(line, linePos, color, finalScale, shadow = true, depth = depth, bgColor = bgColor)
+            Astrum.queueText(line, linePos, color, finalScale, shadow = true, depth = depth, bgColor = bgColor)
         }
     }
 }
