@@ -1,17 +1,17 @@
-package co.stellarskys.stella.utils
+package co.stellarskys.stella.api.handlers
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonSerializer
 import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
-import co.stellarskys.stella.utils.TimeUtils.millis
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import net.fabricmc.loader.api.FabricLoader
 import java.awt.Color
@@ -20,7 +20,7 @@ import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.util.concurrent.ConcurrentHashMap
 
-class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private val typeToken: TypeToken<T>? = null) {
+class Capsule<T: Any>(fileName: String, private val defaultObject: T, private val typeToken: TypeToken<T>? = null) {
     constructor(fileName: String, defaultObject: T) : this(fileName, defaultObject, null)
     companion object {
         private val gson = GsonBuilder()
@@ -62,7 +62,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
             })
             .create()
 
-        private val autosaveIntervals = ConcurrentHashMap<DataUtils<*>, Long>()
+        private val autosaveIntervals = ConcurrentHashMap<Capsule<*>, Long>()
         private var loopStarted = false
     }
 
@@ -71,7 +71,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
         "Stella/${fileName}.json"
     )
     private var data: T = loadData()
-    private var lastSavedTime = TimeUtils.now
+    private var lastSavedTime = Chronos.now
 
     init {
         dataFile.parentFile.mkdirs()
@@ -125,7 +125,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
                     if (currentData == dataUtils.data) return@forEach
                 } catch (_: Exception) {}
                 dataUtils.save()
-                dataUtils.lastSavedTime = TimeUtils.now
+                dataUtils.lastSavedTime = Chronos.now
             }
         }
     }

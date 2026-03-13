@@ -2,7 +2,6 @@ package co.stellarskys.stella.api.handlers
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
-import co.stellarskys.stella.api.handlers.Capsule
 import co.stellarskys.stella.api.handlers.Signal.onHover
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ServerEvent
