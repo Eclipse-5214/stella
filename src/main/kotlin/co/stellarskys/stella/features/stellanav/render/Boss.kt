@@ -8,12 +8,14 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.player
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.ResourceManager
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import java.io.InputStreamReader
+import java.nio.file.Files
 
 object Boss {
     private const val SIZE = 128
@@ -23,7 +25,7 @@ object Boss {
         val p = player ?: return
         val floor = Dungeon.floorNumber ?: return
         val bMap = BossMapRegistry.getBossMap(floor, p.x, p.y, p.z) ?: return
-        val tex = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/boss/${bMap.image}")
+        val tex = map.getOrLoad("boss/${bMap.image}") ?: return
         val sizeInWorld = minOf(bMap.widthInWorld, bMap.heightInWorld, bMap.renderSize ?: Int.MAX_VALUE).toDouble()
         val texScale = SIZE / minOf((bMap.width / bMap.widthInWorld.toDouble()) * (bMap.renderSize ?: bMap.widthInWorld), (bMap.height / bMap.heightInWorld.toDouble()) * (bMap.renderSize ?: bMap.heightInWorld))
         val w = (bMap.width * texScale).toInt()
@@ -34,7 +36,7 @@ object Boss {
         context.pushPop {
             context.pose().translate(5f, 5f)
             context.enableScissor(0, 0, SIZE, SIZE)
-            context.blitSprite(RenderPipelines.GUI_TEXTURED, tex, (-viewX).toInt(), (-viewZ).toInt(), w, h)
+            context.blit(RenderPipelines.GUI_TEXTURED, tex, (-viewX).toInt(), (-viewZ).toInt(), 0f, 0f, w, h, w, h, w, h)
 
             val you = p.name.string
             for (dp in DungeonPlayerManager.players) {
@@ -63,16 +65,25 @@ object Boss {
     object BossMapRegistry {
         private val gson = Gson()
         private val bossMaps = mutableMapOf<String, List<BossMapData>>()
+        private val configFile = FabricLoader.getInstance().configDir.resolve("stella/assets/imagedata.json")
+        init { load() }
 
-        init { load(client.resourceManager) }
+        fun load() {
+            if (!Files.exists(configFile)) {
+                Stella.LOGGER.warn("Boss map data not found in config: $configFile")
+                return
+            }
 
-        fun load(rm: ResourceManager) {
-            val id = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "dungeons/imagedata.json")
-            rm.getResource(id).ifPresent { res ->
-                res.open().use { stream ->
+            try {
+                Files.newBufferedReader(configFile).use { reader ->
                     val type = object : TypeToken<Map<String, List<BossMapData>>>() {}.type
-                    bossMaps.putAll(gson.fromJson(InputStreamReader(stream), type))
+                    val data: Map<String, List<BossMapData>> = gson.fromJson(reader, type)
+                    bossMaps.clear()
+                    bossMaps.putAll(data)
+                    Stella.LOGGER.info("Successfully loaded ${bossMaps.size} boss map entries from config.")
                 }
+            } catch (e: Exception) {
+                Stella.LOGGER.error("Failed to load BossMap data from config", e)
             }
         }
 

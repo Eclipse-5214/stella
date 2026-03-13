@@ -26,8 +26,9 @@ object Render2D {
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
     private val mc = client
 
-    fun drawImage(ctx: GuiGraphics, image: ResourceLocation, x: Int, y: Int, width: Int, height: Int) {
-        ctx.blitSprite(RenderPipelines.GUI_TEXTURED, image, x, y, width, height)
+    fun drawImage(ctx: GuiGraphics, image: ResourceLocation?, x: Int, y: Int, width: Int, height: Int) {
+        if (image == null) return
+        ctx.blit(RenderPipelines.GUI_TEXTURED, image, x, y, 0f, 0f, width, height, width, height, width, height)
     }
 
     fun drawTexture(

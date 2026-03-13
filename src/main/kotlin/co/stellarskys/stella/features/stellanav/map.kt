@@ -7,19 +7,25 @@ import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.render.MapRenderer
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.config
+import com.mojang.blaze3d.platform.NativeImage
+import dev.deftu.omnicore.api.client.client
+import net.fabricmc.loader.api.FabricLoader
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.resources.ResourceLocation
 import java.awt.Color
+import java.nio.file.Files
 
 @Module
 object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
+    private val TEXTURE_CACHE = mutableMapOf<String, ResourceLocation>()
     private const val name = "StellaNav"
 
     // textures
-    val SELF_MARKER = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/markerself")
-    val OTHER_MARKER = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/markerother")
-    val DEFAULT_MAP = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/defaultmap")
+    val SELF_MARKER by lazy { getOrLoad("markerself") }
+    val OTHER_MARKER by lazy { getOrLoad( "markerother") }
+    val DEFAULT_MAP by lazy { getOrLoad( "defaultmap") }
 
     // main map configs
     val bossMapEnabled by config.property<Boolean>("bossMapEnabled")
@@ -100,5 +106,26 @@ object map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
         val scale = HUDManager.getScale(name)
 
         MapRenderer.render(context, x, y, scale)
+    }
+
+    fun getOrLoad(fileName: String): ResourceLocation? {
+        if (TEXTURE_CACHE.containsKey(fileName)) return TEXTURE_CACHE[fileName]
+
+        val path = FabricLoader.getInstance().configDir.resolve("stella/assets/$fileName.png")
+        if (!Files.exists(path)) return null
+
+        try {
+            Files.newInputStream(path).use { inputStream ->
+                val nativeImage = NativeImage.read(inputStream)
+                val dynamicTexture = DynamicTexture({ "Stella Dynamic: $fileName" }, nativeImage)
+                val loc = ResourceLocation.fromNamespaceAndPath("stella", "stellanav/${fileName.lowercase().replace(".", "_")}")
+                client.textureManager.register(loc, dynamicTexture)
+                TEXTURE_CACHE[fileName] = loc
+                return loc
+            }
+        } catch (e: Exception) {
+            Stella.LOGGER.error("Failed to load dynamic texture: $fileName", e)
+            return null
+        }
     }
 }

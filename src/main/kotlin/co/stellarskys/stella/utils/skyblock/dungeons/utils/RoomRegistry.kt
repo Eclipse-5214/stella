@@ -10,14 +10,14 @@ import java.io.FileNotFoundException
 object RoomRegistry {
     private val byCore = mutableMapOf<Int, RoomMetadata>()
     private val allRooms = mutableListOf<RoomMetadata>()
-    private const val ROOM_DATA_URL = "https://raw.githubusercontent.com/Noamm9/NoammAddons-1.21.10/refs/heads/data/rooms.json"
+    private const val ROOM_DATA_URL = "https://ether.stellarskys.co/rooms.json"
     private val LOCAL_ROOMS_FILE = File("config/stella/rooms.json")
 
     fun loadFromRemote() {
         NetworkUtils.fetch<List<RoomMetadata>>(ROOM_DATA_URL) { result ->
             result.onSuccess { rooms ->
                 populateRooms(rooms)
-                Stella.LOGGER.info("RoomRegistry: Loaded ${rooms.size} rooms from NoamAddons")
+                Stella.LOGGER.info("RoomRegistry: Loaded ${rooms.size} rooms from Ether")
             }
 
             result.onFailure { error ->

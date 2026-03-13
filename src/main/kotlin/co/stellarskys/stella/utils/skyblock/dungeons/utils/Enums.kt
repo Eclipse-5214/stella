@@ -27,15 +27,17 @@ enum class DungeonClass(
 }
 
 enum class Checkmark(
-    val texture: ResourceLocation?,
+    private val texturePath: String?, // Store the name/path as a String
     val colorCode: String
 ) {
     NONE(null, "§7"),
-    WHITE(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/clear/bloommapwhitecheck"), "§f"),
-    GREEN(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/clear/bloommapgreencheck"), "§a"),
-    FAILED(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/clear/bloommapfailedroom"), "§c"),
-    UNEXPLORED(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stellanav/clear/bloommapquestionmark"), "§7"),
+    WHITE("clear/bloommapwhitecheck", "§f"),
+    GREEN("clear/bloommapgreencheck", "§a"),
+    FAILED("clear/bloommapfailedroom", "§c"),
+    UNEXPLORED("clear/bloommapquestionmark", "§7"),
     UNDISCOVERED(null, "§7");
+
+    val texture: ResourceLocation? get() = texturePath?.let { map.getOrLoad(it) }
 }
 
 enum class RoomType(

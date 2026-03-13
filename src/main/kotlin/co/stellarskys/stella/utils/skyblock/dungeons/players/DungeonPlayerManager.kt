@@ -42,8 +42,10 @@ object DungeonPlayerManager {
                 val name = match.groups["name"]?.value ?: continue
                 val clazz = DungeonClass.from(match.groups["class"]?.value ?: "EMPTY")
 
-                if (players[i] != null && players[i]!!.name == name) {
-                    players[i]!!.dclass = clazz
+                val existing = getPlayer(name)
+                if (existing != null) {
+                    players[i] = existing
+                    existing.dclass = clazz
                 } else {
                     players[i] = DungeonPlayer(name).apply { dclass = clazz }
                 }

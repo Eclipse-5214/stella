@@ -7,6 +7,7 @@ import dev.deftu.omnicore.api.client.client
 import kotlinx.coroutines.*
 import java.net.URI
 import java.net.http.*
+import java.nio.file.Path
 import java.time.Duration
 import kotlin.coroutines.resume
 
@@ -27,6 +28,22 @@ object NetworkUtils {
                 err != null -> Result.failure(err)
                 res.statusCode() in 200..299 -> Result.success(res.body())
                 else -> Result.failure(Exception("HTTP ${res.statusCode()} at $url"))
+            }
+            cont.resume(result)
+        }
+    }
+
+    suspend fun downloadFile(url: String, targetPath: Path): Result<Path> = suspendCancellableCoroutine { cont ->
+        val request = request(url).GET().build()
+        val future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofFile(targetPath))
+
+        cont.invokeOnCancellation { future.cancel(true) }
+
+        future.whenComplete { res, err ->
+            val result = when {
+                err != null -> Result.failure(err)
+                res.statusCode() in 200..299 -> Result.success(res.body())
+                else -> Result.failure(Exception("HTTP ${res.statusCode()} during download of $url"))
             }
             cont.resume(result)
         }

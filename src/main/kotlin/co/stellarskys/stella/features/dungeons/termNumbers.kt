@@ -4,6 +4,7 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.features.Feature
+import co.stellarskys.stella.utils.NetworkUtils
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
 import co.stellarskys.stella.utils.config
@@ -156,6 +157,7 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
     }
 
     object TermRegistry {
+        private const val TERMS_URL = "https://ether.stellarskys.co/terms.json"
         private val gson = Gson()
 
         data class RootJson(
@@ -183,40 +185,37 @@ object termNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
         private var fullData: RootJson? = null
         private val coordCache = mutableMapOf<String, Map<TaskType, Map<Int, Vec3i>>>()
 
-        init { load(client.resourceManager) }
+        init { load() }
 
-        fun load(resourceManager: ResourceManager) {
-            val id = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "dungeons/terms.json")
-            try {
-                resourceManager.getResource(id).ifPresent { res ->
-                    res.open().use { stream ->
-                        InputStreamReader(stream).use { reader ->
-                            fullData = gson.fromJson(reader, RootJson::class.java)
+        fun load() {
+            NetworkUtils.fetch<RootJson>(TERMS_URL) { result ->
+                result.onSuccess { data ->
+                    fullData = data
+                    coordCache.clear()
+
+                    data.coords.forEach { (phase, phaseCoords) ->
+                        val typeMap = mutableMapOf<TaskType, Map<Int, Vec3i>>()
+
+                        fun parseCoords(rawList: List<List<Any>>): Map<Int, Vec3i> {
+                            return rawList.associate { list ->
+                                val x = (list[0] as Number).toInt()
+                                val y = (list[1] as Number).toInt()
+                                val z = (list[2] as Number).toInt()
+                                val idNum = (list[3] as Number).toInt()
+                                idNum to Vec3i(x, y, z)
+                            }
                         }
+
+                        typeMap[TaskType.TERMINAL] = parseCoords(phaseCoords.terms)
+                        typeMap[TaskType.LEVER] = parseCoords(phaseCoords.levers)
+                        typeMap[TaskType.DEVICE] = parseCoords(phaseCoords.devices)
+
+                        coordCache[phase] = typeMap
                     }
+                    Stella.LOGGER.info("[TermRegistry] Successfully fetched terms.")
+                }.onFailure {
+                    Stella.LOGGER.error("[TermRegistry] Failed to fetch terms from Ether!", it)
                 }
-
-                fullData?.coords?.forEach { (phase, phaseCoords) ->
-                    val typeMap = mutableMapOf<TaskType, Map<Int, Vec3i>>()
-
-                    fun parseCoords(rawList: List<List<Any>>): Map<Int, Vec3i> {
-                        return rawList.associate { list ->
-                            val x = (list[0] as Number).toInt()
-                            val y = (list[1] as Number).toInt()
-                            val z = (list[2] as Number).toInt()
-                            val idNum = (list[3] as Number).toInt()
-                            idNum to Vec3i(x, y, z)
-                        }
-                    }
-
-                    typeMap[TaskType.TERMINAL] = parseCoords(phaseCoords.terms)
-                    typeMap[TaskType.LEVER] = parseCoords(phaseCoords.levers)
-                    typeMap[TaskType.DEVICE] = parseCoords(phaseCoords.devices)
-
-                    coordCache[phase] = typeMap
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
             }
         }
 
