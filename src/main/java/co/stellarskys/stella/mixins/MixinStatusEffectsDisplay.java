@@ -3,10 +3,12 @@ package co.stellarskys.stella.mixins;
 import co.stellarskys.stella.features.msc.InventoryButtons;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
+import net.minecraft.world.effect.MobEffectInstance;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import java.util.Collection;
 
 /*
  * Modified from Devonian code
