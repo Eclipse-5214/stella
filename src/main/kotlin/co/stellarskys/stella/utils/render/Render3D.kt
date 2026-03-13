@@ -1,6 +1,6 @@
 package co.stellarskys.stella.utils.render
 
-import co.stellarskys.stella.utils.render.astrum.Astrum
+import co.stellarskys.stella.api.astrum.Astrum
 import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.Camera
 import net.minecraft.core.BlockPos

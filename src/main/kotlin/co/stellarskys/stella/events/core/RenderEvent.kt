@@ -2,7 +2,7 @@ package co.stellarskys.stella.events.core
 
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
-import co.stellarskys.stella.events.api.Event
+import co.stellarskys.stella.api.events.Event
 import net.minecraft.client.renderer.entity.state.AvatarRenderState
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.core.BlockPos

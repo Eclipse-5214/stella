@@ -1,9 +1,7 @@
 package co.stellarskys.stella.hud
 
-import co.stellarskys.stella.utils.DataUtils
+import co.stellarskys.stella.api.handlers.Capsule
 import com.google.gson.reflect.TypeToken
-import com.mojang.serialization.Codec
-import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import kotlin.collections.component1
@@ -21,7 +19,7 @@ object HUDManager {
         var scale: Float = 1f
     )
 
-    private val layoutStore = DataUtils(
+    private val layoutStore = Capsule(
         fileName = "hud_positions",
         defaultObject = mutableMapOf<String, HudLayoutData>(),
         typeToken = object : TypeToken<MutableMap<String, HudLayoutData>>() {}

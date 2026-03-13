@@ -2,7 +2,7 @@ package co.stellarskys.stella.events.core
 
 import net.hypixel.data.region.Environment
 import net.hypixel.data.type.ServerType
-import co.stellarskys.stella.events.api.Event
+import co.stellarskys.stella.api.events.Event
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland

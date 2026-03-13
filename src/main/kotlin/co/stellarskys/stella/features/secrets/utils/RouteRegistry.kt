@@ -2,7 +2,7 @@ package co.stellarskys.stella.features.secrets.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
-import co.stellarskys.stella.features.secrets.secretRoutes
+import co.stellarskys.stella.features.secrets.SecretRoutes
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import net.minecraft.core.BlockPos
@@ -11,7 +11,7 @@ import java.io.File
 
 @Module
 object RouteRegistry {
-    private val ROUTES_FILE get() = File("config/stella/routes/${secretRoutes.routeFile}")
+    private val ROUTES_FILE get() = File("config/stella/routes/${SecretRoutes.routeFile}")
     private val gson = GsonBuilder().disableHtmlEscaping().create()
     private var routeFile: RouteFile = RouteFile()
 
@@ -21,7 +21,7 @@ object RouteRegistry {
 
     fun load() {
         if (!ROUTES_FILE.exists()) {
-            Stella.LOGGER.info("RouteRegistry: ${secretRoutes.routeFile} not found, creating new file")
+            Stella.LOGGER.info("RouteRegistry: ${SecretRoutes.routeFile} not found, creating new file")
             save()
             return
         }
@@ -53,7 +53,7 @@ object RouteRegistry {
 
             Stella.LOGGER.info("RouteRegistry: Successfully loaded ${routes.size} rooms")
         }.onFailure {
-            Stella.LOGGER.error("RouteRegistry: Failed to load ${secretRoutes.routeFile} — ${it.message}")
+            Stella.LOGGER.error("RouteRegistry: Failed to load ${SecretRoutes.routeFile} — ${it.message}")
         }
     }
 
@@ -88,14 +88,14 @@ object RouteRegistry {
             ROUTES_FILE.parentFile.mkdirs()
             ROUTES_FILE.writeText(sb.toString())
 
-            Stella.LOGGER.info("RouteRegistry: Saved ${secretRoutes.routeFile}")
+            Stella.LOGGER.info("RouteRegistry: Saved ${SecretRoutes.routeFile}")
         }.onFailure {
-            Stella.LOGGER.error("RouteRegistry: Failed to save ${secretRoutes.routeFile} — ${it.message}")
+            Stella.LOGGER.error("RouteRegistry: Failed to save ${SecretRoutes.routeFile} — ${it.message}")
         }
     }
 
     fun reload() {
-        Stella.LOGGER.info("RouteRegistry: Reloading ${secretRoutes.routeFile}...")
+        Stella.LOGGER.info("RouteRegistry: Reloading ${SecretRoutes.routeFile}...")
 
         runCatching {
             load()

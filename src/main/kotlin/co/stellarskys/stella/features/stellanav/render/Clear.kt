@@ -1,13 +1,13 @@
 package co.stellarskys.stella.features.stellanav.render
 
-import co.stellarskys.stella.features.stellanav.map
+import co.stellarskys.stella.features.stellanav.Map
 import co.stellarskys.stella.utils.Utils.darken
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
-import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
-import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
-import co.stellarskys.stella.utils.skyblock.dungeons.utils.*
+import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.api.dungeons.map.Room
+import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
+import co.stellarskys.stella.api.dungeons.utils.*
 import dev.deftu.omnicore.api.client.player
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.resources.ResourceLocation
@@ -42,21 +42,21 @@ object Clear {
     }
 
     private fun renderRooms(context: GuiGraphics) {
-        if(!map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
+        if(!Map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
             Render2D.drawRect(context, it.x * SPACING, it.z * SPACING, ROOM, ROOM, DISCOVERED)
         }
 
         Dungeon.uniqueRooms.forEach { room ->
-            if (!room.explored && !map.hiddenRooms) return@forEach
+            if (!room.explored && !Map.hiddenRooms) return@forEach
             val baseColor = room.type.color ?: return@forEach
-            renderRoom(context, room, if (!room.explored) baseColor.darken(map.tint) else baseColor)
+            renderRoom(context, room, if (!room.explored) baseColor.darken(Map.tint) else baseColor)
         }
 
         Dungeon.uniqueDoors.forEach { door ->
-            if (door.state != DoorState.DISCOVERED && !map.hiddenRooms) return@forEach
+            if (door.state != DoorState.DISCOVERED && !Map.hiddenRooms) return@forEach
             val vert = door.rotation == 0
             val (cx, cz) = door.getComp()
-            val finalColor = (if (door.opened) DoorType.NORMAL else door.type).color.let { if (door.state != DoorState.DISCOVERED) it.darken(map.tint) else it }
+            val finalColor = (if (door.opened) DoorType.NORMAL else door.type).color.let { if (door.state != DoorState.DISCOVERED) it.darken(Map.tint) else it }
             Render2D.drawRect(context, (cx / 2 * SPACING) + if (vert) 6 else 18, (cz / 2 * SPACING) + if (vert) 18 else 6, if (vert) 6 else 4, if (vert) 4 else 6, finalColor)
         }
     }
@@ -78,17 +78,17 @@ object Clear {
     }
 
     private fun renderCheckmarks(context: GuiGraphics) {
-        val scale = map.checkmarkScale
-        if(!map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
+        val scale = Map.checkmarkScale
+        if(!Map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
             drawIcon(context, it.x.toFloat() * SPACING + HALF, it.z.toFloat() * SPACING + HALF, scale, Checkmark.UNEXPLORED.texture!!, 10, 12, -5f)
         }
 
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored || room.type == RoomType.ENTRANCE) return@forEach
-            val show = if (room.type.isNormal && room.secrets > 0) map.roomCheck else if (room.type.isPuzzle) map.puzzleCheck else true
+            val show = if (room.type.isNormal && room.secrets > 0) Map.roomCheck else if (room.type.isPuzzle) Map.puzzleCheck else true
             if (!show) return@forEach
             val tex = room.checkmark.texture ?: return@forEach
-            val anchor = Anchor.fromInt(map.checkAnchor)
+            val anchor = Anchor.fromInt(Map.checkAnchor)
             val coords = room.getAnchorPos(anchor)
             val cx = coords.first.toFloat() * SPACING + HALF
             val cz = coords.second.toFloat() * SPACING + HALF
@@ -107,25 +107,25 @@ object Clear {
 
     private fun renderLabels(context: GuiGraphics) {
         Dungeon.uniqueRooms.forEach { room ->
-            if (!room.explored && !map.hiddenRooms) return@forEach
+            if (!room.explored && !Map.hiddenRooms) return@forEach
             if (!room.type.isNormal && !room.type.isPuzzle) return@forEach
-            if (map.replaceText && room.checkmark == Checkmark.GREEN) return@forEach
+            if (Map.replaceText && room.checkmark == Checkmark.GREEN) return@forEach
             val posGroups = mutableMapOf<Pair<Double, Double>, MutableList<Pair<String, Float>>>()
             val isNormal = room.type.isNormal
 
-            if (if (isNormal) map.roomName else map.puzzleName) {
-                val anchor = Anchor.fromInt(map.nameAnchor)
+            if (if (isNormal) Map.roomName else Map.puzzleName) {
+                val anchor = Anchor.fromInt(Map.nameAnchor)
                 val pos = room.getAnchorPos(anchor)
                 room.name?.split(" ")?.forEach {
-                    posGroups.getOrPut(pos) { mutableListOf() }.add(it to 0.75f * map.nameScale)
+                    posGroups.getOrPut(pos) { mutableListOf() }.add(it to 0.75f * Map.nameScale)
                 }
             }
 
-            if (room.secrets != 0 && (if (isNormal) map.roomSecrets else map.puzzleSecrets)) {
-                val anchor = Anchor.fromInt(map.secretsAnchor)
+            if (room.secrets != 0 && (if (isNormal) Map.roomSecrets else Map.puzzleSecrets)) {
+                val anchor = Anchor.fromInt(Map.secretsAnchor)
                 val pos = room.getAnchorPos(anchor)
                 val count = if (room.checkmark == Checkmark.GREEN) room.secrets else room.secretsFound
-                posGroups.getOrPut(pos) { mutableListOf() }.add("$count/${room.secrets}" to 0.75f * map.secretScale)
+                posGroups.getOrPut(pos) { mutableListOf() }.add("$count/${room.secrets}" to 0.75f * Map.secretScale)
             }
 
             posGroups.forEach { (coords, lines) ->
@@ -159,7 +159,7 @@ object Clear {
         DungeonPlayerManager.players.forEach { p ->
             if (p == null || (!p.alive && p.name != me.name.string)) return@forEach
 
-            val pos = if (map.smoothMovement) p.pos.getLerped() else p.pos.raw
+            val pos = if (Map.smoothMovement) p.pos.getLerped() else p.pos.raw
             val ix = pos?.iconX ?: return@forEach
             val iz = pos.iconZ ?: return@forEach
             val rot = pos.yaw?.toFloat() ?: 0f
@@ -198,7 +198,7 @@ object Clear {
             Anchor.LAST -> sorted.last()
             Anchor.CENTER -> {
                 val isIrregular = shape in setOf("L", "1x2")
-                if (isIrregular && map.prioMiddle) if (size > 1) sorted[1] else sorted.first()
+                if (isIrregular && Map.prioMiddle) if (size > 1) sorted[1] else sorted.first()
                 else this.center()
             }
         }

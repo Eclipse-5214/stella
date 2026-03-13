@@ -1,20 +1,16 @@
 package co.stellarskys.stella.features.stellanav.render
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.features.stellanav.map
-import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayerManager
+import co.stellarskys.stella.features.stellanav.Map
+import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.player
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.packs.resources.ResourceManager
 import tech.thatgravyboat.skyblockapi.platform.pushPop
-import java.io.InputStreamReader
 import java.nio.file.Files
 
 object Boss {
@@ -25,7 +21,7 @@ object Boss {
         val p = player ?: return
         val floor = Dungeon.floorNumber ?: return
         val bMap = BossMapRegistry.getBossMap(floor, p.x, p.y, p.z) ?: return
-        val tex = map.getOrLoad("boss/${bMap.image}") ?: return
+        val tex = Map.getOrLoad("boss/${bMap.image}") ?: return
         val sizeInWorld = minOf(bMap.widthInWorld, bMap.heightInWorld, bMap.renderSize ?: Int.MAX_VALUE).toDouble()
         val texScale = SIZE / minOf((bMap.width / bMap.widthInWorld.toDouble()) * (bMap.renderSize ?: bMap.widthInWorld), (bMap.height / bMap.heightInWorld.toDouble()) * (bMap.renderSize ?: bMap.heightInWorld))
         val w = (bMap.width * texScale).toInt()
@@ -42,7 +38,7 @@ object Boss {
             for (dp in DungeonPlayerManager.players) {
                 if (dp == null || (!dp.alive && dp.name != you)) continue
 
-                val pos = if (map.smoothMovement) dp.pos.getLerped() else dp.pos.raw
+                val pos = if (Map.smoothMovement) dp.pos.getLerped() else dp.pos.raw
                 val rx = pos?.realX ?: continue
                 val rz = pos.realZ ?: continue
                 val hudX = toHud(rx, bMap.topLeftLocation[0], sizeInWorld, viewX)
@@ -76,8 +72,8 @@ object Boss {
 
             try {
                 Files.newBufferedReader(configFile).use { reader ->
-                    val type = object : TypeToken<Map<String, List<BossMapData>>>() {}.type
-                    val data: Map<String, List<BossMapData>> = gson.fromJson(reader, type)
+                    val type = object : TypeToken<kotlin.collections.Map<String, List<BossMapData>>>() {}.type
+                    val data: kotlin.collections.Map<String, List<BossMapData>> = gson.fromJson(reader, type)
                     bossMaps.clear()
                     bossMaps.putAll(data)
                     Stella.LOGGER.info("Successfully loaded ${bossMaps.size} boss map entries from config.")

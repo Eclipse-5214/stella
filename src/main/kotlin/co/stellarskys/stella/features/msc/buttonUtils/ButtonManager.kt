@@ -3,10 +3,10 @@ package co.stellarskys.stella.features.msc.buttonUtils
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
-import co.stellarskys.stella.utils.ChatUtils
+import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
-import co.stellarskys.stella.utils.render.nvg.NVGRenderer
+import co.stellarskys.stella.api.nvg.NVGRenderer
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -15,7 +15,6 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.item.ItemStack
 import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
 import java.io.File
 import kotlin.jvm.optionals.getOrNull
@@ -100,7 +99,7 @@ object ButtonManager {
                     command = "/$command"
                 }
 
-                ChatUtils.sendCommand(command)
+                Signal.sendCommand(command)
                 return true
             }
         }

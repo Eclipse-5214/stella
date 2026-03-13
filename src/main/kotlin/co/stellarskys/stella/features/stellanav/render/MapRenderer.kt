@@ -1,10 +1,10 @@
 package co.stellarskys.stella.features.stellanav.render
 
-import co.stellarskys.stella.features.stellanav.map
+import co.stellarskys.stella.features.stellanav.Map
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
-import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
+import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.api.dungeons.players.DungeonPlayer
 import dev.deftu.omnicore.api.client.player
 import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.platform.pushPop
@@ -24,15 +24,15 @@ object MapRenderer {
             matrix.translate(5f, 5f)
 
             when {
-                Dungeon.inBoss && map.bossMapEnabled && !Dungeon.complete -> MapMode.BOSS
-                map.scoreMapEnabled && Dungeon.complete -> MapMode.SCORE
-                Dungeon.inBoss && map.hideInBoss -> null
+                Dungeon.inBoss && Map.bossMapEnabled && !Dungeon.complete -> MapMode.BOSS
+                Map.scoreMapEnabled && Dungeon.complete -> MapMode.SCORE
+                Dungeon.inBoss && Map.hideInBoss -> null
                 else -> MapMode.CLEAR
             }?.let { mode ->
                 renderBackground(context)
                 mode.renderer(context)
-                if (map.mapInfoUnder) renderInfoUnder(context, false)
-                if (map.mapBorder) renderBorder(context)
+                if (Map.mapInfoUnder) renderInfoUnder(context, false)
+                if (Map.mapBorder) renderBorder(context)
             }
         }
     }
@@ -42,10 +42,10 @@ object MapRenderer {
         context.scale(scale, scale)
 
         renderBackground(context)
-        Render2D.drawImage(context, map.DEFAULT_MAP, 5, 5, 128, 128)
+        Render2D.drawImage(context, Map.DEFAULT_MAP, 5, 5, 128, 128)
 
-        if (map.mapInfoUnder) renderInfoUnder(context, true)
-        if (map.mapBorder) renderBorder(context)
+        if (Map.mapInfoUnder) renderInfoUnder(context, true)
+        if (Map.mapBorder) renderBorder(context)
     }
 
 
@@ -65,12 +65,12 @@ object MapRenderer {
         }
     }
 
-    private fun totalHeight() = MAP_H + if (map.mapInfoUnder) 10 else 0
-    private fun renderBackground(context: GuiGraphics) = Render2D.drawRect(context, 0, 0, MAP_W, totalHeight(), map.mapBgColor)
+    private fun totalHeight() = MAP_H + if (Map.mapInfoUnder) 10 else 0
+    private fun renderBackground(context: GuiGraphics) = Render2D.drawRect(context, 0, 0, MAP_W, totalHeight(), Map.mapBgColor)
     private fun renderBorder(context: GuiGraphics) {
-        val bw = map.mapBdWidth
+        val bw = Map.mapBdWidth
         val h = totalHeight()
-        val c = map.mapBdColor
+        val c = Map.mapBdColor
         Render2D.drawRect(context, -bw, -bw, MAP_W + bw * 2, bw, c)
         Render2D.drawRect(context, -bw, h, MAP_W + bw * 2, bw, c)
         Render2D.drawRect(context, -bw, 0, bw, h, c)
@@ -80,24 +80,24 @@ object MapRenderer {
     fun renderPlayerIcon(context: GuiGraphics, p: DungeonPlayer, x: Double, y: Double, rotation: Float) = context.pushPop {
         val matrix =  context.pose()
         val you = p.name == player?.name?.string
-        renderNametag(context, p.name, x, y, map.iconScale, you)
+        renderNametag(context, p.name, x, y, Map.iconScale, you)
 
         matrix.translate(x.toFloat(), y.toFloat())
         matrix.rotate((rotation * (PI / 180)).toFloat())
-        matrix.scale(map.iconScale, map.iconScale)
+        matrix.scale(Map.iconScale, Map.iconScale)
 
-        if (map.showPlayerHead && !(map.ownDefault && you)) {
-            Render2D.drawRect(context, -6, -6, 12, 12,  if (map.iconClassColors) p.dclass.color ?: map.iconBorderColor else map.iconBorderColor)
-            matrix.scale(1f - map.iconBorderWidth, 1f - map.iconBorderWidth)
+        if (Map.showPlayerHead && !(Map.ownDefault && you)) {
+            Render2D.drawRect(context, -6, -6, 12, 12,  if (Map.iconClassColors) p.dclass.color ?: Map.iconBorderColor else Map.iconBorderColor)
+            matrix.scale(1f - Map.iconBorderWidth, 1f - Map.iconBorderWidth)
             Render2D.drawPlayerHead(context, -6, -6, 12, p.uuid ?: UUID(0, 0))
         } else {
-            val head = if (you) map.SELF_MARKER else map.OTHER_MARKER
+            val head = if (you) Map.SELF_MARKER else Map.OTHER_MARKER
             Render2D.drawImage(context, head, -4, -5, 7, 10)
         }
     }
 
     fun renderNametag(context: GuiGraphics, name: String, x: Double, y: Double, scale: Float, ownName: Boolean) {
-        if (!Dungeon.holdingLeaps || !map.showNames || (map.dontShowOwn && ownName)) return
+        if (!Dungeon.holdingLeaps || !Map.showNames || (Map.dontShowOwn && ownName)) return
 
         context.pushPop {
             val matrix = context.pose()
@@ -112,7 +112,7 @@ object MapRenderer {
     }
 
     fun drawShadowedText(context: GuiGraphics, text: String, x: Int, y: Int, offset: Float) {
-        if (!map.textShadow) return
+        if (!Map.textShadow) return
         val s = "§0$text"
         for (i in 0..3) {
             context.pushPop {

@@ -1,8 +1,8 @@
 package co.stellarskys.stella.events.core
 
-import co.stellarskys.stella.utils.skyblock.dungeons.players.DungeonPlayer
-import co.stellarskys.stella.utils.skyblock.dungeons.utils.Checkmark
-import co.stellarskys.stella.events.api.Event
+import co.stellarskys.stella.api.dungeons.players.DungeonPlayer
+import co.stellarskys.stella.api.dungeons.utils.Checkmark
+import co.stellarskys.stella.api.events.Event
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.block.entity.BlockEntity
@@ -31,12 +31,12 @@ sealed class DungeonEvent {
 
     sealed class Room {
         class Change(
-            val old: co.stellarskys.stella.utils.skyblock.dungeons.map.Room,
-            val new: co.stellarskys.stella.utils.skyblock.dungeons.map.Room
+            val old: co.stellarskys.stella.api.dungeons.map.Room,
+            val new: co.stellarskys.stella.api.dungeons.map.Room
         ) : Event()
 
         class StateChange(
-            val room: co.stellarskys.stella.utils.skyblock.dungeons.map.Room,
+            val room: co.stellarskys.stella.api.dungeons.map.Room,
             val oldState: Checkmark,
             val newState: Checkmark,
             val roomPlayers: List<DungeonPlayer>

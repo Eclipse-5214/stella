@@ -1,7 +1,7 @@
 package co.stellarskys.stella.events.core
 
 import net.minecraft.world.item.ItemStack
-import co.stellarskys.stella.events.api.Event
+import co.stellarskys.stella.api.events.Event
 
 sealed class PlayerEvent {
     class HotbarChange(

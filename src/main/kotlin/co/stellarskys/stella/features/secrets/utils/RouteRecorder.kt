@@ -7,17 +7,16 @@ import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.RenderEvent
 import co.stellarskys.stella.events.core.SoundEvent
 import co.stellarskys.stella.events.core.TickEvent
-import co.stellarskys.stella.features.secrets.secretRoutes
+import co.stellarskys.stella.features.secrets.SecretRoutes
 import co.stellarskys.stella.hud.HUDManager
-import co.stellarskys.stella.utils.ChatUtils
+import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.utils.Utils.calcDistanceSq
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
+import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.api.dungeons.map.Room
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
-import net.fabricmc.loader.impl.lib.sat4j.pb.constraints.pb.WatchPb
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundEvents
@@ -44,7 +43,7 @@ object RouteRecorder {
         EventBus.on<DungeonEvent.Room.Change>(SkyBlockIsland.THE_CATACOMBS) {
             if (!recording) return@on
 
-            ChatUtils.fakeMessage("${Stella.PREFIX} §cError: left room, stopping")
+            Signal.fakeMessage("${Stella.PREFIX} §cError: left room, stopping")
             stopRecording()
         }
 
@@ -142,7 +141,7 @@ object RouteRecorder {
     fun startRecording() {
         val room = Dungeon.currentRoom
         if (room?.name == null) {
-            ChatUtils.fakeMessage("${Stella.PREFIX} §cNot in a valid dungeon room")
+            Signal.fakeMessage("${Stella.PREFIX} §cNot in a valid dungeon room")
             return
         }
 
@@ -152,29 +151,29 @@ object RouteRecorder {
         route.add(StepData(CopyOnWriteArrayList(), CopyOnWriteArrayList()))
         recording = true
 
-        ChatUtils.fakeMessage("${Stella.PREFIX} §aStarted route recording for ${room.name}")
+        Signal.fakeMessage("${Stella.PREFIX} §aStarted route recording for ${room.name}")
     }
 
     fun stopRecording() {
         recording = false
-        ChatUtils.fakeMessage("${Stella.PREFIX} §cStopped Recording")
+        Signal.fakeMessage("${Stella.PREFIX} §cStopped Recording")
     }
 
     fun saveRoute() {
         if (currentRoom?.name == null || !recording || route.isEmpty()) {
-            ChatUtils.fakeMessage("${Stella.PREFIX} §cNo route to save")
+            Signal.fakeMessage("${Stella.PREFIX} §cNo route to save")
             return
         }
 
         RouteRegistry.saveRoute(currentRoom?.name ?: return, getRoute())
         RouteRegistry.reload()
-        ChatUtils.fakeMessage("${Stella.PREFIX} §aSaved route for ${currentRoom?.name}")
+        Signal.fakeMessage("${Stella.PREFIX} §aSaved route for ${currentRoom?.name}")
         stopRecording()
     }
 
     fun reloadRoutes() {
         RouteRegistry.reload()
-        ChatUtils.fakeMessage("${Stella.PREFIX} §aReloaded routes")
+        Signal.fakeMessage("${Stella.PREFIX} §aReloaded routes")
     }
 
     fun addWaypoint(type: WaypointType, pos: BlockPos) {
@@ -198,7 +197,7 @@ object RouteRecorder {
         matirix.pushMatrix()
         matirix.translate(5f, 5f)
 
-        if(secretRoutes.minimized) {
+        if(SecretRoutes.minimized) {
             Render2D.drawString(context, "§a▶ Recording", 0, 0)
         } else {
             Render2D.drawString(context, "§bRecording Room §dSupertall", 0, 0)
@@ -219,9 +218,9 @@ object RouteRecorder {
     fun hud(context: GuiGraphics) {
         val matrix = context.pose()
 
-        val x = HUDManager.getX(secretRoutes.rHudName)
-        val y = HUDManager.getY(secretRoutes.rHudName)
-        val scale = HUDManager.getScale(secretRoutes.rHudName)
+        val x = HUDManager.getX(SecretRoutes.rHudName)
+        val y = HUDManager.getY(SecretRoutes.rHudName)
+        val scale = HUDManager.getScale(SecretRoutes.rHudName)
 
         matrix.pushMatrix()
         matrix.translate(x,y)
@@ -229,7 +228,7 @@ object RouteRecorder {
         matrix.translate(5f, 5f)
 
         if(!recording) {
-            if(secretRoutes.minimized) Render2D.drawString(context, "§c■ Not Recording", 0, 0)
+            if(SecretRoutes.minimized) Render2D.drawString(context, "§c■ Not Recording", 0, 0)
             else Render2D.drawString(context, "§cNot Recording", 0, 0)
         } else {
             val etherwarps = currentStep.waypoints.filter { it.type == WaypointType.ETHERWARP }.size
@@ -240,7 +239,7 @@ object RouteRecorder {
 
             val lastSecretType = lastStep?.waypoints?.firstOrNull { it.type in WaypointType.SECRET}?.type ?: "§cNone"
 
-            if(secretRoutes.minimized) {
+            if(SecretRoutes.minimized) {
                 Render2D.drawString(context, "§a▶ Recording", 0, 0)
             } else {
                 Render2D.drawString(context, "§bRecording Room §d${currentRoom?.name}", 0, 0)

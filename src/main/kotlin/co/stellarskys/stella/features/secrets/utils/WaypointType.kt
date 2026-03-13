@@ -1,6 +1,6 @@
 package co.stellarskys.stella.features.secrets.utils
 
-import co.stellarskys.stella.features.secrets.secretRoutes
+import co.stellarskys.stella.features.secrets.SecretRoutes
 import java.awt.Color
 
 enum class WaypointType {
@@ -19,16 +19,16 @@ enum class WaypointType {
 
     val color: Color
         get() = when (this) {
-            BAT -> secretRoutes.batColor
-            MINE -> secretRoutes.mineColor
-            CHEST -> secretRoutes.chestColor
-            ITEM -> secretRoutes.itemColor
-            ESSENCE -> secretRoutes.essenceColor
-            ETHERWARP -> secretRoutes.etherWarpColor
-            PEARL -> secretRoutes.pearlColor
-            SUPERBOOM -> secretRoutes.superBoomColor
-            LEVER -> secretRoutes.leverColor
-            START -> secretRoutes.startColor
+            BAT -> SecretRoutes.batColor
+            MINE -> SecretRoutes.mineColor
+            CHEST -> SecretRoutes.chestColor
+            ITEM -> SecretRoutes.itemColor
+            ESSENCE -> SecretRoutes.essenceColor
+            ETHERWARP -> SecretRoutes.etherWarpColor
+            PEARL -> SecretRoutes.pearlColor
+            SUPERBOOM -> SecretRoutes.superBoomColor
+            LEVER -> SecretRoutes.leverColor
+            START -> SecretRoutes.startColor
             CUSTOM -> Color.WHITE
         }
 

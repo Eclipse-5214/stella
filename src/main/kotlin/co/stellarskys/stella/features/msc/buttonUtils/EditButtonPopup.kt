@@ -1,9 +1,9 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
-import co.stellarskys.stella.utils.config.ui.ConfigUI.Companion.UI_SCALE
-import co.stellarskys.stella.utils.config.ui.Palette
-import co.stellarskys.stella.utils.config.ui.base.BaseElement
-import co.stellarskys.stella.utils.config.ui.base.TextBox
+import co.stellarskys.stella.api.config.ui.ConfigUI.Companion.UI_SCALE
+import co.stellarskys.stella.api.config.ui.Palette
+import co.stellarskys.stella.api.config.ui.base.BaseElement
+import co.stellarskys.stella.api.config.ui.base.TextBox
 import co.stellarskys.stella.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.platform.pushPop

@@ -1,6 +1,6 @@
 package co.stellarskys.stella.events.core
 
-import co.stellarskys.stella.events.api.Event
+import co.stellarskys.stella.api.events.Event
 import net.minecraft.network.chat.Component
 
 sealed class ChatEvent {

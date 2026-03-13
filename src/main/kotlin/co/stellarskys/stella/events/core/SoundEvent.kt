@@ -1,7 +1,6 @@
 package co.stellarskys.stella.events.core
 
-import co.stellarskys.stella.events.api.Event
-import net.minecraft.client.resources.sounds.SoundInstance
+import co.stellarskys.stella.api.events.Event
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.phys.Vec3

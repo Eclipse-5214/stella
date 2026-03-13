@@ -2,11 +2,11 @@ package co.stellarskys.stella.events
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
-import co.stellarskys.stella.events.api.Event
-import co.stellarskys.stella.events.api.EventBus
-import co.stellarskys.stella.events.api.EventHandle
+import co.stellarskys.stella.api.events.Event
+import co.stellarskys.stella.api.events.EventBus
+import co.stellarskys.stella.api.events.EventHandle
 import co.stellarskys.stella.events.core.*
-import co.stellarskys.stella.managers.events.EventBusManager
+import co.stellarskys.stella.managers.EventBusManager
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
@@ -21,7 +21,6 @@ import net.minecraft.resources.ResourceLocation
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
 import dev.deftu.omnicore.api.client.*
-import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.network.protocol.Packet
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor

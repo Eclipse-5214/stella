@@ -2,7 +2,7 @@
 
 package co.stellarskys.stella.events.core
 
-import co.stellarskys.stella.events.api.Event
+import co.stellarskys.stella.api.events.Event
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen

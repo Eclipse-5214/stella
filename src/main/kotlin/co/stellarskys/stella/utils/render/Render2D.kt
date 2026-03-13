@@ -1,8 +1,7 @@
 package co.stellarskys.stella.utils.render
 
-import co.stellarskys.stella.utils.render.nvg.NVGRenderer
-import co.stellarskys.stella.utils.render.nvg.NVGPIPRenderer
-import com.mojang.blaze3d.systems.RenderSystem
+import co.stellarskys.stella.api.nvg.NVGRenderer
+import co.stellarskys.stella.api.nvg.NVGPIPRenderer
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.ChatFormatting
@@ -17,7 +16,6 @@ import java.awt.Color
 import java.util.Optional
 import java.util.UUID
 import tech.thatgravyboat.skyblockapi.platform.PlayerSkin
-import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.platform.textureUrl
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor

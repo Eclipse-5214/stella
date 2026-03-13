@@ -2,16 +2,18 @@ package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Command
+import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.api.dungeons.score.DungeonScore
+import co.stellarskys.stella.api.handlers.Atlas
+import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
-import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.skyblock.dungeons.score.DungeonScore
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
 
 @Command
-object MainCommand : Commodore("stella", "sta", "sa") {
+object MainCommand : Atlas("stella", "sta", "sa") {
     init {
         literal("hud") {
             runs {
@@ -58,35 +60,35 @@ object MainCommand : Commodore("stella", "sta", "sa") {
 
         literal("help") {
             runs {
-                ChatUtils.fakeMessage("§8§m------------------------------------------");
-                ChatUtils.fakeMessage("§6/stella §7main command! Aliases: §6/sa /sta");
-                ChatUtils.fakeMessage("§6/sa help §7Opens the Stella help menu!");
-                ChatUtils.fakeMessage("§6/sa hud §7Opens the HUD editor!");
-                //ChatUtils.fakeMessage("§6/stellaroutes §routes config! (if installed) Aliases: §6/sr /str");
-                //ChatUtils.fakeMessage("§6/sa route §7 route recording try §6/sa route help §7for more info!");
-                ChatUtils.fakeMessage("§8§m------------------------------------------");
+                Signal.fakeMessage("§8§m------------------------------------------")
+                Signal.fakeMessage("§6/stella §7main command! Aliases: §6/sa /sta")
+                Signal.fakeMessage("§6/sa help §7Opens the Stella help menu!")
+                Signal.fakeMessage("§6/sa hud §7Opens the HUD editor!")
+                //Signal.fakeMessage("§6/stellaroutes §routes config! (if installed) Aliases: §6/sr /str")
+                //Signal.fakeMessage("§6/sa route §7 route recording try §6/sa route help §7for more info!")
+                Signal.fakeMessage("§8§m------------------------------------------")
             }
         }
 
         literal("dumpscore") {
             runs {
                 if (Dungeon.floor == null) {
-                    ChatUtils.fakeMessage("${Stella.PREFIX} §cError: Not in dungeon")
+                    Signal.fakeMessage("${Stella.PREFIX} §cError: Not in dungeon")
                 }
 
                 val data = DungeonScore.data
 
-                ChatUtils.fakeMessage("§d§m------------------------------------------")
-                ChatUtils.fakeMessage("§bDungeon Score Breakdown §7(§6${Dungeon.floor?.name ?: "?"}§7)")
-                ChatUtils.fakeMessage("§d§m------------------------------------------")
-                ChatUtils.fakeMessage("                 §bScore: §6${data.score}")
-                ChatUtils.fakeMessage("")
-                ChatUtils.fakeMessage("§7Skill Score§8: §b${data.skillScore}")
-                ChatUtils.fakeMessage("§7Explore Score§8: §b${data.exploreScore}")
-                ChatUtils.fakeMessage("§7Speed Score§8: §b${data.speedScore}")
-                ChatUtils.fakeMessage("§7Bonus Score§8: §b${data.bonusScore}")
-                ChatUtils.fakeMessage("")
-                ChatUtils.fakeMessage("§d§m------------------------------------------")
+                Signal.fakeMessage("§d§m------------------------------------------")
+                Signal.fakeMessage("§bDungeon Score Breakdown §7(§6${Dungeon.floor?.name ?: "?"}§7)")
+                Signal.fakeMessage("§d§m------------------------------------------")
+                Signal.fakeMessage("                 §bScore: §6${data.score}")
+                Signal.fakeMessage("")
+                Signal.fakeMessage("§7Skill Score§8: §b${data.skillScore}")
+                Signal.fakeMessage("§7Explore Score§8: §b${data.exploreScore}")
+                Signal.fakeMessage("§7Speed Score§8: §b${data.speedScore}")
+                Signal.fakeMessage("§7Bonus Score§8: §b${data.bonusScore}")
+                Signal.fakeMessage("")
+                Signal.fakeMessage("§d§m------------------------------------------")
             }
         }
 

@@ -1,6 +1,6 @@
 package co.stellarskys.stella.mixins;
 
-import co.stellarskys.stella.features.msc.bars;
+import co.stellarskys.stella.features.msc.Bars;
 import net.minecraft.client.multiplayer.chat.ChatListener;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +19,6 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public class MixinChatListener {
     @ModifyArg(method = "handleSystemMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setOverlayMessage(Lnet/minecraft/network/chat/Component;Z)V"), index = 0)
     private Component modifyOverlayMessage(Component component) {
-        return bars.INSTANCE.cleanAB(component);
+        return Bars.INSTANCE.cleanAB(component);
     }
 }

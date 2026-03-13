@@ -1,9 +1,9 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
-import co.stellarskys.stella.utils.config.ui.ConfigUI.Companion.UI_SCALE
+import co.stellarskys.stella.api.config.ui.ConfigUI.Companion.UI_SCALE
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
-import co.stellarskys.stella.utils.render.nvg.NVGRenderer
+import co.stellarskys.stella.api.nvg.NVGRenderer
 import dev.deftu.omnicore.api.client.input.KeyboardModifiers
 import dev.deftu.omnicore.api.client.input.OmniKey
 import dev.deftu.omnicore.api.client.input.OmniMouse

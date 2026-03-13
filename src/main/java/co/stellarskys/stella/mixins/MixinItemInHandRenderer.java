@@ -1,6 +1,6 @@
 package co.stellarskys.stella.mixins;
 
-import co.stellarskys.stella.features.msc.swordBlocking;
+import co.stellarskys.stella.features.msc.SwordBlocking;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
@@ -20,6 +20,6 @@ public class MixinItemInHandRenderer {
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
     private void stella$applySwordBlock(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int j, CallbackInfo ci) {
-         if(swordBlocking.INSTANCE.handleBlock((ItemInHandRenderer) (Object) this, abstractClientPlayer, itemStack, i, poseStack, submitNodeCollector, j, this::applyItemArmTransform)) ci.cancel();
+         if(SwordBlocking.INSTANCE.handleBlock((ItemInHandRenderer) (Object) this, abstractClientPlayer, itemStack, i, poseStack, submitNodeCollector, j, this::applyItemArmTransform)) ci.cancel();
     }
 }

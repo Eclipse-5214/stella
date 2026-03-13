@@ -37,7 +37,7 @@ class FeatureProcessor(
         file.writer().use { out ->
             out.appendLine("package co.stellarskys.stella.generated")
             out.appendLine()
-            out.appendLine("import co.stellarskys.stella.utils.Commodore")
+            out.appendLine("import co.stellarskys.stella.api.handlers.Atlas")
             out.appendLine()
             out.appendLine("object GeneratedFeatureRegistry {")
             out.appendLine("  val modules: List<Class<*>> = listOf(")
@@ -47,7 +47,7 @@ class FeatureProcessor(
                 out.appendLine("    $name::class.java,")
             }
             out.appendLine("  )")
-            out.appendLine("  val commands: List<Commodore> = listOf(")
+            out.appendLine("  val commands: List<Atlas> = listOf(")
 
             commands.forEach { sym ->
                 val name = (sym as KSClassDeclaration).qualifiedName!!.asString()

@@ -2,8 +2,8 @@ package co.stellarskys.stella.features.secrets.utils
 
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render3D
-import co.stellarskys.stella.utils.skyblock.dungeons.Dungeon
-import co.stellarskys.stella.utils.skyblock.dungeons.map.Room
+import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.api.dungeons.map.Room
 import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
