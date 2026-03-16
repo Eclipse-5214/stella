@@ -1,5 +1,7 @@
 package co.stellarskys.stella.utils.render
 
+import co.stellarskys.stella.api.handlers.Chronos
+import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.nvg.NVGPIPRenderer
 import dev.deftu.omnicore.api.client.client
@@ -21,44 +23,14 @@ import tech.thatgravyboat.skyblockapi.platform.textureUrl
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 
 object Render2D {
+    private val textureCache = mutableMapOf<UUID, PlayerSkin>()
+    private var lastCacheClear = Chronos.zero
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
-    private val mc = client
 
     fun drawImage(ctx: GuiGraphics, image: ResourceLocation?, x: Int, y: Int, width: Int, height: Int) {
         if (image == null) return
         ctx.blit(RenderPipelines.GUI_TEXTURED, image, x, y, 0f, 0f, width, height, width, height, width, height)
     }
-
-    fun drawTexture(
-        ctx: GuiGraphics,
-        image: ResourceLocation,
-        x: Int,
-        y: Int,
-        u: Float,
-        v: Float,
-        width: Int,
-        height: Int,
-        regionWidth: Int,
-        regionHeight: Int,
-        textureWidth: Int = 256,
-        textureHeight: Int = 256
-    ) {
-        ctx.blit(
-            RenderPipelines.GUI_TEXTURED, // or your custom layer provider
-            image,
-            x,
-            y,
-            u,
-            v,
-            width,
-            height,
-            regionWidth,
-            regionHeight,
-            textureWidth,
-            textureHeight
-        )
-    }
-
 
     @JvmOverloads
     fun drawRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
@@ -74,7 +46,7 @@ object Render2D {
         }
 
         ctx.drawString(
-            mc.font,
+            client.font,
             str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
             x,
             y,
@@ -94,7 +66,7 @@ object Render2D {
         }
 
         ctx.drawString(
-            mc.font,
+            client.font,
             str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
             x,
             y,
@@ -109,44 +81,37 @@ object Render2D {
         context.pose().pushMatrix()
         context.pose().translate(x, y)
         context.pose().scale(scale, scale)
-
         context.renderItem(item, 0, 0)
-
         context.pose().popMatrix()
     }
 
-    private val textureCache = mutableMapOf<UUID, PlayerSkin>()
-    private var lastCacheClear = System.currentTimeMillis()
-
     fun drawPlayerHead(context: GuiGraphics, x: Int, y: Int, size: Int, uuid: UUID) {
-        val now = System.currentTimeMillis()
-        if (now - lastCacheClear > 300000L) {
+        if (lastCacheClear.since.millis > 300000L) {
             textureCache.clear()
-            lastCacheClear = now
+            lastCacheClear = Chronos.now
         }
 
         val textures = textureCache.getOrElse(uuid) {
-            val profile = mc.connection?.getPlayerInfo(uuid)?.profile
-            val skin = if (profile != null) { mc.skinManager.get(profile).getNow(Optional.empty()).orElseGet { DefaultPlayerSkin.get(uuid) } } else { DefaultPlayerSkin.get(uuid) }
+            val profile = client.connection?.getPlayerInfo(uuid)?.profile
+            val skin = if (profile != null) { client.skinManager.get(profile).getNow(Optional.empty()).orElseGet { DefaultPlayerSkin.get(uuid) } } else { DefaultPlayerSkin.get(uuid) }
             val defaultSkin = DefaultPlayerSkin.get(uuid)
             if (skin.texture != defaultSkin.texture) textureCache[uuid] = skin
             skin
         }
 
         textures.textureUrl
-
         PlayerFaceRenderer.draw(context, textures, x, y, size)
     }
 
 
     fun String.width(): Int {
         val lines = split('\n')
-        return lines.maxOf { mc.font.width(it.stripColor()) }
+        return lines.maxOf { client.font.width(it.stripColor()) }
     }
 
     fun String.height(): Int {
         val lineCount = count { it == '\n' } + 1
-        return mc.font.lineHeight * lineCount
+        return client.font.lineHeight * lineCount
     }
 
     fun GuiGraphics.drawNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {

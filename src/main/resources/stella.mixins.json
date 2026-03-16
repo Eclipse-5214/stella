@@ -8,6 +8,7 @@
     "mixins": [
     ],
     "client": [
+      "MixinFont",
       "MixinClientLevel",
       "MixinNetworkManager",
       "MixinInGameHud",

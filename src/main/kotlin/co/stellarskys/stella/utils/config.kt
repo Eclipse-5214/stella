@@ -72,6 +72,13 @@ val config = Config("Stella", "Stella") {
                 default = true
             }
 
+            toggle {
+                configName = "cosmetics"
+                name = "Cosmetics"
+                description = "Shows cosmetics"
+                default = true
+            }
+
             button {
                 configName = "hudEditor"
                 name = "Hud Editor"

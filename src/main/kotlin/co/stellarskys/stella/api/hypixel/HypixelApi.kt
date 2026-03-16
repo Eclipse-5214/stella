@@ -14,6 +14,10 @@ import kotlin.jvm.optionals.getOrNull
 
 @Module
 object HypixelApi {
+    private val nameCache = mutableMapOf<String, String>()
+
+    data class MojangProfile(val name: String, val id: String)
+
     init {
         HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket::class.java)
         HypixelModAPICallback.EVENT.register { event ->
@@ -90,6 +94,17 @@ object HypixelApi {
             }.onFailure {
                 onResult(null)
             }
+        }
+    }
+
+    fun getName(uuid: String, onResult: (String?) -> Unit) {
+        val clean = uuid.replace("-", "")
+        nameCache[clean]?.let { return onResult(it) }
+        val url = "https://sessionserver.mojang.com/session/minecraft/profile/$clean"
+        Quasar.fetch<MojangProfile>(url) { result ->
+            val name = result.getOrNull()?.name
+            if (name != null) nameCache[clean] = name
+            onResult(name)
         }
     }
 
