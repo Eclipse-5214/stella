@@ -153,7 +153,7 @@ object TermNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
     }
 
     object TermRegistry {
-        private const val TERMS_URL = "https://ether.stellarskys.co/terms.json"
+        private val TERMS_URL = "${Stella.ETHER}/terms.json"
         private val gson = Gson()
 
         data class RootJson(

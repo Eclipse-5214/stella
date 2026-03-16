@@ -16,7 +16,6 @@ object Ether {
     private val root = FabricLoader.getInstance().configDir.resolve(Stella.NAMESPACE)
     private val assetFolder = root.resolve("assets")
     private val versionFile = root.resolve("version.txt")
-    private const val BASE_URL = "https://ether.stellarskys.co"
 
     init {
         sync()
@@ -25,15 +24,14 @@ object Ether {
     fun sync(scope: CoroutineScope = Stella.scope) = scope.launch {
         if (!Files.exists(assetFolder)) Files.createDirectories(assetFolder)
 
-        // 1. Check version
-        val remoteHash = Quasar.fetchString("$BASE_URL/version.txt").getOrNull()?.trim() ?: return@launch
+        val remoteHash = Quasar.fetchString("${Stella.ETHER}/version.txt").getOrNull()?.trim() ?: return@launch
         val localHash = if (Files.exists(versionFile)) Files.readString(versionFile).trim() else ""
 
         if (remoteHash != localHash) {
             Stella.LOGGER.info("[Ether] Updating assets")
 
             val tempZip = Files.createTempFile("stella_assets", ".zip")
-            Quasar.downloadFile("$BASE_URL/assets.zip", tempZip).onSuccess {
+            Quasar.downloadFile("${Stella.ETHER}/assets.zip", tempZip).onSuccess {
                 try {
                     extractZip(tempZip, assetFolder)
                     Files.writeString(versionFile, remoteHash)
@@ -41,10 +39,7 @@ object Ether {
                 } catch (e: Exception) {
                     Stella.LOGGER.error("[Ether] Failed to extract assets!", e)
                 }
-            }.onFailure {
-                Stella.LOGGER.error("[Ether] Failed to download assets!", it)
-            }
-
+            }.onFailure { Stella.LOGGER.error("[Ether] Failed to download assets!", it) }
             Files.deleteIfExists(tempZip)
         }
     }

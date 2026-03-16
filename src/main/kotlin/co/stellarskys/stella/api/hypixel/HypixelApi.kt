@@ -1,5 +1,6 @@
 package co.stellarskys.stella.api.hypixel
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.LocationEvent
@@ -53,7 +54,7 @@ object HypixelApi {
             }
         }
 
-        val apiUrl = "https://api.stellarskys.co/skyblock/profiles?uuid=$uuid"
+        val apiUrl = "${Stella.API}/skyblock/profiles?uuid=$uuid"
         val url = if (force) "$apiUrl&t=${System.currentTimeMillis()}" else apiUrl
 
         Quasar.fetch<SkyblockResponse>(url) { result ->
@@ -82,7 +83,7 @@ object HypixelApi {
             }
         }
 
-        val apiUrl = "https://api.stellarskys.co/secrets?uuid=$uuid"
+        val apiUrl = "${Stella.API}/secrets?uuid=$uuid"
         val url = if (force) "$apiUrl&t=${System.currentTimeMillis()}" else apiUrl
 
         Quasar.fetch<Int>(url) { result ->

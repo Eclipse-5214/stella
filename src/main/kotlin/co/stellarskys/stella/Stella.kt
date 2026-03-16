@@ -14,6 +14,8 @@ object Stella: ClientModInitializer {
     @JvmStatic val NAMESPACE: String = "stella"
     @JvmStatic val PREFIX: String = "§7[§dStella§7]"
     @JvmStatic val SHORTPREFIX: String = "§d[SA]"
+    @JvmStatic val ETHER: String = "https://ether.stellarskys.co"
+    @JvmStatic val API: String = "https://api.stellarskys.co"
     @JvmStatic val DELTA: DeltaTracker = DeltaTracker()
     @JvmStatic val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 

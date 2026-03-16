@@ -46,7 +46,7 @@ object Cosmetics : Feature("cosmetics") {
     }
 
     fun updateNames() {
-        Quasar.fetch<Map<String, NameData>>("https://ether.stellarskys.co/names.json") { result ->
+        Quasar.fetch<Map<String, NameData>>("${Stella.ETHER}/names.json") { result ->
             result.onSuccess { data ->
                 data.forEach { (uuid, ndata) ->
                     HypixelApi.getName(uuid) { name ->

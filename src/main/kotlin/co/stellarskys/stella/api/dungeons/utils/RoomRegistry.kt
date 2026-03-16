@@ -10,7 +10,7 @@ import java.io.FileNotFoundException
 object RoomRegistry {
     private val byCore = mutableMapOf<Int, RoomMetadata>()
     private val allRooms = mutableListOf<RoomMetadata>()
-    private const val ROOM_DATA_URL = "https://ether.stellarskys.co/rooms.json"
+    private val ROOM_DATA_URL = "${Stella.ETHER}/rooms.json"
     private val LOCAL_ROOMS_FILE = File("config/stella/rooms.json")
 
     fun loadFromRemote() {
