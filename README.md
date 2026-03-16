@@ -7,8 +7,8 @@
   <a href="https://github.com/Eclipse-5214/stella/releases" target="_blank">
     <img alt="downloads" src="https://img.shields.io/github/v/release/Eclipse-5214/stella?color=ad03fc&style=flat-square" />
   </a>
-  <a href="https://github.com/Eclipse-5214/stella/releases" target="_blank">
-    <img alt="downloads" src="https://img.shields.io/github/downloads/Eclipse-5214/stella/total?color=ad03fc&style=flat-square" />
+  <a href="https://modrinth.com/mod/stella" target="_blank">
+    <img alt="downloads" src="https://img.shields.io/modrinth/dt/stella?color=ad03fc&style=flat-square" />
   </a>
   <a href="https://github.com/Eclipse-5214/stella/">
     <img src="https://tokei.rs/b1/github/Eclipse-5214/stella?category=code&color=ad03fc&style=flat-square" alt="lines">
