@@ -12,12 +12,17 @@ import java.awt.Color
 
 @Module
 object Cosmetics : Feature("cosmetics") {
+    private val sequenceCache = java.util.WeakHashMap<FormattedCharSequence, FormattedCharSequence>()
     private val nameCache = mutableMapOf<String, NameData>()
     override fun initialize() { updateNames() }
 
     @JvmStatic
     fun handleCharSequence(seq: FormattedCharSequence): FormattedCharSequence {
         if (!isEnabled() || nameCache.isEmpty()) return seq
+        return sequenceCache.computeIfAbsent(seq) { injectNewText(it) }
+    }
+
+    fun injectNewText(seq: FormattedCharSequence): FormattedCharSequence {
         val sb = StringBuilder()
         seq.accept { _, _, cp -> sb.appendCodePoint(cp); true }
         val full = sb.toString()
