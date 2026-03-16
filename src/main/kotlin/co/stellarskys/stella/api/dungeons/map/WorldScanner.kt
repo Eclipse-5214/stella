@@ -34,21 +34,15 @@ object WorldScanner {
 
     fun init() {
         EventBus.on<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
-
             val player = player ?: return@on
-
-            // checking player states
             checkPlayerState()
 
             val (x, z) = WorldScanUtils.realCoordToComponent(player.x.toInt(), player.z.toInt())
             val idx = 6 * z + x
 
-            // Bounds check
-            if (idx < 35) {
-                // Scan dungeon
+            if (idx in 0..35) {
                 scan()
 
-                // Rotation & door state updates
                 checkRoomState()
                 checkDoorState()
 
@@ -59,8 +53,7 @@ object WorldScanner {
                     EventBus.post(DungeonEvent.Room.Change(prevRoom, currRoom))
                 }
 
-                //if (lastIdx == idx) return@on
-
+                if (lastIdx == idx) return@on
                 lastIdx = idx
                 Dungeon.currentRoom = Dungeon.getRoomAt(player.x.toInt(), player.z.toInt())
                 val (rmx, rmz) = Dungeon.currentRoom?.components?.firstOrNull() ?: return@on

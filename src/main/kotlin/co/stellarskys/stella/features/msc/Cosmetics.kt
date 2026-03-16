@@ -7,8 +7,6 @@ import co.stellarskys.stella.api.hypixel.HypixelApi
 import co.stellarskys.stella.features.Feature
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import net.minecraft.network.chat.Style
-import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.util.FormattedCharSequence
 import java.awt.Color
 
@@ -20,45 +18,30 @@ object Cosmetics : Feature("cosmetics") {
     @JvmStatic
     fun handleCharSequence(seq: FormattedCharSequence): FormattedCharSequence {
         if (!isEnabled() || nameCache.isEmpty()) return seq
-        val rebuilt = Component.literal("")
-        var currentStyle: Style? = null
-        val buffer = StringBuilder()
+        val sb = StringBuilder()
+        seq.accept { _, _, cp -> sb.appendCodePoint(cp); true }
+        val full = sb.toString()
 
-        seq.accept { _, style, codePoint ->
-            if (style != currentStyle) {
-                if (buffer.isNotEmpty()) rebuilt.append(Component.literal(buffer.toString()).withStyle(currentStyle)).also { buffer.clear() }
-                currentStyle = style
-            }
-            buffer.append(codePoint.toChar())
-            true
-        }
+        val target = nameCache.keys.find { full.contains(it, true) } ?: return seq
+        val data = nameCache[target.lowercase()] ?: return seq
+        val idx = full.indexOf(target, ignoreCase = true)
+        val endIdx = idx + target.codePointCount(0, target.length)
 
-        if (buffer.isNotEmpty()) rebuilt.append(Component.literal(buffer.toString()).withStyle(currentStyle))
-        if (nameCache.keys.none { rebuilt.string.contains(it, ignoreCase = true) }) return seq
-        return rebuildComponent(rebuilt).visualOrderText
+        return FormattedCharSequence.composite(
+            slice(seq, 0, idx),
+            data.getComponent().visualOrderText,
+            if ((full.codePointCount(0, full.length) - endIdx) > 0) handleCharSequence(slice(seq, endIdx, Int.MAX_VALUE))
+            else FormattedCharSequence.EMPTY
+        )
     }
 
-    private fun rebuildComponent(comp: Component): MutableComponent {
-        val contents = comp.contents
-        return (if (contents is PlainTextContents) {
-            val text = contents.text()
-            val target = nameCache.keys.find { text.contains(it, ignoreCase = true) }
-            if (target != null) injectReplacement(text, target, nameCache[target.lowercase()]!!, comp.style)
-            else (comp.copy() as MutableComponent).apply { siblings.clear() }
-        } else (comp.copy() as MutableComponent).apply { siblings.clear() } )
-            .apply { comp.siblings.forEach { append(rebuildComponent(it)) } }
-    }
-
-    private fun injectReplacement(text: String, target: String, data: NameData, style: Style): MutableComponent {
-        val parts = text.split(Regex("(?i)$target"), limit = 2)
-        return Component.literal("").apply {
-            if (parts[0].isNotEmpty()) append(Component.literal(parts[0]).withStyle(style))
-            append(data.getComponent())
-            if (parts.size > 1 && parts[1].isNotEmpty()) {
-                val next = nameCache.keys.find { parts[1].contains(it, ignoreCase = true) }
-                append(if (next != null) injectReplacement(parts[1], next, nameCache[next.lowercase()]!!, style)
-                else Component.literal(parts[1]).withStyle(style))
-            }
+    fun slice(source: FormattedCharSequence, start: Int, end: Int) = FormattedCharSequence { sink ->
+        var current = 0
+        source.accept { index, style, cp ->
+            if (current in start..<end) {
+                current++
+                sink.accept(index, style, cp)
+            } else { current++; true }
         }
     }
 
