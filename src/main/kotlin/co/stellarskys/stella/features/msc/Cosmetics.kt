@@ -9,33 +9,36 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.util.FormattedCharSequence
 import java.awt.Color
+import java.util.WeakHashMap
 
 @Module
 object Cosmetics : Feature("cosmetics") {
-    private val sequenceCache = java.util.WeakHashMap<FormattedCharSequence, FormattedCharSequence>()
+    private val sequenceCache = WeakHashMap<FormattedCharSequence, FormattedCharSequence>()
     private val nameCache = mutableMapOf<String, NameData>()
     override fun initialize() { updateNames() }
 
     @JvmStatic
     fun handleCharSequence(seq: FormattedCharSequence): FormattedCharSequence {
         if (!isEnabled() || nameCache.isEmpty()) return seq
-        return sequenceCache.computeIfAbsent(seq) { injectNewText(it) }
+        return sequenceCache.computeIfAbsent(seq) { process(it) }
     }
 
-    fun injectNewText(seq: FormattedCharSequence): FormattedCharSequence {
+    fun process(seq: FormattedCharSequence): FormattedCharSequence {
         val sb = StringBuilder()
         seq.accept { _, _, cp -> sb.appendCodePoint(cp); true }
         val full = sb.toString()
 
         val target = nameCache.keys.find { full.contains(it, true) } ?: return seq
         val data = nameCache[target.lowercase()] ?: return seq
-        val idx = full.indexOf(target, ignoreCase = true)
-        val endIdx = idx + target.codePointCount(0, target.length)
+
+        val parts = full.split(Regex("(?i)$target"), 2)
+        val idx = parts[0].codePointCount(0, parts[0].length)
+        val targetIdx = target.codePointCount(0, target.length)
 
         return FormattedCharSequence.composite(
             slice(seq, 0, idx),
             data.getComponent().visualOrderText,
-            if ((full.codePointCount(0, full.length) - endIdx) > 0) handleCharSequence(slice(seq, endIdx, Int.MAX_VALUE))
+            if (parts.size > 1 && parts[1].isNotEmpty()) process(slice(seq, idx + targetIdx, Int.MAX_VALUE))
             else FormattedCharSequence.EMPTY
         )
     }
@@ -62,6 +65,7 @@ object Cosmetics : Feature("cosmetics") {
         }
     }
 
+    data class ExtraPart(val text: String, val color: String)
     data class NameData(val text: String, val extra: List<ExtraPart>? = null) {
         private var comp: MutableComponent? = null
         private fun toComponent(): MutableComponent = Component.literal(text).also { base ->
@@ -70,6 +74,4 @@ object Cosmetics : Feature("cosmetics") {
         }
         fun getComponent(): MutableComponent = comp ?: toComponent()
     }
-
-    data class ExtraPart(val text: String, val color: String)
 }
