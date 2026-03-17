@@ -13,7 +13,7 @@ import java.util.WeakHashMap
 
 @Module
 object Cosmetics : Feature("cosmetics") {
-    val sequenceCache = WeakHashMap<String, FormattedCharSequence>()
+    private val sequenceCache = WeakHashMap<String, FormattedCharSequence>()
     private val nameCache = mutableMapOf<String, NameData>()
     override fun initialize() { updateNames() }
 
