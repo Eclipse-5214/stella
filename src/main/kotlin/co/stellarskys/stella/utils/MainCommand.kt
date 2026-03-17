@@ -6,6 +6,7 @@ import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.score.DungeonScore
 import co.stellarskys.stella.api.handlers.Atlas
 import co.stellarskys.stella.api.handlers.Signal
+import co.stellarskys.stella.features.msc.Cosmetics
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor

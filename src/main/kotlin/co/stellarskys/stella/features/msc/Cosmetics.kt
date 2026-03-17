@@ -13,21 +13,19 @@ import java.util.WeakHashMap
 
 @Module
 object Cosmetics : Feature("cosmetics") {
-    private val sequenceCache = WeakHashMap<FormattedCharSequence, FormattedCharSequence>()
+    val sequenceCache = WeakHashMap<String, FormattedCharSequence>()
     private val nameCache = mutableMapOf<String, NameData>()
     override fun initialize() { updateNames() }
 
     @JvmStatic
     fun handleCharSequence(seq: FormattedCharSequence): FormattedCharSequence {
         if (!isEnabled() || nameCache.isEmpty()) return seq
-        return sequenceCache.computeIfAbsent(seq) { process(it) }
+        val full = buildString { seq.accept { _, _, cp -> appendCodePoint(cp); true }}
+        if (nameCache.keys.none { full.contains(it, true) }) return seq
+        return sequenceCache.computeIfAbsent(full) { process(seq, it) }
     }
 
-    fun process(seq: FormattedCharSequence): FormattedCharSequence {
-        val sb = StringBuilder()
-        seq.accept { _, _, cp -> sb.appendCodePoint(cp); true }
-        val full = sb.toString()
-
+    fun process(seq: FormattedCharSequence, full: String): FormattedCharSequence {
         val target = nameCache.keys.find { full.contains(it, true) } ?: return seq
         val data = nameCache[target.lowercase()] ?: return seq
 
@@ -35,12 +33,13 @@ object Cosmetics : Feature("cosmetics") {
         val idx = parts[0].codePointCount(0, parts[0].length)
         val targetIdx = target.codePointCount(0, target.length)
 
-        return FormattedCharSequence.composite(
-            slice(seq, 0, idx),
-            data.getComponent().visualOrderText,
-            if (parts.size > 1 && parts[1].isNotEmpty()) process(slice(seq, idx + targetIdx, Int.MAX_VALUE))
-            else FormattedCharSequence.EMPTY
-        )
+        val before = slice(seq, 0, idx)
+        val mid = data.getComponent().visualOrderText
+
+        return if(parts.size > 1 && parts[1].isNotEmpty()) {
+            val after = slice(seq, idx + targetIdx, Int.MAX_VALUE)
+            FormattedCharSequence.composite(before, mid, process(after, parts[1]))
+        } else  FormattedCharSequence.composite(before, mid)
     }
 
     fun slice(source: FormattedCharSequence, start: Int, end: Int) = FormattedCharSequence { sink ->
