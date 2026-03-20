@@ -1,5 +1,6 @@
 package co.stellarskys.stella.features.dungeons
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.utils.DungeonClass
@@ -25,9 +26,15 @@ object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
 
     fun fetchAndDisplayStats(name:String) {
         HypixelApi.getUuid(name) { uuid ->
-            if (uuid == null) return@getUuid
+            if (uuid == null) {
+                Signal.fakeMessage("${Stella.PREFIX} §cNo UUID found for $name")
+                return@getUuid
+            }
             HypixelApi.fetchSkyblockProfile(uuid, 600_000L) { profile ->
-                if (profile == null) return@fetchSkyblockProfile
+                if (profile == null) {
+                    Signal.fakeMessage("${Stella.PREFIX} §cNo Profile found for $name")
+                    return@fetchSkyblockProfile
+                }
                 displayCataStats(profile, name)
             }
         }
@@ -46,9 +53,11 @@ object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
 
             Text.literal(
                 "§b§l${Signal.LINE}\n"
-                        + "§dCatacomb stats for: §b$name\n\n"
-                        + "§6Cata $cata §8| §e$secrets Secrets §8(§b${averageSecrets.toString().format(1)}§8)\n"
+                        + "§dCatacomb stats for§8: §b$name\n\n"
+                        + "§6Cata ${"%.1f".format(cata)} §8| §e$secrets Secrets §8(§b${"%.1f".format(averageSecrets)}§8)\n"
             )
+                .append("§b§l${Signal.LINE}")
+                .let { Signal.fakeMessage(it) }
         }
     }
 }

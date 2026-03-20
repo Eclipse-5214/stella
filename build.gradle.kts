@@ -14,7 +14,6 @@ repositories {
     @Suppress("UnstableApiUsage")
     fun strictMaven(url: String, vararg groups: String) = maven(url) { content { groups.forEach(::includeGroupAndSubgroups) } }
 
-    strictMaven("https://jitpack.io", "com.github.stivais")
     strictMaven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1", "me.djtheredstoner")
     strictMaven("https://repo.hypixel.net/repository/Hypixel", "net.hypixel")
     strictMaven("https://api.modrinth.com/maven", "maven.modrinth")
@@ -37,7 +36,6 @@ dependencies {
 
     shadow("omnicore".mc(mc))
     shadow("textile".mc(mc))
-    shadow(libs.commodore)
 
     modImplementation(libs.skyblock.api) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc") }

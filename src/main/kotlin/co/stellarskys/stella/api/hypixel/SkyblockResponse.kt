@@ -52,8 +52,8 @@ data class SkyblockResponse(
         @SerializedName("selected_dungeon_class") val selectedClass: String? = null,
         val secrets: Long = 0
     ) {
-        val totalRuns get() = dungeonTypes.catacombs.tierComps.values.sum().toInt() + dungeonTypes.mastermode.tierComps.values.sum().toInt()
-        val averageSecrets get() = if (totalRuns > 0) secrets.toDouble() / totalRuns else 0.0
+        inline val totalRuns get() = (1..7).sumOf { tier -> (dungeonTypes.catacombs.tierComps["$tier"]?.toInt() ?: 0) + (dungeonTypes.mastermode.tierComps["$tier"]?.toInt() ?: 0) }
+        inline val averageSecrets get() = if (totalRuns > 0) secrets.toDouble() / totalRuns else 0.0
     }
 
     data class DungeonTypes(
