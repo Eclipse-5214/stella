@@ -95,7 +95,7 @@ object MainCommand : Atlas("stella", "sta", "sa") {
         }
 
         literal("cata") {
-            runs<Greedy?> { arg ->
+            runs<Greedy?> ("name") { arg ->
                 val name = arg?.string ?: player?.name?.string ?: return@runs
                 JoinInfo.fetchAndDisplayStats(name)
             }
