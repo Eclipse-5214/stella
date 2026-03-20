@@ -16,25 +16,8 @@ open class Atlas(val root: LiteralNode) {
      * DSL access to the root node for object-style definitions.
      */
     fun runs(block: () -> Unit) = root.runs(block)
-
-    inline fun <reified T> runs(noinline block: (T) -> Unit) =
-        runsInternal(T::class.java, block)
-
-    inline fun <reified T, reified U> runs(noinline block: (T, U) -> Unit) =
-        runsInternal(T::class.java, U::class.java, block)
-
-    /**
-     * These are the "Real" functions.
-     * KSP can resolve these easily because they don't use 'reified'.
-     */
-    fun <T> runsInternal(clazz: Class<T>, block: (T) -> Unit) {
-        root.runs(clazz, block)
-    }
-
-    fun <T, U> runsInternal(clazz1: Class<T>, clazz2: Class<U>, block: (T, U) -> Unit) {
-        root.runs(clazz1, clazz2, block)
-    }
-
+    inline fun <reified T> runs(noinline block: (T) -> Unit) = root.runs(block)
+    inline fun <reified T, reified U> runs(noinline block: (T, U) -> Unit) = root.runs(block)
     fun literal(string: String, block: LiteralNode.() -> Unit = {}): LiteralNode = root.literal(string, block)
     fun literal(vararg names: String, block: LiteralNode.() -> Unit = {}): LiteralNode = root.literal(*names, block = block)
     fun executable(block: Executable.() -> Unit): Executable = root.executable(block)
