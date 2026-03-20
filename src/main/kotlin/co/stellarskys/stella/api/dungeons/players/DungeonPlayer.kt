@@ -32,8 +32,6 @@ class DungeonPlayer(val name: String) {
     var currRoom: Room? = null
     var lastRoom: Room? = null
 
-    var profile: SkyblockResponse.SkyblockMember? = null
-
     val clearedRooms = mutableMapOf(
         "WHITE" to mutableMapOf<String, RoomClearInfo>(),
         "GREEN" to mutableMapOf<String, RoomClearInfo>()
@@ -43,10 +41,6 @@ class DungeonPlayer(val name: String) {
         HypixelApi.fetchSecrets(uuid.toString(), 120_000) { secrets ->
             initSecrets = secrets
             currSecrets = secrets
-        }
-
-        HypixelApi.fetchSkyblockProfile(uuid.toString(), 120_000) { profile ->
-            this.profile = profile
         }
     }
 

@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component
 import kotlin.math.roundToInt
 
 object Signal {
+    const val LINE = "---------------------------------------------"
+
     @JvmStatic
     fun sendMessage(message: String) {
         player?.connection?.sendChat(message)
@@ -33,7 +35,7 @@ object Signal {
 
     @JvmStatic
     fun fakeMessage(message: String) {
-        fakeMessage(Text.Companion.literal(message))
+        fakeMessage(Text.literal(message))
     }
 
     @JvmStatic

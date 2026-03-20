@@ -6,11 +6,12 @@ import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.score.DungeonScore
 import co.stellarskys.stella.api.handlers.Atlas
 import co.stellarskys.stella.api.handlers.Signal
-import co.stellarskys.stella.features.msc.Cosmetics
+import co.stellarskys.stella.features.dungeons.JoinInfo
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
 import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.scheduling.TickSchedulers
 
 @Command
@@ -90,6 +91,13 @@ object MainCommand : Atlas("stella", "sta", "sa") {
                 Signal.fakeMessage("§7Bonus Score§8: §b${data.bonusScore}")
                 Signal.fakeMessage("")
                 Signal.fakeMessage("§d§m------------------------------------------")
+            }
+        }
+
+        literal("cata") {
+            runs { arg: Greedy? ->
+                val name = arg?.string ?: player?.name?.string ?: return@runs
+                JoinInfo.fetchAndDisplayStats(name)
             }
         }
 

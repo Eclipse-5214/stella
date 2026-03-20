@@ -15,7 +15,8 @@ import kotlin.jvm.optionals.getOrNull
 
 @Module
 object HypixelApi {
-    private val nameCache = mutableMapOf<String, String>()
+    private val UUID2NameCache = mutableMapOf<String, String>()
+    private val Name2UUIDCache = mutableMapOf<String, String>()
 
     data class MojangProfile(val name: String, val id: String)
 
@@ -100,12 +101,30 @@ object HypixelApi {
 
     fun getName(uuid: String, onResult: (String?) -> Unit) {
         val clean = uuid.replace("-", "")
-        nameCache[clean]?.let { return onResult(it) }
+        UUID2NameCache[clean]?.let { return onResult(it) }
         val url = "https://sessionserver.mojang.com/session/minecraft/profile/$clean"
         Quasar.fetch<MojangProfile>(url) { result ->
             val name = result.getOrNull()?.name
-            if (name != null) nameCache[clean] = name
+            if (name != null) {
+                UUID2NameCache[clean] = name
+                Name2UUIDCache[name] = clean
+            }
             onResult(name)
+        }
+    }
+
+    fun getUuid(name: String, onResult: (String?) -> Unit) {
+        val lowerName = name.lowercase()
+        Name2UUIDCache[lowerName]?.let { return onResult(it) }
+        val url = "https://api.mojang.com/users/profiles/minecraft/$name"
+        Quasar.fetch<MojangProfile>(url) { result ->
+            result.onSuccess { profile ->
+                val uuid = profile.id
+                val officialName = profile.name
+                Name2UUIDCache[officialName.lowercase()] = uuid
+                UUID2NameCache[uuid] = officialName
+                onResult(uuid)
+            }.onFailure { onResult(null) }
         }
     }
 

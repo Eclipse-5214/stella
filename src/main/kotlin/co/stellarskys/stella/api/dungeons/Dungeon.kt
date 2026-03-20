@@ -22,6 +22,7 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.platform.properties
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
+import kotlin.text.get
 
 /**
  * Central dungeon state manager.
@@ -89,6 +90,18 @@ object Dungeon {
         "Trap",
         "Treasure Talisman"
     )
+
+    private val xpTable = doubleArrayOf(
+        50.0, 75.0, 110.0, 160.0, 230.0, 330.0, 470.0, 670.0, 950.0, 1340.0,
+        1890.0, 2665.0, 3760.0, 5260.0, 7380.0, 10300.0, 14400.0, 20000.0,
+        27600.0, 38000.0, 52500.0, 71500.0, 97000.0, 132000.0, 180000.0,
+        243000.0, 328000.0, 445000.0, 600000.0, 800000.0, 1065000.0,
+        1410000.0, 1900000.0, 2500000.0, 3300000.0, 4300000.0, 5600000.0,
+        7200000.0, 9200000.0, 12000000.0, 15000000.0, 19000000.0,
+        24000000.0, 30000000.0, 38000000.0, 48000000.0, 60000000.0,
+        75000000.0, 93000000.0, 116250000.0
+    )
+
 
     data class DiscoveredRoom(val x: Int, val z: Int, val room: Room)
 
@@ -296,5 +309,16 @@ object Dungeon {
         }
         uniqueRooms += room1
         room1.update()
+    }
+
+    /** Gets a persons cata level from XP */
+    fun calculateDungeonLevel(xp: Double): Double {
+        if (xp <= 0) return 0.0
+        var r = xp
+        for (i in xpTable.indices) {
+            if (r < xpTable[i]) return i + (r / xpTable[i])
+            r -= xpTable[i]
+        }
+        return 50.0 + (r / 200_000_000.0)
     }
 }

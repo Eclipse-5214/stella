@@ -36,6 +36,10 @@ data class SkyblockResponse(
         val assumedMagicalPower get() =
             if (accessoryBag.highestMP > 0) accessoryBag.highestMP
             else (accessoryBag.tuning.currentTunings.values.sum() * 10).toLong()
+
+        val allItems get() = inventory.invContents.itemStacks +
+                inventory.eChestContents.itemStacks +
+                inventory.backpackContents.flatMap { it.value.itemStacks }
     }
 
     data class PlayerStats(val kills: Map<String, Float> = emptyMap()) {
@@ -44,6 +48,8 @@ data class SkyblockResponse(
 
     data class DungeonsData(
         @SerializedName("dungeon_types") val dungeonTypes: DungeonTypes = DungeonTypes(),
+        @SerializedName("player_classes") val classes: Map<String, ClassData> = emptyMap(),
+        @SerializedName("selected_dungeon_class") val selectedClass: String? = null,
         val secrets: Long = 0
     ) {
         val totalRuns get() = dungeonTypes.catacombs.tierComps.values.sum().toInt() + dungeonTypes.mastermode.tierComps.values.sum().toInt()
@@ -56,9 +62,12 @@ data class SkyblockResponse(
     )
 
     data class DungeonTypeData(
+        val experience: Double = 0.0,
         @SerializedName("tier_completions") val tierComps: Map<String, Float> = emptyMap(),
         @SerializedName("fastest_time_s_plus") val fastestSPlus: Map<String, Double> = emptyMap()
     )
+
+    data class ClassData(val experience: Double = 0.0)
 
     data class PetsData(val pets: List<Pet> = emptyList()) {
         val activePet get() = pets.find { it.active }

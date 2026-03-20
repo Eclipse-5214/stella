@@ -427,6 +427,8 @@ val config = Config("Stella", "Stella") {
                 description = "Send message to the party"
             }
         }
+
+        subcategory("Join Info", "joinInfo", "Shows extra info when someone joins your party")
     }
 
     category("StellaNav") {
