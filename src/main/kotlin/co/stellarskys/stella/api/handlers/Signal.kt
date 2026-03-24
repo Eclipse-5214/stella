@@ -7,6 +7,8 @@ import dev.deftu.textile.Text
 import dev.deftu.textile.minecraft.HoverEvent
 import dev.deftu.textile.minecraft.MCText
 import dev.deftu.textile.minecraft.MCTextStyle
+import dev.deftu.textile.minecraft.TextColor
+import dev.deftu.textile.minecraft.TextColors
 import net.minecraft.network.chat.Component
 import kotlin.math.roundToInt
 
@@ -70,6 +72,16 @@ object Signal {
 
     fun MutableText.onHover(text: String): MutableText {
         this.setStyle(MCTextStyle(hoverEvent = HoverEvent.ShowText(Text.literal(text))))
+        return this
+    }
+
+    fun MutableText.color(rgba: Int): MutableText {
+        this.setStyle(MCTextStyle.color(TextColor(rgba)))
+        return this
+    }
+
+    fun MutableText.color(textColor: TextColor): MutableText {
+        this.setStyle(MCTextStyle.color(textColor))
         return this
     }
 }

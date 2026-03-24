@@ -5,6 +5,8 @@ import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.utils.DungeonClass
 import co.stellarskys.stella.api.handlers.Signal
+import co.stellarskys.stella.api.handlers.Signal.color
+import co.stellarskys.stella.api.handlers.Signal.onHover
 import co.stellarskys.stella.api.hypixel.HypixelApi
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.events.core.ChatEvent
@@ -44,20 +46,82 @@ object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
         with(player.dungeons) {
             val normal = dungeonTypes.catacombs
             val master = dungeonTypes.mastermode
-            val cata = Dungeon.calculateDungeonLevel(normal.experience)
-            val classes = DungeonClass.entries.map {
-                if (it !in setOf(DungeonClass.DEAD, DungeonClass.UNKNOWN)) Dungeon.calculateDungeonLevel(
-                    classes[it.name.lowercase()]?.experience ?: 0.0
-                )
-            }
 
-            Text.literal(
-                "§b§l${Signal.LINE}\n"
-                        + "§dCatacomb stats for§8: §b$name\n\n"
-                        + "§6Cata ${"%.1f".format(cata)} §8| §e$secrets Secrets §8(§b${"%.1f".format(averageSecrets)}§8)\n"
-            )
+            Text.literal("§b§l${Signal.LINE}\n§dCatacomb stats for§8: §b$name\n\n")
+                .append(buildCataLine(this))
+                .append(buildFloorTimes(normal, master))
+                .append(buildArmor(player))
+                .append(buildItemLines(player))
                 .append("§b§l${Signal.LINE}")
                 .let { Signal.fakeMessage(it) }
         }
     }
+
+    private fun buildCataLine(data: SkyblockResponse.DungeonsData) = Text.empty().apply {
+        with(data) {
+            val cata = Dungeon.calculateDungeonLevel(dungeonTypes.catacombs.experience)
+            val classLevels = mutableListOf<Double>()
+            val cataHover = Text.literal("§bClasses\n").apply {
+                DungeonClass.entries.filter { it !in setOf(DungeonClass.DEAD, DungeonClass.UNKNOWN) }.forEach {
+                    val exp = data.classes[it.name.lowercase()]?.experience ?: 0.0
+                    append(Text.literal(it.displayName).color(it.color?.rgb ?: -1))
+                    append("§8: §b${Dungeon.calculateDungeonLevel(exp).fmt()}\n")
+                }
+                append("§dAverage§8: §b${"%.1f".format(classLevels.average())}")
+            }
+            append(Text.literal("§6Cata ${"%.1f".format(cata)}").onHover(cataHover))
+            append(" §8| §e$secrets Secrets §8(§b${"%.1f".format(averageSecrets)}§8)\n")
+        }
+    }
+
+    private fun buildFloorHover(dungeonType: SkyblockResponse.DungeonTypeData, title: String, floorPrefix: String) =
+        Text.literal(title).apply {
+            (1..7).forEach { floor ->
+                val time = dungeonType.fastestSPlus["$floor"]?.toLong()?.toMMSS() ?: "§7None"
+                val comps = dungeonType.tierComps["$floor"] ?: "0"
+                append("\n$floorPrefix: $time §8(§b$comps§8)")
+            }
+        }
+
+    private fun buildFloorTimes(normal: SkyblockResponse.DungeonTypeData, master: SkyblockResponse.DungeonTypeData) =
+        Text.literal("§dFloor times§8: ")
+            .append(Text.literal("§bNormal").onHover(buildFloorHover(normal, "§bNormal Floors", "§3F")))
+            .append(" §8| ")
+            .append(Text.literal("§cMaster").onHover(buildFloorHover(master, "§cMaster Floors", "§cM")))
+            .append("\n")
+
+    private fun getArmor(person: SkyblockResponse.SkyblockMember) =
+        person.inventory.invArmor.itemStacks.take(4).reversed().filterNotNull()
+
+    private fun buildArmor(person: SkyblockResponse.SkyblockMember) = Text.literal("\n").apply {
+        for (piece in getArmor(person)) {
+            val hover = Text.literal(piece.name + "\n" + piece.lore.joinToString("\n"))
+            append(Text.literal(piece.name).onHover(hover)).append("\n")
+        }
+    }
+
+    private fun buildItemLines(member: SkyblockResponse.SkyblockMember) = Text.literal("\n§dItems§8: ").apply {
+        val pet = { id: String -> member.petsData.pets.any { it.type.contains(id) }}
+
+        append(item(member, "§bHype", "HYPERION", "ASTRAEA", "SCYLLA", "VALKYRIE")).append(" §8| ")
+        append(item(member, "§cTerm", "TERMINATOR")).append(" §8| ")
+        append("§6GDrag${pet("GOLDEN_DRAGON").check()} §8| ")
+        append("§5EDrag${pet("ENDER_DRAGON").check()}\n")
+    }
+
+    private fun item(member: SkyblockResponse.SkyblockMember, label: String, vararg ids: String): Text {
+        val matches = member.allItems.filter { i -> ids.any { i?.id?.contains(it) == true }}.filterNotNull()
+        val hover = Text.empty().apply {
+            matches.forEachIndexed { i, it ->
+                append("${it.name}\n${it.lore.joinToString("\n")}")
+                if (i < matches.size - 1) append("\n\n")
+            }
+        }
+        return Text.literal("$label${matches.isNotEmpty().check()}").onHover(hover)
+    }
+
+    private fun Boolean.check() = if (this) " §a✓" else " §c✗"
+    private fun Double.fmt(p: Int = 1) = "%.${p}f".format(this)
+    private fun Long.toMMSS(): String = if (this <= 0) "§7None" else
+        "§a%d:%02d.%03d".format(this / 60000, (this % 60000) / 1000, this % 1000)
 }
