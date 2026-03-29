@@ -85,7 +85,8 @@ data class SkyblockResponse(
     data class Inventory(
         @SerializedName("inv_contents") val invContents: InventoryContents = InventoryContents(),
         @SerializedName("ender_chest_contents") val eChestContents: InventoryContents = InventoryContents(),
-        @SerializedName("backpack_contents") val backpackContents: Map<String, InventoryContents> = emptyMap()
+        @SerializedName("backpack_contents") val backpackContents: Map<String, InventoryContents> = emptyMap(),
+        @SerializedName("inv_armor") val invArmor: InventoryContents = InventoryContents()
     )
 
     data class InventoryContents(val type: Int? = null, val data: String = "") {

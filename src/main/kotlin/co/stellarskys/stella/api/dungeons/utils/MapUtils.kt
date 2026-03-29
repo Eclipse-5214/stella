@@ -4,7 +4,6 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.PacketEvent
 import co.stellarskys.stella.events.core.TickEvent
 import co.stellarskys.stella.api.dungeons.Dungeon
-import co.stellarskys.stella.api.dungeons.Dungeon.inBoss
 import co.stellarskys.stella.api.dungeons.map.MapScanner
 import co.stellarskys.stella.api.dungeons.utils.ScanUtils.roomDoorCombinedSize
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
@@ -51,7 +50,7 @@ object MapUtils {
                 }
 
                 calibrated = calibrateDungeonMap()
-            } else if (!inBoss) {
+            } else if (!Dungeon.inBoss && !Dungeon.complete) {
                 (mapData ?: guessMapData)?.let {
                     MapScanner.updatePlayers(it)
                     MapScanner.scan(it)
