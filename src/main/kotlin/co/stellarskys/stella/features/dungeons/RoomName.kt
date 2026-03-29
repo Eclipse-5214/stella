@@ -13,23 +13,18 @@ import net.minecraft.client.gui.GuiGraphics
 
 @Module
 object RoomName : Feature("showRoomName", island = SkyBlockIsland.THE_CATACOMBS) {
+    private val chroma by config.property<Boolean>("roomNameChroma")
+
     override fun initialize() {
         HUDManager.register("roomname", "No Room Found", "showRoomName")
-        on<GuiEvent.RenderHUD> { renderHUD(it.context)}
+        on<GuiEvent.RenderHUD> { renderHUD(it.context) }
     }
 
     private fun renderHUD(
         context: GuiGraphics
-    ) {
-        if (Dungeon.inBoss) return
-
-        val chroma = config["roomNameChroma"] as Boolean
-
+    ) = HUDManager.renderHud("roomname", context) {
+        if (Dungeon.inBoss) return@renderHud
         val text = "${if (chroma) "§z" else ""}${Dungeon.currentRoom?.name ?: "No Room Found"}"
-        val x = HUDManager.getX("roomname")
-        val y = HUDManager.getY("roomname")
-        val scale = HUDManager.getScale("roomname")
-
-        Render2D.drawString(context,text, x.toInt(), y.toInt(), scale, false)
+        Render2D.drawString(context,text, 0, 0, shadow = false)
     }
 }
