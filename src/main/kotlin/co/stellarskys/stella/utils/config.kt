@@ -1076,7 +1076,7 @@ val config = Config("Stella", "Stella") {
 
             toggle {
                 configName = "buttons.hideInTerms"
-                name = "Hide in Dungeon Menus"
+                name = "Clean Terminals"
                 description = "Hides the buttons in various dungeon menus"
                 default = true
             }
