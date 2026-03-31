@@ -61,7 +61,11 @@ sealed class GuiEvent {
         class Content(
             val context: GuiGraphics,
             val mouseX: Int,
-            val mouseY: Int
+            val mouseY: Int,
+            val x: Int,
+            val y: Int,
+            val width: Int,
+            val height: Int,
         ) : Event()
     }
 

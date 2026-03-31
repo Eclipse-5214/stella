@@ -1056,9 +1056,9 @@ val config = Config("Stella", "Stella") {
             }
         }
 
-        subcategory("Inventory Buttons", "buttonsEnabled", "Enables the inventory buttons") {
+        subcategory("Inventory Buttons", "buttons", "Enables the inventory buttons") {
             button {
-                configName = "buttonEdit"
+                configName = "buttons.edit"
                 name = "Button Editor"
                 description = "Opens the inventory button editor"
                 placeholder = "Open"
@@ -1066,6 +1066,19 @@ val config = Config("Stella", "Stella") {
                 onclick {
                     client.setScreen(ButtonLayoutEditor())
                 }
+            }
+
+            toggle {
+                configName = "buttons.invOnly"
+                name = "Inventory Only"
+                description = "Only shows buttons in the inventory"
+            }
+
+            toggle {
+                configName = "buttons.hideInTerms"
+                name = "Hide in Dungeon Menus"
+                description = "Hides the buttons in various dungeon menus"
+                default = true
             }
         }
 

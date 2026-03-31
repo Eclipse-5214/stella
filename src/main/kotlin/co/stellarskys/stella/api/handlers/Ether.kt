@@ -17,9 +17,7 @@ object Ether {
     private val assetFolder = root.resolve("assets")
     private val versionFile = root.resolve("version.txt")
 
-    init {
-        sync()
-    }
+    init { sync() }
 
     fun sync(scope: CoroutineScope = Stella.scope) = scope.launch {
         if (!Files.exists(assetFolder)) Files.createDirectories(assetFolder)

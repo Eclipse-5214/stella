@@ -10,9 +10,11 @@ import co.stellarskys.stella.api.nvg.NVGRenderer
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
@@ -23,8 +25,11 @@ object ButtonManager {
     private val buttons = mutableListOf<StellaButton>()
     private val buttonFile: File get() = File("config/Stella/buttons.json")
 
-    val width = OmniResolution.scaledWidth.toFloat()
-    val height = OmniResolution.scaledHeight.toFloat()
+    val width get()  = OmniResolution.scaledWidth.toFloat()
+    val height get() = OmniResolution.scaledHeight.toFloat()
+
+    var invX = 0; var invY = 0
+    var invW = 0; var invH = 0
 
     init {
         load()
@@ -53,14 +58,25 @@ object ButtonManager {
         buttons.clear()
     }
 
-    fun renderAll(context: GuiGraphics, invX: Int = 0, invY: Int = 0, width: Float = this.width, height: Float = this.height) {
-        buttons.forEach { renderButton(context,it, invX, invY); renderButtonBackgroud(context,it, invX, invY) }
+    fun renderAll(context: GuiGraphics, invX: Int = 0, invY: Int = 0, invW: Int = 176, invH: Int = 166, width: Float = this.width, height: Float = this.height) {
+        val currentScreen = client.screen ?: return
+        val isPlayerInv = currentScreen is InventoryScreen
+
+        this.invX = invX; this.invY = invY
+        this.invW = invW; this.invH = invH
+
+        buttons.forEach { button ->
+            if (!isPlayerInv && button.invOnly) return@forEach
+            val pos = resolveAnchorPosition(button.anchor, button.index, invX, invY, invW, invH)
+            renderButton(context, button, pos)
+            renderButtonBackgroud(context, button, pos)
+        }
     }
 
-    private fun renderButton(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int) {
+    private fun renderButton(context: GuiGraphics, button: StellaButton, pos: Pair<Int, Int>) {
         if (button.iconId == "NONE") return
         val stack = getItem(button.iconId)
-        val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
+        val (x, y) = pos
 
         val offsetX = (20f - 16f) / 2f
         val offsetY = (20f - 16f) / 2f
@@ -68,9 +84,9 @@ object ButtonManager {
         Render2D.renderItem(context, stack, x.toFloat() + offsetX, y.toFloat() + offsetY, 1f)
     }
 
-    private fun renderButtonBackgroud(context: GuiGraphics, button: StellaButton, invX: Int, invY: Int){
+    private fun renderButtonBackgroud(context: GuiGraphics, button: StellaButton, pos: Pair<Int, Int>){
         if(!button.background) return
-        val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
+        val (x, y) = pos
         context.drawNVG {
             NVGRenderer.hollowRect(
                 x.toFloat(),
@@ -85,12 +101,10 @@ object ButtonManager {
     }
 
     fun handleMouseClicked(gui: Screen, mouseX: Int, mouseY: Int): Boolean {
-        val invX = (gui.width - 176) / 2
-        val invY = (gui.height - 166) / 2
         val slotSize = 20
 
         for (button in buttons) {
-            val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY)
+            val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY, invW, invH)
 
             if (mouseX in x..(x + slotSize) && mouseY in y..(y + slotSize)) {
                 var command = button.command.trim()
@@ -107,7 +121,7 @@ object ButtonManager {
         return false
     }
 
-    fun resolveAnchorPosition(anchor: AnchorType, index: Int, invX: Int, invY: Int): Pair<Int, Int> {
+    fun resolveAnchorPosition(anchor: AnchorType, index: Int, invX: Int, invY: Int, invW: Int = 176, invH: Int = 166): Pair<Int, Int> {
         val screenWidth = OmniResolution.scaledWidth
         val screenHeight = OmniResolution.scaledHeight
 
@@ -146,13 +160,13 @@ object ButtonManager {
                 invX + 6 + (index * spacing) to invY - slotSize - 5
 
             AnchorType.INVENTORY_BOTTOM ->
-                invX + 6 + (index * spacing) to invY + 170
+                invX + 6 + (index * spacing) to invY + invH + 5
 
             AnchorType.INVENTORY_LEFT ->
                 invX - slotSize - 5 to invY + 12 + (index * spacing)
 
             AnchorType.INVENTORY_RIGHT ->
-                invX + 176 + 5 to invY + 12 + (index * spacing)
+                invX + invW + 5 to invY + 12 + (index * spacing)
 
             // Player model corners (explicit anchors are cleaner)
             AnchorType.PLAYER_MODEL_TOP_LEFT ->
