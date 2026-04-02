@@ -1,6 +1,7 @@
 package co.stellarskys.stella.events.compat
 
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.TickEvent
 import dev.deftu.omnicore.api.eventBus
@@ -16,10 +17,12 @@ object OmniCore {
     init {
         eventBus.on<ServerTickEvent.Pre> {
             EventBus.post(TickEvent.Server())
+            Chronos.Server.pulse()
         }
 
         eventBus.on<ClientTickEvent.Pre> {
             EventBus.post(TickEvent.Client())
+            Chronos.Tick.pulse()
         }
     }
 }

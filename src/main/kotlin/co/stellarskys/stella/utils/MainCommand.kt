@@ -5,6 +5,7 @@ import co.stellarskys.stella.annotations.Command
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.score.DungeonScore
 import co.stellarskys.stella.api.handlers.Atlas
+import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.features.dungeons.JoinInfo
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
@@ -12,14 +13,13 @@ import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
 import dev.deftu.omnicore.api.client.client
 import dev.deftu.omnicore.api.client.player
-import dev.deftu.omnicore.api.scheduling.TickSchedulers
 
 @Command
 object MainCommand : Atlas("stella", "sta", "sa") {
     init {
         literal("hud") {
             runs {
-                TickSchedulers.client.post {
+                Chronos.Tick post {
                     client.setScreen(HUDEditor())
                 }
             }
@@ -27,7 +27,7 @@ object MainCommand : Atlas("stella", "sta", "sa") {
 
         literal("buttons") {
             runs {
-                TickSchedulers.client.post {
+                Chronos.Tick post {
                     client.setScreen(ButtonLayoutEditor())
                 }
             }

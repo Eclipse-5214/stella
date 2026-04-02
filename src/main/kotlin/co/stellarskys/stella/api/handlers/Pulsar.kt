@@ -7,7 +7,6 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ServerEvent
 import co.stellarskys.stella.managers.FeatureManager
 import co.stellarskys.stella.utils.config
-import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import dev.deftu.textile.Text
 
 @Module
@@ -31,7 +30,7 @@ object Pulsar {
             }
 
             if (FirstInstall) {
-                TickSchedulers.client.after(20*1) {
+                Chronos.Tick.after(20 * 1) run {
                     Signal.fakeMessage(
                                 "§b§l---------------------------------------------\n" +
                                 "   §r§6Thank you for installing §d§lStella§r§3!\n" +

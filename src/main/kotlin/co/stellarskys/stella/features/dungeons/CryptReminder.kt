@@ -8,27 +8,26 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.score.DungeonScore
+import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.events.core.LocationEvent
-import dev.deftu.omnicore.api.scheduling.TickScheduler
-import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import net.minecraft.sounds.SoundEvents
 import tech.thatgravyboat.skyblockapi.api.location.*
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+import kotlin.time.Duration.Companion.minutes
 
 @Module
 object CryptReminder: Feature("cryptReminder", island = SkyBlockIsland.THE_CATACOMBS) {
-    private var reminderHandle: TickScheduler.Handle? = null
+    private val delay by config.property<Int>("cryptReminder.delay")
+    private val party by config.property<Boolean>("cryptReminder.sendParty")
 
-    val delay by config.property<Int>("cryptReminder.delay")
-    var party by config.property<Boolean>("cryptReminder.sendParty")
+    private var reminderHandle: Chronos.Task? = null
+    private val crypts get() = DungeonScore.data.crypts
 
     override fun initialize() {
         on<ChatEvent.Receive> { event ->
             if (event.message.stripped != "[NPC] Mort: Good luck.") return@on
             reminderHandle?.cancel()
-            reminderHandle = TickSchedulers.client.after(60 * 20 * delay) {
-                val crypts = DungeonScore.data.crypts
-                if (crypts >= 5 || LocationAPI.island != SkyBlockIsland.THE_CATACOMBS || Dungeon.inBoss) return@after
+            reminderHandle = Chronos.Async after delay.minutes given { crypts < 5 && LocationAPI.island == SkyBlockIsland.THE_CATACOMBS && !Dungeon.inBoss } run {
                 Utils.alert("§dCrypts: §c$crypts§7/§c5", SoundEvents.NOTE_BLOCK_PLING.value())
                 if (party) Signal.sendCommand("pc $crypts/5 crypts")
             }

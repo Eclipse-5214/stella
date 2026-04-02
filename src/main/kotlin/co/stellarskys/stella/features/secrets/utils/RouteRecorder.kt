@@ -14,9 +14,9 @@ import co.stellarskys.stella.utils.Utils.calcDistanceSq
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.map.Room
+import co.stellarskys.stella.api.handlers.Chronos
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.world
-import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundEvents
@@ -95,7 +95,7 @@ object RouteRecorder {
             if (sound in setOf(SoundEvents.ARROW_SHOOT, SoundEvents.ENDERMAN_TELEPORT) ) {
                 if (!healdItem.contains("Ender Pearl")) return@on
                 val land = sound == SoundEvents.ENDERMAN_TELEPORT
-                TickSchedulers.client.post {
+                Chronos.Tick post {
                     var pos = player?.onPos ?: BlockPos((pos.x - 0.5).toInt(), (pos.y - 1).toInt(), (pos.z - 0.5).toInt())
                     if (land) pos = player?.onPos?.below(1) ?: pos
                     addWaypoint(WaypointType.PEARL, pos)

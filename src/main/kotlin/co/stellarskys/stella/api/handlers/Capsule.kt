@@ -12,13 +12,13 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
-import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import net.fabricmc.loader.api.FabricLoader
 import java.awt.Color
 import java.io.File
 import java.lang.reflect.Type
 import java.math.BigDecimal
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Duration.Companion.seconds
 
 class Capsule<T: Any>(fileName: String, private val defaultObject: T, private val typeToken: TypeToken<T>? = null) {
     constructor(fileName: String, defaultObject: T) : this(fileName, defaultObject, null)
@@ -117,7 +117,7 @@ class Capsule<T: Any>(fileName: String, private val defaultObject: T, private va
     private fun startAutosaveLoop() {
         if (loopStarted) return
         loopStarted = true
-        TickSchedulers.client.every(10000) {
+        Chronos.Async every 500.seconds run {
             autosaveIntervals.forEach { (dataUtils, interval) ->
                 if (dataUtils.lastSavedTime.since.millis < interval) return@forEach
                 try {

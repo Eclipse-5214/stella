@@ -9,8 +9,8 @@ import co.stellarskys.stella.api.handlers.Signal.onHover
 import co.stellarskys.stella.api.dungeons.map.MapScanner
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
+import co.stellarskys.stella.api.handlers.Chronos
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import dev.deftu.omnicore.api.scheduling.TickSchedulers
 import dev.deftu.textile.Text
 
 @Module
@@ -18,7 +18,7 @@ object DungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE
 
     override fun initialize() {
         on<DungeonEvent.End> {
-            TickSchedulers.client.after(3 * 20) {
+            Chronos.Tick.after(3 * 20) run {
                 Signal.fakeMessage(Stella.PREFIX + " §bCleared room counts:")
                 DungeonPlayerManager.players.forEach { player ->
                     if (player == null) return@forEach
