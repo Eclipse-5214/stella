@@ -1,11 +1,11 @@
 package co.stellarskys.stella.features.msc
 
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.features.Feature
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.player
 import net.minecraft.client.player.AbstractClientPlayer
 import net.minecraft.client.renderer.ItemInHandRenderer
 import net.minecraft.client.renderer.SubmitNodeCollector

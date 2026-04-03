@@ -7,7 +7,7 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ServerEvent
 import co.stellarskys.stella.managers.FeatureManager
 import co.stellarskys.stella.utils.config
-import dev.deftu.textile.Text
+import net.minecraft.network.chat.Component
 
 @Module
 object Pulsar {
@@ -22,7 +22,7 @@ object Pulsar {
         EventBus.on<ServerEvent.Connect> {
             if(!shown) {
                 val showMessage = config["loadMessage"] as Boolean
-                val loadMessage = Text
+                val loadMessage = Component
                     .literal("${Stella.PREFIX} §bMod loaded.")
                     .onHover("§b${FeatureManager.moduleCount} §dmodules §8- §b${FeatureManager.loadTime}§dms §8- §b${FeatureManager.commandCount} §dcommands")
                 if (showMessage) Signal.fakeMessage(loadMessage)

@@ -1,8 +1,8 @@
 package co.stellarskys.stella.features.stellanav.render
 
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.player
-import dev.deftu.omnicore.api.client.world
+import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.api.zenith.player
+import co.stellarskys.stella.api.zenith.world
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.state.MapRenderState
 import net.minecraft.core.component.DataComponents

@@ -5,9 +5,9 @@ import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonManager
 import co.stellarskys.stella.api.handlers.Chronos
+import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.utils.config
-import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped

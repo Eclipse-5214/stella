@@ -7,8 +7,8 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.Utils.toHex
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.handlers.Chronos
+import co.stellarskys.stella.api.zenith.client
 import com.google.gson.*
-import dev.deftu.omnicore.api.client.client
 import java.awt.Color
 import java.io.File
 import kotlin.reflect.KProperty

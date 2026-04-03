@@ -1,7 +1,7 @@
 package co.stellarskys.stella.api.orbit
 
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.world
+import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.api.zenith.world
 import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.GameType

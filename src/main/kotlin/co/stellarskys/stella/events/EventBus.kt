@@ -5,6 +5,8 @@ import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.api.events.Event
 import co.stellarskys.stella.api.events.EventBus
 import co.stellarskys.stella.api.events.EventHandle
+import co.stellarskys.stella.api.handlers.Chronos
+import co.stellarskys.stella.api.zenith.*
 import co.stellarskys.stella.events.core.*
 import co.stellarskys.stella.managers.EventBusManager
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
@@ -20,7 +22,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.resources.ResourceLocation
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
-import dev.deftu.omnicore.api.client.*
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.network.protocol.Packet
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
@@ -31,6 +34,16 @@ object EventBus : EventBus() {
     private val STELLA_HUDS = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stella_hud")
 
     init {
+        ClientTickEvents.START_CLIENT_TICK.register {
+            post(TickEvent.Client())
+            Chronos.Tick.pulse()
+        }
+
+        ServerTickEvents.START_SERVER_TICK.register {
+            post(TickEvent.Server())
+            Chronos.Server.pulse()
+        }
+
         ClientReceiveMessageEvents.ALLOW_GAME.register { message, isActionBar ->
             !post(ChatEvent.Receive(message, isActionBar))
         }

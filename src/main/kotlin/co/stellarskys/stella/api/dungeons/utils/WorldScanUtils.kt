@@ -1,7 +1,7 @@
 package co.stellarskys.stella.api.dungeons.utils
 
 import co.stellarskys.stella.api.orbit.Orbit
-import dev.deftu.omnicore.api.client.world
+import co.stellarskys.stella.api.zenith.world
 import net.minecraft.core.BlockPos
 
 object WorldScanUtils {

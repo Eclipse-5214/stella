@@ -5,7 +5,8 @@ import co.stellarskys.stella.api.nvg.Color.Companion.alpha
 import co.stellarskys.stella.api.nvg.Color.Companion.red
 import co.stellarskys.stella.api.nvg.Color.Companion.green
 import co.stellarskys.stella.api.nvg.Color.Companion.blue
-import dev.deftu.omnicore.api.client.client
+import co.stellarskys.stella.api.zenith.Zenith
+import co.stellarskys.stella.api.zenith.resourceManager
 import net.minecraft.resources.ResourceLocation
 import org.joml.Matrix3x2f
 import org.lwjgl.nanovg.NVGColor
@@ -41,7 +42,7 @@ object NVGRenderer {
     private var drawing: Boolean = false
     private var vg = -1L
 
-    val inter = Font("Default", client.resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/montserrat.ttf")).get().open())
+    val inter = Font("Default", resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/montserrat.ttf")).get().open())
     var dpr = devicePixelRatio()
 
     init {
@@ -51,7 +52,7 @@ object NVGRenderer {
 
     fun devicePixelRatio(): Float {
         return try {
-            val window = client.window
+            val window = Zenith.window
             val fbw = window.width
             val ww = window.screenWidth
             if (ww == 0) 1f else fbw.toFloat() / ww.toFloat()

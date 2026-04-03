@@ -1,15 +1,11 @@
 package co.stellarskys.stella.api.handlers
 
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.player
-import dev.deftu.textile.MutableText
-import dev.deftu.textile.Text
-import dev.deftu.textile.minecraft.HoverEvent
-import dev.deftu.textile.minecraft.MCText
-import dev.deftu.textile.minecraft.MCTextStyle
-import dev.deftu.textile.minecraft.TextColor
-import dev.deftu.textile.minecraft.TextColors
+import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.api.zenith.player
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.HoverEvent
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.TextColor
 import kotlin.math.roundToInt
 
 object Signal {
@@ -26,18 +22,13 @@ object Signal {
     }
 
     @JvmStatic
-    fun fakeMessage(message: Text) {
-        client.gui?.chat?.addMessage(MCText.convert(message))
-    }
-
-    @JvmStatic
     fun fakeMessage(message: Component) {
         client.gui?.chat?.addMessage(message)
     }
 
     @JvmStatic
     fun fakeMessage(message: String) {
-        fakeMessage(Text.literal(message))
+        fakeMessage(Component.literal(message))
     }
 
     @JvmStatic
@@ -65,23 +56,23 @@ object Signal {
         return " ".repeat(padding) + text
     }
 
-    fun MutableText.onHover(text: Text): MutableText {
-        this.setStyle(MCTextStyle(hoverEvent = HoverEvent.ShowText(text)))
+    fun MutableComponent.onHover(text: Component): MutableComponent {
+        this.withStyle{ it.withHoverEvent(HoverEvent.ShowText(text)) }
         return this
     }
 
-    fun MutableText.onHover(text: String): MutableText {
-        this.setStyle(MCTextStyle(hoverEvent = HoverEvent.ShowText(Text.literal(text))))
+    fun MutableComponent.onHover(text: String): MutableComponent {
+        this.withStyle{ it.withHoverEvent(HoverEvent.ShowText(Component.literal(text))) }
         return this
     }
 
-    fun MutableText.color(rgba: Int): MutableText {
-        this.setStyle(MCTextStyle.color(TextColor(rgba)))
+    fun MutableComponent.color(rgba: Int): MutableComponent {
+        this.withStyle{ it.withColor(rgba) }
         return this
     }
 
-    fun MutableText.color(textColor: TextColor): MutableText {
-        this.setStyle(MCTextStyle.color(textColor))
+    fun MutableComponent.color(textColor: TextColor): MutableComponent {
+        this.withStyle{ it.withColor(textColor) }
         return this
     }
 }

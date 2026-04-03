@@ -4,8 +4,8 @@ import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.nvg.NVGPIPRenderer
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.render.OmniResolution
+import co.stellarskys.stella.api.zenith.Zenith
+import co.stellarskys.stella.api.zenith.client
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.PlayerFaceRenderer
@@ -119,7 +119,7 @@ object Render2D {
 
         NVGPIPRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
             val n = NVGRenderer
-            val sf = OmniResolution.scaleFactor.toFloat() / n.dpr
+            val sf = Zenith.Res.scaleFactor.toFloat() / n.dpr
 
             if (scaled) {
                 n.resetTransform()

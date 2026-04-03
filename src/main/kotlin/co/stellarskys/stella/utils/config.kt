@@ -1,11 +1,11 @@
 package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.api.config.core.Config
+import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.features.secrets.utils.RouteRegistry
 import co.stellarskys.stella.hud.HUDEditor
-import dev.deftu.omnicore.api.client.client
 import java.awt.Color
 import java.net.URI
 

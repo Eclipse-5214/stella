@@ -6,9 +6,9 @@ import co.stellarskys.stella.events.core.TickEvent
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.map.MapScanner
 import co.stellarskys.stella.api.dungeons.utils.ScanUtils.roomDoorCombinedSize
+import co.stellarskys.stella.api.zenith.player
+import co.stellarskys.stella.api.zenith.world
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import dev.deftu.omnicore.api.client.player
-import dev.deftu.omnicore.api.client.world
 import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket
 import net.minecraft.world.item.MapItem
 import net.minecraft.world.level.saveddata.maps.MapDecoration

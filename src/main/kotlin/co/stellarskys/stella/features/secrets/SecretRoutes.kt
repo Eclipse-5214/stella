@@ -17,7 +17,7 @@ import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.api.config.core.Keybind
 import co.stellarskys.stella.api.dungeons.map.Room
 import co.stellarskys.stella.api.dungeons.utils.Checkmark
-import dev.deftu.omnicore.api.client.world
+import co.stellarskys.stella.api.zenith.world
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import java.awt.Color
 

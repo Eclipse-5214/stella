@@ -3,14 +3,13 @@ package co.stellarskys.stella.api.config.ui.base
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.nvg.Font
 import co.stellarskys.stella.api.nvg.NVGRenderer
-import dev.deftu.omnicore.api.client.input.OmniMouse
-import dev.deftu.omnicore.api.client.render.OmniResolution
+import co.stellarskys.stella.api.zenith.Zenith
 import net.minecraft.client.gui.GuiGraphics
 
 abstract class BaseElement {
     val nvg get() = NVGRenderer
-    val rez get() = OmniResolution
-    val mouse = OmniMouse
+    val rez get() = Zenith.Res
+    val mouse = Zenith.Mouse
 
     var x = 0f
     var y = 0f

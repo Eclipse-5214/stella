@@ -8,8 +8,8 @@ import co.stellarskys.stella.api.dungeons.map.*
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.api.dungeons.score.*
 import co.stellarskys.stella.api.dungeons.utils.*
-import dev.deftu.omnicore.api.client.player
-import dev.deftu.omnicore.api.client.world
+import co.stellarskys.stella.api.zenith.player
+import co.stellarskys.stella.api.zenith.world
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
 import net.minecraft.world.entity.ambient.Bat
@@ -22,7 +22,6 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.platform.properties
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
-import kotlin.text.get
 
 /**
  * Central dungeon state manager.

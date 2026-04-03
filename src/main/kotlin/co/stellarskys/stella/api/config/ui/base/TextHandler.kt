@@ -3,7 +3,7 @@ package co.stellarskys.stella.api.config.ui.base
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.nvg.Font
-import dev.deftu.omnicore.api.client.client
+import co.stellarskys.stella.api.zenith.client
 import net.minecraft.client.gui.GuiGraphics
 
 /*

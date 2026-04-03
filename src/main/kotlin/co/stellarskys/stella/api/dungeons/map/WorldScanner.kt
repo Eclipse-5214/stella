@@ -12,10 +12,10 @@ import co.stellarskys.stella.api.dungeons.Dungeon.rooms
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.api.dungeons.utils.RoomType
+import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.api.zenith.player
+import co.stellarskys.stella.api.zenith.world
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.player
-import dev.deftu.omnicore.api.client.world
 import java.util.UUID
 
 /*

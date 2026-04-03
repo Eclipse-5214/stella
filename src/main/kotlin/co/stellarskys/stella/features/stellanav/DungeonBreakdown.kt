@@ -10,8 +10,8 @@ import co.stellarskys.stella.api.dungeons.map.MapScanner
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.api.handlers.Chronos
+import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import dev.deftu.textile.Text
 
 @Module
 object DungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -29,7 +29,7 @@ object DungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE
                     val deaths = player.deaths
                     val roomLore = buildRoomLore(player)
 
-                    val mesage = Text.literal("§d| §b$name §fcleared §b$minmax §frooms | §b$secrets §fsecrets | §b$deaths §fdeaths").onHover(roomLore)
+                    val mesage = Component.literal("§d| §b$name §fcleared §b$minmax §frooms | §b$secrets §fsecrets | §b$deaths §fdeaths").onHover(roomLore)
                     Signal.fakeMessage(mesage)
                 }
             }

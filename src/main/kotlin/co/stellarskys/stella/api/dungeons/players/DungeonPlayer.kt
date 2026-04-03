@@ -1,11 +1,10 @@
 package co.stellarskys.stella.api.dungeons.players
 
 import co.stellarskys.stella.api.hypixel.HypixelApi
-import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.dungeons.map.MapScanner.RoomClearInfo
 import co.stellarskys.stella.api.dungeons.map.Room
 import co.stellarskys.stella.api.dungeons.utils.DungeonClass
-import dev.deftu.omnicore.api.client.world
+import co.stellarskys.stella.api.zenith.world
 import net.minecraft.world.entity.player.Player
 import java.util.*
 

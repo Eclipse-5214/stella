@@ -18,8 +18,6 @@ repositories {
     strictMaven("https://repo.hypixel.net/repository/Hypixel", "net.hypixel")
     strictMaven("https://api.modrinth.com/maven", "maven.modrinth")
     strictMaven("https://maven.teamresourceful.com/repository/maven-public/", "tech.thatgravyboat", "com.terraformersmc", "me.owdding")
-    strictMaven("https://maven.deftu.dev/snapshots", "dev.deftu")
-    strictMaven("https://maven.deftu.dev/releases", "dev.deftu")
 }
 
 dependencies {
@@ -33,9 +31,6 @@ dependencies {
     modImplementation(libs.fabric.language.kotlin)
     modImplementation(libs.hypixel.modapi)
     modImplementation(libs.hypixel.modapi.fabric)
-
-    shadow("omnicore".mc(mc))
-    shadow("textile".mc(mc))
 
     modImplementation(libs.skyblock.api) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc") }

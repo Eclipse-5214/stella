@@ -4,9 +4,9 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.features.stellanav.Map
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
+import co.stellarskys.stella.api.zenith.player
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import dev.deftu.omnicore.api.client.player
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.renderer.RenderPipelines

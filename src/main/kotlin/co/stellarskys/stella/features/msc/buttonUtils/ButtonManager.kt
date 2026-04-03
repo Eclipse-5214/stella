@@ -7,11 +7,11 @@ import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.api.nvg.NVGRenderer
+import co.stellarskys.stella.api.zenith.Zenith
+import co.stellarskys.stella.api.zenith.client
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.render.OmniResolution
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
@@ -25,8 +25,8 @@ object ButtonManager {
     private val buttons = mutableListOf<StellaButton>()
     private val buttonFile: File get() = File("config/Stella/buttons.json")
 
-    val width get()  = OmniResolution.scaledWidth.toFloat()
-    val height get() = OmniResolution.scaledHeight.toFloat()
+    val width get()  = Zenith.Res.scaledWidth.toFloat()
+    val height get() = Zenith.Res.scaledHeight.toFloat()
 
     var invX = 0; var invY = 0
     var invW = 0; var invH = 0
@@ -122,8 +122,8 @@ object ButtonManager {
     }
 
     fun resolveAnchorPosition(anchor: AnchorType, index: Int, invX: Int, invY: Int, invW: Int = 176, invH: Int = 166): Pair<Int, Int> {
-        val screenWidth = OmniResolution.scaledWidth
-        val screenHeight = OmniResolution.scaledHeight
+        val screenWidth = Zenith.Res.scaledWidth
+        val screenHeight = Zenith.Res.scaledHeight
 
         val spacing = 24
         val slotSize = 20

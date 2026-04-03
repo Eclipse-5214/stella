@@ -11,8 +11,6 @@ fabric-api-1-21-10 = "0.138.4+1.21.10"
 fabric-api-1-21-11 = "0.141.3+1.21.11"
 
 skyblock-api = "4.1.3"
-omnicore = "1.0.0-beta.40"
-textile = "1.0.0-beta.10"
 lwjgl = "3.3.3"
 
 hypixel-modapi = "1.0.1"
@@ -26,12 +24,6 @@ devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth"
 
 fabric-api-1-21-10 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-1-21-10" }
 fabric-api-1-21-11 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-1-21-11" }
-
-omnicore-1-21-10 = { module = "dev.deftu:omnicore-1.21.10-fabric", version.ref = "omnicore" }
-omnicore-1-21-11 = { module = "dev.deftu:omnicore-1.21.11-fabric", version.ref = "omnicore" }
-
-textile-1-21-10 = { module = "dev.deftu:textile-1.21.10-fabric", version.ref = "textile" }
-textile-1-21-11 = { module = "dev.deftu:textile-1.21.11-fabric", version.ref = "textile" }
 
 skyblock-api = { module = "tech.thatgravyboat:skyblock-api", version.ref = "skyblock-api" }
 

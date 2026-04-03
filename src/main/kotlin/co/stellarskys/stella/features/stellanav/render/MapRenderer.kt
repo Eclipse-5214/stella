@@ -5,7 +5,7 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayer
-import dev.deftu.omnicore.api.client.player
+import co.stellarskys.stella.api.zenith.player
 import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.scale

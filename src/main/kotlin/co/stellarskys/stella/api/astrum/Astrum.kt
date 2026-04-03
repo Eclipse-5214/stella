@@ -1,11 +1,11 @@
 package co.stellarskys.stella.api.astrum
 
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.RenderEvent
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
-import dev.deftu.omnicore.api.client.client
 import net.minecraft.client.Camera
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.MultiBufferSource

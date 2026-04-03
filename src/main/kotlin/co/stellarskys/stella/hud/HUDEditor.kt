@@ -1,21 +1,15 @@
 package co.stellarskys.stella.hud
 
+import co.stellarskys.stella.api.zenith.Aperture
+import co.stellarskys.stella.api.zenith.Zenith.Keys
 import net.minecraft.client.gui.GuiGraphics
 import co.stellarskys.stella.hud.HUDManager.customRenderers
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.height
 import co.stellarskys.stella.utils.render.Render2D.width
-import dev.deftu.omnicore.api.client.input.KeyboardModifiers
-import dev.deftu.omnicore.api.client.input.OmniKey
-import dev.deftu.omnicore.api.client.input.OmniKeys
-import dev.deftu.omnicore.api.client.input.OmniMouseButton
-import dev.deftu.omnicore.api.client.render.OmniRenderingContext
-import dev.deftu.omnicore.api.client.screen.KeyPressEvent
-import dev.deftu.omnicore.api.client.screen.OmniScreen
-import dev.deftu.textile.Text
 import java.awt.Color
 
-class HUDEditor : OmniScreen(Text.literal("HUD Editor")) {
+class HUDEditor : Aperture("HUD Editor") {
     private val borderHoverColor = Color(255, 255, 255).rgb
     private val borderNormalColor = Color(100, 100, 120).rgb
 
@@ -44,8 +38,7 @@ class HUDEditor : OmniScreen(Text.literal("HUD Editor")) {
         HUDManager.saveAllLayouts()
     }
 
-    override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
-        val context = ctx.graphics ?: return
+    override fun onRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) {
         context.fill(0, 0, width, height, 0x90000000.toInt())
 
         snapLines.forEach { line ->
@@ -92,7 +85,7 @@ class HUDEditor : OmniScreen(Text.literal("HUD Editor")) {
         Render2D.drawString(context, "Press S to enable Snapping.", 10, 20)
     }
 
-    override fun onMouseDrag(button: OmniMouseButton, x: Double, y: Double, deltaX: Double, deltaY: Double, clickTime: Long, modifiers: KeyboardModifiers): Boolean {
+    override fun onMouseDrag(button: Int, x: Double, y: Double, deltaX: Double, deltaY: Double, clickTime: Long, modifiers: Int): Boolean {
         dragging?.let { element ->
             snapLines.clear()
 
@@ -131,7 +124,7 @@ class HUDEditor : OmniScreen(Text.literal("HUD Editor")) {
         return super.onMouseDrag(button, x, y, deltaX, deltaY, clickTime, modifiers)
     }
 
-    override fun onMouseRelease(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
+    override fun onMouseRelease(button: Int, x: Double, y: Double, modifiers: Int): Boolean {
         dragging = null
         snapLines.clear()
         return super.onMouseRelease(button, x, y, modifiers)
@@ -148,16 +141,16 @@ class HUDEditor : OmniScreen(Text.literal("HUD Editor")) {
         return super.onMouseScroll(x, y, amount, horizontalAmount)
     }
 
-    override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
+    override fun onMouseClick(button: Int, x: Double, y: Double, modifiers: Int): Boolean {
         dragging = HUDManager.elements.values.firstOrNull { it.isEnabled() && it.isHovered(x.toFloat(), y.toFloat()) }?.also {
             offsetX = x.toFloat() - it.x; offsetY = y.toFloat() - it.y
         }
         return super.onMouseClick(button, x, y, modifiers)
     }
 
-    override fun onKeyPress(key: OmniKey, scanCode: Int, typedChar: Char, modifiers: KeyboardModifiers, event: KeyPressEvent): Boolean {
-        if (key == OmniKeys.KEY_S) snappingEnabled = !snappingEnabled.also { snapLines.clear() }
-        return super.onKeyPress(key, scanCode, typedChar, modifiers, event)
+    override fun onKeyPress(key: Int, scanCode: Int, modifiers: Int): Boolean {
+        if (key == Keys.S) snappingEnabled = !snappingEnabled.also { snapLines.clear() }
+        return super.onKeyPress(key, scanCode, modifiers)
     }
     override val isPausingScreen: Boolean = false
 

@@ -11,7 +11,7 @@ import co.stellarskys.stella.api.hypixel.HypixelApi
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.features.Feature
-import dev.deftu.textile.Text
+import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
@@ -47,7 +47,7 @@ object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
             val normal = dungeonTypes.catacombs
             val master = dungeonTypes.mastermode
 
-            Text.literal("§b§l${Signal.LINE}\n§dCatacomb stats for§8: §b$name\n\n")
+            Component.literal("§b§l${Signal.LINE}\n§dCatacomb stats for§8: §b$name\n\n")
                 .append(buildCataLine(this))
                 .append(buildFloorTimes(normal, master))
                 .append(buildArmor(player))
@@ -57,25 +57,25 @@ object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
         }
     }
 
-    private fun buildCataLine(data: SkyblockResponse.DungeonsData) = Text.empty().apply {
+    private fun buildCataLine(data: SkyblockResponse.DungeonsData) = Component.empty().apply {
         with(data) {
             val cata = Dungeon.calculateDungeonLevel(dungeonTypes.catacombs.experience)
             val classLevels = mutableListOf<Double>()
-            val cataHover = Text.literal("§bClasses\n").apply {
+            val cataHover = Component.literal("§bClasses\n").apply {
                 DungeonClass.entries.filter { it !in setOf(DungeonClass.DEAD, DungeonClass.UNKNOWN) }.forEach {
                     val exp = data.classes[it.name.lowercase()]?.experience ?: 0.0
-                    append(Text.literal(it.displayName).color(it.color?.rgb ?: -1))
+                    append(Component.literal(it.displayName).color(it.color?.rgb ?: -1))
                     append("§8: §b${Dungeon.calculateDungeonLevel(exp).fmt()}\n")
                 }
                 append("§dAverage§8: §b${"%.1f".format(classLevels.average())}")
             }
-            append(Text.literal("§6Cata ${"%.1f".format(cata)}").onHover(cataHover))
+            append(Component.literal("§6Cata ${"%.1f".format(cata)}").onHover(cataHover))
             append(" §8| §e$secrets Secrets §8(§b${"%.1f".format(averageSecrets)}§8)\n")
         }
     }
 
     private fun buildFloorHover(dungeonType: SkyblockResponse.DungeonTypeData, title: String, floorPrefix: String) =
-        Text.literal(title).apply {
+        Component.literal(title).apply {
             (1..7).forEach { floor ->
                 val time = dungeonType.fastestSPlus["$floor"]?.toLong()?.toMMSS() ?: "§7None"
                 val comps = dungeonType.tierComps["$floor"] ?: "0"
@@ -84,23 +84,23 @@ object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
         }
 
     private fun buildFloorTimes(normal: SkyblockResponse.DungeonTypeData, master: SkyblockResponse.DungeonTypeData) =
-        Text.literal("§dFloor times§8: ")
-            .append(Text.literal("§bNormal").onHover(buildFloorHover(normal, "§bNormal Floors", "§3F")))
+        Component.literal("§dFloor times§8: ")
+            .append(Component.literal("§bNormal").onHover(buildFloorHover(normal, "§bNormal Floors", "§3F")))
             .append(" §8| ")
-            .append(Text.literal("§cMaster").onHover(buildFloorHover(master, "§cMaster Floors", "§cM")))
+            .append(Component.literal("§cMaster").onHover(buildFloorHover(master, "§cMaster Floors", "§cM")))
             .append("\n")
 
     private fun getArmor(person: SkyblockResponse.SkyblockMember) =
         person.inventory.invArmor.itemStacks.take(4).reversed().filterNotNull()
 
-    private fun buildArmor(person: SkyblockResponse.SkyblockMember) = Text.literal("\n").apply {
+    private fun buildArmor(person: SkyblockResponse.SkyblockMember) = Component.literal("\n").apply {
         for (piece in getArmor(person)) {
-            val hover = Text.literal(piece.name + "\n" + piece.lore.joinToString("\n"))
-            append(Text.literal(piece.name).onHover(hover)).append("\n")
+            val hover = Component.literal(piece.name + "\n" + piece.lore.joinToString("\n"))
+            append(Component.literal(piece.name).onHover(hover)).append("\n")
         }
     }
 
-    private fun buildItemLines(member: SkyblockResponse.SkyblockMember) = Text.literal("\n§dItems§8: ").apply {
+    private fun buildItemLines(member: SkyblockResponse.SkyblockMember) = Component.literal("\n§dItems§8: ").apply {
         val pet = { id: String -> member.petsData.pets.any { it.type.contains(id) }}
 
         append(item(member, "§bHype", "HYPERION", "ASTRAEA", "SCYLLA", "VALKYRIE")).append(" §8| ")
@@ -109,15 +109,15 @@ object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
         append("§5EDrag${pet("ENDER_DRAGON").check()}\n")
     }
 
-    private fun item(member: SkyblockResponse.SkyblockMember, label: String, vararg ids: String): Text {
+    private fun item(member: SkyblockResponse.SkyblockMember, label: String, vararg ids: String): Component {
         val matches = member.allItems.filter { i -> ids.any { i?.id?.contains(it) == true }}.filterNotNull()
-        val hover = Text.empty().apply {
+        val hover = Component.empty().apply {
             matches.forEachIndexed { i, it ->
                 append("${it.name}\n${it.lore.joinToString("\n")}")
                 if (i < matches.size - 1) append("\n\n")
             }
         }
-        return Text.literal("$label${matches.isNotEmpty().check()}").onHover(hover)
+        return Component.literal("$label${matches.isNotEmpty().check()}").onHover(hover)
     }
 
     private fun Boolean.check() = if (this) " §a✓" else " §c✗"

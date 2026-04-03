@@ -15,8 +15,8 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.map.Room
 import co.stellarskys.stella.api.handlers.Chronos
-import dev.deftu.omnicore.api.client.player
-import dev.deftu.omnicore.api.client.world
+import co.stellarskys.stella.api.zenith.player
+import co.stellarskys.stella.api.zenith.world
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundEvents

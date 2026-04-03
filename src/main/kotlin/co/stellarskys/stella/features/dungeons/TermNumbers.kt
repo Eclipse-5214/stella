@@ -7,12 +7,12 @@ import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.api.handlers.Quasar
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render3D
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import dev.deftu.omnicore.api.client.player
 import net.minecraft.core.BlockPos
 import java.awt.Color
 import kotlin.math.roundToInt

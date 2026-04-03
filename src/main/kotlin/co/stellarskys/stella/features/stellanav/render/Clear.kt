@@ -8,7 +8,7 @@ import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.map.Room
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.api.dungeons.utils.*
-import dev.deftu.omnicore.api.client.player
+import co.stellarskys.stella.api.zenith.player
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.resources.ResourceLocation
 import tech.thatgravyboat.skyblockapi.platform.pushPop

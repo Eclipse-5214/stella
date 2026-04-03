@@ -9,19 +9,13 @@ import co.stellarskys.stella.api.config.ui.elements.*
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.api.nvg.Gradient
 import co.stellarskys.stella.api.nvg.NVGRenderer
+import co.stellarskys.stella.api.zenith.*
 import com.mojang.blaze3d.opengl.GlTexture
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.input.*
-import dev.deftu.omnicore.api.client.player
-import dev.deftu.omnicore.api.client.render.OmniRenderingContext
-import dev.deftu.omnicore.api.client.render.OmniResolution
-import dev.deftu.omnicore.api.client.screen.KeyPressEvent
-import dev.deftu.omnicore.api.client.screen.OmniScreen
 import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
-internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config): OmniScreen(dev.deftu.textile.Text.literal("Config")) {
+internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config): Aperture("Config") {
     private val panels =  mutableListOf<Panel>()
     private val subcategoryContainers = mutableMapOf<String, Subcategory>()
     private val subcategoryRefs = mutableMapOf<String, ConfigSubcategory>()
@@ -33,8 +27,8 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private var reveal by revealDelegate
     private var opening = true
     private val nvg get() = NVGRenderer
-    private val rez get() = OmniResolution
-    private val mouse = OmniMouse
+    private val rez get() = Zenith.Res
+    private val mouse = Zenith.Mouse
     private val mx get() = mouse.rawX.toFloat() / UI_SCALE
     private val my get() = mouse.rawY.toFloat() / UI_SCALE
     private var searchQuery = ""
@@ -83,10 +77,9 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         super.onResize(width, height)
     }
 
-    override fun onRender(ctx: OmniRenderingContext, mouseX: Int, mouseY: Int, tickDelta: Float) {
-        super.onRender(ctx, mouseX, mouseY, tickDelta)
+    override fun onRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) {
+        super.onRender(context, mouseX, mouseY, tickDelta)
 
-        val context = ctx.graphics ?: return
         context.drawNVG(false) {
             nvg.push()
             applyOpeningScissor()
@@ -263,7 +256,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     fun drawPlayer(x: Float, y: Float, width: Float, height: Float, radius: Float) {
         val skin = player?.skin?.texture ?: return
         imageCacheMap.getOrPut(skin.path) {
-            val texture = client.textureManager.getTexture(skin)?.texture as? GlTexture
+            val texture = textureManager.getTexture(skin)?.texture as? GlTexture
             nvg.createNVGImage(texture?.glId() ?: 0, 64, 64)
         }.let { id ->
             nvg.image(id, 64, 64, 8, 8, 8, 8, x, y, width, height, radius)
@@ -289,15 +282,15 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     }
 
 
-    override fun onMouseClick(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
-        if (searchHandler.mouseClicked(mx, my, button.code)) return true
+    override fun onMouseClick(button: Int, x: Double, y: Double, modifiers: Int): Boolean {
+        if (searchHandler.mouseClicked(mx, my, button)) return true
 
         if (editHudHovered()) {
             client.setScreen(HUDEditor())
             return true
         }
 
-        for (panel in panels) panel.mouseClicked(mx, my, button.code)
+        for (panel in panels) panel.mouseClicked(mx, my, button)
         return super.onMouseClick(button, x, y, modifiers)
     }
 
@@ -306,41 +299,27 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         return super.onMouseScroll(x, y, amount, horizontalAmount)
     }
 
-    override fun onMouseRelease(button: OmniMouseButton, x: Double, y: Double, modifiers: KeyboardModifiers): Boolean {
-        for (panel in panels) panel.mouseReleased(mx, my, button.code)
+    override fun onMouseRelease(button: Int, x: Double, y: Double, modifiers: Int): Boolean {
+        for (panel in panels) panel.mouseReleased(mx, my, button)
         return super.onMouseRelease(button, x, y, modifiers)
     }
 
-    override fun onKeyPress(
-        key: OmniKey,
-        scanCode: Int,
-        typedChar: Char,
-        modifiers: KeyboardModifiers,
-        event: KeyPressEvent
-    ): Boolean {
-        val modInt = modifiers.toMods()
+    override fun onKeyPress(key: Int, scanCode: Int, modifiers: Int): Boolean {
+        if (searchHandler.isFocused && searchHandler.keyPressed(key, modifiers)) return true
+        if (panels.any { it.keyPressed(key, modifiers) }) return true
+        return super.onKeyPress(key, scanCode, modifiers)
+    }
 
-        if (searchHandler.isFocused) {
-            val handled = when (event) {
-                KeyPressEvent.TYPED -> searchHandler.charTyped(typedChar, modInt)
-                KeyPressEvent.PRESSED -> searchHandler.keyPressed(key.code, modInt)
-            }
-            if (handled) return true
-        }
-
-        val handled = when (event) {
-            KeyPressEvent.TYPED -> panels.any { it.charTyped(typedChar, modInt) }
-            KeyPressEvent.PRESSED -> panels.any { it.keyPressed(key.code, modInt) }
-        }
-
-        if (handled) return true
-        return super.onKeyPress(key, scanCode, typedChar, modifiers, event)
+    override fun onCharTyped(char: Char, modifiers: Int): Boolean {
+        if (searchHandler.isFocused && searchHandler.charTyped(char, modifiers)) return true
+        if (panels.any { it.charTyped(char, modifiers) }) return true
+        return super.onCharTyped(char, modifiers)
     }
 
     companion object {
         val caretImage = NVGRenderer.createImage( "/assets/stella/logos/dropdown.svg")
         val pencilImage = NVGRenderer.createImage( "/assets/stella/logos/editLocations.svg")
-        val UI_SCALE get() = (OmniResolution.windowWidth.toFloat() / 1920f).coerceAtLeast(0.5f)
+        val UI_SCALE get() = (Zenith.Res.windowWidth.toFloat() / 1920f).coerceAtLeast(0.5f)
         lateinit var tooltip: Tooltip
             private set
     }

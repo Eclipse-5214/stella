@@ -2,13 +2,13 @@ package co.stellarskys.stella.features.stellanav
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.api.zenith.textureManager
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.stellanav.render.MapRenderer
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.config
 import com.mojang.blaze3d.platform.NativeImage
-import dev.deftu.omnicore.api.client.client
 import net.fabricmc.loader.api.FabricLoader
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import net.minecraft.client.gui.GuiGraphics
@@ -119,7 +119,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
                 val nativeImage = NativeImage.read(inputStream)
                 val dynamicTexture = DynamicTexture({ "Stella Dynamic: $fileName" }, nativeImage)
                 val loc = ResourceLocation.fromNamespaceAndPath("stella", "stellanav/${fileName.lowercase().replace(".", "_")}")
-                client.textureManager.register(loc, dynamicTexture)
+                textureManager.register(loc, dynamicTexture)
                 TEXTURE_CACHE[fileName] = loc
                 return loc
             }

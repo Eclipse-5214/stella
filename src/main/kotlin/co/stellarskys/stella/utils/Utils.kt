@@ -3,8 +3,8 @@ package co.stellarskys.stella.utils
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.animation.AnimType
 import co.stellarskys.stella.api.animation.Animation
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.player
+import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.api.zenith.player
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FontDescription

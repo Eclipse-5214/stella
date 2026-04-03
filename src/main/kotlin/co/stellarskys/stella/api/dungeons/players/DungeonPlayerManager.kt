@@ -6,8 +6,8 @@ import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.api.dungeons.utils.DungeonClass
+import co.stellarskys.stella.api.zenith.player
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import dev.deftu.omnicore.api.client.player
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 object DungeonPlayerManager {

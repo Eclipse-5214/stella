@@ -1,9 +1,9 @@
 package co.stellarskys.stella.api.handlers
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.api.zenith.client
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import dev.deftu.omnicore.api.client.client
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
