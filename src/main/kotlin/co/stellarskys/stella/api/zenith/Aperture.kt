@@ -35,9 +35,9 @@ abstract class Aperture(title: String = "") : Screen(Component.literal(title)) {
         onInitialize(width, height)
     }
 
-    final override fun resize(mc: Minecraft, width: Int, height: Int) {
+    final override fun resize(/*? if <= 1.21.10 {*/ mc: Minecraft, /*?}*/ width: Int, height: Int) {
         onResize(width, height)
-        super.resize(mc, width, height)
+        super.resize(/*? if <= 1.21.10 {*/ mc, /*?}*/ width, height)
     }
 
     final override fun tick() = onScreenTick()
