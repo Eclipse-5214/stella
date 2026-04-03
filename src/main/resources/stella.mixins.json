@@ -10,9 +10,10 @@
     "client": [
       "MixinFont",
       "MixinClientLevel",
-      "MixinNetworkManager",
-      "MixinInGameHud",
-      "MixinStatusEffectsDisplay",
+      "MixinConnection",
+      "MixinGui",
+      "MixinEffectsInInventory",
+      "MixinClientCommonPacketListenerImpl",
       "MixinLivingEntity",
       "MixinContainer",
       "MixinKeyboardHandler",

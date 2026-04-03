@@ -3,19 +3,17 @@ package co.stellarskys.stella.mixins;
 import co.stellarskys.stella.features.msc.InventoryButtons;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
-import net.minecraft.world.effect.MobEffectInstance;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import java.util.Collection;
 
 /*
  * Modified from Devonian code
  * Under GPL 3.0 License
  */
 @Mixin(EffectsInInventory.class)
-public class MixinStatusEffectsDisplay {
+public class MixinEffectsInInventory {
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
     //?if > 1.21.10 {
     /*private void stella$onDrawEffect(GuiGraphics guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {

@@ -3,6 +3,8 @@ package co.stellarskys.stella
 import co.stellarskys.stella.managers.FeatureManager
 import co.stellarskys.stella.api.animation.DeltaTracker
 import co.stellarskys.stella.api.nvg.NVGPIPRenderer
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.TickEvent
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import org.apache.logging.log4j.LogManager
@@ -24,6 +26,10 @@ object Stella: ClientModInitializer {
         FeatureManager.initializeFeatures()
 
         SpecialGuiElementRegistry.register { NVGPIPRenderer(it.vertexConsumers()) }
+
+        EventBus.on<TickEvent.Server> {
+            println("SERVERING")
+        }
     }
 }
 

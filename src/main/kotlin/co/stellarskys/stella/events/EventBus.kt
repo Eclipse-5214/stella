@@ -39,11 +39,6 @@ object EventBus : EventBus() {
             Chronos.Tick.pulse()
         }
 
-        ServerTickEvents.START_SERVER_TICK.register {
-            post(TickEvent.Server())
-            Chronos.Server.pulse()
-        }
-
         ClientReceiveMessageEvents.ALLOW_GAME.register { message, isActionBar ->
             !post(ChatEvent.Receive(message, isActionBar))
         }
