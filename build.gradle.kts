@@ -22,7 +22,11 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:$mc")
-    mappings(loom.officialMojangMappings())
+
+    if(sc.current.parsed < "26.1") {
+        mappings(loom.officialMojangMappings())
+    }
+
     ksp(project(":stella-ksp"))
     modRuntimeOnly(libs.devauth)
 
