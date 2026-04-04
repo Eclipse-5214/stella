@@ -113,7 +113,7 @@ class SliderUI(initX: Float, initY: Float, val slider: Slider) : BaseElement() {
         valueInput.mouseReleased(mouseX, mouseY, button)
     }
 
-    override fun charTyped(char: Char, modifiers: Int) = valueInput.charTyped(char, modifiers)
+    override fun charTyped(char: Char) = valueInput.charTyped(char)
     override fun keyPressed(keyCode: Int, modifiers: Int) = valueInput.keyPressed(keyCode, modifiers)
 
     companion object { const val HEIGHT = 60f }

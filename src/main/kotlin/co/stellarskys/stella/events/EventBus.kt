@@ -11,7 +11,6 @@ import co.stellarskys.stella.events.core.*
 import co.stellarskys.stella.managers.EventBusManager
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
@@ -28,6 +27,10 @@ import net.minecraft.network.protocol.Packet
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
+
+//? if <= 1.21.11 {
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
+//? }
 
 @Module
 object EventBus : EventBus() {
@@ -82,7 +85,8 @@ object EventBus : EventBus() {
             if (screen != null) post(GuiEvent.Open(screen))
         }
 
-        WorldRenderEvents.AFTER_ENTITIES.register { context ->
+        //? if <= 1.21.11 {
+         WorldRenderEvents.AFTER_ENTITIES.register { context ->
             post(RenderEvent.World.AfterEntities(context.matrices()))
         }
 
@@ -93,6 +97,7 @@ object EventBus : EventBus() {
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
            !post(RenderEvent.World.BlockOutline(context.matrices(), outlineRenderState.pos(), outlineRenderState.shape))
         }
+        //? }
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->
             if (client.options.hideGui || world == null || player == null) return@attachElementBefore

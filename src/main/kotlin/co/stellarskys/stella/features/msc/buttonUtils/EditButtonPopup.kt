@@ -108,7 +108,7 @@ class EditButtonPopup : BaseElement() {
         commandInput.mouseReleased(mouseX, mouseY, button)
     }
 
-    override fun charTyped(char: Char, modifiers: Int) = itemIdInput.charTyped(char, modifiers) || commandInput.charTyped(char, modifiers)
+    override fun charTyped(char: Char) = itemIdInput.charTyped(char) || commandInput.charTyped(char)
     override fun keyPressed(keyCode: Int, modifiers: Int) = itemIdInput.keyPressed(keyCode, modifiers) || commandInput.keyPressed(keyCode, modifiers)
 
     fun open(anchor: AnchorType, index: Int) {

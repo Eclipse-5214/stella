@@ -69,6 +69,6 @@ class TextBox(
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int) = handler.mouseClicked(mouseX, mouseY, button)
     override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) = handler.mouseReleased(mouseX, mouseY, button)
-    override fun charTyped(char: Char, modifiers: Int) = handler.charTyped(char, modifiers)
+    override fun charTyped(char: Char) = handler.charTyped(char)
     override fun keyPressed(keyCode: Int, modifiers: Int) = handler.keyPressed(keyCode, modifiers)
 }

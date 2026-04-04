@@ -310,10 +310,10 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         return super.onKeyPress(key, scanCode, modifiers)
     }
 
-    override fun onCharTyped(char: Char, modifiers: Int): Boolean {
-        if (searchHandler.isFocused && searchHandler.charTyped(char, modifiers)) return true
-        if (panels.any { it.charTyped(char, modifiers) }) return true
-        return super.onCharTyped(char, modifiers)
+    override fun onCharTyped(char: Char): Boolean {
+        if (searchHandler.isFocused && searchHandler.charTyped(char)) return true
+        if (panels.any { it.charTyped(char) }) return true
+        return super.onCharTyped(char)
     }
 
     companion object {

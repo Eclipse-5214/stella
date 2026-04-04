@@ -46,6 +46,6 @@ abstract class BaseElement {
     open fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) {}
 
     // Keyboard input
-    open fun charTyped(char: Char, modifiers: Int): Boolean = false
+    open fun charTyped(char: Char): Boolean = false
     open fun keyPressed(keyCode: Int, modifiers: Int): Boolean = false
 }

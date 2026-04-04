@@ -75,8 +75,8 @@ class ButtonLayoutEditor : Aperture() {
         return popup.keyPressed(key, modifiers) || super.onKeyPress(key, scanCode, modifiers)
     }
 
-    override fun onCharTyped(char: Char, modifiers: Int): Boolean {
-        return popup.charTyped(char, modifiers) || super.onCharTyped(char, modifiers)
+    override fun onCharTyped(char: Char): Boolean {
+        return popup.charTyped(char) || super.onCharTyped(char)
     }
 
     override fun onMouseClick(button: Int, x: Double, y: Double, modifiers: Int): Boolean {

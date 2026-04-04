@@ -152,7 +152,7 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         if (recentColors.size > MAX_RECENT) recentColors.removeLast()
     }
 
-    override fun charTyped(char: Char, modifiers: Int) = hexBox.charTyped(char, modifiers)
+    override fun charTyped(char: Char) = hexBox.charTyped(char)
     override fun keyPressed(keyCode: Int, modifiers: Int) = hexBox.keyPressed(keyCode, modifiers)
 
     private fun drawRoundedSBArea(s: Float) {

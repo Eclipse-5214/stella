@@ -95,7 +95,7 @@ class TextHandler(
 
     override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) { if (button == 0) dragging = false }
 
-    override fun charTyped(char: Char, modifiers: Int): Boolean {
+    override fun charTyped(char: Char): Boolean {
         if (isFocused && filter(char) && text.length < maxLength) insert(char.toString())
         return isFocused
     }

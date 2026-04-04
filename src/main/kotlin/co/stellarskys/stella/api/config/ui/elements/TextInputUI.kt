@@ -70,7 +70,7 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
         textField.mouseReleased(mouseX , mouseY , button)
     }
 
-    override fun charTyped(char: Char, modifiers: Int) = textField.charTyped(char, modifiers)
+    override fun charTyped(char: Char) = textField.charTyped(char)
     override fun keyPressed(keyCode: Int, modifiers: Int) = textField.keyPressed(keyCode, modifiers)
 
     companion object { const val HEIGHT = 72f }
