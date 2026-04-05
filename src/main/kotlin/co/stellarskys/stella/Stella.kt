@@ -9,12 +9,7 @@ import net.fabricmc.api.ClientModInitializer
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import kotlinx.coroutines.*
-
-//? if <= 1.21.11 {
- import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
-//? } else {
-/*import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
-*///? }
+import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 
 
 object Stella: ClientModInitializer {
@@ -31,11 +26,7 @@ object Stella: ClientModInitializer {
         FeatureManager.loadFeatures()
         FeatureManager.initializeFeatures()
 
-        //? if <= 1.21.11 {
-         SpecialGuiElementRegistry.register { NVGPIPRenderer(it.vertexConsumers()) }
-        //? } else {
-        /*PictureInPictureRendererRegistry.register { NVGPIPRenderer(it.bufferSource()) }
-        *///? }
+        SpecialGuiElementRegistry.register { NVGPIPRenderer(it.vertexConsumers()) }
 
         EventBus.on<TickEvent.Server> {
             println("SERVERING")

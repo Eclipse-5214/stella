@@ -1,6 +1,7 @@
 package co.stellarskys.stella.api.nvg
 
 import com.mojang.blaze3d.opengl.GlConst
+import com.mojang.blaze3d.opengl.GlDevice
 import com.mojang.blaze3d.opengl.GlStateManager
 import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.systems.RenderSystem
@@ -8,20 +9,13 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
-
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.MultiBufferSource
-
 import org.joml.Matrix3x2f
 
 //? if > 1.21.10 {
 /*import org.lwjgl.opengl.GL33C
 *///?}
-
-//? if > 1.21.11 {
-/*import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
-*///? } else {
- import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
-//? }
 
 /*
  * Adapted from NVGSpecialRenderer.kt in OdinFabric
@@ -31,9 +25,8 @@ import org.joml.Matrix3x2f
  * Copyright (c) 2025, odtheking
  * See full license at: https://opensource.org/licenses/BSD-3-Clause
  */
-class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPictureRenderer<NVGPIPRenderer.NVGRenderState>(bufferSource) {
+class NVGPIPRenderer(vertexConsumers: MultiBufferSource.BufferSource) : PictureInPictureRenderer<NVGPIPRenderer.NVGRenderState>(vertexConsumers) {
     override fun renderToTexture(state: NVGRenderState, poseStack: PoseStack) {
-        /*
         val colorTex = RenderSystem.outputColorTextureOverride ?: return
         val bufferManager = (RenderSystem.getDevice() as? GlDevice)?.directStateAccess() ?: return
         val glDepthTex = (RenderSystem.outputDepthTextureOverride?.texture() as? GlTexture) ?: return
@@ -45,22 +38,8 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
         }
 
         //? if > 1.21.10 {
-        GL33C.glBindSampler(0, 0)
-        //?}
-        */
-        val colorTex = RenderSystem.outputColorTextureOverride?: return
-        val depthTex = RenderSystem.outputDepthTextureOverride?: return
-        //val colorId = (colorTex.texture() as? GlTexture)?.glId() ?: return
-        //val depthId = (depthTex.texture() as? GlTexture)?.glId() ?: return
-        val width = colorTex.getWidth(0)
-        val height = colorTex.getHeight(0)
-
-        val fbo = (colorTex.texture() as? GlTexture)?.getFbo(null, depthTex.texture() as GlTexture)
-
-        if (fbo != null) {
-            GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, fbo)
-            GlStateManager._viewport(0, 0, width, height)
-        }
+        /*GL33C.glBindSampler(0, 0)
+        *///?}
 
         NVGRenderer.beginFrame(width.toFloat(), height.toFloat())
         state.renderContent()
@@ -126,12 +105,7 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
                 pose, scissor, bounds,
                 renderContent
             )
-
-            //? if > 1.21.11 {
-            /*context.guiRenderState.addPicturesInPictureState(state)
-            *///? } else {
             context.guiRenderState.submitPicturesInPictureState(state)
-            //? }
         }
 
         private fun createBounds(x0: Int, y0: Int, x1: Int, y1: Int, pose: Matrix3x2f, scissorArea: ScreenRectangle?): ScreenRectangle? {

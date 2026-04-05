@@ -22,15 +22,11 @@ import net.minecraft.resources.ResourceLocation
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
 import net.minecraft.network.protocol.Packet
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
-
-//? if <= 1.21.11 {
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
-//? }
 
 @Module
 object EventBus : EventBus() {
@@ -85,8 +81,7 @@ object EventBus : EventBus() {
             if (screen != null) post(GuiEvent.Open(screen))
         }
 
-        //? if <= 1.21.11 {
-         WorldRenderEvents.AFTER_ENTITIES.register { context ->
+        WorldRenderEvents.AFTER_ENTITIES.register { context ->
             post(RenderEvent.World.AfterEntities(context.matrices()))
         }
 
@@ -97,7 +92,6 @@ object EventBus : EventBus() {
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
            !post(RenderEvent.World.BlockOutline(context.matrices(), outlineRenderState.pos(), outlineRenderState.shape))
         }
-        //? }
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->
             if (client.options.hideGui || world == null || player == null) return@attachElementBefore
@@ -134,13 +128,13 @@ object EventBus : EventBus() {
 
         val handle = on<T>(priority, handler = handler, register = false)
 
-            EventBusManager.trackConditionalEvent(
-                islands = islands.ifEmpty { null },
-                arias = arias.ifEmpty { null },
-                floors = floors.ifEmpty { null },
-                skyblockOnly = skyblockOnly,
-                handle = handle
-            )
+        EventBusManager.trackConditionalEvent(
+            islands = islands.ifEmpty { null },
+            arias = arias.ifEmpty { null },
+            floors = floors.ifEmpty { null },
+            skyblockOnly = skyblockOnly,
+            handle = handle
+        )
 
         return handle
     }

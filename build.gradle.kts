@@ -1,5 +1,4 @@
 plugins {
-    id("dev.kikugie.loom-back-compat")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.loom)
     alias(libs.plugins.ksp)
@@ -23,7 +22,7 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:$mc")
-    loomx.applyMojangMappings()
+    mappings(loom.officialMojangMappings())
     ksp(project(":stella-ksp"))
     modRuntimeOnly(libs.devauth)
 
@@ -81,7 +80,7 @@ tasks {
 
     register<Copy>("buildAndCollect") {
         group = "build"
-        from(loomx.modJar.map { it.archiveFile }, loomx.modSourcesJar.map { it.archiveFile })
+        from(remapJar.map { it.archiveFile }, remapSourcesJar.map { it.archiveFile })
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
         dependsOn("build")
     }
