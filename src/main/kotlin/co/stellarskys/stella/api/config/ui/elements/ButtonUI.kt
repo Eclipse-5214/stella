@@ -7,7 +7,7 @@ import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.config.ui.base.BaseElement
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
 class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
@@ -24,7 +24,7 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
     }
 
     override fun render(
-        context: GuiGraphics,
+        context: GuiGraphicsExtractor,
         mouseX: Float,
         mouseY: Float,
         delta: Float

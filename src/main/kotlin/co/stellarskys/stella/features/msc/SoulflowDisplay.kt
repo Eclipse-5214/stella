@@ -6,7 +6,7 @@ import co.stellarskys.stella.events.core.PacketEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.render.Render2D
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import tech.thatgravyboat.skyblockapi.utils.extentions.getLore
 import tech.thatgravyboat.skyblockapi.utils.extentions.getSkyBlockId
@@ -32,5 +32,5 @@ object SoulflowDisplay: Feature("soulflowDisplay", true) {
         on<GuiEvent.RenderHUD> { render(it.context) }
     }
 
-    private fun render(context: GuiGraphics) = HUDManager.renderHud(displayName, context) { Render2D.drawString(context, "§3$soulflow", 0, 0) }
+    private fun render(context: GuiGraphicsExtractor) = HUDManager.renderHud(displayName, context) { Render2D.drawString(context, "§3$soulflow", 0, 0) }
 }

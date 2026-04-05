@@ -6,7 +6,7 @@ import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class ButtonLayoutEditor : Aperture() {
     private val slotSize = 20
@@ -15,7 +15,7 @@ class ButtonLayoutEditor : Aperture() {
     private val mx get() = mouse.rawX.toFloat() / UI_SCALE
     private val my get() = mouse.rawY.toFloat() / UI_SCALE
 
-    override fun onRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) {
         context.fill(0, 0, width, height, 0x90000000.toInt())
 
         // Draw dummy inventory
@@ -106,5 +106,5 @@ class ButtonLayoutEditor : Aperture() {
         return super.onMouseRelease(button, x, y, modifiers)
     }
 
-    override fun onBackgroundRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) {}
+    override fun onBackgroundRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) {}
 }

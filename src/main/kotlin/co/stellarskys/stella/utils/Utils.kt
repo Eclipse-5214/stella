@@ -8,7 +8,7 @@ import co.stellarskys.stella.api.zenith.player
 import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FontDescription
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
 import java.awt.Color
 import kotlin.math.max
@@ -155,7 +155,7 @@ object Utils {
         val montserrat_bold = getFont("montserrat")
 
         fun getFont(font: String): FontDescription {
-            val resource = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, font)
+            val resource = Identifier.fromNamespaceAndPath(Stella.NAMESPACE, font)
             return FontDescription.Resource(resource)
         }
     }

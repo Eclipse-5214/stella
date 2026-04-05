@@ -8,7 +8,7 @@ import co.stellarskys.stella.utils.render.*
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.api.dungeons.Dungeon
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 @Module
 object MapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -20,11 +20,11 @@ object MapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS
         on<GuiEvent.RenderHUD> { event -> renderNormal(event.context) }
     }
 
-    fun hudEditorRender(context: GuiGraphics){
+    fun hudEditorRender(context: GuiGraphicsExtractor){
         renderMapInfo(context, true)
     }
 
-    fun renderNormal(context: GuiGraphics) {
+    fun renderNormal(context: GuiGraphicsExtractor) {
         val matrix = context.pose()
 
         val x = HUDManager.getX(name)
@@ -40,7 +40,7 @@ object MapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS
         matrix.popMatrix()
     }
 
-    fun renderMapInfo(context: GuiGraphics, preview: Boolean) {
+    fun renderMapInfo(context: GuiGraphicsExtractor, preview: Boolean) {
         val matrix = context.pose()
 
         var mapLine1 = Dungeon.mapLine1

@@ -8,7 +8,7 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.events.core.GuiEvent
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 
 @Module
@@ -21,7 +21,7 @@ object RoomName : Feature("showRoomName", island = SkyBlockIsland.THE_CATACOMBS)
     }
 
     private fun renderHUD(
-        context: GuiGraphics
+        context: GuiGraphicsExtractor
     ) = HUDManager.renderHud("roomname", context) {
         if (Dungeon.inBoss) return@renderHud
         val text = "${if (chroma) "§z" else ""}${Dungeon.currentRoom?.name ?: "No Room Found"}"

@@ -1,7 +1,7 @@
 package co.stellarskys.stella.mixins;
 
 import co.stellarskys.stella.features.msc.InventoryButtons;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.world.effect.MobEffectInstance;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,10 +18,10 @@ import java.util.Collection;
 public class MixinEffectsInInventory {
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
     //?if > 1.21.10 {
-    /*private void stella$onDrawEffect(GuiGraphics guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
-    *///?} else {
-     private void stella$onInventoryEffects(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
-    //?}
+    private void stella$onDrawEffect(GuiGraphicsExtractor guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
+    //?} else {
+     /*private void stella$onInventoryEffects(GuiGraphicsExtractor guiGraphics, int i, int j, CallbackInfo ci) {
+    *///?}
         if (InventoryButtons.INSTANCE.isEnabled()) ci.cancel();
     }
 }

@@ -36,5 +36,5 @@ lwjgl-nanovg = { module = "org.lwjgl:lwjgl-nanovg", version.ref = "lwjgl" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-loom = { id = "fabric-loom", version.ref = "loom" }
+loom = { id = "net.fabricmc.fabric-loom", version.ref = "loom" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

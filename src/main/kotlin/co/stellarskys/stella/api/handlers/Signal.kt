@@ -23,7 +23,7 @@ object Signal {
 
     @JvmStatic
     fun fakeMessage(message: Component) {
-        client.gui?.chat?.addMessage(message)
+        client.gui.chat.addMessage(message)
     }
 
     @JvmStatic

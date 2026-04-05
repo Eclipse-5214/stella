@@ -10,10 +10,10 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(Font.class)
 public class MixinFont {
     //? if <= 1.21.10 {
-    @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
-    //?} else {
-     /*@ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
-    *///?}
+    /*@ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
+    *///?} else {
+     @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZZI)Lnet/minecraft/client/gui/Font$PreparedText;", at = @At("HEAD"), argsOnly = true)
+    //?}
     private FormattedCharSequence onPrepareText(FormattedCharSequence text) {
         return Cosmetics.handleCharSequence(text);
     }

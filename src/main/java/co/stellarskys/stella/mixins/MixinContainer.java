@@ -2,7 +2,7 @@ package co.stellarskys.stella.mixins;
 
 import co.stellarskys.stella.events.EventBus;
 import co.stellarskys.stella.events.core.GuiEvent;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,7 +18,7 @@ public class MixinContainer {
     @Shadow protected int imageHeight;
 
     @Inject(method = "renderContents", at = @At("TAIL"))
-    public void onRenderContents(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
+    public void onRenderContents(GuiGraphicsExtractor guiGraphics, int i, int j, float f, CallbackInfo ci){
         EventBus.INSTANCE.post(new GuiEvent.Container.Content(guiGraphics, i, j, leftPos, topPos, imageWidth, imageHeight));
     }
 }

@@ -2,7 +2,7 @@ package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.api.handlers.Capsule
 import com.google.gson.reflect.TypeToken
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -10,7 +10,7 @@ import kotlin.collections.set
 
 object HUDManager {
     val elements = mutableMapOf<String, HUDElement>()
-    val customRenderers = mutableMapOf<String, (GuiGraphics) -> Unit>()
+    val customRenderers = mutableMapOf<String, (GuiGraphicsExtractor) -> Unit>()
     val customSizes = mutableMapOf<String, Pair<Int, Int>>()
 
     data class HudLayoutData(
@@ -34,7 +34,7 @@ object HUDManager {
         id: String,
         width: Int,
         height: Int,
-        renderer: (GuiGraphics) -> Unit,
+        renderer: (GuiGraphicsExtractor) -> Unit,
         configKey: String? =  null
     ) {
         customRenderers[id] = renderer
@@ -67,7 +67,7 @@ object HUDManager {
     fun getY(id: String): Float = elements[id]?.let { if (id in customRenderers) it.y else it.y + 3f } ?: 0f
     fun getScale(id: String): Float = elements[id]?.scale ?: 1f
 
-    inline fun renderHud(name: String, context: GuiGraphics, block: () -> Unit) {
+    inline fun renderHud(name: String, context: GuiGraphicsExtractor, block: () -> Unit) {
         val matrix = context.pose()
         val x = getX(name)
         val y = getY(name)

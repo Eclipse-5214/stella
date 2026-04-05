@@ -4,7 +4,7 @@ import co.stellarskys.stella.api.config.core.ConfigElement
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.nvg.Gradient
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class Tooltip: BaseElement() {
     init {
@@ -30,7 +30,7 @@ class Tooltip: BaseElement() {
     }
 
     override fun render(
-        context: GuiGraphics,
+        context: GuiGraphicsExtractor,
         mouseX: Float,
         mouseY: Float,
         delta: Float

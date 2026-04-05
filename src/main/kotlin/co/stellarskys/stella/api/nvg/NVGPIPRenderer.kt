@@ -5,7 +5,7 @@ import com.mojang.blaze3d.opengl.GlStateManager
 import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 
@@ -14,14 +14,14 @@ import net.minecraft.client.renderer.MultiBufferSource
 import org.joml.Matrix3x2f
 
 //? if > 1.21.10 {
-/*import org.lwjgl.opengl.GL33C
-*///?}
+import org.lwjgl.opengl.GL33C
+//?}
 
 //? if > 1.21.11 {
-/*import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
-*///? } else {
- import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
-//? }
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
+//? } else {
+ /*import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
+*///? }
 
 /*
  * Adapted from NVGSpecialRenderer.kt in OdinFabric
@@ -102,7 +102,7 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
         /**
          * Draw NVG content as a special GUI element.
          *
-         * @param context The GuiGraphics to draw to
+         * @param context The GuiGraphicsExtractor to draw to
          * @param x The x position
          * @param y The y position
          * @param width The width of the rendering area
@@ -110,7 +110,7 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
          * @param renderContent A lambda that draws the NVG content
          */
         fun draw(
-            context: GuiGraphics,
+            context: GuiGraphicsExtractor,
             x: Int,
             y: Int,
             width: Int,
@@ -128,10 +128,10 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
             )
 
             //? if > 1.21.11 {
-            /*context.guiRenderState.addPicturesInPictureState(state)
-            *///? } else {
-            context.guiRenderState.submitPicturesInPictureState(state)
-            //? }
+            context.guiRenderState.addPicturesInPictureState(state)
+            //? } else {
+            /*context.guiRenderState.submitPicturesInPictureState(state)
+            *///? }
         }
 
         private fun createBounds(x0: Int, y0: Int, x1: Int, y1: Int, pose: Matrix3x2f, scissorArea: ScreenRectangle?): ScreenRectangle? {

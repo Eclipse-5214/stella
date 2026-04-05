@@ -2,7 +2,7 @@ package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith.Keys
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import co.stellarskys.stella.hud.HUDManager.customRenderers
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.height
@@ -38,7 +38,7 @@ class HUDEditor : Aperture("HUD Editor") {
         HUDManager.saveAllLayouts()
     }
 
-    override fun onRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) {
         context.fill(0, 0, width, height, 0x90000000.toInt())
 
         snapLines.forEach { line ->
@@ -154,7 +154,7 @@ class HUDEditor : Aperture("HUD Editor") {
     }
     override val isPausingScreen: Boolean = false
 
-    private fun drawHollowRect(context: GuiGraphics, x1: Int, y1: Int, x2: Int, y2: Int, color: Int) {
+    private fun drawHollowRect(context: GuiGraphicsExtractor, x1: Int, y1: Int, x2: Int, y2: Int, color: Int) {
         context.fill(x1, y1, x2, y1 + 1, color)
         context.fill(x1, y2 - 1, x2, y2, color)
         context.fill(x1, y1, x1 + 1, y2, color)

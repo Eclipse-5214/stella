@@ -1,5 +1,4 @@
 plugins {
-    id("dev.kikugie.loom-back-compat")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.loom)
     alias(libs.plugins.ksp)
@@ -23,17 +22,16 @@ repositories {
 
 dependencies {
     minecraft("com.mojang:minecraft:$mc")
-    loomx.applyMojangMappings()
     ksp(project(":stella-ksp"))
-    modRuntimeOnly(libs.devauth)
+    runtimeOnly(libs.devauth)
 
-    modImplementation("fabric-api".mc(mc))
-    modImplementation(libs.fabric.loader)
-    modImplementation(libs.fabric.language.kotlin)
-    modImplementation(libs.hypixel.modapi)
-    modImplementation(libs.hypixel.modapi.fabric)
+    implementation("fabric-api".mc(mc))
+    implementation(libs.fabric.loader)
+    implementation(libs.fabric.language.kotlin)
+    implementation(libs.hypixel.modapi)
+    implementation(libs.hypixel.modapi.fabric)
 
-    modImplementation(libs.skyblock.api) {
+    implementation(libs.skyblock.api) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc") }
     }
 
@@ -81,11 +79,12 @@ tasks {
 
     register<Copy>("buildAndCollect") {
         group = "build"
-        from(loomx.modJar.map { it.archiveFile }, loomx.modSourcesJar.map { it.archiveFile })
+        from(jar.map { it.archiveFile })
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
         dependsOn("build")
     }
+
 }
 
 fun String.mc(mc: String): Provider<MinimalExternalModuleDependency> = project.extensions.getByType<VersionCatalogsExtension>().named("libs").findLibrary("$this-${mc.replace(".", "_")}").get()
-fun DependencyHandler.shadow(dep: Any) { include(dep);modImplementation(dep) }
+fun DependencyHandler.shadow(dep: Any) { include(dep); implementation(dep) }

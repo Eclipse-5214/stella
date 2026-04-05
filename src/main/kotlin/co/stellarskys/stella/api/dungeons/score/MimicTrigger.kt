@@ -10,10 +10,10 @@ import net.minecraft.world.entity.EquipmentSlot
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 //? if <= 1.21.10 {
-import net.minecraft.world.entity.monster.Zombie
-//?} else {
-/*import net.minecraft.world.entity.monster.zombie.Zombie
-*///?}
+/*import net.minecraft.world.entity.monster.Zombie
+*///?} else {
+import net.minecraft.world.entity.monster.zombie.Zombie
+//?}
 
 /**
  * Tracks whether the Mimic miniboss has been killed in F6/F7.

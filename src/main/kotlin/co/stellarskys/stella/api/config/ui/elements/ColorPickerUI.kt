@@ -10,7 +10,7 @@ import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.config.ui.base.BaseElement
 import co.stellarskys.stella.api.config.ui.base.TextBox
 import co.stellarskys.stella.api.nvg.Gradient
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
 class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseElement() {
@@ -57,7 +57,7 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         updatePickerValue(updateHex)
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible && !isAnimating) return
 
         val currentFullHeight = HEIGHT + (CONTENT_HEIGHT * expansion)

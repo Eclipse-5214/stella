@@ -8,7 +8,7 @@ import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.api.handlers.Capsule
 import co.stellarskys.stella.utils.render.Render2D
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
 import tech.thatgravyboat.skyblockapi.api.remote.RepoPetsAPI
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
@@ -124,7 +124,7 @@ object PetDisplay: Feature("petDisplay", true) {
     }
 
     fun hudEditorRender(
-        context: GuiGraphics,
+        context: GuiGraphicsExtractor,
     ){
         Render2D.drawString(context,"§bEnder Dragon", 40, 7)
         Render2D.drawString(context,"§7[Lvl 100]", 40, 17)
@@ -133,7 +133,7 @@ object PetDisplay: Feature("petDisplay", true) {
         Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
     }
 
-    fun renderHud(context: GuiGraphics) {
+    fun renderHud(context: GuiGraphicsExtractor) {
         if (activePet == null) return
         val matrix = context.pose()
 

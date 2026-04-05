@@ -7,7 +7,7 @@ import co.stellarskys.stella.api.nvg.Color.Companion.green
 import co.stellarskys.stella.api.nvg.Color.Companion.blue
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.resourceManager
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.joml.Matrix3x2f
 import org.lwjgl.nanovg.NVGColor
 import org.lwjgl.nanovg.NVGPaint
@@ -42,7 +42,7 @@ object NVGRenderer {
     private var drawing: Boolean = false
     private var vg = -1L
 
-    val inter = Font("Default", resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "font/montserrat.ttf")).get().open())
+    val inter = Font("Default", resourceManager.getResource(Identifier.fromNamespaceAndPath(Stella.NAMESPACE, "font/montserrat.ttf")).get().open())
     var dpr = devicePixelRatio()
 
     init {

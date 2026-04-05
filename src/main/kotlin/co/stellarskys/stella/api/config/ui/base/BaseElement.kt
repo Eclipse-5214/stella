@@ -4,7 +4,7 @@ import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.nvg.Font
 import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.zenith.Zenith
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 abstract class BaseElement {
     val nvg get() = NVGRenderer
@@ -34,7 +34,7 @@ abstract class BaseElement {
 
 
     // Rendering
-    abstract fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float)
+    abstract fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float)
     open fun setVisibility(value: Boolean) {
         if (visible == value) return
         visible = value

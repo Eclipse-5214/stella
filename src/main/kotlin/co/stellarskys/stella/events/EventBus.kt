@@ -18,7 +18,7 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -29,12 +29,12 @@ import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
 
 //? if <= 1.21.11 {
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
-//? }
+/*import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
+*///? }
 
 @Module
 object EventBus : EventBus() {
-    private val STELLA_HUDS = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, "stella_hud")
+    private val STELLA_HUDS = Identifier.fromNamespaceAndPath(Stella.NAMESPACE, "stella_hud")
 
     init {
         ClientTickEvents.START_CLIENT_TICK.register {
@@ -86,7 +86,7 @@ object EventBus : EventBus() {
         }
 
         //? if <= 1.21.11 {
-         WorldRenderEvents.AFTER_ENTITIES.register { context ->
+         /*WorldRenderEvents.AFTER_ENTITIES.register { context ->
             post(RenderEvent.World.AfterEntities(context.matrices()))
         }
 
@@ -97,7 +97,7 @@ object EventBus : EventBus() {
         WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
            !post(RenderEvent.World.BlockOutline(context.matrices(), outlineRenderState.pos(), outlineRenderState.shape))
         }
-        //? }
+        *///? }
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->
             if (client.options.hideGui || world == null || player == null) return@attachElementBefore

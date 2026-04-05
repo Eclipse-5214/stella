@@ -4,7 +4,7 @@ import co.stellarskys.stella.Stella
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.DepthTestFunction
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 object AstrumPipelines {
     val LINES: RenderPipeline = RenderPipelines.register(
@@ -35,5 +35,5 @@ object AstrumPipelines {
             .build()
     )
 
-    private fun id(path: String) = ResourceLocation.fromNamespaceAndPath(Stella.NAMESPACE, path)
+    private fun id(path: String) = Identifier.fromNamespaceAndPath(Stella.NAMESPACE, path)
 }

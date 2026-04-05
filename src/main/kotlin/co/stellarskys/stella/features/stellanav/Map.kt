@@ -11,15 +11,15 @@ import co.stellarskys.stella.utils.config
 import com.mojang.blaze3d.platform.NativeImage
 import net.fabricmc.loader.api.FabricLoader
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.renderer.texture.DynamicTexture
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import java.awt.Color
 import java.nio.file.Files
 
 @Module
 object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
-    private val TEXTURE_CACHE = mutableMapOf<String, ResourceLocation>()
+    private val TEXTURE_CACHE = mutableMapOf<String, Identifier>()
     private const val name = "StellaNav"
 
     // textures
@@ -96,11 +96,11 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
         }
     }
 
-    fun hudEditorRender(context: GuiGraphics){
+    fun hudEditorRender(context: GuiGraphicsExtractor){
         MapRenderer.renderPreview(context, 5f, 5f, 1f)
     }
 
-    fun renderMap(context: GuiGraphics) {
+    fun renderMap(context: GuiGraphicsExtractor) {
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)
         val scale = HUDManager.getScale(name)
@@ -108,7 +108,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
         MapRenderer.render(context, x, y, scale)
     }
 
-    fun getOrLoad(fileName: String): ResourceLocation? {
+    fun getOrLoad(fileName: String): Identifier? {
         if (TEXTURE_CACHE.containsKey(fileName)) return TEXTURE_CACHE[fileName]
 
         val path = FabricLoader.getInstance().configDir.resolve("stella/assets/$fileName.png")
@@ -118,7 +118,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
             Files.newInputStream(path).use { inputStream ->
                 val nativeImage = NativeImage.read(inputStream)
                 val dynamicTexture = DynamicTexture({ "Stella Dynamic: $fileName" }, nativeImage)
-                val loc = ResourceLocation.fromNamespaceAndPath("stella", "stellanav/${fileName.lowercase().replace(".", "_")}")
+                val loc = Identifier.fromNamespaceAndPath("stella", "stellanav/${fileName.lowercase().replace(".", "_")}")
                 textureManager.register(loc, dynamicTexture)
                 TEXTURE_CACHE[fileName] = loc
                 return loc

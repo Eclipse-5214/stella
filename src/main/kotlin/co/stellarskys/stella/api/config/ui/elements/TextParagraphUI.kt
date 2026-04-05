@@ -5,7 +5,7 @@ import co.stellarskys.stella.api.config.core.TextParagraph
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.config.ui.base.BaseElement
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
 class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) : BaseElement() {
@@ -49,7 +49,7 @@ class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) 
         isAnimating = true
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible && !isAnimating) return
 
         if (isAnimating) {

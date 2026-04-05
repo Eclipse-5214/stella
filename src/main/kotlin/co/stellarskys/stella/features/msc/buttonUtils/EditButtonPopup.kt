@@ -5,7 +5,7 @@ import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.base.BaseElement
 import co.stellarskys.stella.api.config.ui.base.TextBox
 import co.stellarskys.stella.utils.render.Render2D
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.scale
 import tech.thatgravyboat.skyblockapi.platform.translate
@@ -40,7 +40,7 @@ class EditButtonPopup : BaseElement() {
         onType = { }
     ).apply { parent = this@EditButtonPopup; maxLength = 128 }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible) return
 
         nvg.push()

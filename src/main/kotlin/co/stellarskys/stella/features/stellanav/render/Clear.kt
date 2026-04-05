@@ -9,8 +9,8 @@ import co.stellarskys.stella.api.dungeons.map.Room
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.api.dungeons.utils.*
 import co.stellarskys.stella.api.zenith.player
-import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.resources.Identifier
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import java.awt.Color
 
@@ -25,7 +25,7 @@ object Clear {
     private val RoomType.isPuzzle get() = this in setOf(RoomType.PUZZLE, RoomType.TRAP, RoomType.YELLOW)
     private val RoomType.isNormal get() = this == RoomType.NORMAL || this == RoomType.RARE
 
-    fun renderMap(context: GuiGraphics) {
+    fun renderMap(context: GuiGraphicsExtractor) {
         val matrix = context.pose()
         val floor = Dungeon.floorNumber ?: 7
         val scale = floorScale(floor)
@@ -41,7 +41,7 @@ object Clear {
         }
     }
 
-    private fun renderRooms(context: GuiGraphics) {
+    private fun renderRooms(context: GuiGraphicsExtractor) {
         if(!Map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
             Render2D.drawRect(context, it.x * SPACING, it.z * SPACING, ROOM, ROOM, DISCOVERED)
         }
@@ -61,7 +61,7 @@ object Clear {
         }
     }
 
-    private fun renderRoom(context: GuiGraphics, room: Room, color: Color) {
+    private fun renderRoom(context: GuiGraphicsExtractor, room: Room, color: Color) {
         for ((x, z) in room.components) {
             val px = x * SPACING
             val pz = z * SPACING
@@ -77,7 +77,7 @@ object Clear {
         }
     }
 
-    private fun renderCheckmarks(context: GuiGraphics) {
+    private fun renderCheckmarks(context: GuiGraphicsExtractor) {
         val scale = Map.checkmarkScale
         if(!Map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
             drawIcon(context, it.x.toFloat() * SPACING + HALF, it.z.toFloat() * SPACING + HALF, scale, Checkmark.UNEXPLORED.texture!!, 10, 12, -5f)
@@ -97,7 +97,7 @@ object Clear {
         }
     }
 
-    private fun drawIcon(context: GuiGraphics, x: Float, y: Float, scale: Float, tex: ResourceLocation, w: Int, h: Int, off: Float) {
+    private fun drawIcon(context: GuiGraphicsExtractor, x: Float, y: Float, scale: Float, tex: Identifier, w: Int, h: Int, off: Float) {
         context.pushPop {
             context.pose().translate(x, y)
             context.pose().scale(scale, scale)
@@ -105,7 +105,7 @@ object Clear {
         }
     }
 
-    private fun renderLabels(context: GuiGraphics) {
+    private fun renderLabels(context: GuiGraphicsExtractor) {
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored && !Map.hiddenRooms) return@forEach
             if (!room.type.isNormal && !room.type.isPuzzle) return@forEach
@@ -136,7 +136,7 @@ object Clear {
         }
     }
 
-    private fun renderStack(context: GuiGraphics, lines: List<Pair<String, Float>>, x: Float, y: Float, color: String) {
+    private fun renderStack(context: GuiGraphicsExtractor, lines: List<Pair<String, Float>>, x: Float, y: Float, color: String) {
         val visualHeight = lines.sumOf { (it.second * 9).toDouble() }.toFloat()
         var currentY = -visualHeight / 2f
         lines.forEach { (text, scale) ->
@@ -152,7 +152,7 @@ object Clear {
         }
     }
 
-    private fun renderPlayers(context: GuiGraphics) {
+    private fun renderPlayers(context: GuiGraphicsExtractor) {
         if (Dungeon.inBoss) return
         val me = player ?: return
 

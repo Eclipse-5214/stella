@@ -10,10 +10,10 @@ import java.awt.Color
 import java.net.URI
 
 //? if <= 1.21.10 {
-import net.minecraft.Util
-//?} else {
- /*import net.minecraft.util.Util
-*///?}
+/*import net.minecraft.Util
+*///?} else {
+ import net.minecraft.util.Util
+//?}
 
 
 val config = Config("Stella", "Stella") {

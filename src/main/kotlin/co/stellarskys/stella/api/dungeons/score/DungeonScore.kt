@@ -7,7 +7,7 @@ import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.utils.Checkmark
 import co.stellarskys.stella.utils.config
-import tech.thatgravyboat.skyblockapi.api.data.Perk
+import tech.thatgravyboat.skyblockapi.api.data.MayorPerks
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
@@ -37,7 +37,7 @@ object DungeonScore {
     // Current dungeon score state and accessor
     var data = ScoreData()
     val forcePaul by config.property<Boolean>("forcePaul")
-    val hasPaul get() = Perk.EZPZ.active || forcePaul
+    val hasPaul get() = MayorPerks.EZPZ.active || forcePaul
     val score get() = data.score
 
     private var lastScore = 0

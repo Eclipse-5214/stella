@@ -6,7 +6,7 @@ import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.api.zenith.player
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.scale
 import java.util.UUID
@@ -16,7 +16,7 @@ object MapRenderer {
     private const val MAP_W = 138
     private const val MAP_H = 138
 
-    fun render(context: GuiGraphics, x: Float, y: Float, scale: Float) {
+    fun render(context: GuiGraphicsExtractor, x: Float, y: Float, scale: Float) {
         context.pushPop {
             val matrix = context.pose()
             matrix.translate(x, y)
@@ -37,7 +37,7 @@ object MapRenderer {
         }
     }
 
-    fun renderPreview(context: GuiGraphics, x: Float, y: Float, scale: Float) = context.pushPop {
+    fun renderPreview(context: GuiGraphicsExtractor, x: Float, y: Float, scale: Float) = context.pushPop {
         context.pose().translate(x, y)
         context.scale(scale, scale)
 
@@ -49,7 +49,7 @@ object MapRenderer {
     }
 
 
-    fun renderInfoUnder(context: GuiGraphics, preview: Boolean) {
+    fun renderInfoUnder(context: GuiGraphicsExtractor, preview: Boolean) {
         val (l1, l2) = if (preview) {
             "§7Secrets: §b?§8-§e?§8-§c?        §7Score: §c0"  to
             "§7Deaths: §a0 §8| §7M: §c✘ §8| §7P: §c✘ §8| §7Crypts: §c0"
@@ -66,8 +66,8 @@ object MapRenderer {
     }
 
     private fun totalHeight() = MAP_H + if (Map.mapInfoUnder) 10 else 0
-    private fun renderBackground(context: GuiGraphics) = Render2D.drawRect(context, 0, 0, MAP_W, totalHeight(), Map.mapBgColor)
-    private fun renderBorder(context: GuiGraphics) {
+    private fun renderBackground(context: GuiGraphicsExtractor) = Render2D.drawRect(context, 0, 0, MAP_W, totalHeight(), Map.mapBgColor)
+    private fun renderBorder(context: GuiGraphicsExtractor) {
         val bw = Map.mapBdWidth
         val h = totalHeight()
         val c = Map.mapBdColor
@@ -77,7 +77,7 @@ object MapRenderer {
         Render2D.drawRect(context, MAP_W, 0, bw, h, c)
     }
 
-    fun renderPlayerIcon(context: GuiGraphics, p: DungeonPlayer, x: Double, y: Double, rotation: Float) = context.pushPop {
+    fun renderPlayerIcon(context: GuiGraphicsExtractor, p: DungeonPlayer, x: Double, y: Double, rotation: Float) = context.pushPop {
         val matrix =  context.pose()
         val you = p.name == player?.name?.string
         renderNametag(context, p.name, x, y, Map.iconScale, you)
@@ -96,7 +96,7 @@ object MapRenderer {
         }
     }
 
-    fun renderNametag(context: GuiGraphics, name: String, x: Double, y: Double, scale: Float, ownName: Boolean) {
+    fun renderNametag(context: GuiGraphicsExtractor, name: String, x: Double, y: Double, scale: Float, ownName: Boolean) {
         if (!Dungeon.holdingLeaps || !Map.showNames || (Map.dontShowOwn && ownName)) return
 
         context.pushPop {
@@ -111,7 +111,7 @@ object MapRenderer {
         }
     }
 
-    fun drawShadowedText(context: GuiGraphics, text: String, x: Int, y: Int, offset: Float) {
+    fun drawShadowedText(context: GuiGraphicsExtractor, text: String, x: Int, y: Int, offset: Float) {
         if (!Map.textShadow) return
         val s = "§0$text"
         for (i in 0..3) {
@@ -124,7 +124,7 @@ object MapRenderer {
         }
     }
 
-    private enum class MapMode(val renderer: (GuiGraphics) -> Unit) {
+    private enum class MapMode(val renderer: (GuiGraphicsExtractor) -> Unit) {
         CLEAR({ Clear.renderMap(it) }),
         BOSS({ Boss.renderMap(it) }),
         SCORE({ Score.render(it) })

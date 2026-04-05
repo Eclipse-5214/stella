@@ -17,7 +17,7 @@ import co.stellarskys.stella.api.dungeons.map.Room
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.api.zenith.world
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundEvents
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
@@ -191,7 +191,7 @@ object RouteRecorder {
         currentStep.waypoints += waypoint
     }
 
-    fun hudPreview(context: GuiGraphics) {
+    fun hudPreview(context: GuiGraphicsExtractor) {
         val matirix = context.pose()
 
         matirix.pushMatrix()
@@ -215,7 +215,7 @@ object RouteRecorder {
         matirix.popMatrix()
     }
 
-    fun hud(context: GuiGraphics) {
+    fun hud(context: GuiGraphicsExtractor) {
         val matrix = context.pose()
 
         val x = HUDManager.getX(SecretRoutes.rHudName)

@@ -8,7 +8,7 @@ import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.config.ui.base.BaseElement
 import co.stellarskys.stella.api.config.ui.base.TextBox
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.math.roundToInt
 
 class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseElement() {
@@ -50,7 +50,7 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
         return stepped.coerceIn(slider.min, slider.max)
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible && !isAnimating) return
 
         if (lastFocusState && !valueInput.isFocused) {

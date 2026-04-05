@@ -8,7 +8,7 @@ import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.config.ui.base.BaseElement
 import co.stellarskys.stella.api.config.ui.base.TextBox
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class SliderUI(initX: Float, initY: Float, val slider: Slider) : BaseElement() {
     private var visualProgressAnim = Utils.animate<Float>(0.2, AnimType.EASE_OUT)
@@ -39,7 +39,7 @@ class SliderUI(initX: Float, initY: Float, val slider: Slider) : BaseElement() {
         valueInput.x = width - valueInput.width - 12f
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible && !isAnimating) return
         if (lastFocusState && !valueInput.isFocused) valueInput.setText(String.format("%.2f", slider.value as Float))
         if (dragging || !valueInput.isFocused) valueInput.setText(String.format("%.2f", slider.value as Float))

@@ -8,7 +8,7 @@ import co.stellarskys.stella.api.zenith.player
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.renderer.RenderPipelines
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import java.nio.file.Files
@@ -17,7 +17,7 @@ object Boss {
     private const val SIZE = 128
     private const val HALF_SIZE = 64f
 
-    fun renderMap(context: GuiGraphics) {
+    fun renderMap(context: GuiGraphicsExtractor) {
         val p = player ?: return
         val floor = Dungeon.floorNumber ?: return
         val bMap = BossMapRegistry.getBossMap(floor, p.x, p.y, p.z) ?: return

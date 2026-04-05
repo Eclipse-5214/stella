@@ -3,7 +3,7 @@ package co.stellarskys.stella.features.stellanav.render
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.api.zenith.world
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.renderer.state.MapRenderState
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.MapItem
@@ -12,7 +12,7 @@ import tech.thatgravyboat.skyblockapi.platform.pushPop
 object Score {
     private val state = MapRenderState()
 
-    fun render(context: GuiGraphics) {
+    fun render(context: GuiGraphicsExtractor) {
         updateState()
         if (state.texture == null) return
 

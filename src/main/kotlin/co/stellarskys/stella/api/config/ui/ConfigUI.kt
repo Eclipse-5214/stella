@@ -11,7 +11,7 @@ import co.stellarskys.stella.api.nvg.Gradient
 import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.zenith.*
 import com.mojang.blaze3d.opengl.GlTexture
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
@@ -77,7 +77,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         super.onResize(width, height)
     }
 
-    override fun onRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) {
         super.onRender(context, mouseX, mouseY, tickDelta)
 
         context.drawNVG(false) {
@@ -214,7 +214,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         nvg.pop()
     }
 
-    fun drawSearchBar(context: GuiGraphics, delta: Float) {
+    fun drawSearchBar(context: GuiGraphicsExtractor, delta: Float) {
         val swx = (rez.windowWidth / UI_SCALE) / 2
         val bx = swx - 150f
         val by = (rez.windowHeight / UI_SCALE) - 100f

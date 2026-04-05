@@ -3,7 +3,7 @@
 package co.stellarskys.stella.events.core
 
 import co.stellarskys.stella.api.events.Event
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -12,7 +12,7 @@ import net.minecraft.world.inventory.ClickType
 
 sealed class GuiEvent {
     class RenderHUD(
-        val context: GuiGraphics
+        val context: GuiGraphicsExtractor
     ) : Event()
 
     class Open(
@@ -51,7 +51,7 @@ sealed class GuiEvent {
         ) : Event(cancelable = true)
 
         class Render(
-            val context: GuiGraphics,
+            val context: GuiGraphicsExtractor,
             val slot: net.minecraft.world.inventory.Slot,
             val screen: AbstractContainerScreen<AbstractContainerMenu>
         ) : Event()
@@ -59,7 +59,7 @@ sealed class GuiEvent {
 
     sealed class Container {
         class Content(
-            val context: GuiGraphics,
+            val context: GuiGraphicsExtractor,
             val mouseX: Int,
             val mouseY: Int,
             val x: Int,

@@ -4,7 +4,7 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.api.animation.AnimType
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.nvg.Gradient
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class Panel(initX: Float, initY: Float, val title: String = ""): ParentElement() {
     private var scrollOffset by Utils.animate<Float>(0.25, AnimType.EASE_OUT)
@@ -19,7 +19,7 @@ class Panel(initX: Float, initY: Float, val title: String = ""): ParentElement()
     override val absoluteY: Float get() = super.absoluteY + scrollOffset
 
     override fun render(
-        context: GuiGraphics,
+        context: GuiGraphicsExtractor,
         mouseX: Float,
         mouseY: Float,
         delta: Float

@@ -6,7 +6,7 @@ import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.config.ui.base.BaseElement
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import org.lwjgl.glfw.GLFW
 
 class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement() {
@@ -28,7 +28,7 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
         if (!value) isListening = false // Stop listening if hidden
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible && !isAnimating) return
 
         if (isAnimating) {

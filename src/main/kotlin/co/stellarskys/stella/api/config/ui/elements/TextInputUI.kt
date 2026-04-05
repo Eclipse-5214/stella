@@ -7,7 +7,7 @@ import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.config.ui.base.BaseElement
 import co.stellarskys.stella.api.config.ui.base.TextBox
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElement() {
     private var offsetAnim = Utils.animate<Float>(0.15)
@@ -35,7 +35,7 @@ class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElemen
         offset = if (visible) 0f else HEIGHT; height = HEIGHT - offset
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible && !isAnimating) return
 
         if (isAnimating) {

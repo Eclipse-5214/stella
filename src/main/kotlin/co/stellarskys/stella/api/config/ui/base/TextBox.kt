@@ -2,7 +2,7 @@ package co.stellarskys.stella.api.config.ui.base
 
 import co.stellarskys.stella.api.nvg.Font
 import co.stellarskys.stella.api.nvg.NVGRenderer
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class TextBox(
     x: Float, y: Float, w: Float, h: Float,
@@ -50,7 +50,7 @@ class TextBox(
         this.textSidePadding = this@TextBox.padding // Add a new variable for internal text offset
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         nvg.push()
         nvg.translate(x, y)
         nvg.rect(0f, 0f, width, height, color, radius)

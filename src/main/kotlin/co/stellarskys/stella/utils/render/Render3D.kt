@@ -12,9 +12,9 @@ import java.awt.Color
 
 object Render3D {
     //? <= 1.21.10 {
-    fun Camera.xRot() = this.xRot
+    /*fun Camera.xRot() = this.xRot
     fun Camera.yRot() = this.yRot
-    //?}
+    *///?}
 
     fun outlineBlock(pos: BlockPos, color: Color, lineWidth: Float = 1f, depth: Boolean = true, state: BlockState? = null) {
         val level = client.level ?: return

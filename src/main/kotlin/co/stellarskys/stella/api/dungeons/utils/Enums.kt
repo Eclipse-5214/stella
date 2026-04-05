@@ -2,7 +2,7 @@ package co.stellarskys.stella.api.dungeons.utils
 
 import co.stellarskys.stella.features.stellanav.Map
 import co.stellarskys.stella.api.dungeons.Dungeon
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import java.awt.Color
 
 enum class DungeonClass(
@@ -36,7 +36,7 @@ enum class Checkmark(
     UNEXPLORED("clear/bloommapquestionmark", "§7"),
     UNDISCOVERED(null, "§7");
 
-    val texture: ResourceLocation? get() = texturePath?.let { Map.getOrLoad(it) }
+    val texture: Identifier? get() = texturePath?.let { Map.getOrLoad(it) }
 }
 
 enum class RoomType(

@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.loom) apply false
 }
 
-stonecutter active "1.21.10"
+stonecutter active "26.1"
 
 stonecutter parameters {
     swaps["mod_version"] = "\"${property("mod.version")}\";"
