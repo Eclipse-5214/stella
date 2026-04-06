@@ -8,7 +8,7 @@ import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.gui.components.PlayerFaceRenderer
+import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.resources.Identifier
@@ -45,7 +45,7 @@ object Render2D {
             matrices.scale(scale, scale)
         }
 
-        ctx.drawString(
+        ctx.text(
             client.font,
             str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
             x,
@@ -65,7 +65,7 @@ object Render2D {
             matrices.scale(scale, scale)
         }
 
-        ctx.drawString(
+        ctx.text(
             client.font,
             str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
             x,
@@ -81,7 +81,7 @@ object Render2D {
         context.pose().pushMatrix()
         context.pose().translate(x, y)
         context.pose().scale(scale, scale)
-        context.renderItem(item, 0, 0)
+        context.item(item, 0, 0)
         context.pose().popMatrix()
     }
 
@@ -100,7 +100,7 @@ object Render2D {
         }
 
         textures.textureUrl
-        PlayerFaceRenderer.draw(context, textures, x, y, size)
+        PlayerFaceExtractor.extractRenderState(context, textures, x, y, size)
     }
 
 

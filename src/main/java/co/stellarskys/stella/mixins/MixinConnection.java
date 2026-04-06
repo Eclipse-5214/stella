@@ -14,17 +14,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Connection.class)
 public class MixinConnection {
     @Inject(method = "channelRead0*", at = @At("HEAD"), cancellable = true)
-    private void stella$onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
+    private void stella$onReceivePacket(ChannelHandlerContext ctx, Packet<?> packet, CallbackInfo ci) {
         if (EventBus.INSTANCE.onPacketReceived(packet)) ci.cancel();
     }
 
     @Inject(method = "channelRead0*", at = @At("TAIL"))
-    private void stella$onReceivePacketPost(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
+    private void stella$onReceivePacketPost(ChannelHandlerContext ctx, Packet<?> packet, CallbackInfo ci) {
         EventBus.INSTANCE.post(new PacketEvent.ReceivedPost(packet));
     }
 
     @Inject(method = "sendPacket", at = @At("HEAD"), cancellable = true)
-    private void stella$onPacketSend(Packet<?> packet, ChannelFutureListener channelFutureListener, boolean flush, CallbackInfo ci) {
+    private void stella$onPacketSend(Packet<?> packet, ChannelFutureListener listener, boolean flush, CallbackInfo ci) {
         if (EventBus.INSTANCE.post(new PacketEvent.Sent(packet))) ci.cancel();
     }
 }

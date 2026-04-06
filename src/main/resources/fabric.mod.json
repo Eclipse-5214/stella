@@ -13,7 +13,7 @@
     },
     "license": "LGPL-3.0-or-later",
     "environment": "*",
-    "accessWidener": "stella.accesswidener",
+    "accessWidener": "stella.classtweaker",
     "entrypoints": {
         "client": [
             {
@@ -27,8 +27,8 @@
     ],
     "depends": {
         "minecraft": "${minecraft}",
-        "fabric": "*",
         "fabricloader": ">=0.18.4",
+        "fabric-api": "*",
         "fabric-language-kotlin": "*"
     }
 }

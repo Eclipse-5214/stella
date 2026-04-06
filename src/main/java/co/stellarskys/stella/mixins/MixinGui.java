@@ -17,23 +17,23 @@ public class MixinGui {
      * Modified from Devonian code
      * Under GPL 3.0 License
      */
-    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    private void stella$renderEffects(GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+    @Inject(method = "extractEffects", at = @At("HEAD"), cancellable = true)
+    private void stella$renderEffects(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (InventoryButtons.INSTANCE.isEnabled()) ci.cancel();
     }
 
-    @Inject(method = "renderHearts", at = @At("HEAD"), cancellable = true)
-    private void stella$onRenderHealthBar(GuiGraphicsExtractor guiGraphics, Player player, int i, int j, int k, int l, float f, int m, int n, int o, boolean bl, CallbackInfo ci) {
+    @Inject(method = "extractHearts", at = @At("HEAD"), cancellable = true)
+    private void stella$onRenderHealthBar(GuiGraphicsExtractor graphics, Player player, int xLeft, int yLineBase, int healthRowHeight, int heartOffsetIndex, float maxHealth, int currentHealth, int oldHealth, int absorption, boolean blink, CallbackInfo ci) {
         if (Bars.INSTANCE.getHideVanillaHealth() && Bars.INSTANCE.isEnabled()) ci.cancel();
     }
 
-    @Inject(method = "renderFood", at = @At("HEAD"), cancellable = true)
-    private void stella$onRenderFood(GuiGraphicsExtractor context, Player player, int y, int x, CallbackInfo ci) {
+    @Inject(method = "extractFood", at = @At("HEAD"), cancellable = true)
+    private void stella$onRenderFood(GuiGraphicsExtractor graphics, Player player, int yLineBase, int xRight, CallbackInfo ci) {
         if (Bars.INSTANCE.getHideVanillaHunger() && Bars.INSTANCE.isEnabled()) ci.cancel();
     }
 
-    @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
-    private static void stella$onRenderArmor(GuiGraphicsExtractor context, Player player, int y, int x, int z, int width, CallbackInfo ci) {
+    @Inject(method = "extractArmor", at = @At("HEAD"), cancellable = true)
+    private static void stella$onRenderArmor(GuiGraphicsExtractor graphics, Player player, int yLineBase, int numHealthRows, int healthRowHeight, int xLeft, CallbackInfo ci) {
         if (Bars.INSTANCE.getHideVanillaArmor() && Bars.INSTANCE.isEnabled()) ci.cancel();
     }
 }

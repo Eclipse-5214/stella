@@ -26,10 +26,6 @@ object Stella: ClientModInitializer {
         FeatureManager.initializeFeatures()
 
         PictureInPictureRendererRegistry.register { NVGPIPRenderer(it.bufferSource()) }
-
-        EventBus.on<TickEvent.Server> {
-            println("SERVERING")
-        }
     }
 }
 

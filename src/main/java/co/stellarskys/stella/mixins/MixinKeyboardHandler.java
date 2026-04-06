@@ -15,21 +15,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(KeyboardHandler.class)
 public class MixinKeyboardHandler {
     @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
-    private void stella$onKey(long window, int action, net.minecraft.client.input.KeyEvent input, CallbackInfo ci) {
-        if (window == Zenith.getWindowHandle()) {
+    private void stella$onKey(long handle, int action, net.minecraft.client.input.KeyEvent event, CallbackInfo ci) {
+        if (handle == Zenith.getWindowHandle()) {
             if (action == 1) {
-                if (EventBus.INSTANCE.post(new KeyEvent.Press(input.key(), input.scancode(), input.modifiers()))) ci.cancel();
+                if (EventBus.INSTANCE.post(new KeyEvent.Press(event.key(), event.scancode(), event.modifiers()))) ci.cancel();
             } else if (action == 0) {
-                if (EventBus.INSTANCE.post(new KeyEvent.Release(input.key(), input.scancode(), input.modifiers()))) ci.cancel();
+                if (EventBus.INSTANCE.post(new KeyEvent.Release(event.key(), event.scancode(), event.modifiers()))) ci.cancel();
             }
         }
     }
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
-    private void stella$onChar(long window, net.minecraft.client.input.CharacterEvent characterEvent, CallbackInfo ci) {
+    private void stella$onChar(long handle, net.minecraft.client.input.CharacterEvent event, CallbackInfo ci) {
         Screen screen = Zenith.getClient().screen;
         if (screen == null) return;
-        char charTyped = (char) characterEvent.codepoint();
+        char charTyped = (char) event.codepoint();
         boolean cancelled = EventBus.INSTANCE.post(new GuiEvent.Key(null, GLFW.GLFW_KEY_UNKNOWN, charTyped, 0, screen));
         if (cancelled) ci.cancel();
     }

@@ -18,7 +18,7 @@ object Score {
 
         context.pushPop {
             context.pose().translate(5f, 5f)
-            context.submitMapRenderState(state)
+            context.map(state)
         }
     }
 

@@ -76,16 +76,12 @@ object Astrum {
 
         if (outlineVoxelQueue.isNotEmpty()) {
             val (depth, noDepth) = outlineVoxelQueue.partition { it.depth }
-            depth.groupBy { it.lineWidth }.forEach { (width, list) ->
-                renderVoxelBatch(list, AstrumLayers.getLines(width.toDouble(), true), poseEntry) { b, p, v ->
-                    addVoxelOutlineVertices(b, p, v)
-                }
+            renderVoxelBatch(depth, AstrumLayers.getLines(true), poseEntry) { b, p, v ->
+                addVoxelOutlineVertices(b, p, v)
             }
 
-            noDepth.groupBy { it.lineWidth }.forEach { (width, list) ->
-                renderVoxelBatch(list, AstrumLayers.getLines(width.toDouble(), false), poseEntry) { b, p, v ->
-                    addVoxelOutlineVertices(b, p, v)
-                }
+            renderVoxelBatch(noDepth, AstrumLayers.getLines(false), poseEntry) { b, p, v ->
+                addVoxelOutlineVertices(b, p, v)
             }
         }
 
@@ -103,11 +99,11 @@ object Astrum {
             val (depth, noDepth) = lineQueue.partition { it.depth }
 
             depth.groupBy { it.width }.forEach { (width, lines) ->
-                renderLineBatch(lines, AstrumLayers.getLines(width.toDouble(), true), poseEntry)
+                renderLineBatch(lines, AstrumLayers.getLines(true), poseEntry)
             }
 
             noDepth.groupBy { it.width }.forEach { (width, lines) ->
-                renderLineBatch(lines, AstrumLayers.getLines(width.toDouble(), false), poseEntry)
+                renderLineBatch(lines, AstrumLayers.getLines(false), poseEntry)
             }
         }
 
@@ -186,8 +182,8 @@ object Astrum {
             val sx = (x1 + pos.x).toFloat(); val sy = (y1 + pos.y).toFloat(); val sz = (z1 + pos.z).toFloat()
             val ex = (x2 + pos.x).toFloat(); val ey = (y2 + pos.y).toFloat(); val ez = (z2 + pos.z).toFloat()
 
-            buffer.addVertex(pose, sx, sy, sz).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz) /*? if > 1.21.10 { */.setLineWidth(queued.lineWidth) /*?}*/
-            buffer.addVertex(pose, ex, ey, ez).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz) /*? if > 1.21.10 { */.setLineWidth(queued.lineWidth) /*?}*/
+            buffer.addVertex(pose, sx, sy, sz).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz).setLineWidth(queued.lineWidth)
+            buffer.addVertex(pose, ex, ey, ez).setColor(color).setNormal(pose, ex - sx, ey - sy, ez - sz).setLineWidth(queued.lineWidth)
         }
     }
 

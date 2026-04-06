@@ -1,10 +1,11 @@
 package co.stellarskys.stella.api.astrum
 
 import co.stellarskys.stella.Stella
+import com.mojang.blaze3d.pipeline.DepthStencilState
 import com.mojang.blaze3d.pipeline.RenderPipeline
-import com.mojang.blaze3d.platform.DepthTestFunction
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
+import java.util.Optional
 
 object AstrumPipelines {
     val LINES: RenderPipeline = RenderPipelines.register(
@@ -16,22 +17,20 @@ object AstrumPipelines {
     val LINES_THROUGH_WALLS: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
             .withLocation(id( "lines_through_walls"))
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withDepthStencilState(Optional.empty())
             .build()
     )
 
     val FILLED: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withLocation(id("filled"))
-            //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
             .build()
     )
 
     val FILLED_THROUGH_WALLS: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withLocation(id("filled_through_walls"))
-            //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP)
-            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .withDepthStencilState(Optional.empty())
             .build()
     )
 

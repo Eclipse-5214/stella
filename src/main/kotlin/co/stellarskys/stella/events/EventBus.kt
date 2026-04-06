@@ -22,15 +22,11 @@ import net.minecraft.resources.Identifier
 import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.minecraft.network.protocol.Packet
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
-
-//? if <= 1.21.11 {
-/*import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents
-*///? }
 
 @Module
 object EventBus : EventBus() {
@@ -82,22 +78,20 @@ object EventBus : EventBus() {
         }
 
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
-            if (screen != null) post(GuiEvent.Open(screen))
+            post(GuiEvent.Open(screen))
         }
 
-        //? if <= 1.21.11 {
-         /*WorldRenderEvents.AFTER_ENTITIES.register { context ->
-            post(RenderEvent.World.AfterEntities(context.matrices()))
+        LevelRenderEvents.AFTER_SOLID_FEATURES.register { context ->
+            post(RenderEvent.World.AfterEntities(context.poseStack()))
         }
 
-        WorldRenderEvents.END_MAIN.register { context ->
-           post(RenderEvent.World.Last(context.matrices()))
+        LevelRenderEvents.END_MAIN.register { context ->
+           post(RenderEvent.World.Last(context.poseStack()))
         }
 
-        WorldRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
-           !post(RenderEvent.World.BlockOutline(context.matrices(), outlineRenderState.pos(), outlineRenderState.shape))
+        LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
+           !post(RenderEvent.World.BlockOutline(context.poseStack(), outlineRenderState.pos(), outlineRenderState.shape))
         }
-        *///? }
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->
             if (client.options.hideGui || world == null || player == null) return@attachElementBefore

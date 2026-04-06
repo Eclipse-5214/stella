@@ -11,7 +11,7 @@ object WorldScanUtils {
         val world = world ?: return false
         val chunkX = x shr 4
         val chunkZ = z shr 4
-        return world.chunkSource.hasChunk(chunkX, chunkZ) && world.getChunk(chunkX, chunkZ)?.javaClass?.simpleName != "FakeChunk"
+        return world.chunkSource.hasChunk(chunkX, chunkZ) && world.getChunk(chunkX, chunkZ).javaClass.simpleName != "FakeChunk"
     }
 
     fun getCore(x: Int, z: Int): Int {

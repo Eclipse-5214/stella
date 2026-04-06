@@ -16,12 +16,9 @@ import java.util.Collection;
  */
 @Mixin(EffectsInInventory.class)
 public class MixinEffectsInInventory {
-    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    //?if > 1.21.10 {
-    private void stella$onDrawEffect(GuiGraphicsExtractor guiGraphics, Collection<MobEffectInstance> collection, int i, int j, int k, int l, int m, CallbackInfo ci) {
-    //?} else {
-     /*private void stella$onInventoryEffects(GuiGraphicsExtractor guiGraphics, int i, int j, CallbackInfo ci) {
-    *///?}
+    @Inject(method = "extractEffects", at = @At("HEAD"), cancellable = true)
+
+    private void stella$onDrawEffect(GuiGraphicsExtractor graphics, Collection<MobEffectInstance> activeEffects, int x0, int yStep, int mouseX, int mouseY, int maxWidth, CallbackInfo ci) {
         if (InventoryButtons.INSTANCE.isEnabled()) ci.cancel();
     }
 }

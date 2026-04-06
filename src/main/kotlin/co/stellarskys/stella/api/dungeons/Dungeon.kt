@@ -158,7 +158,7 @@ object Dungeon {
 
         EventBus.on<PacketEvent.Sent>(SkyBlockIsland.THE_CATACOMBS) { event ->
             if (event.packet !is ServerboundUseItemOnPacket) return@on
-            val pos = event.packet.hitResult.blockPos ?: return@on
+            val pos = event.packet.hitResult.blockPos
             val world = world ?: return@on
             val blockState = world.getBlockState(pos)
 

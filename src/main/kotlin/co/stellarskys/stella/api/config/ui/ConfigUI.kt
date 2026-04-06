@@ -256,7 +256,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     fun drawPlayer(x: Float, y: Float, width: Float, height: Float, radius: Float) {
         val skin = player?.skin?.texture ?: return
         imageCacheMap.getOrPut(skin.path) {
-            val texture = textureManager.getTexture(skin)?.texture as? GlTexture
+            val texture = textureManager.getTexture(skin).texture as? GlTexture
             nvg.createNVGImage(texture?.glId() ?: 0, 64, 64)
         }.let { id ->
             nvg.image(id, 64, 64, 8, 8, 8, 8, x, y, width, height, radius)

@@ -19,6 +19,7 @@
       "MixinKeyboardHandler",
       "MixinChatListener",
       "MixinItemInHandRenderer",
-      "accessors.AccessorMapState"
+      "accessors.AccessorMapState",
+      "accessors.AccessorGpuDevice"
     ]
 }

@@ -19,7 +19,7 @@ public abstract class MixinLivingEntity extends Entity {
     }
 
     @Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setPose(Lnet/minecraft/world/entity/Pose;)V"))
-    private void stella$onDeath(DamageSource damageSource, CallbackInfo ci) {
+    private void stella$onDeath(DamageSource source, CallbackInfo ci) {
         EventBus.INSTANCE.post(new EntityEvent.Death(this));
     }
 }

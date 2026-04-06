@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientCommonPacketListenerImpl.class)
 public class MixinClientCommonPacketListenerImpl {
     @Inject(method = "handlePing", at = @At("HEAD"))
-    private void stella$onPingStart(ClientboundPingPacket clientboundPingPacket, CallbackInfo ci) {
+    private void stella$onPingStart(ClientboundPingPacket packet, CallbackInfo ci) {
         EventBus.INSTANCE.post(new TickEvent.Server());
         Chronos.Server.INSTANCE.pulse();
     }

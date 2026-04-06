@@ -4,6 +4,7 @@ import co.stellarskys.stella.events.EventBus;
 import co.stellarskys.stella.events.core.GuiEvent;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,11 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinContainer {
     @Shadow protected int leftPos;
     @Shadow protected int topPos;
-    @Shadow protected int imageWidth;
-    @Shadow protected int imageHeight;
+    @Final @Shadow protected int imageWidth;
+    @Final @Shadow protected int imageHeight;
 
-    @Inject(method = "renderContents", at = @At("TAIL"))
-    public void onRenderContents(GuiGraphicsExtractor guiGraphics, int i, int j, float f, CallbackInfo ci){
-        EventBus.INSTANCE.post(new GuiEvent.Container.Content(guiGraphics, i, j, leftPos, topPos, imageWidth, imageHeight));
+    @Inject(method = "extractContents", at = @At("TAIL"))
+    public void onRenderContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a, CallbackInfo ci){
+        EventBus.INSTANCE.post(new GuiEvent.Container.Content(graphics, mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight));
     }
 }

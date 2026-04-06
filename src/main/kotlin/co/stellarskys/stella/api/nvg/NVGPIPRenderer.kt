@@ -1,5 +1,6 @@
 package co.stellarskys.stella.api.nvg
 
+import co.stellarskys.stella.mixins.accessors.AccessorGpuDevice
 import com.mojang.blaze3d.opengl.GlConst
 import com.mojang.blaze3d.opengl.GlStateManager
 import com.mojang.blaze3d.opengl.GlTexture
@@ -8,20 +9,11 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
-
 import net.minecraft.client.renderer.MultiBufferSource
-
-import org.joml.Matrix3x2f
-
-//? if > 1.21.10 {
-import org.lwjgl.opengl.GL33C
-//?}
-
-//? if > 1.21.11 {
+import com.mojang.blaze3d.opengl.GlDevice
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
-//? } else {
- /*import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
-*///? }
+import org.joml.Matrix3x2f
+import org.lwjgl.opengl.GL33C
 
 /*
  * Adapted from NVGSpecialRenderer.kt in OdinFabric
@@ -33,9 +25,9 @@ import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
  */
 class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPictureRenderer<NVGPIPRenderer.NVGRenderState>(bufferSource) {
     override fun renderToTexture(state: NVGRenderState, poseStack: PoseStack) {
-        /*
+        val device = RenderSystem.getDevice() as? AccessorGpuDevice ?: return
         val colorTex = RenderSystem.outputColorTextureOverride ?: return
-        val bufferManager = (RenderSystem.getDevice() as? GlDevice)?.directStateAccess() ?: return
+        val bufferManager = (device.backend as? GlDevice)?.directStateAccess() ?: return
         val glDepthTex = (RenderSystem.outputDepthTextureOverride?.texture() as? GlTexture) ?: return
 
         val (width, height) = colorTex.let { it.getWidth(0) to it.getHeight(0) }
@@ -44,28 +36,11 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
             GlStateManager._viewport(0, 0, width, height)
         }
 
-        //? if > 1.21.10 {
         GL33C.glBindSampler(0, 0)
-        //?}
-        */
-        val colorTex = RenderSystem.outputColorTextureOverride?: return
-        val depthTex = RenderSystem.outputDepthTextureOverride?: return
-        //val colorId = (colorTex.texture() as? GlTexture)?.glId() ?: return
-        //val depthId = (depthTex.texture() as? GlTexture)?.glId() ?: return
-        val width = colorTex.getWidth(0)
-        val height = colorTex.getHeight(0)
-
-        val fbo = (colorTex.texture() as? GlTexture)?.getFbo(null, depthTex.texture() as GlTexture)
-
-        if (fbo != null) {
-            GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, fbo)
-            GlStateManager._viewport(0, 0, width, height)
-        }
 
         NVGRenderer.beginFrame(width.toFloat(), height.toFloat())
         state.renderContent()
         NVGRenderer.endFrame()
-
 
         GlStateManager._disableDepthTest()
         GlStateManager._disableCull()
@@ -127,11 +102,7 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
                 renderContent
             )
 
-            //? if > 1.21.11 {
             context.guiRenderState.addPicturesInPictureState(state)
-            //? } else {
-            /*context.guiRenderState.submitPicturesInPictureState(state)
-            *///? }
         }
 
         private fun createBounds(x0: Int, y0: Int, x1: Int, y1: Int, pose: Matrix3x2f, scissorArea: ScreenRectangle?): ScreenRectangle? {

@@ -151,7 +151,7 @@ class Capsule<T: Any>(fileName: String, private val defaultObject: T, private va
     }
 
     fun reload() {
-        loadData()?.let { data = it }
+        loadData().let { data = it }
     }
 
     fun copy(): T {

@@ -19,7 +19,7 @@ public class MixinItemInHandRenderer {
     @Shadow private void applyItemArmTransform(PoseStack poseStack, HumanoidArm arm, float inverseArmHeight) {}
 
     @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
-    private void stella$applySwordBlock(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int j, CallbackInfo ci) {
-         if(SwordBlocking.INSTANCE.handleBlock((ItemInHandRenderer) (Object) this, abstractClientPlayer, itemStack, i, poseStack, submitNodeCollector, j, this::applyItemArmTransform)) ci.cancel();
+    private void stella$applySwordBlock(AbstractClientPlayer player, float frameInterp, float xRot, InteractionHand hand, float attack, ItemStack itemStack, float inverseArmHeight, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, CallbackInfo ci) {
+         if(SwordBlocking.INSTANCE.handleBlock((ItemInHandRenderer) (Object) this, player, itemStack, inverseArmHeight, poseStack, submitNodeCollector, lightCoords, this::applyItemArmTransform)) ci.cancel();
     }
 }
