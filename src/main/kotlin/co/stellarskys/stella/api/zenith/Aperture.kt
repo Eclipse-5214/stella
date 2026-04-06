@@ -21,7 +21,7 @@ abstract class Aperture(title: String = "") : Screen(Component.literal(title)) {
     open fun onScreenClose() = super.onClose()
 
     open fun onRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) = super.render(context, mouseX, mouseY, tickDelta)
-    open fun onBackgroundRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) = super.renderBackground(context, mouseX, mouseY, tickDelta)
+    open fun onBackgroundRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) {}
     open fun onMouseClick(button: Int, x: Double, y: Double, modifiers: Int): Boolean = false
     open fun onMouseRelease(button: Int, x: Double, y: Double, modifiers: Int): Boolean = false
     open fun onMouseDrag(button: Int, x: Double, y: Double, deltaX: Double, deltaY: Double, clickTime: Long, modifiers: Int): Boolean = false
