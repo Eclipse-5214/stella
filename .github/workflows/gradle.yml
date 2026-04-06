@@ -34,10 +34,20 @@ jobs:
         run: |
           mkdir -p build/processed
           find . -type f -name "*.jar" -path "*/build/libs/*" | while read -r jar; do
+            if [[ "$jar" == *"stella-ksp"* ]]; then
+              echo "Skipping KSP internal jar: $jar"
+              continue
+            fi
+
             if [[ ! "$jar" == *"-sources"* ]] && [[ ! "$jar" == *"-dev"* ]] && [[ ! "$jar" == *"-refmap"* ]]; then
               filename=$(basename "$jar")
               raw_version=${filename#stella-}
               clean_version=${raw_version%.jar}
+              if [[ "$raw_version" == "$filename" ]]; then
+                 echo "Skipping non-mod jar: $filename"
+                 continue
+              fi
+
               new_name="stella-${clean_version}-fabric-nightly-${{ steps.commit-count.outputs.commit-number }}.jar"
               echo "Processing: $new_name"
               cp "$jar" "build/processed/$new_name"
