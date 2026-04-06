@@ -11,7 +11,6 @@ import org.apache.logging.log4j.Logger
 import kotlinx.coroutines.*
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 
-
 object Stella: ClientModInitializer {
     @JvmStatic val LOGGER: Logger = LogManager.getLogger("stella")
     @JvmStatic val NAMESPACE: String = "stella"
@@ -27,10 +26,6 @@ object Stella: ClientModInitializer {
         FeatureManager.initializeFeatures()
 
         SpecialGuiElementRegistry.register { NVGPIPRenderer(it.vertexConsumers()) }
-
-        EventBus.on<TickEvent.Server> {
-            println("SERVERING")
-        }
     }
 }
 
