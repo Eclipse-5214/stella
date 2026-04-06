@@ -33,11 +33,13 @@ jobs:
       - name: Process built JARs
         run: |
           mkdir -p build/processed
-          for jar in build/libs/*/*.jar; do
-            if [[ ! "$jar" == *"dev"* ]]; then
+          find . -type f -name "*.jar" -path "*/build/libs/*" | while read -r jar; do
+            if [[ ! "$jar" == *"-sources"* ]] && [[ ! "$jar" == *"-dev"* ]] && [[ ! "$jar" == *"-refmap"* ]]; then
               filename=$(basename "$jar")
-              version=$(echo "$filename" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?')
-              new_name="stella-${version}-fabric-nightly-${{ steps.commit-count.outputs.commit-number }}.jar"
+              raw_version=${filename#stella-}
+              clean_version=${raw_version%.jar}
+              new_name="stella-${clean_version}-fabric-nightly-${{ steps.commit-count.outputs.commit-number }}.jar"
+              echo "Processing: $new_name"
               cp "$jar" "build/processed/$new_name"
             fi
           done
