@@ -36,7 +36,7 @@ dependencies {
     }
 
     include(libs.skyblock.api) {
-        capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc-remapped") }
+        capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc") }
     }
 
     shadow(libs.lwjgl.nanovg)
