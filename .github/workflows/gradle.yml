@@ -36,7 +36,7 @@ jobs:
           for jar in build/libs/*/*.jar; do
             if [[ ! "$jar" == *"dev"* ]]; then
               filename=$(basename "$jar")
-              version=$(echo "$filename" | grep -o '1\.21\.[0-9]\+')
+              version=$(echo "$filename" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?')
               new_name="stella-${version}-fabric-nightly-${{ steps.commit-count.outputs.commit-number }}.jar"
               cp "$jar" "build/processed/$new_name"
             fi
