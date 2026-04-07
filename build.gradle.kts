@@ -18,6 +18,7 @@ repositories {
     strictMaven("https://repo.hypixel.net/repository/Hypixel", "net.hypixel")
     strictMaven("https://api.modrinth.com/maven", "maven.modrinth")
     strictMaven("https://maven.teamresourceful.com/repository/maven-public/", "tech.thatgravyboat", "com.terraformersmc", "me.owdding")
+    strictMaven("https://maven.cassian.cc", "cc.cassian")
 }
 
 dependencies {
@@ -30,6 +31,9 @@ dependencies {
     implementation(libs.fabric.language.kotlin)
     implementation(libs.hypixel.modapi)
     implementation(libs.hypixel.modapi.fabric)
+
+    runtimeOnly("cc.cassian.rrv:reliable-recipe-viewer-fabric:7.0.4+$mc.1")
+    compileOnly("cc.cassian.rrv:reliable-recipe-viewer-fabric:7.0.4+$mc.1")
 
     api(libs.skyblock.api) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc") }

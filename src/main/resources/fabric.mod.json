@@ -20,6 +20,9 @@
                 "value": "co.stellarskys.stella.Stella",
                 "adapter": "kotlin"
             }
+        ],
+        "rrv_client": [
+            "co.stellarskys.stella.api.rrv.StellaRrvPlugin"
         ]
     },
     "mixins": [

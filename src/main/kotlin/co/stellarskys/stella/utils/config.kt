@@ -1210,6 +1210,18 @@ val config = Config("Stella", "Stella") {
         subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
         subcategory("Sword Blocking", "swordBlocking", "Enables 1.8.9 style sword blocking")
 
+        subcategory("RRV Integration", "rrv", "Enables the recipe viewer integration (requires RRV)") {
+            stepslider {
+                configName = "rrv.width"
+                name = "Width Override"
+                description = "Changes the Item Displays width by a percentage"
+                min = 0
+                max = 100
+                step = 1
+                default = 100
+            }
+        }
+
         /*
         subcategory("Custom Nametags") {
             toggle {
