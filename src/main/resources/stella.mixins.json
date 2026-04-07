@@ -20,7 +20,7 @@
       "MixinChatListener",
       "MixinItemInHandRenderer",
       "rrv.MixinItemVieweOverlay",
-      "rrv.MixinItemSlot",
+      "rrv.MixinItemFilters",
       "accessors.AccessorMapState",
       "accessors.AccessorGpuDevice"
     ]

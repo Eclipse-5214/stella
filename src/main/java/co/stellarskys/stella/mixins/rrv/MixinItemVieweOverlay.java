@@ -20,6 +20,8 @@ public abstract class MixinItemVieweOverlay extends AbstractRrvItemListOverlay {
 
     @Inject(method = "initForScreen", at = @At("TAIL"))
     private void modifyWidth(AbstractContainerScreen<? extends AbstractContainerMenu> screen, AbstractRrvOverlay.InventoryPositionInfo invInfo, CallbackInfo ci) {
+        if(RrvCompat.INSTANCE.getEnabled()) return;
+
         double percentage = RrvCompat.INSTANCE.getWidth() / 100.0;
 
         int newWidth = (int) (this.width * percentage);
