@@ -21,6 +21,8 @@ object InventoryButtons : Feature("buttons",true) {
     private val invOnly by config.property<Boolean>("buttons.invOnly")
     private val hideInTerms by config.property<Boolean>("buttons.hideInTerms")
 
+    private val menueBlacklist = setOf("RecipeViewScreen")
+
     private val dungeonMenus = setOf(
         "Spirit Leap", "Revive A Teammate", "Click in order!",
         "Click the button on time!", "Correct all the panes!", "Change all to same color!"
@@ -32,7 +34,6 @@ object InventoryButtons : Feature("buttons",true) {
         on<GuiEvent.Container.Content> { event ->
             val screen = client.screen ?: return@on
             if (!validScreen(screen)) return@on
-
             val sw = screen.width.toFloat()
             val sh = screen.height.toFloat()
 
@@ -75,6 +76,7 @@ object InventoryButtons : Feature("buttons",true) {
 
     private fun validScreen(screen: Screen): Boolean {
         if (screen !is InventoryScreen && invOnly) return false
+        if (screen.javaClass.simpleName in menueBlacklist) return false
         if (isTerm(screen.title.stripped) && hideInTerms) return false
         return true
     }

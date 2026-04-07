@@ -7,11 +7,13 @@ import cc.cassian.rrv.common.recipe.inventory.RecipeViewScreen
 import cc.cassian.rrv.common.recipe.inventory.SlotContent
 import co.stellarskys.stella.api.rrv.RrvCompat
 import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.components.Button
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import tech.thatgravyboat.skyblockapi.api.remote.api.SkyBlockId.Companion.getSkyBlockId
+import java.awt.Color
 
 class StellaCraftingClientRecipe(
     private val inputs: Array<SlotContent?>,
@@ -31,6 +33,6 @@ class StellaCraftingClientRecipe(
     }
 
     override fun renderRecipe(screen: RecipeViewScreen, pos: ReliableClientRecipe.RecipePosition, guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
-        guiGraphics.text(client.font, Component.literal("→"), 62, 22, 0xFF404040.toInt(), false)
+        Render2D.drawString(guiGraphics, "→" , 62, 22, color = Color.GRAY, shadow = false)
     }
 }
