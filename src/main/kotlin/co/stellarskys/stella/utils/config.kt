@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.api.config.core.Config
+import co.stellarskys.stella.api.rrv.RrvCompat
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
@@ -1211,6 +1212,8 @@ val config = Config("Stella", "Stella") {
         subcategory("Sword Blocking", "swordBlocking", "Enables 1.8.9 style sword blocking")
 
         subcategory("RRV Integration", "rrv", "Enables the recipe viewer integration (requires RRV)") {
+            shouldShow { RrvCompat.modInstalled }
+
             stepslider {
                 configName = "rrv.width"
                 name = "Width Override"
@@ -1219,6 +1222,16 @@ val config = Config("Stella", "Stella") {
                 max = 100
                 step = 1
                 default = 100
+            }
+
+            button {
+                configName = "rrvConfig"
+                name = "Open RRV Config"
+                description = "Opens the rrv config"
+
+                onclick {
+                    RrvCompat.openConfig()
+                }
             }
         }
 

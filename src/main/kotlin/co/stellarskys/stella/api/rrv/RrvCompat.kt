@@ -2,13 +2,18 @@ package co.stellarskys.stella.api.rrv
 
 import cc.cassian.rrv.api.recipe.ItemView
 import cc.cassian.rrv.api.recipe.ReliableServerRecipeType
+import cc.cassian.rrv.common.gui.RrvClientSettingsScreen
 import cc.cassian.rrv.common.recipe.ServerRecipeManager
 import cc.cassian.rrv.common.recipe.cache.LowEndRecipeCache
 import cc.cassian.rrv.common.recipe.inventory.SlotContent
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.rrv.core.ServerRecipe
 import co.stellarskys.stella.api.rrv.recipes.*
 import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.RepoEvent
 import co.stellarskys.stella.utils.config
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.resources.Identifier
@@ -25,16 +30,22 @@ import tech.thatgravyboat.skyblockapi.utils.extentions.getLore
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import kotlin.collections.forEach
 
+@Module
 object RrvCompat {
     private val PET_REGEX = """\[Lvl\s\d+]\s+([a-zA-Z0-9 ]+)""".toRegex()
-    private var injected = false
+
     private val cachedEntries = mutableMapOf<ReliableServerRecipeType<*>, List<ServerRecipeManager.ServerRecipeEntry>>()
     val cachedStacks = mutableListOf<ItemStack>()
 
-    val modInstalled = FabricLoader.getInstance().isModLoaded("rrv")
     val configEnabled by config.property<Boolean>("rrv")
     val width by config.property<Int>("rrv.width")
-    val enabled get() = configEnabled && RepoAPI.isInitialized() && modInstalled
+    val modInstalled get() = FabricLoader.getInstance().isModLoaded("rrv")
+    val enabled get() = configEnabled && modInstalled
+
+    var injected = false
+        private set
+
+    init { EventBus.on<RepoEvent.Success> { sync(); println("enabled: $enabled")} }
 
     fun checkIngredient(s: ItemStack?, slots: List<SlotContent>) = s?.getSkyBlockId()?.let { id -> slots.any { it.validContents.any { i -> i.getSkyBlockId() == id } } } ?: false
 
@@ -100,6 +111,7 @@ object RrvCompat {
 
     fun formatTime(s: Int) = when { s >= 86400 -> "${s/86400}d"; s >= 3600 -> "${s/3600}h"; s >= 60 -> "${s/60}m"; else -> "${s}s" }
     fun formatCoins(c: Int) = when { c >= 1_000_000 -> "${c/1_000_000}M"; c >= 1_000 -> "${c/1_000}k"; else -> c.toString() }
+    fun openConfig() { Chronos.Tick post { client.setScreen(RrvClientSettingsScreen(client.screen)) } }
 
     private fun ServerRecipe.addResult(i: CraftingIngredient?) = results.add(resolveToIngredient(i))
     private fun LowEndRecipeCache.cacheType(t: ReliableServerRecipeType<*>, e: Map<ReliableServerRecipeType<*>, List<ServerRecipeManager.ServerRecipeEntry>>) = e[t]?.let { r -> startCaching(t, r.size); r.forEach { cacheModRecipe(it) }; endCaching(t) }

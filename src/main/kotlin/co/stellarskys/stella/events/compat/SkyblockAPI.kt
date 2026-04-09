@@ -11,13 +11,16 @@ import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.events.core.PlayerEvent
+import co.stellarskys.stella.events.core.RepoEvent
 import co.stellarskys.stella.events.core.ScoreboardEvent
 import co.stellarskys.stella.events.core.TablistEvent
 import net.hypixel.data.type.GameType
+import tech.thatgravyboat.repolib.api.RepoStatus
 import tech.thatgravyboat.skyblockapi.api.events.dungeon.DungeonKeyPickedUpEvent
 import tech.thatgravyboat.skyblockapi.api.events.hypixel.ServerChangeEvent
 import tech.thatgravyboat.skyblockapi.api.events.location.AreaChangeEvent
 import tech.thatgravyboat.skyblockapi.api.events.location.IslandChangeEvent
+import tech.thatgravyboat.skyblockapi.api.events.misc.RepoStatusEvent
 
 /**
  * Handles and converts SkyblockAPI events to our own.
@@ -68,5 +71,11 @@ object SkyblockAPI {
     @Subscription
     fun onKeyPickup(event: DungeonKeyPickedUpEvent) {
         EventBus.post(DungeonEvent.KeyPickUp(event.key))
+    }
+
+    @Subscription
+    fun onRepoStatus(event: RepoStatusEvent) {
+        EventBus.post(RepoEvent.Sataus(event.status))
+        if (event.status == RepoStatus.SUCCESS) EventBus.post(RepoEvent.Success())
     }
 }

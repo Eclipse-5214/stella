@@ -14,7 +14,7 @@ import java.util.List;
 public class MixinItemFilters {
     @Inject(method = "fullStackList", at = @At("HEAD"), cancellable = true)
     private static void stella$bypassIndexing(CallbackInfoReturnable<List<ItemStack>> cir) {
-        if (!RrvCompat.INSTANCE.getConfigEnabled()) return;
+        if (!RrvCompat.INSTANCE.getConfigEnabled() && !RrvCompat.INSTANCE.getInjected()) return;
         List<ItemStack> prebuilt = RrvCompat.INSTANCE.getCachedStacks();
         cir.setReturnValue(prebuilt);
     }
