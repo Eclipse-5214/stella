@@ -45,7 +45,7 @@ object RrvCompat {
     var injected = false
         private set
 
-    init { EventBus.on<RepoEvent.Success> { sync(); println("enabled: $enabled")} }
+    init { EventBus.on<RepoEvent.Success> { sync() } }
 
     fun checkIngredient(s: ItemStack?, slots: List<SlotContent>) = s?.getSkyBlockId()?.let { id -> slots.any { it.validContents.any { i -> i.getSkyBlockId() == id } } } ?: false
 

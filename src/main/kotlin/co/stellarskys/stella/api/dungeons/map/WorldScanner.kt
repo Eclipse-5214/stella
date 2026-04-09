@@ -149,7 +149,6 @@ object WorldScanner {
                 room.addComponent(neighborComp)
                 rooms[neighborIdx] = room
             } else if (neighborRoom != room && neighborRoom.type != RoomType.ENTRANCE) {
-                println("DEBUG: Merging ${room.name} with ${neighborRoom.name} at $neighborIdx")
                 Dungeon.mergeRooms(neighborRoom, room)
             }
         }

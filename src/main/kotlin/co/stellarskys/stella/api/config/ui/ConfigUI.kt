@@ -194,7 +194,6 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         val container = subcategoryContainers[configKey] ?: return
         val element = subcategoryRefs[configKey] ?: return
         val predicateVisible = element.isVisible(config)
-        println("configKey: $configKey, predicateVisible: $predicateVisible")
         val searchVisible = if (searchQuery.isEmpty()) {
             true
         } else {
