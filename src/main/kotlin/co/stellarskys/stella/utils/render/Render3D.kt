@@ -59,7 +59,7 @@ object Render3D {
     }
 
     fun drawLineFromCursor(target: Vec3, color: Color, width: Float = 1f) {
-        val cam = Astrum.cam
+        val cam = client.gameRenderer.mainCamera
         val start = cam.position().add(Vec3.directionFromRotation(cam.xRot(), cam.yRot()).scale(0.5))
         Astrum.queueLine(start, target, color, width, depth = false)
     }
@@ -89,7 +89,7 @@ object Render3D {
     ) {
         var finalScale = scale
         if (increase) {
-            val dist = Astrum.cam.position().distanceTo(pos)
+            val dist = client.gameRenderer.mainCamera.position().distanceTo(pos)
             finalScale *= (dist.toFloat() / 120f) / 0.025f
         }
 

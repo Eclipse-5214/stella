@@ -101,11 +101,9 @@ object Astrum {
 
         if (lineQueue.isNotEmpty()) {
             val (depth, noDepth) = lineQueue.partition { it.depth }
-
             depth.groupBy { it.width }.forEach { (width, lines) ->
                 renderLineBatch(lines, AstrumLayers.getLines(width.toDouble(), true), poseEntry)
             }
-
             noDepth.groupBy { it.width }.forEach { (width, lines) ->
                 renderLineBatch(lines, AstrumLayers.getLines(width.toDouble(), false), poseEntry)
             }
