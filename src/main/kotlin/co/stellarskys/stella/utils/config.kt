@@ -1,21 +1,14 @@
 package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.api.config.core.Config
-import co.stellarskys.stella.api.rrv.RrvCompat
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.features.secrets.utils.RouteRegistry
 import co.stellarskys.stella.hud.HUDEditor
+import net.minecraft.util.Util
 import java.awt.Color
 import java.net.URI
-
-//? if <= 1.21.10 {
-/*import net.minecraft.Util
-*///?} else {
- import net.minecraft.util.Util
-//?}
-
 
 val config = Config("Stella", "Stella") {
     category("General") {
@@ -1210,30 +1203,6 @@ val config = Config("Stella", "Stella") {
 
         subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
         subcategory("Sword Blocking", "swordBlocking", "Enables 1.8.9 style sword blocking")
-
-        subcategory("RRV Integration", "rrv", "Enables the recipe viewer integration (requires RRV)") {
-            shouldShow { RrvCompat.modInstalled }
-
-            stepslider {
-                configName = "rrv.width"
-                name = "Width Override"
-                description = "Changes the Item Displays width by a percentage"
-                min = 0
-                max = 100
-                step = 1
-                default = 100
-            }
-
-            button {
-                configName = "rrvConfig"
-                name = "Open RRV Config"
-                description = "Opens the rrv config"
-
-                onclick {
-                    RrvCompat.openConfig()
-                }
-            }
-        }
 
         /*
         subcategory("Custom Nametags") {
