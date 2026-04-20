@@ -9,17 +9,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.Camera
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 import java.awt.Color
-
-//?if > 1.21.10 {
- import net.minecraft.client.renderer.rendertype.RenderType
- //? } else {
-/*import net.minecraft.client.renderer.RenderType
-*///? }
 
 @Module
 object Astrum {
@@ -32,8 +27,8 @@ object Astrum {
     private val lineQueue = mutableListOf<QueuedLine>()
     private val textQueue = mutableListOf<QueuedText>()
 
-    lateinit var buffers: MultiBufferSource.BufferSource
-    lateinit var cam: Camera
+    private lateinit var buffers: MultiBufferSource.BufferSource
+    private lateinit var cam: Camera
 
     init {
         EventBus.on<RenderEvent.World.Last> { event ->

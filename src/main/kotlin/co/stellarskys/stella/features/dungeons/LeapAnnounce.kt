@@ -16,7 +16,7 @@ object LeapAnnounce: Feature("leapAnnounce", island = SkyBlockIsland.THE_CATACOM
     override fun initialize() {
         on<ChatEvent.Receive> { event ->
             val person = leapRegex.find(event.message.stripped)?.groups?.get(1)?.value ?: return@on
-            val finalMessage = if (message.contains("\$player")) message.replace($$"$player", person) else "$message $person"
+            val finalMessage = if (message.contains($$"$player")) message.replace($$"$player", person) else "$message $person"
             Signal.sendCommand("pc $finalMessage")
         }
     }

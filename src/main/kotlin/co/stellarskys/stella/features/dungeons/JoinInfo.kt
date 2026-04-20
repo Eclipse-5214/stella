@@ -26,7 +26,7 @@ object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
         }
     }
 
-    fun fetchAndDisplayStats(name:String) {
+    fun fetchAndDisplayStats(name: String) {
         HypixelApi.getUuid(name) { uuid ->
             if (uuid == null) {
                 Signal.fakeMessage("${Stella.PREFIX} §cNo UUID found for $name")

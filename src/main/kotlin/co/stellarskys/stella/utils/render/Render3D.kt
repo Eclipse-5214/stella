@@ -1,8 +1,8 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.api.astrum.Astrum
+import co.stellarskys.stella.api.zenith.camera
 import co.stellarskys.stella.api.zenith.client
-import net.minecraft.client.Camera
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
@@ -11,11 +11,6 @@ import net.minecraft.world.phys.shapes.CollisionContext
 import java.awt.Color
 
 object Render3D {
-    //? <= 1.21.10 {
-    /*fun Camera.xRot() = this.xRot
-    fun Camera.yRot() = this.yRot
-    *///?}
-
     fun outlineBlock(pos: BlockPos, color: Color, lineWidth: Float = 1f, depth: Boolean = true, state: BlockState? = null) {
         val level = client.level ?: return
         val finalState = state ?:level.getBlockState(pos)
@@ -59,8 +54,7 @@ object Render3D {
     }
 
     fun drawLineFromCursor(target: Vec3, color: Color, width: Float = 1f) {
-        val cam = Astrum.cam
-        val start = cam.position().add(Vec3.directionFromRotation(cam.xRot(), cam.yRot()).scale(0.5))
+        val start = camera.position().add(Vec3.directionFromRotation(camera.xRot(), camera.yRot()).scale(0.5))
         Astrum.queueLine(start, target, color, width, depth = false)
     }
 
@@ -89,7 +83,7 @@ object Render3D {
     ) {
         var finalScale = scale
         if (increase) {
-            val dist = Astrum.cam.position().distanceTo(pos)
+            val dist = camera.position().distanceTo(pos)
             finalScale *= (dist.toFloat() / 120f) / 0.025f
         }
 

@@ -1,6 +1,7 @@
 package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.utils.config
+
 class HUDElement(
     val id: String,
     var x: Float,

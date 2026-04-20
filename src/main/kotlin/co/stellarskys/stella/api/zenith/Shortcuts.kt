@@ -1,5 +1,6 @@
 package co.stellarskys.stella.api.zenith
 
+import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
@@ -11,3 +12,4 @@ inline val textureManager: TextureManager get() = Zenith.textureManager
 inline val player: LocalPlayer? get() = Zenith.player
 inline val world: ClientLevel? get() = Zenith.world
 inline val resourceManager: ResourceManager get() = Zenith.resourceManager
+inline val camera: Camera get() = Zenith.cam

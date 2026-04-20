@@ -20,9 +20,7 @@ object RoomName : Feature("showRoomName", island = SkyBlockIsland.THE_CATACOMBS)
         on<GuiEvent.RenderHUD> { renderHUD(it.context) }
     }
 
-    private fun renderHUD(
-        context: GuiGraphicsExtractor
-    ) = HUDManager.renderHud("roomname", context) {
+    private fun renderHUD(context: GuiGraphicsExtractor) = HUDManager.renderHud("roomname", context) {
         if (Dungeon.inBoss) return@renderHud
         val text = "${if (chroma) "§z" else ""}${Dungeon.currentRoom?.name ?: "No Room Found"}"
         Render2D.drawString(context,text, 0, 0, shadow = false)
