@@ -19,9 +19,6 @@
       "MixinKeyboardHandler",
       "MixinChatListener",
       "MixinItemInHandRenderer",
-      "rrv.MixinItemViewOverlay",
-      "rrv.MixinItemFilters",
-      "rrv.MixinClientRecipeManager",
       "accessors.AccessorMapState",
       "accessors.AccessorGpuDevice"
     ]

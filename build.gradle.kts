@@ -32,9 +32,6 @@ dependencies {
     implementation(libs.hypixel.modapi)
     implementation(libs.hypixel.modapi.fabric)
 
-    runtimeOnly("cc.cassian.rrv:reliable-recipe-viewer-fabric:7.0.4+$mc.1")
-    compileOnly("cc.cassian.rrv:reliable-recipe-viewer-fabric:7.0.4+$mc.1")
-
     api(libs.skyblock.api) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc") }
     }
