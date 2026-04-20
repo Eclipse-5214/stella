@@ -1,6 +1,7 @@
 package co.stellarskys.stella.api.zenith
 
 import com.mojang.blaze3d.platform.Window
+import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
@@ -18,6 +19,7 @@ object Zenith {
     @JvmStatic val resourceManager: ResourceManager get() = client.resourceManager
     @JvmStatic val window: Window get() = client.window
     @JvmStatic val windowHandle: Long get() = window.handle()
+    @JvmStatic val cam: Camera get() = client.gameRenderer.mainCamera
 
     object Mouse {
         @JvmStatic val rawX: Double get() = client.mouseHandler.xpos()

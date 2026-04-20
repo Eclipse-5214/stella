@@ -32,8 +32,8 @@ object Astrum {
     private val lineQueue = mutableListOf<QueuedLine>()
     private val textQueue = mutableListOf<QueuedText>()
 
-    lateinit var buffers: MultiBufferSource.BufferSource
-    lateinit var cam: Camera
+    private lateinit var buffers: MultiBufferSource.BufferSource
+    private lateinit var cam: Camera
 
     init {
         EventBus.on<RenderEvent.World.Last> { event ->
@@ -81,7 +81,6 @@ object Astrum {
                     addVoxelOutlineVertices(b, p, v)
                 }
             }
-
             noDepth.groupBy { it.lineWidth }.forEach { (width, list) ->
                 renderVoxelBatch(list, AstrumLayers.getLines(width.toDouble(), false), poseEntry) { b, p, v ->
                     addVoxelOutlineVertices(b, p, v)

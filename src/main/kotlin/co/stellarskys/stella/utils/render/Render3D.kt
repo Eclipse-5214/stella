@@ -1,6 +1,7 @@
 package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.api.astrum.Astrum
+import co.stellarskys.stella.api.zenith.camera
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.client.Camera
 import net.minecraft.core.BlockPos
@@ -18,7 +19,7 @@ object Render3D {
 
     fun outlineBlock(pos: BlockPos, color: Color, lineWidth: Float = 1f, depth: Boolean = true, state: BlockState? = null) {
         val level = client.level ?: return
-        val finalState = state ?:level.getBlockState(pos)
+        val finalState = state ?: level.getBlockState(pos)
         val shape = finalState.getShape(level, pos, CollisionContext.empty())
 
         if (shape.isEmpty) {
@@ -59,8 +60,7 @@ object Render3D {
     }
 
     fun drawLineFromCursor(target: Vec3, color: Color, width: Float = 1f) {
-        val cam = client.gameRenderer.mainCamera
-        val start = cam.position().add(Vec3.directionFromRotation(cam.xRot(), cam.yRot()).scale(0.5))
+        val start = camera.position().add(Vec3.directionFromRotation(camera.xRot(), camera.yRot()).scale(0.5))
         Astrum.queueLine(start, target, color, width, depth = false)
     }
 
@@ -89,7 +89,7 @@ object Render3D {
     ) {
         var finalScale = scale
         if (increase) {
-            val dist = client.gameRenderer.mainCamera.position().distanceTo(pos)
+            val dist = camera.position().distanceTo(pos)
             finalScale *= (dist.toFloat() / 120f) / 0.025f
         }
 
