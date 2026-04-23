@@ -78,8 +78,8 @@ object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
         Component.literal(title).apply {
             (1..7).forEach { floor ->
                 val time = dungeonType.fastestSPlus["$floor"]?.toLong()?.toMMSS() ?: "§7None"
-                val comps = dungeonType.tierComps["$floor"] ?: "0"
-                append("\n$floorPrefix: $time §8(§b$comps§8)")
+                val comps = dungeonType.tierComps["$floor"]?.toInt() ?: "0"
+                append("\n$floorPrefix$floor: $time §8(§b$comps§8)")
             }
         }
 
