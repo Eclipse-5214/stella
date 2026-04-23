@@ -165,7 +165,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         }
 
         subcategoryContainers.keys.forEach { key->
-            updateSubcategoryVisibility(key)
+            updateSubcategoryVisibility(key, config)
         }
 
         for (panel in panels) {
@@ -189,17 +189,18 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         container.setVisibility(predicateVisible && searchVisible)
     }
 
-    private fun updateSubcategoryVisibility(configKey: String) {
+    private fun updateSubcategoryVisibility(configKey: String, config: Config) {
         val container = subcategoryContainers[configKey] ?: return
         val element = subcategoryRefs[configKey] ?: return
-        val visible = if (searchQuery.isEmpty()) {
+        val predicateVisible = element.isVisible(config)
+        val searchVisible = if (searchQuery.isEmpty()) {
             true
         } else {
             element.name.contains(searchQuery, ignoreCase = true) || element.description.contains(searchQuery, ignoreCase = true)
                     || element.elements.any { it.value.name.contains(searchQuery, ignoreCase = true) || it.value.description.contains(searchQuery, ignoreCase = true) }
         }
 
-        container.setVisibility(visible)
+        container.setVisibility(predicateVisible && searchVisible)
     }
 
     fun drawHeader() {
