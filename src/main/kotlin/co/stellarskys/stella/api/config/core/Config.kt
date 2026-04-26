@@ -15,7 +15,6 @@ import kotlin.reflect.KProperty
 
 //Main config Shananagens
 class Config(
-    val fileName: String,
     val modID: String,
     val configPath: File? = null,
     builder: Config.() -> Unit
@@ -30,6 +29,7 @@ class Config(
     private var loading = false
 
     private val resolvedFile: File get() = configPath ?: File("config/$modID/settings.json")
+    val path get() = "config/$modID"
 
     init {
         builder()

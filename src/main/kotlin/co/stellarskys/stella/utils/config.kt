@@ -1,5 +1,6 @@
 package co.stellarskys.stella.utils
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.config.core.Config
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
@@ -10,7 +11,7 @@ import net.minecraft.util.Util
 import java.awt.Color
 import java.net.URI
 
-val config = Config("Stella", "Stella") {
+val config = Config(Stella.NAMESPACE) {
     category("General") {
         subcategory("Info") {
             textparagraph {

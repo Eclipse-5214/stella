@@ -11,7 +11,7 @@ object RoomRegistry {
     private val byCore = mutableMapOf<Int, RoomMetadata>()
     private val allRooms = mutableListOf<RoomMetadata>()
     private val ROOM_DATA_URL = "${Stella.ETHER}/rooms.json"
-    private val LOCAL_ROOMS_FILE = File("config/stella/rooms.json")
+    private val LOCAL_ROOMS_FILE = File("${Stella.PATH}/rooms.json")
 
     fun loadFromRemote() {
         Quasar.fetch<List<RoomMetadata>>(ROOM_DATA_URL) { result ->
