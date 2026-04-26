@@ -3,8 +3,7 @@ package co.stellarskys.stella
 import co.stellarskys.stella.managers.FeatureManager
 import co.stellarskys.stella.api.animation.DeltaTracker
 import co.stellarskys.stella.api.nvg.NVGPIPRenderer
-import co.stellarskys.stella.events.EventBus
-import co.stellarskys.stella.events.core.TickEvent
+import co.stellarskys.stella.utils.config
 import net.fabricmc.api.ClientModInitializer
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -18,6 +17,7 @@ object Stella: ClientModInitializer {
     @JvmStatic val SHORTPREFIX: String = "§d[SA]"
     @JvmStatic val ETHER: String = "https://ether.stellarskys.co"
     @JvmStatic val API: String = "https://api.stellarskys.co"
+    @JvmStatic val PATH get() = config.path
     @JvmStatic val DELTA: DeltaTracker = DeltaTracker()
     @JvmStatic val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 

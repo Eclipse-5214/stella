@@ -23,7 +23,7 @@ import kotlin.jvm.optionals.getOrNull
 
 object ButtonManager {
     private val buttons = mutableListOf<StellaButton>()
-    private val buttonFile: File get() = File("config/Stella/buttons.json")
+    private val buttonFile: File get() = File("${Stella.PATH}/buttons.json")
 
     val width get()  = Zenith.Res.scaledWidth.toFloat()
     val height get() = Zenith.Res.scaledHeight.toFloat()

@@ -11,7 +11,7 @@ import java.io.File
 
 @Module
 object RouteRegistry {
-    private val ROUTES_FILE get() = File("config/stella/routes/${SecretRoutes.routeFile}")
+    private val ROUTES_FILE get() = File("${Stella.PATH}/routes/${SecretRoutes.routeFile}")
     private val gson = GsonBuilder().disableHtmlEscaping().create()
     private var routeFile: RouteFile = RouteFile()
 

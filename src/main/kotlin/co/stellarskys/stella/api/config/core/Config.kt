@@ -30,6 +30,7 @@ class Config(
     private var loading = false
 
     private val resolvedFile: File get() = configPath ?: File("config/$modID/settings.json")
+    val path get() = "config/$modID"
 
     init {
         builder()

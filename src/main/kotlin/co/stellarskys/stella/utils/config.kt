@@ -16,7 +16,7 @@ import net.minecraft.Util
 *///?}
 
 
-val config = Config("Stella", "Stella") {
+val config = Config("stella", "Stella") {
     category("General") {
         subcategory("Info") {
             textparagraph {
