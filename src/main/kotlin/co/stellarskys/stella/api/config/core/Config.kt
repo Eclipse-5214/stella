@@ -15,7 +15,6 @@ import kotlin.reflect.KProperty
 
 //Main config Shananagens
 class Config(
-    val fileName: String,
     val modID: String,
     val configPath: File? = null,
     builder: Config.() -> Unit
@@ -24,7 +23,6 @@ class Config(
     private val elementMap = mutableMapOf<String, ConfigElement>()
     private val categories = mutableMapOf<String, ConfigCategory>()
     private val listeners = mutableListOf<(String, Any?) -> Unit>()
-
     private var configUI: ConfigUI? = null
     private var loaded = false
     private var loading = false
