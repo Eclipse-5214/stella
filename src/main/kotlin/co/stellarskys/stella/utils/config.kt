@@ -897,6 +897,13 @@ val config = Config(Stella.NAMESPACE) {
                 default = true
             }
 
+            toggle {
+                configName = "secretRoutes.startEsp"
+                name = "Start ESP"
+                description = "Renders start text through walls"
+                default = false
+            }
+
             slider {
                 configName = "secretRoutes.textScale"
                 name = "Text Scale"

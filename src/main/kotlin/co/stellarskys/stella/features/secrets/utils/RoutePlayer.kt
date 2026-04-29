@@ -10,6 +10,7 @@ import java.awt.Color
 object RoutePlayer {
     val text by config.property<Boolean>("secretRoutes.text")
     val textScale by config.property<Float>("secretRoutes.textScale")
+    val startEsp by config.property<Boolean>("secretRoutes.startEsp")
 
     fun renderRoute(data: StepData, firstStep: Boolean) {
         val room = Dungeon.currentRoom ?: return
@@ -34,7 +35,7 @@ object RoutePlayer {
         if (firstStep) {
             val startPoint = room.getRealCoord(data.line.first())
             val startPos = Vec3(startPoint.center.x, startPoint.center.y + 1, startPoint.center.z)
-            Render3D.drawText("Start!", startPos, bgBox = true)
+            Render3D.drawText("Start!", startPos, bgBox = true, depth = startEsp)
         }
 
         data.line.zipWithNext { a, b ->
