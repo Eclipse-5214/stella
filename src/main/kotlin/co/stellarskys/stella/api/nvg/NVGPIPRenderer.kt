@@ -39,8 +39,13 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
         GL33C.glBindSampler(0, 0)
 
         NVGRenderer.beginFrame(width.toFloat(), height.toFloat())
-        state.renderContent()
-        NVGRenderer.endFrame()
+        try {
+            state.renderContent()
+        } finally {
+            NVGRenderer.endFrame()
+        }
+
+
 
         GlStateManager._disableDepthTest()
         GlStateManager._disableCull()
