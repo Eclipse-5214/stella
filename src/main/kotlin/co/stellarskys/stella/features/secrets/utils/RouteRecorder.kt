@@ -232,11 +232,15 @@ object RouteRecorder {
             if(SecretRoutes.minimized) Render2D.drawString(context, "§c■ Not Recording", 0, 0)
             else Render2D.drawString(context, "§cNot Recording", 0, 0)
         } else {
-            val etherwarps = currentStep.waypoints.filter { it.type == WaypointType.ETHERWARP }.size
-            val superbooms = currentStep.waypoints.filter { it.type == WaypointType.SUPERBOOM }.size
-            val levers = currentStep.waypoints.filter { it.type == WaypointType.LEVER }.size
-            val stonks = currentStep.waypoints.filter { it.type == WaypointType.MINE }.size
-            val customs = currentStep.waypoints.filter { it.type == WaypointType.CUSTOM }.size
+            var etherwarps = 0; var superbooms = 0; var levers = 0; var stonks = 0; var customs = 0
+            for (wp in currentStep.waypoints) when (wp.type) {
+                WaypointType.ETHERWARP -> etherwarps++
+                WaypointType.SUPERBOOM -> superbooms++
+                WaypointType.LEVER     -> levers++
+                WaypointType.MINE      -> stonks++
+                WaypointType.CUSTOM    -> customs++
+                else -> {}
+            }
 
             val lastSecretType = lastStep?.waypoints?.firstOrNull { it.type in WaypointType.SECRET}?.type ?: "§cNone"
 
