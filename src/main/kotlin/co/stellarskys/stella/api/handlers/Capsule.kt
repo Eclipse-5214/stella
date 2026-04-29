@@ -68,7 +68,7 @@ class Capsule<T: Any>(fileName: String, private val defaultObject: T, private va
 
     private val dataFile = File(
         FabricLoader.getInstance().configDir.toFile(),
-        "Stella/${fileName}.json"
+        "stella/${fileName}.json"
     )
     private var data: T = loadData()
     private var lastSavedTime = Chronos.now
