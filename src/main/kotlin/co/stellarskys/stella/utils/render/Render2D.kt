@@ -135,6 +135,6 @@ object Render2D {
         }
     }
 
-    fun GuiGraphics.batchNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) { Batcher.queue(this, scaled, block) }
-    fun GuiGraphics.flushNVG() { Batcher.flush(this) }
+    fun GuiGraphicsExtractor.batchNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) { Batcher.queue(this, scaled, block) }
+    fun GuiGraphicsExtractor.flushNVG() { Batcher.flush(this) }
 }
