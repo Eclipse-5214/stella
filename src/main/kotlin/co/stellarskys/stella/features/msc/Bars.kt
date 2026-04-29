@@ -12,7 +12,9 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.api.nvg.NVGRenderer
-import net.minecraft.client.gui.GuiGraphicsExtractor
+import co.stellarskys.stella.utils.render.Render2D.batchNVG
+import co.stellarskys.stella.utils.render.Render2D.flushNVG
+import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.profile.StatsAPI
 import java.awt.Color
@@ -85,15 +87,17 @@ object Bars : Feature("bars", true) {
             if (manaBar) mpHud(it.context)
             if (mpNum) mpNumHud(it.context)
             if (ofMana) ofManaHud(it.context)
+
+            it.context.flushNVG()
         }
     }
 
-    fun hpHudPreview(context: GuiGraphicsExtractor) = context.drawNVG {
+    fun hpHudPreview(context: GuiGraphics) = context.drawNVG {
         NVGRenderer.rect(5f, 5f, 80f, 5f, healthColor.rgb, 3f)
     }
 
 
-    fun hpNumPreview(context: GuiGraphicsExtractor) {
+    fun hpNumPreview(context: GuiGraphics) {
         val string = "1000/1000"
         val x = 35 - (string.width() / 2)
         Render2D.drawString(context, "1000", x,5, color = healthColor)
@@ -101,17 +105,17 @@ object Bars : Feature("bars", true) {
         Render2D.drawString(context, "1000", x + "1000/".width(), 5, color = healthColor)
     }
 
-    fun hpChangePreview(context: GuiGraphicsExtractor) {
+    fun hpChangePreview(context: GuiGraphics) {
         val string = "+123"
         val x = 15 - (string.width() / 2)
         Render2D.drawString(context, "§a$string", x,5)
     }
 
-    fun mpHudPreview(context: GuiGraphicsExtractor) = context.drawNVG {
+    fun mpHudPreview(context: GuiGraphics) = context.drawNVG {
             NVGRenderer.rect(5f, 5f, 80f, 5f, manaColor.rgb, 3f)
     }
 
-    fun mpNumPreview(context: GuiGraphicsExtractor) {
+    fun mpNumPreview(context: GuiGraphics) {
         val string = "1000/1000"
         val x = 35 - (string.width() / 2)
         Render2D.drawString(context, "1000", x,5, color = manaColor)
@@ -119,13 +123,13 @@ object Bars : Feature("bars", true) {
         Render2D.drawString(context, "1000", x + "1000/".width(), 5, color = manaColor)
     }
 
-    fun ofManaPreview(context: GuiGraphicsExtractor) {
+    fun ofManaPreview(context: GuiGraphics) {
         val string = "400"
         val x = 15 - (string.width() / 2)
         Render2D.drawString(context, string + "ʬ", x,5, color = ofmColor)
     }
 
-    fun hpHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(HPHudName, context) {
+    fun hpHud(context: GuiGraphics) = HUDManager.renderHud(HPHudName, context) {
         val matrix = context.pose()
         matrix.translate(5f, 5f)
 
@@ -135,7 +139,7 @@ object Bars : Feature("bars", true) {
         drawBar(context, smoothHp, smoothAbs, absorptionBar, healthColor, absorptionColor)
     }
 
-    fun hpNumHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(HPNumHudName, context) {
+    fun hpNumHud(context: GuiGraphics) = HUDManager.renderHud(HPNumHudName, context) {
         val matrix = context.pose()
 
         val left = StatsAPI.health
@@ -150,7 +154,7 @@ object Bars : Feature("bars", true) {
         Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = healthColor)
     }
 
-    fun hpChangeHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(HPChangeHudName, context) {
+    fun hpChangeHud(context: GuiGraphics) = HUDManager.renderHud(HPChangeHudName, context) {
         val matrix = context.pose()
         matrix.translate(15f, 5f)
 
@@ -163,7 +167,7 @@ object Bars : Feature("bars", true) {
         }
     }
 
-    fun mpHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(MPHudName, context) {
+    fun mpHud(context: GuiGraphics) = HUDManager.renderHud(MPHudName, context) {
         val matrix = context.pose()
         matrix.translate(5f, 5f)
 
@@ -173,7 +177,7 @@ object Bars : Feature("bars", true) {
         drawBar(context, smoothMp, smoothOf, overflowManaBar, manaColor, ofmColor)
     }
 
-    fun ofManaHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(OFManaHudName, context){
+    fun ofManaHud(context: GuiGraphics) = HUDManager.renderHud(OFManaHudName, context){
         val matrix = context.pose()
 
         val string = StatsAPI.overflowMana.toString() + "ʬ"
@@ -183,7 +187,7 @@ object Bars : Feature("bars", true) {
         Render2D.drawString(context, string, 0,0, color = ofmColor)
     }
 
-    fun mpNumHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(MPNumHudName, context) {
+    fun mpNumHud(context: GuiGraphics) = HUDManager.renderHud(MPNumHudName, context) {
         val matrix = context.pose()
 
         val left = StatsAPI.mana
@@ -211,8 +215,8 @@ object Bars : Feature("bars", true) {
         }
     }
 
-    private fun drawBar(context: GuiGraphicsExtractor, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color) {
-        context.drawNVG {
+    private fun drawBar(context: GuiGraphics, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color) {
+        context.batchNVG {
             NVGRenderer.drawMasked(0f, 0f, 80f, 5f, 3f) {
                 NVGRenderer.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
                 NVGRenderer.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)

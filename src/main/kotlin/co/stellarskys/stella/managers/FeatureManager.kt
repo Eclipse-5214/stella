@@ -85,9 +85,13 @@ object FeatureManager {
             if (feature.dungeonFloors.isNotEmpty()) dungeonFloorFeatures.add(feature)
             if (feature.skyblockOnly) skyblockFeatures.add(feature)
 
-            feature.initialize()
-            feature.configName?.let { registerListener(it, feature) }
-            feature.update()
+            runCatching {
+                feature.initialize()
+                feature.configName?.let { registerListener(it, feature) }
+                feature.update()
+            }.onFailure { e ->
+                Stella.LOGGER.error("Error initializing feature ${feature::class.simpleName}: $e")
+            }
         }
 
         pendingFeatures.clear()

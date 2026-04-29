@@ -130,7 +130,7 @@ object WorldScanner {
         val x = cx / 2
         val z = cz / 2
 
-        for ((dx, dz, cxoff, zoff) in ScanUtils.directions.map { it }) {
+        for ((dx, dz, cxoff, zoff) in ScanUtils.directions) {
             val nx = rx + dx
             val nz = rz + dz
             val blockBelow = Orbit.getBlockNumericId(nx, roofHeight, nz)

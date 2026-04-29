@@ -16,9 +16,9 @@ class DungeonPlayer(val name: String) {
     var dclass = DungeonClass.UNKNOWN
     val alive get() = dclass != DungeonClass.DEAD
 
-    private var initSecrets: Int? = null
-    private var currSecrets: Int? = null
-    val secrets get() = currSecrets!! - initSecrets!!
+    private var initSecrets: Int = 0
+    private var currSecrets: Int = 0
+    val secrets get() = currSecrets - initSecrets
 
     val entity: Player? = world?.entitiesForRendering()
         ?.filterIsInstance<Player>()
@@ -38,15 +38,14 @@ class DungeonPlayer(val name: String) {
 
     init {
         HypixelApi.fetchSecrets(uuid.toString(), 120_000) { secrets ->
-            initSecrets = secrets
-            currSecrets = secrets
+            secrets?.let { initSecrets = it; currSecrets = it }
         }
     }
 
     fun updateSecrets() {
         if (uuid == null) return
         HypixelApi.fetchSecrets(uuid.toString(), 0) { secrets ->
-            currSecrets = secrets
+            secrets?.let { currSecrets = it }
         }
     }
 

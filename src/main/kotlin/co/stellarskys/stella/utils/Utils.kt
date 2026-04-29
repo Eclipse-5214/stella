@@ -108,33 +108,6 @@ object Utils {
         return Color(r, g, b, alpha)
     }
 
-    fun decodeRoman(roman: String): Int {
-        val values = mapOf(
-            'I' to 1,
-            'V' to 5,
-            'X' to 10,
-            'L' to 50,
-            'C' to 100,
-            'D' to 500,
-            'M' to 1000
-        )
-
-        var total = 0
-        var prev = 0
-
-        for (char in roman.uppercase()) {
-            val value = values[char] ?: return 0
-            total += if (value > prev) {
-                value - 2 * prev
-            } else {
-                value
-            }
-            prev = value
-        }
-
-        return total
-    }
-
     fun alert(title: String, sound: SoundEvent? = null, volume: Float = 1f, pitch: Float = 1f) {
         client.gui.setTimes(0, 20, 5)
         client.gui.setTitle(Component.literal(title))

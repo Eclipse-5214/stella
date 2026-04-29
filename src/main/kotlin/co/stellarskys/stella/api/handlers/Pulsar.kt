@@ -12,11 +12,7 @@ import net.minecraft.network.chat.Component
 @Module
 object Pulsar {
     private var shown = false
-
-    val FirstInstallStore = Capsule("firstInstall", true)
-    var FirstInstall: Boolean
-        get() = FirstInstallStore.getData()
-        set(value) = FirstInstallStore.setData(value)
+    var FirstInstall by Capsule("firstInstall", true)
 
     init {
         EventBus.on<ServerEvent.Connect> {

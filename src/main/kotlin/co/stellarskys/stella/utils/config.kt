@@ -1,16 +1,23 @@
 package co.stellarskys.stella.utils
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.config.core.Config
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.RouteRecorder
 import co.stellarskys.stella.features.secrets.utils.RouteRegistry
 import co.stellarskys.stella.hud.HUDEditor
-import net.minecraft.util.Util
 import java.awt.Color
 import java.net.URI
 
-val config = Config("Stella", "Stella") {
+//? if <= 1.21.10 {
+import net.minecraft.Util
+//?} else {
+ /*import net.minecraft.util.Util
+*///?}
+
+
+val config = Config(Stella.NAMESPACE) {
     category("General") {
         subcategory("Info") {
             textparagraph {
@@ -888,6 +895,13 @@ val config = Config("Stella", "Stella") {
                 name = "Waypoint Text"
                 description = "Renders Secret Routes Waypoints text"
                 default = true
+            }
+
+            toggle {
+                configName = "secretRoutes.startEsp"
+                name = "Start ESP"
+                description = "Renders start text through walls"
+                default = false
             }
 
             slider {
