@@ -147,9 +147,10 @@ object Dungeon {
             if (secretItems.contains(name)) {
                 EventBus.post(DungeonEvent.Secrets.Item(event.packet.itemId, entity))
 
-                currentRoom?.roomData?.secretCoords?.item?.find {
+                val room = currentRoom ?: return@on
+                room.roomData?.secretCoords?.item?.find {
                     Utils.calcDistance(
-                        currentRoom!!.getRealCoord(it.toBlockPos()),
+                        room.getRealCoord(it.toBlockPos()),
                         entity.blockPosition()
                     ) < 25
                 }?.collected = true
@@ -205,9 +206,10 @@ object Dungeon {
             val pos = entity.blockPosition()
             EventBus.post(DungeonEvent.Secrets.Bat(pos, entity))
 
-            currentRoom?.roomData?.secretCoords?.bat?.find {
+            val room = currentRoom ?: return@on
+            room.roomData?.secretCoords?.item?.find {
                 Utils.calcDistance(
-                    currentRoom!!.getRealCoord(it.toBlockPos()),
+                    room.getRealCoord(it.toBlockPos()),
                     pos
                 ) < 100
             }?.collected = true

@@ -142,9 +142,7 @@ object Astrum {
 
     fun renderTextBatch(batch: List<QueuedText>, pose: PoseStack) {
         if (batch.isEmpty()) return
-
         val font = client.font
-        val source = client.renderBuffers().bufferSource()
 
         batch.forEach { queued ->
             pose.pushPose()
@@ -164,7 +162,7 @@ object Astrum {
                 queued.color,
                 queued.shadow,
                 matrix,
-                source,
+                buffers,
                 if (queued.depth) Font.DisplayMode.NORMAL else Font.DisplayMode.SEE_THROUGH,
                 queued.bgColor,
                 0xF000F0
