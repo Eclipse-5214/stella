@@ -47,6 +47,11 @@ enum class WaypointType {
             CUSTOM -> name
         }
 
+    val depth get() = when (this) {
+        START -> !RoutePlayer.startEsp
+        else -> true
+    }
+
     companion object {
         fun fromString(value: String?): WaypointType? {
             if (value == null) return null

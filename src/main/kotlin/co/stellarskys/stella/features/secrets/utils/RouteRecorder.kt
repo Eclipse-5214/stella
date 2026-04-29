@@ -151,6 +151,7 @@ object RouteRecorder {
         route.add(StepData(CopyOnWriteArrayList(), CopyOnWriteArrayList()))
         recording = true
 
+        player?.onPos?.let { addWaypoint(WaypointType.START, it) }
         Signal.fakeMessage("${Stella.PREFIX} §aStarted route recording for ${room.name}")
     }
 

@@ -28,8 +28,18 @@ class FeatureProcessor(
         modules: Sequence<KSAnnotated>,
         commands: Sequence<KSAnnotated>
     ) {
+        val moduleDecls = modules.filterIsInstance<KSClassDeclaration>().toList()
+        val commandDecls = commands.filterIsInstance<KSClassDeclaration>().toList()
+
+        val sourceFiles = (moduleDecls + commandDecls)
+            .mapNotNull { it.containingFile }
+            .distinct()
+            .toTypedArray()
+
+        val deps = if (sourceFiles.isEmpty()) Dependencies.ALL_FILES else Dependencies(false, *sourceFiles)
+
         val file = codeGenerator.createNewFile(
-            Dependencies.ALL_FILES,
+            deps,
             "co.stellarskys.stella.generated",
             "GeneratedFeatureRegistry"
         )
@@ -42,16 +52,14 @@ class FeatureProcessor(
             out.appendLine("object GeneratedFeatureRegistry {")
             out.appendLine("  val modules: List<Class<*>> = listOf(")
 
-            modules.forEach { sym ->
-                val name = (sym as KSClassDeclaration).qualifiedName!!.asString()
-                out.appendLine("    $name::class.java,")
+            moduleDecls.forEach { decl ->
+                out.appendLine("    ${decl.qualifiedName!!.asString()}::class.java,")
             }
             out.appendLine("  )")
             out.appendLine("  val commands: List<Atlas> = listOf(")
 
-            commands.forEach { sym ->
-                val name = (sym as KSClassDeclaration).qualifiedName!!.asString()
-                out.appendLine("    $name,")
+            commandDecls.forEach { decl ->
+                out.appendLine("    ${decl.qualifiedName!!.asString()},")
             }
 
             out.appendLine("  )")

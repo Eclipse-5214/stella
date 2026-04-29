@@ -42,8 +42,11 @@ class NVGPIPRenderer(vertexConsumers: MultiBufferSource.BufferSource) : PictureI
         *///?}
 
         NVGRenderer.beginFrame(width.toFloat(), height.toFloat())
-        state.renderContent()
-        NVGRenderer.endFrame()
+        try {
+            state.renderContent()
+        } finally {
+            NVGRenderer.endFrame()
+        }
 
 
         GlStateManager._disableDepthTest()

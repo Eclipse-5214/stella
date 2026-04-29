@@ -45,6 +45,12 @@ class TextHandler(
     private val history = mutableListOf<String>()
     private var historyIndex = -1
 
+    private var cachedPosText = ""
+    private var cachedPosCaret = -1
+    private var cachedPosSelection = -1
+    private var cachedPosFontSize = -1f
+    private var cachedPosFont: Font? = null
+
     init {
         saveState()
         updateCaretPosition()
@@ -141,9 +147,18 @@ class TextHandler(
     }
 
     fun updateCaretPosition() {
-        caretX = nvg.textWidth(text.substring(0, caret), fontSize, font)
-        val anchorX = nvg.textWidth(text.substring(0, selection), fontSize, font)
-        selectionWidth = caretX - anchorX
+        val curText = text
+        if (curText != cachedPosText || caret != cachedPosCaret || selection != cachedPosSelection
+            || fontSize != cachedPosFontSize || font !== cachedPosFont) {
+            cachedPosText = curText
+            cachedPosCaret = caret
+            cachedPosSelection = selection
+            cachedPosFontSize = fontSize
+            cachedPosFont = font
+            caretX = nvg.textWidth(curText.substring(0, caret), fontSize, font)
+            val anchorX = nvg.textWidth(curText.substring(0, selection), fontSize, font)
+            selectionWidth = caretX - anchorX
+        }
 
         if (caretX - textOffset > width) textOffset = caretX - width
         if (caretX - textOffset < 0f) textOffset = caretX

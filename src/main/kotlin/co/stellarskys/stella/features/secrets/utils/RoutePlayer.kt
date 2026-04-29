@@ -35,7 +35,7 @@ object RoutePlayer {
         if (firstStep) {
             val startPoint = room.getRealCoord(data.line.first())
             val startPos = Vec3(startPoint.center.x, startPoint.center.y + 1, startPoint.center.z)
-            Render3D.drawText("Start!", startPos, bgBox = true, depth = startEsp)
+            Render3D.drawText("Start!", startPos, bgBox = true, depth = !startEsp)
         }
 
         data.line.zipWithNext { a, b ->
@@ -67,7 +67,7 @@ object RoutePlayer {
 
     private fun renderWaypoint(waypoint: WaypointData, room: Room, name: Boolean = true){
         val realPos = room.getRealCoord(waypoint.pos)
-        Render3D.outlineBlock(realPos, waypoint.type.color, 3f, true)
+        Render3D.outlineBlock(realPos, waypoint.type.color, 3f, waypoint.type.depth)
         if (name && text) Render3D.drawText(waypoint.type.label, realPos.center, scale = textScale, depth = false)
     }
 }

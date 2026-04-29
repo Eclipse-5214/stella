@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
+import co.stellarskys.stella.api.nvg.Batcher
 import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.nvg.NVGPIPRenderer
 import co.stellarskys.stella.api.zenith.Zenith
@@ -133,4 +134,7 @@ object Render2D {
             block(snapshot)
         }
     }
+
+    fun GuiGraphics.batchNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) { Batcher.queue(this, scaled, block) }
+    fun GuiGraphics.flushNVG() { Batcher.flush(this) }
 }

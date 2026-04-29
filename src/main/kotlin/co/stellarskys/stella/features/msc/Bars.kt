@@ -12,6 +12,8 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.api.nvg.NVGRenderer
+import co.stellarskys.stella.utils.render.Render2D.batchNVG
+import co.stellarskys.stella.utils.render.Render2D.flushNVG
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.profile.StatsAPI
@@ -85,6 +87,8 @@ object Bars : Feature("bars", true) {
             if (manaBar) mpHud(it.context)
             if (mpNum) mpNumHud(it.context)
             if (ofMana) ofManaHud(it.context)
+
+            it.context.flushNVG()
         }
     }
 
@@ -212,7 +216,7 @@ object Bars : Feature("bars", true) {
     }
 
     private fun drawBar(context: GuiGraphics, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color) {
-        context.drawNVG {
+        context.batchNVG {
             NVGRenderer.drawMasked(0f, 0f, 80f, 5f, 3f) {
                 NVGRenderer.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
                 NVGRenderer.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
