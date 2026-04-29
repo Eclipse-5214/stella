@@ -6,11 +6,11 @@ Ordered by impact.
 
 ## Critical / High Impact
 
-- [ ] **1. Try-catch in EventBus dispatch**
+- [x] **1. Try-catch in EventBus dispatch**
   At 30k downloads, someone's machine will do something unexpected and a handler will throw. Right now that silently kills the entire event loop for that frame. One try-catch with a logger call protects every feature at once.
   *Why it matters: a single bad handler currently has blast radius across all handlers in that event.*
 
-- [ ] **2. AstrumLayers line cache key collision**
+- [x] **2. AstrumLayers line cache key collision**
   `width.hashCode()` as a `HashMap<Int, RenderType>` key means two different `Double` widths that happen to hash the same will silently share a render type, producing wrong line widths. Change the map to `HashMap<Double, RenderType>` and key on the value directly.
   *Why it matters: hash collisions are silent and produce visually wrong output that's very hard to debug.*
 
@@ -34,7 +34,7 @@ Ordered by impact.
   If something triggers two fetches for the same UUID close together on a single client, both hit the network. A `HashMap<UUID, Deferred<*>>` tracking in-flight requests short-circuits the duplicate.
   *Why it matters: defensive hygiene — prevents accidental double-requests from edge cases in dungeon logic.*
 
-- [ ] **7. `TEXT_SCALE_DISTANCE` constant in Astrum**
+- [x] **7. `TEXT_SCALE_DISTANCE` constant in Astrum**
   `120f` in the distance-scaled text calculation is a magic number. Name it.
   *Why it matters: readability — your own stated goal. Future-you will not remember what 120 means.*
 
@@ -58,7 +58,7 @@ Ordered by impact.
   `ConcurrentHashMap<String, MutableList<Feature>>` — the map is thread-safe but `MutableList` isn't. Concurrent reads while a feature registers could cause a `ConcurrentModificationException`.
   *Why it matters: rare but non-deterministic crash that only shows up under specific timing conditions.*
 
-- [ ] **12. `println("DEBUG: Merging...")` in WorldScanner**
+- [x] **12. `println("DEBUG: Merging...")` in WorldScanner**
   Left-in debug print. Replace with your logger or remove.
   *Why it matters: spams stdout for every merge event, which in a busy dungeon is a lot.*
 

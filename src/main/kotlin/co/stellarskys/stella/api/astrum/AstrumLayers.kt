@@ -14,8 +14,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 object AstrumLayers {
     //? if <= 1.21.10 {
-    private val linesCache = ConcurrentHashMap<Int, RenderType>()
-    private val linesThroughWallsCache = ConcurrentHashMap<Int, RenderType>()
+    private val linesCache = ConcurrentHashMap<Double, RenderType>()
+    private val linesThroughWallsCache = ConcurrentHashMap<Double, RenderType>()
     //? }
 
     val FILLED: RenderType = RenderType.create(
@@ -84,7 +84,7 @@ object AstrumLayers {
         //? if > 1.21.10 {
          /*if (depth) LINES else LINES_THROUGH_WALLS
          *///? } else {
-        (if (depth) linesCache else linesThroughWallsCache).computeIfAbsent(width.hashCode()) { createLineLayer(width, depth) }
+        (if (depth) linesCache else linesThroughWallsCache).computeIfAbsent(width) { createLineLayer(width, depth) }
         //? }
 
     fun getFilled(depth: Boolean): RenderType = if (depth) FILLED else FILLED_THROUGH_WALLS

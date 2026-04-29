@@ -12,6 +12,8 @@ import net.minecraft.world.phys.shapes.CollisionContext
 import java.awt.Color
 
 object Render3D {
+    private val textScaleDistance = 120f
+
     //? <= 1.21.10 {
     fun Camera.xRot() = this.xRot
     fun Camera.yRot() = this.yRot
@@ -90,7 +92,7 @@ object Render3D {
         var finalScale = scale
         if (increase) {
             val dist = camera.position().distanceTo(pos)
-            finalScale *= (dist.toFloat() / 120f) / 0.025f
+            finalScale *= (dist.toFloat() / textScaleDistance) / 0.025f
         }
 
         val lines = text.split("\n")

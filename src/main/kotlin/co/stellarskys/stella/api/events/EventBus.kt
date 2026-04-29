@@ -15,7 +15,7 @@ open class EventBus {
     fun <T : Event> post(event: T): Boolean {
         @Suppress("UNCHECKED_CAST")
         val handles = subscribers.enabled[event.javaClass] as? Array<EventHandle<T>> ?: return false
-        for (h in handles) h.handler(event)
+        for (h in handles) try { h.handler(event) } catch(e: Exception) { e.printStackTrace() }
         return event.cancelable && event.cancelled
     }
 

@@ -11,6 +11,7 @@ import co.stellarskys.stella.api.zenith.client
 import com.google.gson.*
 import java.awt.Color
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KProperty
 
 //Main config Shananagens
@@ -23,7 +24,7 @@ class Config(
     @PublishedApi internal val valueCache = mutableMapOf<String, Any?>()
     private val elementMap = mutableMapOf<String, ConfigElement>()
     private val categories = mutableMapOf<String, ConfigCategory>()
-    private val listeners = mutableListOf<(String, Any?) -> Unit>()
+    private val listeners = CopyOnWriteArrayList<(String, Any?) -> Unit>()
 
     private var configUI: ConfigUI? = null
     private var loaded = false
