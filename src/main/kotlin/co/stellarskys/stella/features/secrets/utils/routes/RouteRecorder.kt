@@ -1,4 +1,4 @@
-package co.stellarskys.stella.features.secrets.utils
+package co.stellarskys.stella.features.secrets.utils.routes
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module

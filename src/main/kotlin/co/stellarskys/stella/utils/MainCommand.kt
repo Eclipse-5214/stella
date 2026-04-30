@@ -11,7 +11,7 @@ import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.features.dungeons.JoinInfo
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
-import co.stellarskys.stella.features.secrets.utils.RouteRecorder
+import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
 
 @Command

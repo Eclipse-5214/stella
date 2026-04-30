@@ -4,8 +4,8 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.config.core.Config
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
-import co.stellarskys.stella.features.secrets.utils.RouteRecorder
-import co.stellarskys.stella.features.secrets.utils.RouteRegistry
+import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
+import co.stellarskys.stella.features.secrets.utils.routes.RouteRegistry
 import co.stellarskys.stella.hud.HUDEditor
 import net.minecraft.util.Util
 import java.awt.Color
@@ -835,6 +835,13 @@ val config = Config(Stella.NAMESPACE) {
                 name = "Chest Color"
                 description = "Highlight color for Chest waypoints"
                 default = Color(255, 255, 0, 255) // yellow
+            }
+
+            colorpicker {
+                configName = "secretWaypointColor.lever"
+                name = "Lever Color"
+                description = "Highlight color for Lever waypoints"
+                default = Color(0, 255, 255, 255) // cyan
             }
         }
 
