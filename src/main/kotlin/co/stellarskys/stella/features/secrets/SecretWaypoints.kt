@@ -66,7 +66,4 @@ object SecretWaypoints: Feature("secretWaypoints", island = SkyBlockIsland.THE_C
             predicate(CoordType(coordPos, realPos, coord))
         }?.collected = collect
     }
-
-    override fun onUnregister() { SecretsRegistry.resetSecrets() }
-    override fun onRegister() { SecretsRegistry.resetSecrets() }
 }
