@@ -1,4 +1,4 @@
-package co.stellarskys.stella.features.secrets.utils
+package co.stellarskys.stella.features.secrets.utils.routes
 
 import co.stellarskys.stella.features.secrets.SecretRoutes
 import java.awt.Color

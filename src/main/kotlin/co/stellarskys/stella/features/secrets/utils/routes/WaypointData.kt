@@ -1,4 +1,4 @@
-package co.stellarskys.stella.features.secrets.utils
+package co.stellarskys.stella.features.secrets.utils.routes
 
 import net.minecraft.core.BlockPos
 import java.awt.Color

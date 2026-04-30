@@ -50,6 +50,7 @@ class Room(
     var rotation: Int? = null
     var type: RoomType = RoomType.UNKNOWN
     var shape: String = "1x1"
+    var id: Int = -1
 
     var secrets: Int = 0
     var secretsFound: Int = 0
@@ -100,6 +101,7 @@ class Room(
     fun loadFromData(data: RoomMetadata) {
         roomData = data
         name = data.name
+        id = data.roomID
         type = RoomType.fromString(data.type)
         secrets = data.secrets; crypts = data.crypts
         if (type == RoomType.ENTRANCE) explored = true

@@ -143,18 +143,7 @@ object Dungeon {
             val world = world ?: return@on
             val entity = world.getEntity(event.packet.itemId) as? ItemEntity ?: return@on
             val name = entity.item.displayName.stripped.drop(1).dropLast(1)
-
-            if (secretItems.contains(name)) {
-                EventBus.post(DungeonEvent.Secrets.Item(event.packet.itemId, entity))
-
-                val room = currentRoom ?: return@on
-                room.roomData?.secretCoords?.item?.find {
-                    Utils.calcDistance(
-                        room.getRealCoord(it.toBlockPos()),
-                        entity.blockPosition()
-                    ) < 25
-                }?.collected = true
-            }
+            if (secretItems.contains(name)) EventBus.post(DungeonEvent.Secrets.Item(event.packet.itemId, entity))
         }
 
         EventBus.on<PacketEvent.Sent>(SkyBlockIsland.THE_CATACOMBS) { event ->
@@ -164,35 +153,15 @@ object Dungeon {
             val blockState = world.getBlockState(pos)
 
             when (blockState.block) {
-                Blocks.CHEST, Blocks.TRAPPED_CHEST -> {
-                    EventBus.post(DungeonEvent.Secrets.Chest(blockState, pos))
-
-                    currentRoom?.roomData?.secretCoords?.chest?.find {
-                        currentRoom?.getRealCoord(it.toBlockPos()) == pos
-                    }?.collected = true
-                }
-                Blocks.LEVER -> {
-                    EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.LEVER, pos))
-                }
+                Blocks.CHEST, Blocks.TRAPPED_CHEST -> EventBus.post(DungeonEvent.Secrets.Chest(blockState, pos))
+                Blocks.LEVER -> EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.LEVER, pos))
                 else -> {
                     val entity = world.getBlockEntity(pos) ?: return@on
                     if (entity is SkullBlockEntity) {
                         val texture = entity.ownerProfile?.properties?.get("textures")?.firstOrNull()?.value
                         when (texture) {
-                            WITHER_ESSENCE_TEXTURE -> {
-                                EventBus.post(DungeonEvent.Secrets.Essence(entity, pos))
-
-                                currentRoom?.roomData?.secretCoords?.wither?.find {
-                                    currentRoom?.getRealCoord(it.toBlockPos()) == pos
-                                }?.collected = true
-                            }
-                            RED_SKULL_TEXTURE -> {
-                                EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.RED_SKULL, pos))
-
-                                currentRoom?.roomData?.secretCoords?.redstoneKey?.find {
-                                    currentRoom?.getRealCoord(it.toBlockPos()) == pos
-                                }?.collected = true
-                            }
+                            WITHER_ESSENCE_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Essence(entity, pos))
+                            RED_SKULL_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.RED_SKULL, pos))
                         }
                     }
                 }
@@ -205,14 +174,6 @@ object Dungeon {
             if (entity.maxHealth != 100f) return@on
             val pos = entity.blockPosition()
             EventBus.post(DungeonEvent.Secrets.Bat(pos, entity))
-
-            val room = currentRoom ?: return@on
-            room.roomData?.secretCoords?.item?.find {
-                Utils.calcDistance(
-                    room.getRealCoord(it.toBlockPos()),
-                    pos
-                ) < 100
-            }?.collected = true
         }
 
         RoomRegistry.loadFromRemote()
@@ -240,7 +201,6 @@ object Dungeon {
         DungeonPlayerManager.reset()
         DungeonScore.reset()
         MapUtils.reset()
-        RoomRegistry.resetSecrets()
     }
 
     /** Updates HUD lines for map overlay */
