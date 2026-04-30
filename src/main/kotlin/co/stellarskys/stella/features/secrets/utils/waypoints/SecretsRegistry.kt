@@ -2,11 +2,17 @@ package co.stellarskys.stella.features.secrets.utils.waypoints
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.handlers.Quasar
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.LocationEvent
 
 object SecretsRegistry {
     private val byId = mutableMapOf<Int, SecretData>()
     private val allRooms = mutableListOf<SecretData>()
     private val ROOM_DATA_URL = "${Stella.ETHER}/secretCoords.json"
+
+    init {
+        EventBus.on<LocationEvent.IslandChange> { resetSecrets() }
+    }
 
     fun load() {
         Quasar.fetch<List<SecretData>>(ROOM_DATA_URL) { result ->
