@@ -49,6 +49,7 @@ enum class WaypointType {
 
     val depth get() = when (this) {
         START -> !RoutePlayer.startEsp
+        CHEST, ITEM, ESSENCE, BAT -> false
         else -> true
     }
 
