@@ -58,10 +58,6 @@ object EventBus : EventBus() {
             post(GameEvent.Stop())
         }
 
-        ClientEntityEvents.ENTITY_UNLOAD.register { entity, _ ->
-            post(EntityEvent.Death(entity))
-        }
-
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             ScreenMouseEvents.allowMouseClick(screen).register { _, click ->
                !post(GuiEvent.Click(click.x, click.y, click.button(), true, screen))

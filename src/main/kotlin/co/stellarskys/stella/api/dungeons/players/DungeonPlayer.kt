@@ -3,6 +3,7 @@ package co.stellarskys.stella.api.dungeons.players
 import co.stellarskys.stella.api.hypixel.HypixelApi
 import co.stellarskys.stella.api.dungeons.map.MapScanner.RoomClearInfo
 import co.stellarskys.stella.api.dungeons.map.Room
+import co.stellarskys.stella.api.dungeons.utils.Checkmark
 import co.stellarskys.stella.api.dungeons.utils.DungeonClass
 import co.stellarskys.stella.api.zenith.world
 import net.minecraft.world.entity.player.Player
@@ -20,7 +21,7 @@ class DungeonPlayer(val name: String) {
     private var currSecrets: Int = 0
     val secrets get() = currSecrets - initSecrets
 
-    val entity: Player? = world?.entitiesForRendering()
+    val entity: Player? get() = world?.entitiesForRendering()
         ?.filterIsInstance<Player>()
         ?.find { it.gameProfile.name == name }
 
@@ -32,23 +33,25 @@ class DungeonPlayer(val name: String) {
     var lastRoom: Room? = null
 
     val clearedRooms = mutableMapOf(
-        "WHITE" to mutableMapOf<String, RoomClearInfo>(),
-        "GREEN" to mutableMapOf<String, RoomClearInfo>()
+        Checkmark.WHITE to mutableMapOf<String, RoomClearInfo>(),
+        Checkmark.GREEN to mutableMapOf<String, RoomClearInfo>()
     )
 
     init {
-        HypixelApi.fetchSecrets(uuid.toString(), 120_000) { secrets ->
-            secrets?.let { initSecrets = it; currSecrets = it }
+        uuid?.let { uid ->
+            HypixelApi.fetchSecrets(uid.toString(), 120_000) { secrets ->
+                secrets?.let { initSecrets = it; currSecrets = it }
+            }
         }
     }
 
     fun updateSecrets() {
-        if (uuid == null) return
-        HypixelApi.fetchSecrets(uuid.toString(), 0) { secrets ->
+        val uid = uuid ?: return
+        HypixelApi.fetchSecrets(uid.toString(), 0) { secrets ->
             secrets?.let { currSecrets = it }
         }
     }
 
-    fun getGreenChecks() = clearedRooms["GREEN"] ?: mutableMapOf()
-    fun getWhiteChecks() = clearedRooms["WHITE"] ?: mutableMapOf()
+    fun getGreenChecks() = clearedRooms[Checkmark.GREEN] ?: mutableMapOf()
+    fun getWhiteChecks() = clearedRooms[Checkmark.WHITE] ?: mutableMapOf()
 }

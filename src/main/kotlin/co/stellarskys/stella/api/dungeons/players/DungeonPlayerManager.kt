@@ -11,16 +11,11 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 object DungeonPlayerManager {
-    /**
-     * Match a player entry.
-     * Group 1: name
-     * Group 2: class (or literal "EMPTY" pre map start)
-     * Group 3: level (or nothing, if pre map start)
-     * This regex filters out the ironman icon as well as rank prefixes and emblems
-     * \[\d+\] (?:\[[A-Za-z]+\] )?(?&lt;name&gt;[A-Za-z0-9_]+) (?:.+ )?\((?&lt;class&gt;\S+) ?(?&lt;level&gt;[LXVI0]+)?\)
-     *
-     * Modified from Skyblocker
-     */
+    private const val TAB_PLAYER_OFFSET = 1
+    private const val TAB_PLAYER_STRIDE = 4
+
+    // Modified from Skyblocker — filters rank prefixes, ironman icons, and emblems
+    // Groups: name, class (or "EMPTY" before map start), level (Roman numerals, or absent)
     val playerTabPattern = Regex("\\[\\d+] (?:\\[[A-Za-z]+] )?(?<name>[A-Za-z0-9_]+) (?:.+ )?\\((?<class>\\S+) ?(?<level>[LXVI0]+)?\\)")
     val playerGhostPattern = Regex(" ☠ (?<name>[A-Za-z0-9_]+) .+ became a ghost\\.")
 
@@ -31,7 +26,7 @@ object DungeonPlayerManager {
             val firstColumn = event.new.firstOrNull() ?: return@on
 
             for (i in 0 until 5) {
-                val index = 1 + i * 4
+                val index = TAB_PLAYER_OFFSET + i * TAB_PLAYER_STRIDE
                 if (index !in firstColumn.indices) continue
                 val match = playerTabPattern.find(firstColumn[index].stripped)
                 if (match == null) {
@@ -65,7 +60,6 @@ object DungeonPlayerManager {
         val player = getPlayer(name)
         if (player != null) {
             player.deaths ++
-
             EventBus.post(DungeonEvent.Player.Death(player))
         } else {
             Stella.LOGGER.error(

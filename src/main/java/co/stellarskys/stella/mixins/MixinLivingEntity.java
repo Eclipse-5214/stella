@@ -8,6 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,8 +21,6 @@ public abstract class MixinLivingEntity extends Entity {
 
     @Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setPose(Lnet/minecraft/world/entity/Pose;)V"))
     private void stella$onDeath(DamageSource damageSource, CallbackInfo ci) {
-        var world = this.level();
-        if(!world.isClientSide()) return;
         EventBus.INSTANCE.post(new EntityEvent.Death(this));
     }
 }

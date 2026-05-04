@@ -35,7 +35,6 @@ object RouteRecorder {
     private var stepIndex = 0
     private var currentRoom: Room? = null
     private var lastPlayerPos: BlockPos? = null
-    private val deadBats: MutableList<Int> = mutableListOf()
 
     val currentStep: StepData get() = route[stepIndex]
     val lastStep: StepData? get() = route.getOrNull(stepIndex - 1)
@@ -49,6 +48,7 @@ object RouteRecorder {
             stopRecording()
         }
 
+        EventBus.on<DungeonEvent.Secrets.Bat>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on;addWaypoint(WaypointType.BAT, it.blockPos) }
         EventBus.on<DungeonEvent.Secrets.Chest>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.CHEST, it.blockPos) }
         EventBus.on<DungeonEvent.Secrets.Essence>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.ESSENCE, it.blockPos)}
 
@@ -58,16 +58,6 @@ object RouteRecorder {
             if (calcDistanceSq(currentRoom!!.getRealCoord(lastSecretPos), pos) < 3) return@on
             addWaypoint(WaypointType.ITEM, pos)
         }
-
-        EventBus.on<DungeonEvent.Secrets.Bat>(SkyBlockIsland.THE_CATACOMBS) {
-            if (!recording) return@on
-            val id = it.entity.id
-            if (id in deadBats) return@on
-            deadBats.add(id)
-            addWaypoint(WaypointType.BAT, it.blockPos)
-        }
-
-
 
         EventBus.on<DungeonEvent.Secrets.Misc>(SkyBlockIsland.THE_CATACOMBS) {
             if (!recording) return@on
@@ -167,7 +157,6 @@ object RouteRecorder {
 
     fun stopRecording() {
         recording = false
-        deadBats.clear()
         Signal.fakeMessage("${Stella.PREFIX} §cStopped Recording")
     }
 

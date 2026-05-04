@@ -256,8 +256,8 @@ object MapScanner {
                 player.maxRooms++
             }
 
-            val colorKey = if (isGreen) "GREEN" else "WHITE"
-            val clearedMap = player.clearedRooms[colorKey]
+            val checkmark = if (isGreen) Checkmark.GREEN else Checkmark.WHITE
+            val clearedMap = player.clearedRooms[checkmark]
 
             clearedMap?.putIfAbsent(
                 room.name ?: "unknown",
