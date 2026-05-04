@@ -89,7 +89,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     val tint = 0.7
 
     override fun initialize() {
-        HUDManager.registerCustom(name, 148, 148, this::hudEditorRender)
+        HUDManager.registerCustom(name, 148, 148, this::hudEditorRender, "mapEnabled")
 
         on<GuiEvent.RenderHUD> { event ->
             renderMap(event.context)
