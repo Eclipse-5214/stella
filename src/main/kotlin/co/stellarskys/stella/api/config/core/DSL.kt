@@ -1,6 +1,7 @@
 package co.stellarskys.stella.api.config.core
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.KeyEvent
 import java.awt.Color
@@ -236,6 +237,7 @@ class Keybind : ConfigElement() {
 
             init {
                 EventBus.on<KeyEvent.Press> {
+                    if (client.screen != null) return@on
                     if (it.keyCode == keyCode && !isDown) {
                         isDown = true
                         pressListeners.forEach { fn -> fn() }
@@ -243,6 +245,7 @@ class Keybind : ConfigElement() {
                 }
 
                 EventBus.on<KeyEvent.Release> {
+                    if (client.screen != null) return@on
                     if (it.keyCode == keyCode && isDown) {
                         isDown = false
                         releaseListeners.forEach { fn -> fn() }

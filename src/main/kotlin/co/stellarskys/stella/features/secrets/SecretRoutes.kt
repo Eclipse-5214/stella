@@ -30,8 +30,8 @@ import java.awt.Color
 object SecretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOMBS) {
     val onlyRenderAfterClear by config.property<Boolean>("secretRoutes.onlyRenderAfterClear")
     val stopRenderAfterGreen by config.property<Boolean>("secretRoutes.stopRenderAfterGreen")
-    var nextStepBind by config.property<Keybind.Handler>("secretRoutes.nextStep")
-    var lastStepBind by config.property<Keybind.Handler>("secretRoutes.lastStep")
+    val nextStepBind by config.property<Keybind.Handler>("secretRoutes.nextStep")
+    val lastStepBind by config.property<Keybind.Handler>("secretRoutes.lastStep")
     var routeFile by config.property<String>("secretRoutes.fileName")
 
     val startColor by config.property<Color>("secretRoutes.startColor")

@@ -13,7 +13,6 @@ import co.stellarskys.stella.features.dungeons.JoinInfo
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
-
 @Command
 object MainCommand : Atlas("stella", "sta", "sa") {
     init {
@@ -55,6 +54,12 @@ object MainCommand : Atlas("stella", "sta", "sa") {
             literal("reload") {
                 runs {
                     RouteRecorder.reloadRoutes()
+                }
+            }
+
+            literal("custom") {
+                runs {
+                    RouteRecorder.addCustom()
                 }
             }
 

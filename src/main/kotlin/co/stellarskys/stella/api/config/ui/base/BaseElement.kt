@@ -48,4 +48,7 @@ abstract class BaseElement {
     // Keyboard input
     open fun charTyped(char: Char): Boolean = false
     open fun keyPressed(keyCode: Int, modifiers: Int): Boolean = false
+
 }
+
+fun <T : BaseElement> T.addTo(parent: ParentElement): T { this.parent = parent; parent.elements.add(this); return this }

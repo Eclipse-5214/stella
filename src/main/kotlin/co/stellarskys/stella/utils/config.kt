@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.config.core.Config
+import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
@@ -887,12 +888,21 @@ val config = Config(Stella.NAMESPACE) {
                 configName = "secretRoutes.nextStep"
                 name = "Next Step Bind"
                 description = "Goes to the next step of a route"
+                default = Zenith.Keys.R_BRACKET
             }
 
             keybind {
                 configName = "secretRoutes.lastStep"
                 name = "Last Step Bind"
                 description = "Goes to the last step of a route"
+                default = Zenith.Keys.L_BRACKET
+            }
+
+            keybind {
+                configName = "secretRoutes.addCustom"
+                name = "Custom Waypoint Bind"
+                description = "Adds a custom waypoint to the route"
+                default = Zenith.Keys.C
             }
         }
 
