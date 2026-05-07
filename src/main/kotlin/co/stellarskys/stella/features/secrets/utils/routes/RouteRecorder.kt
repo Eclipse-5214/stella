@@ -297,6 +297,6 @@ object RouteRecorder {
     }
 
     fun getMissing(): List<String> = RoomRegistry.getAll()
-        .filter { it.type.equals("normal", true) }
+        .filter { it.type.equals("normal", true) && it.secrets > 0 }
         .map { it.name } - RouteRegistry.getAll().map { it.key }.toSet()
 }
