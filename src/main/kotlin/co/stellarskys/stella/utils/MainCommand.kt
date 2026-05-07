@@ -13,7 +13,6 @@ import co.stellarskys.stella.features.dungeons.JoinInfo
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
-
 @Command
 object MainCommand : Atlas("stella", "sta", "sa") {
     init {
@@ -58,6 +57,19 @@ object MainCommand : Atlas("stella", "sta", "sa") {
                 }
             }
 
+            literal("custom") {
+                runs {
+                    RouteRecorder.addCustom()
+                }
+            }
+
+            literal("missing") {
+                runs {
+                    val missing = RouteRecorder.getMissing()
+                    Signal.fakeMessage("${Stella.PREFIX} §bMissing Rooms §6${missing.size}§b:")
+                    missing.forEach { Signal.fakeMessage("§7 - $it") }
+                }
+            }
         }
 
         literal("help") {

@@ -75,4 +75,6 @@ object Signal {
         this.withStyle{ it.withColor(textColor) }
         return this
     }
+
+    fun MutableComponent.chat() { fakeMessage(this) }
 }

@@ -29,7 +29,7 @@ import java.util.UUID
  */
 
 object WorldScanner {
-    val availableComponents = ScanUtils.getScanCoords().toMutableList()
+    private val availableComponents = LinkedHashSet(ScanUtils.getScanCoords())
     var lastIdx: Int? = null
 
     fun init() {
@@ -69,22 +69,20 @@ object WorldScanner {
     }
 
     fun scan() {
-        if (availableComponents.isEmpty()) return
-
-        for (idx in availableComponents.indices.reversed()) {
-            val (cx, cz, rxz) = availableComponents[idx]
+        val iter = availableComponents.iterator()
+        while (iter.hasNext()) {
+            val (cx, cz, rxz) = iter.next()
             val (rx, rz) = rxz
-            if (!WorldScanUtils.isChunkLoaded(rx,0,rz)) continue
+            if (!WorldScanUtils.isChunkLoaded(rx, 0, rz)) continue
             val roofHeight = WorldScanUtils.getHighestY(rx, rz) ?: continue
-            availableComponents.removeAt(idx)
+            iter.remove()
 
-            // Door detection
             if (cx % 2 == 1 || cz % 2 == 1) {
                 addDoor(cx, cz, rx, rz, roofHeight)
                 continue
             }
 
-            val room = addRoom(cx, cz,  roofHeight)
+            val room = addRoom(cx, cz, roofHeight)
             checkAdjacent(room, cx, cz, rx, rz, roofHeight)
         }
     }
@@ -157,29 +155,26 @@ object WorldScanner {
     fun checkPlayerState() {
         val world = world ?: return
 
-        DungeonPlayerManager.players.forEach { player ->
-            if (player == null) return@forEach
+        for (player in DungeonPlayerManager.players) {
+            if (player == null) continue
 
             val entity = world.players().find { it.name.string == player.name }
+            val ping = client.connection?.getPlayerInfo(entity?.uuid ?: UUID(0, 0))?.latency ?: -1
 
-            val entry = client.connection?.getPlayerInfo(entity?.uuid ?: UUID(0, 0))
-            val ping = entry?.latency ?: -1
-
-            if (ping != -1 && entity != null) {
+            if (entity != null && ping != -1) {
                 player.inRender = true
                 onPlayerMove(player, entity.x, entity.z, entity.yRot)
             } else {
                 player.inRender = false
             }
 
-            if (ping == -1) return@forEach
-            val currRoom = player.currRoom ?: return@forEach
+            if (ping == -1) continue
+            val currRoom = player.currRoom ?: continue
 
             if (currRoom != player.lastRoom) {
                 player.lastRoom?.players?.remove(player)
                 currRoom.players.add(player)
             }
-
             player.lastRoom = currRoom
         }
     }
@@ -207,7 +202,7 @@ object WorldScanner {
         val iconZ = Utils.mapRange(z, -200.0, -10.0, 0.0, ScanUtils.defaultMapSize.second.toDouble())
         entity.pos.updatePosition(x, z, yaw + 180f, iconX, iconZ)
 
-        if ( x in -200.0..-10.0 || z in -200.0..-10.0){
+        if (x in -200.0..-10.0 && z in -200.0..-10.0) {
             val currRoom = Dungeon.getRoomAt(x.toInt(), z.toInt())
             entity.currRoom = currRoom
         }

@@ -2,6 +2,7 @@ package co.stellarskys.stella.features.secrets.utils.routes
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.api.config.core.Keybind
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.RenderEvent
@@ -14,19 +15,27 @@ import co.stellarskys.stella.utils.Utils.calcDistanceSq
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.map.Room
+import co.stellarskys.stella.api.dungeons.utils.RoomRegistry
 import co.stellarskys.stella.api.handlers.Chronos
+import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.api.zenith.world
-import net.minecraft.client.gui.GuiGraphicsExtractor
+import co.stellarskys.stella.features.secrets.utils.routes.editor.WaypointEditor
+import co.stellarskys.stella.utils.config
+import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundEvents
+import net.minecraft.world.phys.BlockHitResult
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+import java.awt.Color
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.setOf
 
 @Module
 object RouteRecorder {
+    private val addCustomBind by config.property<Keybind.Handler>("secretRoutes.addCustom")
+
     var recording = false
         private set
 
@@ -47,7 +56,7 @@ object RouteRecorder {
             stopRecording()
         }
 
-        EventBus.on<DungeonEvent.Secrets.Bat>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.BAT, it.blockPos) }
+        EventBus.on<DungeonEvent.Secrets.Bat>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on;addWaypoint(WaypointType.BAT, it.blockPos) }
         EventBus.on<DungeonEvent.Secrets.Chest>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.CHEST, it.blockPos) }
         EventBus.on<DungeonEvent.Secrets.Essence>(SkyBlockIsland.THE_CATACOMBS) { if (!recording) return@on; addWaypoint(WaypointType.ESSENCE, it.blockPos)}
 
@@ -57,7 +66,6 @@ object RouteRecorder {
             if (calcDistanceSq(currentRoom!!.getRealCoord(lastSecretPos), pos) < 3) return@on
             addWaypoint(WaypointType.ITEM, pos)
         }
-
 
         EventBus.on<DungeonEvent.Secrets.Misc>(SkyBlockIsland.THE_CATACOMBS) {
             if (!recording) return@on
@@ -120,6 +128,8 @@ object RouteRecorder {
             if (!recording) return@on
             RoutePlayer.renderRecordingRoute(currentStep, lastStep)
         }
+
+        addCustomBind.onPress { addCustom() }
     }
 
     fun nextStep() {
@@ -177,13 +187,23 @@ object RouteRecorder {
         Signal.fakeMessage("${Stella.PREFIX} §aReloaded routes")
     }
 
+    fun addWaypoint(pos: BlockPos, name: String, color: Color, depth: Boolean) {
+        val room = Dungeon.currentRoom ?: return
+        val relPos = room.getRoomCoord(pos)
+        val waypoint = WaypointData(relPos, WaypointType.CUSTOM, name, color, depth)
+        addWaypoint(waypoint)
+    }
+
     fun addWaypoint(type: WaypointType, pos: BlockPos) {
         val room = Dungeon.currentRoom ?: return
         val relPos = room.getRoomCoord(pos)
-
         val waypoint = WaypointData(relPos, type)
-        if (type in WaypointType.SECRET) {
-            if (relPos == lastSecretPos) return
+        addWaypoint(waypoint)
+    }
+
+    fun addWaypoint(waypoint: WaypointData) {
+        if (waypoint.type in WaypointType.SECRET) {
+            if (waypoint.pos == lastSecretPos) return
             currentStep.waypoints += waypoint
             nextStep()
             return
@@ -192,7 +212,7 @@ object RouteRecorder {
         currentStep.waypoints += waypoint
     }
 
-    fun hudPreview(context: GuiGraphicsExtractor) {
+    fun hudPreview(context: GuiGraphics) {
         val matirix = context.pose()
 
         matirix.pushMatrix()
@@ -216,7 +236,7 @@ object RouteRecorder {
         matirix.popMatrix()
     }
 
-    fun hud(context: GuiGraphicsExtractor) {
+    fun hud(context: GuiGraphics) {
         val matrix = context.pose()
 
         val x = HUDManager.getX(SecretRoutes.rHudName)
@@ -262,4 +282,21 @@ object RouteRecorder {
 
         matrix.popMatrix()
     }
+
+    fun addCustom() {
+        if (!recording) {
+            Signal.fakeMessage("${Stella.PREFIX} §cError: not recording")
+            return
+        }
+
+        val hitresult = client.hitResult as? BlockHitResult ?: return
+
+        Chronos.Tick post {
+            client.setScreen(WaypointEditor(hitresult.blockPos))
+        }
+    }
+
+    fun getMissing(): List<String> = RoomRegistry.getAll()
+        .filter { it.type.equals("normal", true) }
+        .map { it.name } - RouteRegistry.getAll().map { it.key }.toSet()
 }

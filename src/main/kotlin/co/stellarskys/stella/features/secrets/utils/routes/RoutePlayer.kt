@@ -67,7 +67,7 @@ object RoutePlayer {
 
     private fun renderWaypoint(waypoint: WaypointData, room: Room, name: Boolean = true){
         val realPos = room.getRealCoord(waypoint.pos)
-        Render3D.outlineBlock(realPos, waypoint.type.color, 3f, waypoint.type.depth)
-        if (name && text) Render3D.drawText(waypoint.type.label, realPos.center, scale = textScale, depth = false)
+        Render3D.outlineBlock(realPos, waypoint.col, 3f, waypoint.dep)
+        if (name && text) Render3D.drawText(waypoint.label, realPos.center, scale = textScale, depth = false)
     }
 }
