@@ -22,7 +22,7 @@ import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.api.zenith.world
 import co.stellarskys.stella.features.secrets.utils.routes.editor.WaypointEditor
 import co.stellarskys.stella.utils.config
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.core.BlockPos
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.phys.BlockHitResult
@@ -212,7 +212,7 @@ object RouteRecorder {
         currentStep.waypoints += waypoint
     }
 
-    fun hudPreview(context: GuiGraphics) {
+    fun hudPreview(context: GuiGraphicsExtractor) {
         val matirix = context.pose()
 
         matirix.pushMatrix()
@@ -236,7 +236,7 @@ object RouteRecorder {
         matirix.popMatrix()
     }
 
-    fun hud(context: GuiGraphics) {
+    fun hud(context: GuiGraphicsExtractor) {
         val matrix = context.pose()
 
         val x = HUDManager.getX(SecretRoutes.rHudName)
