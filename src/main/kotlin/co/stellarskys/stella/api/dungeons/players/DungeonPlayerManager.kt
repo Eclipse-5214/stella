@@ -1,6 +1,7 @@
 package co.stellarskys.stella.api.dungeons.players
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.api.dungeons.utils.Checkmark
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.DungeonEvent
@@ -75,10 +76,6 @@ object DungeonPlayerManager {
             .asSequence()
             .filterNotNull()
             .firstOrNull { it.name == name }
-    }
-
-    fun updateAllSecrets() {
-        players.filterNotNull().forEach { it.updateSecrets() }
     }
 
     fun reset() {

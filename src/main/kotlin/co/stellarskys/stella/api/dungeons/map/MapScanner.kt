@@ -250,9 +250,10 @@ object MapScanner {
 
         players.forEach { player ->
             val alreadyCleared = player.getWhiteChecks().containsKey(roomKey) || player.getGreenChecks().containsKey(roomKey)
+            val solo = players.size == 1
 
             if (!alreadyCleared) {
-                if (players.size == 1) player.minRooms++
+                if (solo) player.minRooms++
                 player.maxRooms++
             }
 
@@ -264,7 +265,7 @@ object MapScanner {
                 RoomClearInfo(
                     time = room.clearTime.since,
                     room = room,
-                    solo = players.size == 1
+                    solo = solo
                 )
             )
         }
