@@ -7,9 +7,7 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 
-class FeatureProcessor(
-    private val codeGenerator: CodeGenerator
-) : SymbolProcessor {
+class FeatureProcessor(private val codeGenerator: CodeGenerator) : SymbolProcessor {
     private var invoked = false
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -24,10 +22,7 @@ class FeatureProcessor(
         return emptyList()
     }
 
-    private fun generateRegistry(
-        modules: Sequence<KSAnnotated>,
-        commands: Sequence<KSAnnotated>
-    ) {
+    private fun generateRegistry(modules: Sequence<KSAnnotated>, commands: Sequence<KSAnnotated>) {
         val moduleDecls = modules.filterIsInstance<KSClassDeclaration>().toList()
         val commandDecls = commands.filterIsInstance<KSClassDeclaration>().toList()
 
@@ -36,12 +31,12 @@ class FeatureProcessor(
             .distinct()
             .toTypedArray()
 
-        val deps = if (sourceFiles.isEmpty()) Dependencies.ALL_FILES else Dependencies(false, *sourceFiles)
+        val deps = if (sourceFiles.isEmpty()) Dependencies.ALL_FILES else Dependencies(true, *sourceFiles)
 
         val file = codeGenerator.createNewFile(
             deps,
             "co.stellarskys.stella.generated",
-            "GeneratedFeatureRegistry"
+            "ModuleList"
         )
 
         file.writer().use { out ->
@@ -49,7 +44,7 @@ class FeatureProcessor(
             out.appendLine()
             out.appendLine("import co.stellarskys.stella.api.handlers.Atlas")
             out.appendLine()
-            out.appendLine("object GeneratedFeatureRegistry {")
+            out.appendLine("object ModuleList {")
             out.appendLine("  val modules: List<Class<*>> = listOf(")
 
             moduleDecls.forEach { decl ->

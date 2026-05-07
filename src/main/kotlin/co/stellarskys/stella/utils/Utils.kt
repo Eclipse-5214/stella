@@ -16,13 +16,9 @@ import kotlin.math.sqrt
 
 object Utils {
     /**
-     * Calculates the Euclidean distance between two 3D points.
-     *
-     * @param a First point as Triple(x, y, z)
-     * @param b Second point as Triple(x, y, z)
-     * @return The straight-line distance between the points.
+     * Calculates the squared Euclidean distance between two 3D points.
+     * Faster than [calcDistance] because it avoids the square root.
      */
-
     fun calcDistanceSq(pos1: BlockPos, pos2: BlockPos) = calcDistanceSq(Triple(pos1.x, pos1.y, pos1.z), Triple(pos2.x, pos2.y, pos2.z))
     fun calcDistanceSq(a: Triple<Int, Int, Int>, b: Triple<Int, Int, Int>): Double {
         val dx = (a.first - b.first).toDouble()
@@ -32,8 +28,11 @@ object Utils {
     }
 
     /**
-     * Calculates the squared Euclidean distance between two 3D points.
-     * Faster than [calcDistanceSq] because it avoids the square root.
+     * Calculates the Euclidean distance between two 3D points.
+     *
+     * @param a First point as Triple(x, y, z)
+     * @param b Second point as Triple(x, y, z)
+     * @return The straight-line distance between the points.
      */
     fun calcDistance(pos1: BlockPos, pos2: BlockPos) = calcDistance(Triple(pos1.x, pos1.y, pos1.z), Triple(pos2.x, pos2.y, pos2.z))
     fun calcDistance(a: Triple<Int, Int, Int>, b: Triple<Int, Int, Int>): Double {
@@ -94,8 +93,6 @@ object Utils {
 
         return Color(r, g, b, a)
     }
-
-    fun Color.getNormalized(): FloatArray = this.getRGBComponents(null)
 
     /**
      * Darkens the color by a given factor.
