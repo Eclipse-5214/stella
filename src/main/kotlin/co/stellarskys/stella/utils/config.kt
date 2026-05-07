@@ -686,6 +686,11 @@ val config = Config(Stella.NAMESPACE) {
                 default = Color(107, 58, 17, 255)
             }
             colorpicker {
+                configName = "rareRoomColor"
+                name = "Rare"
+                default = Color(107, 58, 17, 255)
+            }
+            colorpicker {
                 configName = "puzzleRoomColor"
                 name = "Puzzle"
                 default = Color(117, 0, 133, 255)

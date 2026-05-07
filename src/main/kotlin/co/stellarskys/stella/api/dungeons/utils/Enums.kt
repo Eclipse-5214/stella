@@ -50,7 +50,7 @@ enum class RoomType(
     YELLOW("Champion", "e", { Map.MinibossColor }),
     BLOOD("Blood", "c", { Map.BloodColor }),
     FAIRY("Fairy", "d", { Map.FairyColor }),
-    RARE("Rare", "b", { null }),
+    RARE("Rare", "b", { Map.NormalColor }),
     ENTRANCE("Entrance", "a", { Map.EntranceColor }),
     UNKNOWN("Unknown", "f", { Color(100, 100, 100) });
 

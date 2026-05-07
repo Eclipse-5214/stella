@@ -61,6 +61,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
 
     // map colors
     val NormalColor by config.property<Color>("normalRoomColor")
+    val RareColor by config.property<Color>("rareRoomColor")
     val PuzzleColor by config.property<Color>("puzzleRoomColor")
     val TrapColor by config.property<Color>("trapRoomColor")
     val MinibossColor by config.property<Color>("minibossRoomColor")
