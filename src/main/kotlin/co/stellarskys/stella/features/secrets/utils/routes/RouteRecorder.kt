@@ -15,6 +15,7 @@ import co.stellarskys.stella.utils.Utils.calcDistanceSq
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.map.Room
+import co.stellarskys.stella.api.dungeons.utils.RoomRegistry
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
@@ -294,4 +295,8 @@ object RouteRecorder {
             client.setScreen(WaypointEditor(hitresult.blockPos))
         }
     }
+
+    fun getMissing(): List<String> = RoomRegistry.getAll()
+        .filter { it.type.equals("normal", true) }
+        .map { it.name } - RouteRegistry.getAll().map { it.key }.toSet()
 }

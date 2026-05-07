@@ -63,6 +63,13 @@ object MainCommand : Atlas("stella", "sta", "sa") {
                 }
             }
 
+            literal("missing") {
+                runs {
+                    val missing = RouteRecorder.getMissing()
+                    Signal.fakeMessage("${Stella.PREFIX} §bMissing Rooms §6${missing.size}§b:")
+                    missing.forEach { Signal.fakeMessage("§7 - $it") }
+                }
+            }
         }
 
         literal("help") {
