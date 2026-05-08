@@ -174,11 +174,9 @@ object Dungeon {
         EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val entity = event.entity
             if (entity !is Bat) return@on
-            if (entity.maxHealth != 100f) return@on
+            if (entity.maxHealth != 200f) return@on
             val pos = entity.blockPosition()
             EventBus.post(DungeonEvent.Secrets.Bat(pos, entity))
-
-            println("Death Event triggered for Bat ID: ${entity.id}, Hash: ${entity.hashCode()}")
         }
 
         RoomRegistry.loadFromRemote()
