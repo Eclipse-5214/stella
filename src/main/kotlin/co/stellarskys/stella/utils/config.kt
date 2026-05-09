@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.config.core.Config
+import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
@@ -882,10 +883,28 @@ val config = Config(Stella.NAMESPACE) {
             button {
                 configName = "secretRoutes.reload"
                 name = "Reload Routes"
-                description = "reloads the secret routes from the config file"
+                description = "Reloads the secret routes from the config file"
 
                 onclick {
                     RouteRegistry.reload()
+                }
+            }
+
+            button {
+                configName = "secretRoutes.update"
+                name = "Update Routes"
+                description = "Updates the secret routes from ether"
+
+                onclick {
+                    Signal.fakeMessage("${Stella.PREFIX} §bStarting redownload...")
+                    RouteRegistry.redownload { success ->
+                        if (success) {
+                            RouteRegistry.reload()
+                            Signal.fakeMessage("${Stella.PREFIX} §aSuccessfully updated routes!")
+                        } else {
+                            Signal.fakeMessage("${Stella.PREFIX} §cFailed to download routes. Check your internet or GitHub Pages status.")
+                        }
+                    }
                 }
             }
 
