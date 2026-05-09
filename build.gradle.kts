@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.loom)
     alias(libs.plugins.ksp)
+    `maven-publish`
 }
 
 val mc = stonecutter.current.version
@@ -43,6 +44,15 @@ dependencies {
     shadow(libs.lwjgl.nanovg)
     listOf("windows", "linux", "linux-arm64", "macos", "macos-arm64").forEach { os ->
         shadow("${libs.lwjgl.nanovg.get()}:natives-$os")
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifactId = "${property("mod.id")}-${stonecutter.current.version}"
+            from(components["java"])
+        }
     }
 }
 
