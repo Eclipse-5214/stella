@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.SkullBlockEntity
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonAPI
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
+import tech.thatgravyboat.skyblockapi.api.data.MayorPerks
 import tech.thatgravyboat.skyblockapi.api.location.LocationAPI
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.platform.properties
@@ -174,7 +175,7 @@ object Dungeon {
         EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val entity = event.entity
             if (entity !is Bat) return@on
-            if (entity.maxHealth != 200f) return@on
+            if (entity.maxHealth != if(MayorPerks.DOUBLE_MOBS_HP.active) 200f else 100f) return@on
             val pos = entity.blockPosition()
             EventBus.post(DungeonEvent.Secrets.Bat(pos, entity))
         }
