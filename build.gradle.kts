@@ -50,7 +50,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            artifactId = "${property("mod.id")}-${stonecutter.current.version}"
+            artifactId = "${property("mod.id")}-$mc"
             from(components["java"])
         }
     }

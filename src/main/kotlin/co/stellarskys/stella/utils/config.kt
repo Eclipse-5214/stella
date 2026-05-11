@@ -800,6 +800,13 @@ val config = Config(Stella.NAMESPACE) {
     category("Secrets") {
         subcategory("Waypoints", "secretWaypoints", "Renders Secret Waypoints") {
             toggle {
+                configName = "secretWaypoints.missingRoute"
+                name = "with routes"
+                description = "Renders waypoints in rooms without routes"
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+            
+            toggle {
                 configName = "secretWaypoints.text"
                 name = "Waypoint Text"
                 description = "Renders Secret Waypoints text"
