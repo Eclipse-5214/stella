@@ -253,7 +253,7 @@ object Dungeon {
     fun getDoorAt(x: Int, z: Int) = getDoorAtComp(WorldScanUtils.realCoordToComponent(x, z))
 
     /** Adds a door to the map and tracks it as unique */
-    fun addDoor(door: co.stellarskys.stella.api.dungeons.map.Door) {
+    fun addDoor(door: Door) {
         val idx = getDoorIdx(door.getComp())
         if (idx in doors.indices) {
             doors[idx] = door

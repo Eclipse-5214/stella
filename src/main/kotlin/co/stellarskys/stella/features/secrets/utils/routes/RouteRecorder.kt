@@ -20,6 +20,7 @@ import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.api.zenith.world
+import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.features.secrets.utils.routes.editor.WaypointEditor
 import co.stellarskys.stella.utils.config
 import net.minecraft.client.gui.GuiGraphics
@@ -129,6 +130,8 @@ object RouteRecorder {
             RoutePlayer.renderRecordingRoute(currentStep, lastStep)
         }
 
+        EventBus.on<LocationEvent.IslandChange>{ if(recording) stopRecording() }
+
         addCustomBind.onPress { addCustom() }
     }
 
@@ -149,6 +152,7 @@ object RouteRecorder {
     fun getRoute(): List<StepData> = route
 
     fun startRecording() {
+        if (recording) return
         val room = Dungeon.currentRoom
         if (room?.name == null) {
             Signal.fakeMessage("${Stella.PREFIX} §cNot in a valid dungeon room")
@@ -166,6 +170,7 @@ object RouteRecorder {
     }
 
     fun stopRecording() {
+        if (!recording) return
         recording = false
         Signal.fakeMessage("${Stella.PREFIX} §cStopped Recording")
     }
