@@ -304,4 +304,6 @@ object RouteRecorder {
     fun getMissing(): List<String> = RoomRegistry.getAll()
         .filter { it.type.equals("normal", true) && it.secrets > 0 }
         .map { it.name } - RouteRegistry.getAll().map { it.key }.toSet()
+
+    fun currentMissing(): Boolean = currentRoom?.name?.let { it in getMissing() } ?: false
 }

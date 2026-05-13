@@ -11,6 +11,7 @@ import co.stellarskys.stella.api.zenith.world
 import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.DungeonEvent.Secrets.Type.*
+import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.features.secrets.utils.waypoints.*
 import co.stellarskys.stella.utils.Utils
 import net.minecraft.core.BlockPos
@@ -19,6 +20,7 @@ import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 @Module
 object SecretWaypoints: Feature("secretWaypoints", island = SkyBlockIsland.THE_CATACOMBS) {
+    private val missingRoute by config.property<Boolean>("secretWaypoints.missingRoute")
     data class CoordType(val rel: BlockPos, val real: BlockPos, val orig: SecretData.Coord )
 
     override fun initialize() {
@@ -46,6 +48,7 @@ object SecretWaypoints: Feature("secretWaypoints", island = SkyBlockIsland.THE_C
 
         on<RenderEvent.World.Last> {
             if (Dungeon.inBoss) return@on
+            if (missingRoute && RouteRecorder.currentMissing()) return@on
             val room = Dungeon.currentRoom ?: return@on
             val data = SecretsRegistry.getById(room.id) ?: return@on
             if(room.checkmark == Checkmark.GREEN) return@on

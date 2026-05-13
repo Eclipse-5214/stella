@@ -10,6 +10,7 @@ import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.features.dungeons.JoinInfo
+import co.stellarskys.stella.features.msc.ProfileViewer
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
@@ -110,6 +111,13 @@ object MainCommand : Atlas("stella", "sta", "sa") {
             runs<Greedy?> ("name") { arg ->
                 val name = arg?.string ?: player?.name?.string ?: return@runs
                 JoinInfo.fetchAndDisplayStats(name)
+            }
+        }
+
+        literal("pv") {
+            runs<Greedy?> ("name") { arg ->
+                val name = arg?.string ?: player?.name?.string ?: return@runs
+                ProfileViewer.view(name)
             }
         }
 

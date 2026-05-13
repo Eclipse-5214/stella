@@ -20,3 +20,11 @@ stonecutter parameters {
         }
     }
 }
+
+tasks.register("publishAllToJitPack") {
+    group = "publishing"
+    description = "Publishes all Stonecutter versions to Maven Local for JitPack"
+
+    val allPublishTasks = stonecutter.tasks.named("publishToMavenLocal")
+    dependsOn(allPublishTasks)
+}

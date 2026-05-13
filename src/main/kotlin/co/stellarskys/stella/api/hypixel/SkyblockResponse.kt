@@ -1,8 +1,12 @@
 package co.stellarskys.stella.api.hypixel
 
+import co.stellarskys.stella.annotations.Skip
 import com.google.gson.annotations.SerializedName
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtIo
+import net.minecraft.world.item.ItemStack
+import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
+import tech.thatgravyboat.skyblockapi.api.remote.hypixel.legacyStack
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.optionals.getOrNull
@@ -14,7 +18,9 @@ data class SkyblockResponse(
     fun getActiveMember(uuid: String): SkyblockMember? {
         val cleanUuid = uuid.replace("-", "")
         val activeProfile = profiles?.find { it.selected } ?: return null
-        return activeProfile.members[cleanUuid]
+        val member = activeProfile.members[cleanUuid] ?: return null
+        member.profileBank = activeProfile.banking
+        return member
     }
 
 
@@ -22,7 +28,12 @@ data class SkyblockResponse(
         @SerializedName("profile_id") val id: String,
         val selected: Boolean = false,
         @SerializedName("cute_name") val cuteName: String? = null,
-        val members: Map<String, SkyblockMember> = emptyMap()
+        val members: Map<String, SkyblockMember> = emptyMap(),
+        val banking: Banking = Banking()
+    )
+
+    data class Banking(
+        val balance: Double = 0.0
     )
 
     data class SkyblockMember(
@@ -30,7 +41,10 @@ data class SkyblockResponse(
         @SerializedName("pets_data") val petsData: PetsData = PetsData(),
         val dungeons: DungeonsData = DungeonsData(),
         @SerializedName("accessory_bag_storage") val accessoryBag: AccessoryBagStorage = AccessoryBagStorage(),
-        val inventory: Inventory = Inventory()
+        val inventory: Inventory = Inventory(),
+        @SerializedName("bank_account") val soloBank: Double = 0.0,
+        val currencies: Currencies = Currencies(),
+        var profileBank: Banking? = null,
     ) {
         val inventoryApi get() = inventory.invContents.data.isNotEmpty()
         val assumedMagicalPower get() =
@@ -39,8 +53,24 @@ data class SkyblockResponse(
 
         val allItems get() = inventory.invContents.itemStacks +
                 inventory.eChestContents.itemStacks +
+                inventory.wardrobeContents.itemStacks +
+                inventory.equipment.itemStacks +
+                inventory.fishingBag.itemStacks +
+                inventory.talismanBag.itemStacks +
+                inventory.quiver.itemStacks +
+                inventory.personalVault.itemStacks +
                 inventory.backpackContents.flatMap { it.value.itemStacks }
+
+        val allStacks: List<ItemStack> = allItems.filterNotNull().map { it.stack }.filterNot { it.isEmpty }
     }
+
+    data class Currencies(
+        @SerializedName("coin_purse") val purse: Double = 0.0,
+        @SerializedName("motes_purse") val motes: Double = 0.0,
+        val essence: Map<String, EssenceData> = emptyMap()
+    )
+
+    data class EssenceData(val current: Long = 0)
 
     data class PlayerStats(val kills: Map<String, Float> = emptyMap()) {
         val bloodMobKills get() = ((kills["watcher_summon_undead"] ?: 0f) + (kills["master_watcher_summon_undead"] ?: 0f)).toInt()
@@ -73,7 +103,9 @@ data class SkyblockResponse(
         val activePet get() = pets.find { it.active }
     }
 
-    data class Pet(val type: String = "", val active: Boolean = false, val tier: String = "", val heldItem: String? = null)
+    data class Pet(val type: String = "", val active: Boolean = false, val tier: String = "", val heldItem: String? = null) {
+        val rarity = SkyBlockRarity.entries.find { it.name == tier } ?: SkyBlockRarity.COMMON
+    }
 
     data class AccessoryBagStorage(
         @SerializedName("highest_magical_power") val highestMP: Long = 0,
@@ -86,7 +118,13 @@ data class SkyblockResponse(
         @SerializedName("inv_contents") val invContents: InventoryContents = InventoryContents(),
         @SerializedName("ender_chest_contents") val eChestContents: InventoryContents = InventoryContents(),
         @SerializedName("backpack_contents") val backpackContents: Map<String, InventoryContents> = emptyMap(),
-        @SerializedName("inv_armor") val invArmor: InventoryContents = InventoryContents()
+        @SerializedName("inv_armor") val invArmor: InventoryContents = InventoryContents(),
+        @SerializedName("wardrobe_contents") val wardrobeContents: InventoryContents = InventoryContents(),
+        @SerializedName("talisman_bag") val talismanBag: InventoryContents = InventoryContents(),
+        @SerializedName("equipment_contents") val equipment: InventoryContents = InventoryContents(),
+        @SerializedName("personal_vault_contents") val personalVault: InventoryContents = InventoryContents(),
+        @SerializedName("quiver") val quiver: InventoryContents = InventoryContents(),
+        @SerializedName("fishing_bag") val fishingBag: InventoryContents = InventoryContents(),
     )
 
     data class InventoryContents(val type: Int? = null, val data: String = "") {
@@ -98,14 +136,16 @@ data class SkyblockResponse(
             itemNBTList.indices.map { i ->
                 val compound = itemNBTList.getCompound(i).getOrNull()?.takeIf { it.size() > 0 } ?: return@map null
                 val tag = compound.get("tag")?.asCompound()?.get() ?: return@map null
+                val stack = tag.legacyStack()
                 val id = tag.get("ExtraAttributes")?.asCompound()?.get()?.get("id")?.asString()?.get() ?: ""
                 val display = tag.get("display")?.asCompound()?.get() ?: return@map null
                 val name = display.get("Name")?.asString()?.get() ?: ""
                 val lore = display.get("Lore")?.asList()?.get()?.mapNotNull { it.asString().getOrNull() } ?: emptyList()
-                ItemData(name, id, lore)
+
+                ItemData(name, id, lore, stack)
             }
         }
     }
 
-    data class ItemData(val name: String, val id: String, val lore: List<String>)
+    data class ItemData(val name: String, val id: String, val lore: List<String>, @Skip val stack: ItemStack)
 }

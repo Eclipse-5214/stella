@@ -2,6 +2,7 @@ package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.config.core.Config
+import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
@@ -799,6 +800,13 @@ val config = Config(Stella.NAMESPACE) {
     category("Secrets") {
         subcategory("Waypoints", "secretWaypoints", "Renders Secret Waypoints") {
             toggle {
+                configName = "secretWaypoints.missingRoute"
+                name = "with routes"
+                description = "Renders waypoints in rooms without routes"
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+            
+            toggle {
                 configName = "secretWaypoints.text"
                 name = "Waypoint Text"
                 description = "Renders Secret Waypoints text"
@@ -882,10 +890,28 @@ val config = Config(Stella.NAMESPACE) {
             button {
                 configName = "secretRoutes.reload"
                 name = "Reload Routes"
-                description = "reloads the secret routes from the config file"
+                description = "Reloads the secret routes from the config file"
 
                 onclick {
                     RouteRegistry.reload()
+                }
+            }
+
+            button {
+                configName = "secretRoutes.update"
+                name = "Update Routes"
+                description = "Updates the secret routes from ether"
+
+                onclick {
+                    Signal.fakeMessage("${Stella.PREFIX} §bStarting redownload...")
+                    RouteRegistry.redownload { success ->
+                        if (success) {
+                            RouteRegistry.reload()
+                            Signal.fakeMessage("${Stella.PREFIX} §aSuccessfully updated routes!")
+                        } else {
+                            Signal.fakeMessage("${Stella.PREFIX} §cFailed to download routes. Check your internet or GitHub Pages status.")
+                        }
+                    }
                 }
             }
 
@@ -1239,6 +1265,14 @@ val config = Config(Stella.NAMESPACE) {
 
         subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
         subcategory("Sword Blocking", "swordBlocking", "Enables 1.8.9 style sword blocking")
+
+        subcategory("Profile Viewer", "profileViewer", "Super minimal profile viewer") {
+            toggle {
+                configName = "profileViewer.pv"
+                name = "PV command"
+                description = "use /pv as an alias to /sa pv"
+            }
+        }
 
         /*
         subcategory("Custom Nametags") {
