@@ -2,27 +2,23 @@ package co.stellarskys.stella.api.handlers
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.zenith.client
-import com.google.gson.Gson
+import co.stellarskys.stella.generated.ModuleList
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
+import com.google.gson.stream.*
+import kotlinx.coroutines.*
 import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
+import java.net.http.*
 import java.nio.file.Path
 import java.time.Duration
 import kotlin.coroutines.resume
 
 object Quasar {
-    val gson = Gson()
+    val gson: Gson = GsonBuilder().registerTypeAdapterFactory(SkipFactory).create()
     private val httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()
 
-    private fun request(url: String) = HttpRequest.newBuilder()
-        .uri(URI.create(url))
-        .header("User-Agent", "Stella-Mod")
-        .timeout(Duration.ofSeconds(10))
+    private fun request(url: String) = HttpRequest.newBuilder().uri(URI.create(url))
+        .header("User-Agent", "Stella-Mod").timeout(Duration.ofSeconds(10))
 
     suspend fun fetchString(url: String): Result<String> = suspendCancellableCoroutine { cont ->
         val future = httpClient.sendAsync(request(url).GET().build(), HttpResponse.BodyHandlers.ofString())
@@ -40,7 +36,6 @@ object Quasar {
     suspend fun downloadFile(url: String, targetPath: Path): Result<Path> = suspendCancellableCoroutine { cont ->
         val request = request(url).GET().build()
         val future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofFile(targetPath))
-
         cont.invokeOnCancellation { future.cancel(true) }
 
         future.whenComplete { res, err ->
@@ -60,8 +55,21 @@ object Quasar {
     ) {
         val type = object : TypeToken<T>() {}.type
         scope.launch {
-            val res = fetchString(url).mapCatching { gson.fromJson<T>(it, type) }
+            val res = fetchString(url).mapCatching { json ->
+                try { gson.fromJson<T>(json, type) } catch (e: Exception) {
+                    Stella.LOGGER.error("Quasar GSON Error: ${e.message}"); throw e
+                }
+            }
+
             client.execute { onResult(res) }
         }
+    }
+
+    private object SkipFactory : TypeAdapterFactory {
+        override fun <T : Any> create(gson: Gson, type: TypeToken<T>) = if (type.rawType in ModuleList.skippedTypes)
+            object : TypeAdapter<T>() {
+                override fun write(out: JsonWriter, value: T?) { out.nullValue() }
+                override fun read(reader: JsonReader) = reader.skipValue().let { null }
+            } else null
     }
 }

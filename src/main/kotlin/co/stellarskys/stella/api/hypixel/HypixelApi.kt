@@ -45,7 +45,7 @@ object HypixelApi {
     fun fetchSkyblockProfile(
         uuid: String,
         cacheMs: Long = 300_000L,
-        force: Boolean = false, // New parameter
+        force: Boolean = false,
         onResult: (SkyblockResponse.SkyblockMember?) -> Unit
     ) {
         if (!force) {

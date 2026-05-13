@@ -1266,6 +1266,14 @@ val config = Config(Stella.NAMESPACE) {
         subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
         subcategory("Sword Blocking", "swordBlocking", "Enables 1.8.9 style sword blocking")
 
+        subcategory("Profile Viewer", "profileViewer", "Super minimal profile viewer") {
+            toggle {
+                configName = "profileViewer.pv"
+                name = "PV command"
+                description = "use /pv as an alias to /sa pv"
+            }
+        }
+
         /*
         subcategory("Custom Nametags") {
             toggle {
