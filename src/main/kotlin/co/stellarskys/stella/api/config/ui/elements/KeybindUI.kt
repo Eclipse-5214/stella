@@ -5,7 +5,7 @@ import co.stellarskys.stella.api.config.core.Keybind
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
-import co.stellarskys.stella.api.config.ui.base.BaseElement
+import co.stellarskys.stella.api.horizon.nvg.BaseElement
 import net.minecraft.client.gui.GuiGraphics
 import org.lwjgl.glfw.GLFW
 

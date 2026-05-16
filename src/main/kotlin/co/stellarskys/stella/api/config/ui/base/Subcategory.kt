@@ -4,6 +4,7 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.api.config.core.ConfigSubcategory
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
+import co.stellarskys.stella.api.horizon.nvg.ParentElement
 import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color
 

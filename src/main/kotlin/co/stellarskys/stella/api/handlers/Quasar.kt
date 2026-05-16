@@ -2,10 +2,8 @@ package co.stellarskys.stella.api.handlers
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.zenith.client
-import co.stellarskys.stella.generated.ModuleList
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
-import com.google.gson.stream.*
 import kotlinx.coroutines.*
 import java.net.URI
 import java.net.http.*
@@ -14,7 +12,7 @@ import java.time.Duration
 import kotlin.coroutines.resume
 
 object Quasar {
-    val gson: Gson = GsonBuilder().registerTypeAdapterFactory(SkipFactory).create()
+    val gson = Gson()
     private val httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()
 
     private fun request(url: String) = HttpRequest.newBuilder().uri(URI.create(url))
@@ -63,13 +61,5 @@ object Quasar {
 
             client.execute { onResult(res) }
         }
-    }
-
-    private object SkipFactory : TypeAdapterFactory {
-        override fun <T : Any> create(gson: Gson, type: TypeToken<T>) = if (type.rawType in ModuleList.skippedTypes)
-            object : TypeAdapter<T>() {
-                override fun write(out: JsonWriter, value: T?) { out.nullValue() }
-                override fun read(reader: JsonReader) = reader.skipValue().let { null }
-            } else null
     }
 }

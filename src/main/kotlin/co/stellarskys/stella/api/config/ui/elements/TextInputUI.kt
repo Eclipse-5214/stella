@@ -5,8 +5,8 @@ import co.stellarskys.stella.api.config.core.TextInput
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
-import co.stellarskys.stella.api.config.ui.base.BaseElement
-import co.stellarskys.stella.api.config.ui.base.TextBox
+import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import co.stellarskys.stella.api.horizon.nvg.TextBox
 import net.minecraft.client.gui.GuiGraphics
 
 class TextInputUI(initX: Float, initY: Float, val input: TextInput) : BaseElement() {

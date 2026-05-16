@@ -1,8 +1,8 @@
 package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
-import co.stellarskys.stella.api.animation.AnimType
-import co.stellarskys.stella.api.animation.Animation
+import co.stellarskys.stella.api.horizon.animation.AnimType
+import co.stellarskys.stella.api.horizon.animation.Animation
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
 import net.minecraft.core.BlockPos

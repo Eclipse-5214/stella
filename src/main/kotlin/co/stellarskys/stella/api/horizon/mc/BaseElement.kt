@@ -1,13 +1,12 @@
-package co.stellarskys.stella.api.config.ui.base
+package co.stellarskys.stella.api.horizon.mc
 
-import co.stellarskys.stella.api.config.ui.ConfigUI
-import co.stellarskys.stella.api.nvg.Font
-import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.zenith.Zenith
+import co.stellarskys.stella.utils.render.Render2D
+import co.stellarskys.stella.utils.render.Render2D.width
 import net.minecraft.client.gui.GuiGraphics
 
 abstract class BaseElement {
-    val nvg get() = NVGRenderer
+    val ren2d get() = Render2D
     val rez get() = Zenith.Res
     val mouse = Zenith.Mouse
 
@@ -26,12 +25,11 @@ abstract class BaseElement {
     open val absoluteX: Float get() = (parent?.absoluteX ?: 0f) + x
     open val absoluteY: Float get() = (parent?.absoluteY ?: 0f) + y
 
-    open fun isAreaHovered(rx: Float, ry: Float, rw: Float, rh: Float, mx: Float = mouse.rawX.toFloat() / ConfigUI.UI_SCALE, my: Float = mouse.rawY.toFloat()  / ConfigUI.UI_SCALE) =
+    open fun isAreaHovered(rx: Float, ry: Float, rw: Float, rh: Float, mx: Float = mouse.scaledX.toFloat(), my: Float = mouse.scaledY.toFloat()) =
         mx in (absoluteX + rx)..(absoluteX + rx + rw) && my in (absoluteY + ry)..(absoluteY + ry + rh)
 
-    open fun isTextHovered(text: String, rx: Float, ry: Float, size: Float = 16f, font: Font = nvg.inter, mx: Float = mouse.rawX.toFloat() / ConfigUI.UI_SCALE, my: Float = mouse.rawY.toFloat()  / ConfigUI.UI_SCALE) =
-        isAreaHovered(rx, ry, nvg.textWidth(text, size, font), size, mx, my)
-
+    open fun isTextHovered(text: String, rx: Float, ry: Float, scale: Float = 1f, mx: Float = mouse.scaledX.toFloat(), my: Float = mouse.scaledY.toFloat()) =
+        isAreaHovered(rx, ry, width, text.width().toFloat() * scale, mx, my)
 
     // Rendering
     abstract fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float)

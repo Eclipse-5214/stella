@@ -2,8 +2,8 @@ package co.stellarskys.stella.features.secrets.utils.routes.editor
 
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
-import co.stellarskys.stella.api.config.ui.base.BaseElement
-import co.stellarskys.stella.api.config.ui.base.TextBox
+import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import co.stellarskys.stella.api.horizon.nvg.TextBox
 import co.stellarskys.stella.api.nvg.Gradient
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.Utils.toHex

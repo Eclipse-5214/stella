@@ -1,4 +1,4 @@
-package co.stellarskys.stella.api.config.ui.base
+package co.stellarskys.stella.api.horizon.nvg
 
 abstract class ParentElement : BaseElement() {
     val elements = mutableListOf<BaseElement>()

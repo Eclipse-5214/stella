@@ -2,13 +2,11 @@ package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.api.config.ui.ConfigUI.Companion.UI_SCALE
 import co.stellarskys.stella.api.config.ui.Palette
-import co.stellarskys.stella.api.config.ui.base.BaseElement
-import co.stellarskys.stella.api.config.ui.base.TextBox
+import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import co.stellarskys.stella.api.horizon.nvg.TextBox
 import co.stellarskys.stella.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.platform.pushPop
-import tech.thatgravyboat.skyblockapi.platform.scale
-import tech.thatgravyboat.skyblockapi.platform.translate
 import java.awt.Color
 
 class EditButtonPopup : BaseElement() {

@@ -12,6 +12,8 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.PlayerFaceRenderer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.resources.DefaultPlayerSkin
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import org.joml.Matrix3x2f
@@ -22,6 +24,7 @@ import tech.thatgravyboat.skyblockapi.platform.PlayerSkin
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.platform.textureUrl
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
+import tech.thatgravyboat.skyblockapi.utils.text.TextUtils.splitLines
 
 object Render2D {
     private val textureCache = mutableMapOf<UUID, PlayerSkin>()
@@ -39,6 +42,16 @@ object Render2D {
     }
 
     @JvmOverloads
+    fun drawHollowRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, thickness: Int, color: Color = Color.WHITE) {
+        if (thickness <= 0) return
+        val rgb = color.rgb
+        ctx.fill(RenderPipelines.GUI, x, y, x + width, y + thickness, rgb)
+        ctx.fill(RenderPipelines.GUI, x, y + height - thickness, x + width, y + height, rgb)
+        ctx.fill(RenderPipelines.GUI, x, y + thickness, x + thickness, y + height - thickness, rgb)
+        ctx.fill(RenderPipelines.GUI, x + width - thickness, y + thickness, x + width, y + height - thickness, rgb)
+    }
+
+    @JvmOverloads
     fun drawString(ctx: GuiGraphics, str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
         val matrices = ctx.pose()
         if (scale != 1f) {
@@ -49,6 +62,26 @@ object Render2D {
         ctx.drawString(
             client.font,
             str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
+            x,
+            y,
+            -1,
+            shadow
+        )
+
+        if (scale != 1f) matrices.popMatrix()
+    }
+
+    @JvmOverloads
+    fun drawString(ctx: GuiGraphics, str: Component, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
+        val matrices = ctx.pose()
+        if (scale != 1f) {
+            matrices.pushMatrix()
+            matrices.scale(scale, scale)
+        }
+
+        ctx.drawString(
+            client.font,
+            str,
             x,
             y,
             -1,
@@ -110,8 +143,18 @@ object Render2D {
         return lines.maxOf { client.font.width(it.stripColor()) }
     }
 
+    fun MutableComponent.width(): Int {
+        val lines = splitLines()
+        return lines.maxOf { client.font.width(it)}
+    }
+
     fun String.height(): Int {
         val lineCount = count { it == '\n' } + 1
+        return client.font.lineHeight * lineCount
+    }
+
+    fun MutableComponent.height(): Int {
+        val lineCount = this.string.count { it == '\n' } + 1
         return client.font.lineHeight * lineCount
     }
 

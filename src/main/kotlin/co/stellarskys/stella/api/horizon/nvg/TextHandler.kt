@@ -1,10 +1,11 @@
-package co.stellarskys.stella.api.config.ui.base
+package co.stellarskys.stella.api.horizon.nvg
 
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.nvg.Font
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.client.gui.GuiGraphics
+import kotlin.math.abs
 
 /*
  * Adapted from TextInputHandler.kt in OdinFabric
@@ -75,7 +76,7 @@ class TextHandler(
 
         if (selectionWidth != 0f) {
             val selX = nvg.textWidth(text.substring(0, minOf(selection, caret)), fontSize, font)
-            nvg.rect(renderX + selX, textY, kotlin.math.abs(selectionWidth), fontSize, 0x665555FF)
+            nvg.rect(renderX + selX, textY, abs(selectionWidth), fontSize, 0x665555FF)
         }
 
         nvg.text(text, renderX, textY, fontSize, textColor, font)
@@ -197,7 +198,7 @@ class TextHandler(
         } else 0f
 
         val localX = mouseX - (absoluteX - textOffset + centeringOffset + textSidePadding)
-        caret = (0..text.length).minByOrNull { kotlin.math.abs(nvg.textWidth(text.substring(0, it), fontSize, font) - localX) } ?: 0
+        caret = (0..text.length).minByOrNull { abs(nvg.textWidth(text.substring(0, it), fontSize, font) - localX) } ?: 0
     }
 
     private fun saveState() {

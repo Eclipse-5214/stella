@@ -2,10 +2,13 @@ package co.stellarskys.stella.api.config.ui
 
 import co.stellarskys.stella.hud.HUDEditor
 import co.stellarskys.stella.utils.Utils
-import co.stellarskys.stella.api.animation.AnimType
+import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.config.core.*
 import co.stellarskys.stella.api.config.ui.base.*
 import co.stellarskys.stella.api.config.ui.elements.*
+import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import co.stellarskys.stella.api.horizon.nvg.ParentElement
+import co.stellarskys.stella.api.horizon.nvg.TextHandler
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.api.nvg.Gradient
 import co.stellarskys.stella.api.nvg.NVGRenderer

@@ -1,7 +1,7 @@
 package co.stellarskys.stella
 
 import co.stellarskys.stella.managers.FeatureManager
-import co.stellarskys.stella.api.animation.DeltaTracker
+import co.stellarskys.stella.api.horizon.animation.DeltaTracker
 import co.stellarskys.stella.api.nvg.NVGPIPRenderer
 import co.stellarskys.stella.utils.config
 import net.fabricmc.api.ClientModInitializer

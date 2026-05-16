@@ -3,9 +3,9 @@ package co.stellarskys.stella.features.secrets.utils.routes.editor
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
-import co.stellarskys.stella.api.config.ui.base.ParentElement
-import co.stellarskys.stella.api.config.ui.base.TextBox
-import co.stellarskys.stella.api.config.ui.base.addTo
+import co.stellarskys.stella.api.horizon.nvg.ParentElement
+import co.stellarskys.stella.api.horizon.nvg.TextBox
+import co.stellarskys.stella.api.horizon.nvg.addTo
 import co.stellarskys.stella.api.nvg.Gradient
 import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.zenith.Aperture

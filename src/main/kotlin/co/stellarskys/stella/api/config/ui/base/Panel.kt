@@ -1,8 +1,9 @@
 package co.stellarskys.stella.api.config.ui.base
 
 import co.stellarskys.stella.utils.Utils
-import co.stellarskys.stella.api.animation.AnimType
+import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.config.ui.Palette
+import co.stellarskys.stella.api.horizon.nvg.ParentElement
 import co.stellarskys.stella.api.nvg.Gradient
 import net.minecraft.client.gui.GuiGraphics
 

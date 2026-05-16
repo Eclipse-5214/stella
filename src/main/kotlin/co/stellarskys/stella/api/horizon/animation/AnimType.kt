@@ -1,4 +1,4 @@
-package co.stellarskys.stella.api.animation
+package co.stellarskys.stella.api.horizon.animation
 
 enum class AnimType {
     LINEAR,        // linear

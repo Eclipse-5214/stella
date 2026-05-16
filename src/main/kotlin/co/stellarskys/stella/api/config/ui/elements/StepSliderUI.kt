@@ -1,13 +1,13 @@
 package co.stellarskys.stella.api.config.ui.elements
 
 import co.stellarskys.stella.utils.Utils
-import co.stellarskys.stella.api.animation.AnimType
+import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.config.core.StepSlider
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
-import co.stellarskys.stella.api.config.ui.base.BaseElement
-import co.stellarskys.stella.api.config.ui.base.TextBox
+import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import co.stellarskys.stella.api.horizon.nvg.TextBox
 import net.minecraft.client.gui.GuiGraphics
 import kotlin.math.roundToInt
 
