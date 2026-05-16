@@ -33,8 +33,8 @@ abstract class Page(
     private val componentsTooltips = mutableListOf<Tooltip>()
 
     init {
-        width = 300f
-        height = 210f
+        width = 350f
+        height = 220f
         x = screenX
         y = screenY
     }

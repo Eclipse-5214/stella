@@ -72,9 +72,7 @@ data class SkyblockResponse(
 
     data class Leveling(
         val experience: Int = 0,
-    ) {
-        fun getLevel() = experience / 100 to (experience % 100)
-    }
+    )
 
     data class PlayerData(
         val experience: Map<String, Double> = emptyMap(),

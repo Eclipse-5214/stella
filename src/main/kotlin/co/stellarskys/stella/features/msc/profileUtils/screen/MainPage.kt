@@ -7,11 +7,13 @@ import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.profileUtils.FakePlayer
 import co.stellarskys.stella.features.msc.profileUtils.NetworthUtils
 import co.stellarskys.stella.features.msc.profileUtils.NetworthUtils.toReadable
+import co.stellarskys.stella.features.msc.profileUtils.SkillUtils
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import java.awt.Color
 
@@ -26,6 +28,11 @@ class MainPage(
         .append("§6" + networth.total.toReadable())
         .onHover(networth.getFormatted())
 
+    val skillAverage = SkillUtils.getCappedSkillAverage(member, false) to SkillUtils.getCappedSkillAverage(member)
+    val saComp = Component.literal("§dSA§7: ")
+        .append("§6" + skillAverage.first)
+        .onHover("§bWith Progress§7: §6${String.format("%.2f", skillAverage.second)}")
+
     init {
         member.uuid?.let {
             FakePlayer.fromUUID(it, member.inventory.invArmor.items() ).thenAccept { plr ->
@@ -35,21 +42,38 @@ class MainPage(
 
     }
 
-    override val icon: ItemStack = Items.IRON_SWORD.defaultInstance
+    override val icon: ItemStack = RepoItemsAPI.getItem("HYPERION")
 
     override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
         // Paper Doll
         drawPlayer(context, 10, 25, 80, 100)
 
         // Quick Stats
-        ren2d.drawHollowRect(context, 10, 135, 80, 65, 1, Palette.Purple)
+        ren2d.drawHollowRect(context, 10, 135, 80, 75, 1, Palette.Purple)
         ren2d.drawString(context, "§b§n${member.profile?.cuteName ?: ""}", 15, 140)
-        ren2d.drawString(context, "§bLevel§7: §6${member.leveling.getLevel().first}", 15, 150)
+        ren2d.drawString(context, "§dLevel§7: §6${member.sbLevel}", 15, 150)
         ren2d.drawString(context, "§dPurse§7: §6${member.currencies.purse.toLong().toReadable()}", 15, 160)
         ren2d.drawString(context, "§dBank§7: §6${member.profile?.banking?.balance?.toLong()?.toReadable() ?: ""}", 15, 170)
         drawComp(context, nwComp, 15, 180)
         ren2d.drawString(context, "§dMP§7: §6${member.assumedMagicalPower}", 15, 190)
+        drawComp(context, saComp, 15, 200)
 
+        // Skills
+        ren2d.drawHollowRect(context, 100, 10, 240, 200, 1,Palette.Purple)
+
+        drawSkill(context, 107, 22, SkillUtils.SkillType.COMBAT)
+        drawSkill(context, 107, 52, SkillUtils.SkillType.MINING)
+        drawSkill(context, 107, 82, SkillUtils.SkillType.FARMING)
+        drawSkill(context, 107, 112, SkillUtils.SkillType.FORAGING)
+        drawSkill(context, 107, 142, SkillUtils.SkillType.FISHING)
+        drawSkill(context, 107, 172, SkillUtils.SkillType.ENCHANTING)
+
+        drawSkill(context, 222, 22, SkillUtils.SkillType.ALCHEMY)
+        drawSkill(context, 222, 52, SkillUtils.SkillType.TAMING)
+        drawSkill(context, 222, 82, SkillUtils.SkillType.CARPENTRY)
+        drawSkill(context, 222, 112, SkillUtils.SkillType.HUNTING)
+        drawSkill(context, 222, 142, SkillUtils.SkillType.RUNECRAFTING)
+        drawSkill(context, 222, 172, SkillUtils.SkillType.SOCIAL)
 
     }
 
@@ -66,5 +90,17 @@ class MainPage(
                 mouse.scaledX.toFloat(), mouse.scaledY.toFloat(), player
             )
         }
+    }
+
+    private fun drawSkill(context: GuiGraphics, x: Int, y: Int, skilltype: SkillUtils.SkillType) {
+        val skill = SkillUtils.getSkill(skilltype, member)
+        val skillComp = Component.literal("§d${skilltype.displayName}§7: §6${skill.level.toInt()}")
+            .onHover("§b${skilltype.displayName}\n§dXP§7: §6" + "%,.3f".format(skill.xp))
+
+        ren2d.drawHollowRect(context, x, y, 110, 25, 1, Palette.Purple)
+        ren2d.renderItem(context, skilltype.icon(), x.toFloat() + 5f, y.toFloat() + 5f, 1f)
+        drawComp(context, skillComp, x + 25, y + 5)
+        ren2d.drawRect(context, x + 25, y + 15, 80, 5, Palette.Crust)
+        ren2d.drawRect(context, x + 25, y + 15, (80f * skill.progress).toInt(), 5, if (skill.level == skill.cap.toDouble()) Palette.Sapphire else Palette.Green)
     }
 }
