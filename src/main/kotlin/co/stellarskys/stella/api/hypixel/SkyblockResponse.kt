@@ -1,11 +1,13 @@
 package co.stellarskys.stella.api.hypixel
 
 import com.google.gson.annotations.SerializedName
+import com.mojang.util.UndashedUuid
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtIo
 import net.minecraft.world.item.ItemStack
 import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
 import tech.thatgravyboat.skyblockapi.api.remote.hypixel.legacyStack
+import java.util.UUID
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.optionals.getOrNull
@@ -19,6 +21,7 @@ data class SkyblockResponse(
         val activeProfile = profiles?.find { it.selected } ?: return null
         val member = activeProfile.members[cleanUuid] ?: return null
         member.profile = activeProfile
+        member.uuid = UndashedUuid.fromStringLenient(cleanUuid)
         return member
     }
 
@@ -46,6 +49,7 @@ data class SkyblockResponse(
         @SerializedName("bank_account") val soloBank: Double = 0.0,
         val currencies: Currencies = Currencies(),
         var profile: SkyblockProfile? = null,
+        var uuid: UUID? = null
     ) {
         val sbLevel get() = leveling.experience / 100
         val sbLevelProgress get() = leveling.experience % 100

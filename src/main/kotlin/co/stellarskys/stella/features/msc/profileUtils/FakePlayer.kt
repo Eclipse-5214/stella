@@ -1,38 +1,40 @@
 package co.stellarskys.stella.features.msc.profileUtils
 
 import co.stellarskys.stella.api.zenith.client
-import co.stellarskys.stella.api.zenith.world
 import com.mojang.authlib.GameProfile
-import net.minecraft.client.entity.ClientMannequin
-import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.network.chat.Component
+import net.minecraft.client.multiplayer.PlayerInfo
+import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.player.PlayerModelPart
 import net.minecraft.world.entity.player.PlayerSkin
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.ResolvableProfile
+import java.util.UUID
+import java.util.concurrent.CompletableFuture
 
-class FakePlayer(
-    val profile: GameProfile,
-    val armor: List<ItemStack>,
-    val customDisplayName: Component? = null
-): ClientMannequin(world!!, client.playerSkinRenderCache()) {
-    private var _skin: PlayerSkin = DefaultPlayerSkin.get(profile)
-    private val resolvable = ResolvableProfile.createResolved(profile)
-        .apply { resolveProfile(client.services().profileResolver) }
-
+class FakePlayer(val profile: GameProfile, val armor: List<ItemStack> = listOf()): RemotePlayer(client.level!!, profile) {
     init {
-        EquipmentSlot.entries.filter { it.isArmor }.reversed().forEachIndexed { i, slot ->
-            equipment.set(slot, armor.getOrNull(i) ?: ItemStack.EMPTY)
-        }
-
-       client.playerSkinRenderCache().lookup(resolvable).thenAccept {
-            _skin = it.get().playerSkin()
-        }
+        equipment.set(EquipmentSlot.HEAD, armor[3])
+        equipment.set(EquipmentSlot.CHEST, armor[2])
+        equipment.set(EquipmentSlot.LEGS, armor[1])
+        equipment.set(EquipmentSlot.FEET, armor[0])
     }
 
-    override fun getSkin() = _skin
-    override fun getDisplayName() = customName
-    override fun shouldShowName() = true
-    override fun isModelPartShown(part: PlayerModelPart) = part != PlayerModelPart.CAPE
+    override fun getSkin(): PlayerSkin = PlayerInfo(profile, false).skin
+    override fun isModelPartShown(part: PlayerModelPart?): Boolean = part != PlayerModelPart.CAPE
+    override fun isInvisibleTo(player: Player): Boolean = false
+
+    companion object {
+        fun fromUUID(id: UUID, armor: List<ItemStack> = listOf()): CompletableFuture<FakePlayer?> {
+            val resolvable = ResolvableProfile.createUnresolved(id)
+
+            return client.playerSkinRenderCache().lookup(resolvable).thenApply { optionalEntry ->
+                if (optionalEntry.isPresent) {
+                    val entry = optionalEntry.get()
+                    FakePlayer(entry.gameProfile(), armor)
+                } else null
+            }
+        }
+    }
 }

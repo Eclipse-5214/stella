@@ -69,9 +69,9 @@ abstract class Page(
             ren2d.drawHollowRect(context, 0, 0, width.toInt(), height.toInt(), 1, Palette.Purple)
             ren2d.drawString(context, "§d$name's $title!", 10, 10)
             navBar.render(context, mouseX, mouseY, delta)
-            componentsTooltips.clear()
             onRender(context, mouseX, mouseY, delta)
         }
         renderTooltips(context, mouseX.toInt(), mouseY.toInt())
+        componentsTooltips.clear()
     }
 }
