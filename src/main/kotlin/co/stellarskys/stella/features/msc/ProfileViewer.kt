@@ -22,6 +22,7 @@ object ProfileViewer: Feature("profileViewer") {
     }
 
     fun view(name: String) {
+        Signal.modMessage("§bOpening profile for $name...")
         fetchProfile(name) { profile ->
             if (profile == null) return@fetchProfile
             displayProfile(name, profile)

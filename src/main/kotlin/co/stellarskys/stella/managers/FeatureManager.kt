@@ -60,6 +60,7 @@ object FeatureManager {
 
         for (command in commands) {
             runCatching {
+                if (!command.isEnabled()) return@runCatching
                 ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
                     command.register(dispatcher)
                 }

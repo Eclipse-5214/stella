@@ -3,28 +3,31 @@ package co.stellarskys.stella.api.dungeons.utils
 import co.stellarskys.stella.features.stellanav.Map
 import co.stellarskys.stella.api.dungeons.Dungeon
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import java.awt.Color
 
 enum class DungeonClass(
     val displayName: String,
-    val colorGetter: () -> Color?
+    val colorGetter: () -> Color?,
+    val iconProvider: () -> ItemStack = { ItemStack.EMPTY }
 ) {
     UNKNOWN("Unknown", { Color(0, 0, 0, 255) }),
-    HEALER("Healer", { Dungeon.healerColor }),
-    MAGE("Mage", { Dungeon.mageColor }),
-    BERSERK("Berserk", { Dungeon.berzColor }),
-    ARCHER("Archer", { Dungeon.archerColor }),
-    TANK("Tank", { Dungeon.tankColor }),
+    HEALER("Healer", { Dungeon.healerColor }, { Items.SPLASH_POTION.defaultInstance }),
+    MAGE("Mage", { Dungeon.mageColor }, { Items.BLAZE_ROD.defaultInstance }),
+    BERSERK("Berserk", { Dungeon.berzColor }, { Items.DIAMOND_SWORD.defaultInstance }),
+    ARCHER("Archer", { Dungeon.archerColor }, { Items.BOW.defaultInstance }),
+    TANK("Tank", { Dungeon.tankColor }, { Items.DIAMOND_CHESTPLATE.defaultInstance }),
     DEAD("DEAD", { null });
 
     val color: Color? get() = colorGetter()
 
     companion object {
+        val valid = listOf(HEALER, MAGE, BERSERK, ARCHER, TANK)
         private val classMap = entries.associateBy { it.displayName }
         fun from(name: String?): DungeonClass = classMap[name] ?: UNKNOWN
     }
 }
-
 enum class Checkmark(
     private val texturePath: String?, // Store the name/path as a String
     val colorCode: String

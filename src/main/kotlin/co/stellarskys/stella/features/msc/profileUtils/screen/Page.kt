@@ -4,7 +4,6 @@ import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.horizon.mc.ParentElement
 import co.stellarskys.stella.api.horizon.mc.addTo
-import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.MutableComponent

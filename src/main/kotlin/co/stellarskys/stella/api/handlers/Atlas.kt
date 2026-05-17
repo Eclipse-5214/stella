@@ -18,6 +18,8 @@ open class Atlas(val name: String, vararg val aliases: String) {
     val pendingArgs = mutableListOf<ArgumentData<*>>()
     val arg = ArgBuilder()
 
+    open fun isEnabled(): Boolean = true
+
     class ArgumentData<T>(var argName: String, val type: ArgumentType<T>, val suggestions: List<String>? = null, var isNullable: Boolean = false) {
         fun optional(): ArgumentData<T?> {
             this.isNullable = true

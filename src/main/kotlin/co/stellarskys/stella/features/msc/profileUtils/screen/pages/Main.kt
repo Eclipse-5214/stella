@@ -1,4 +1,4 @@
-package co.stellarskys.stella.features.msc.profileUtils.screen
+package co.stellarskys.stella.features.msc.profileUtils.screen.pages
 
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.handlers.Signal.onHover
@@ -8,16 +8,15 @@ import co.stellarskys.stella.features.msc.profileUtils.FakePlayer
 import co.stellarskys.stella.features.msc.profileUtils.NetworthUtils
 import co.stellarskys.stella.features.msc.profileUtils.NetworthUtils.toReadable
 import co.stellarskys.stella.features.msc.profileUtils.SkillUtils
+import co.stellarskys.stella.features.msc.profileUtils.screen.Page
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
 import tech.thatgravyboat.skyblockapi.platform.pushPop
-import java.awt.Color
 
-class MainPage(
+class Main(
     name: String,
     val member: SkyblockResponse.SkyblockMember,
     navigate: (Page) -> Unit
@@ -35,7 +34,7 @@ class MainPage(
 
     init {
         member.uuid?.let {
-            FakePlayer.fromUUID(it, member.inventory.invArmor.items() ).thenAccept { plr ->
+            FakePlayer.Companion.fromUUID(it, member.inventory.invArmor.items() ).thenAccept { plr ->
                 client.execute { entity = plr }
             }
         }
@@ -59,26 +58,26 @@ class MainPage(
         drawComp(context, saComp, 15, 200)
 
         // Skills
-        ren2d.drawHollowRect(context, 100, 10, 240, 200, 1,Palette.Purple)
+        ren2d.drawHollowRect(context, 100, 25, 240, 185, 1, Palette.Purple)
 
-        drawSkill(context, 107, 22, SkillUtils.SkillType.COMBAT)
-        drawSkill(context, 107, 52, SkillUtils.SkillType.MINING)
-        drawSkill(context, 107, 82, SkillUtils.SkillType.FARMING)
-        drawSkill(context, 107, 112, SkillUtils.SkillType.FORAGING)
-        drawSkill(context, 107, 142, SkillUtils.SkillType.FISHING)
-        drawSkill(context, 107, 172, SkillUtils.SkillType.ENCHANTING)
+        drawSkill(context, 107, 30, SkillUtils.SkillType.COMBAT)
+        drawSkill(context, 107, 60, SkillUtils.SkillType.MINING)
+        drawSkill(context, 107, 90, SkillUtils.SkillType.FARMING)
+        drawSkill(context, 107, 120, SkillUtils.SkillType.FORAGING)
+        drawSkill(context, 107, 150, SkillUtils.SkillType.FISHING)
+        drawSkill(context, 107, 180, SkillUtils.SkillType.ENCHANTING)
 
-        drawSkill(context, 222, 22, SkillUtils.SkillType.ALCHEMY)
-        drawSkill(context, 222, 52, SkillUtils.SkillType.TAMING)
-        drawSkill(context, 222, 82, SkillUtils.SkillType.CARPENTRY)
-        drawSkill(context, 222, 112, SkillUtils.SkillType.HUNTING)
-        drawSkill(context, 222, 142, SkillUtils.SkillType.RUNECRAFTING)
-        drawSkill(context, 222, 172, SkillUtils.SkillType.SOCIAL)
+        drawSkill(context, 222, 30, SkillUtils.SkillType.ALCHEMY)
+        drawSkill(context, 222, 60, SkillUtils.SkillType.TAMING)
+        drawSkill(context, 222, 90, SkillUtils.SkillType.CARPENTRY)
+        drawSkill(context, 222, 120, SkillUtils.SkillType.HUNTING)
+        drawSkill(context, 222, 150, SkillUtils.SkillType.RUNECRAFTING)
+        drawSkill(context, 222, 180, SkillUtils.SkillType.SOCIAL)
 
     }
 
     private fun drawPlayer(context: GuiGraphics, x: Int, y: Int, width: Int, height: Int) {
-        ren2d.drawRect(context, 10, 25, width, height, Color.BLACK)
+        ren2d.drawHollowRect(context, 10, 25, width, height, 1, Palette.Purple)
         val player = entity ?: return ren2d.drawString(context, "§cLoading Model...", x + 5, y + 5)
         val x0 = (absoluteX + x).toInt()
         val y0 = (absoluteY + y).toInt()

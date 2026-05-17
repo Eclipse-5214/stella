@@ -22,7 +22,7 @@ class FakePlayer(val profile: GameProfile, val armor: List<ItemStack> = listOf()
     }
 
     override fun getSkin(): PlayerSkin = PlayerInfo(profile, false).skin
-    override fun isModelPartShown(part: PlayerModelPart?): Boolean = part != PlayerModelPart.CAPE
+    override fun isModelPartShown(part: PlayerModelPart): Boolean = part != PlayerModelPart.CAPE
     override fun isInvisibleTo(player: Player): Boolean = false
 
     companion object {

@@ -3,7 +3,7 @@ package co.stellarskys.stella.features.msc.profileUtils
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith
-import co.stellarskys.stella.features.msc.profileUtils.screen.MainPage
+import co.stellarskys.stella.features.msc.profileUtils.screen.pages.*
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
 import net.minecraft.client.gui.GuiGraphics
 
@@ -16,7 +16,8 @@ class PvScreen private constructor(
 
     init {
         pages = listOf(
-            MainPage(name, member, ::switchTo),
+            Main(name, member, ::switchTo),
+            Cata(name, member, ::switchTo),
         )
         pages.forEach { it.siblings = pages }
         currentPage = pages.first()
