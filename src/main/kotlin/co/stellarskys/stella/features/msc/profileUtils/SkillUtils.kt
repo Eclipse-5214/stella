@@ -64,8 +64,6 @@ object SkillUtils {
         val skill = skillRegistry[skillType] ?: return 0.0
         val cap = getEffectiveCap(skillType, member)
         val totalXp = member.playerData.experience[skillType.apiKey] ?: 0.0
-        println("XP for skill ${skillType.name}, cap: $cap, total: $totalXp")
-
         val current = skill.levels.entries.lastOrNull { it.value < totalXp }
         val currentLevel = current?.key ?: 0
 
