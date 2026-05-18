@@ -27,8 +27,8 @@ class Main(
         .append("§6" + networth.total.toReadable())
         .onHover(networth.getFormatted())
 
-    val skillAverage = SkillUtils.getCappedSkillAverage(member, false) to SkillUtils.getCappedSkillAverage(member)
-    val saComp = Component.literal("§dSA§7: ")
+    val skillAverage get() = SkillUtils.getCappedSkillAverage(member, false) to SkillUtils.getCappedSkillAverage(member)
+    val saComp get() = Component.literal("§dSA§7: ")
         .append("§6" + skillAverage.first)
         .onHover("§bWith Progress§7: §6${String.format("%.2f", skillAverage.second)}")
 
@@ -100,6 +100,6 @@ class Main(
         ren2d.renderItem(context, skilltype.icon(), x.toFloat() + 5f, y.toFloat() + 5f, 1f)
         drawComp(context, skillComp, x + 25, y + 5)
         ren2d.drawRect(context, x + 25, y + 15, 80, 5, Palette.Crust)
-        ren2d.drawRect(context, x + 25, y + 15, (80f * skill.progress).toInt(), 5, if (skill.level == skill.cap.toDouble()) Palette.Sapphire else Palette.Green)
+        ren2d.drawRect(context, x + 25, y + 15, (80f * skill.progress).toInt(), 5, if (skill.level >= skill.cap.toDouble()) Palette.Sapphire else Palette.Green)
     }
 }
