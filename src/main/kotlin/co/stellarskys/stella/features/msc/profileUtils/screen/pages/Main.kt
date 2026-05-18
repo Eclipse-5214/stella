@@ -27,8 +27,8 @@ class Main(
         .append("§6" + networth.total.toReadable())
         .onHover(networth.getFormatted())
 
-    val skillAverage get() = SkillUtils.getCappedSkillAverage(member, false) to SkillUtils.getCappedSkillAverage(member)
-    val saComp get() = Component.literal("§dSA§7: ")
+    val skillAverage = SkillUtils.getCappedSkillAverage(member, false) to SkillUtils.getCappedSkillAverage(member)
+    val saComp = Component.literal("§dSA§7: ")
         .append("§6" + skillAverage.first)
         .onHover("§bWith Progress§7: §6${String.format("%.2f", skillAverage.second)}")
 
