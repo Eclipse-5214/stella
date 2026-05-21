@@ -21,6 +21,7 @@ import java.awt.Color
 import java.util.Optional
 import java.util.UUID
 import tech.thatgravyboat.skyblockapi.platform.PlayerSkin
+import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.platform.textureUrl
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
@@ -116,6 +117,7 @@ object Render2D {
         context.pose().translate(x, y)
         context.pose().scale(scale, scale)
         context.renderItem(item, 0, 0)
+        context.renderItemDecorations(client.font, item, 0, 0)
         context.pose().popMatrix()
     }
 
@@ -180,4 +182,27 @@ object Render2D {
 
     fun GuiGraphics.batchNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) { Batcher.queue(this, scaled, block) }
     fun GuiGraphics.flushNVG() { Batcher.flush(this) }
+
+    fun renderScrolled(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, scrollOffset: Float, block: () -> Unit) {
+        ctx.enableScissor(x, y, x + width, y + height)
+        ctx.pushPop {
+            ctx.pose().translate(x.toFloat(), y.toFloat())
+            ctx.pose().translate(0f, scrollOffset)
+            block()
+        }
+
+        ctx.disableScissor()
+    }
+
+    fun calculateScroll(currentTarget: Float, amount: Float, totalHeight: Int, viewportHeight: Int, speed: Float = 20f): Float {
+        val maxScroll = (totalHeight - viewportHeight).toFloat().coerceAtLeast(0f)
+        return (currentTarget + amount * speed).coerceIn(-maxScroll, 0f)
+    }
+
+    fun drawScrollbar(ctx: GuiGraphics, x: Int, y: Int, viewportHeight: Int, scrollOffset: Float, totalHeight: Int, color: Color) {
+        if (totalHeight <= viewportHeight) return
+        val barHeight = (viewportHeight.toFloat() / totalHeight) * viewportHeight
+        val barY = (-scrollOffset / totalHeight) * viewportHeight
+        drawRect(ctx, x, y + barY.toInt(), 1, barHeight.toInt(), color)
+    }
 }

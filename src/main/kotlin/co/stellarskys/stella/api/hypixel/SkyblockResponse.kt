@@ -46,6 +46,7 @@ data class SkyblockResponse(
         val dungeons: DungeonsData = DungeonsData(),
         @SerializedName("accessory_bag_storage") val accessoryBag: AccessoryBagStorage = AccessoryBagStorage(),
         val inventory: Inventory = Inventory(),
+        val collection: Map<String, Double> = emptyMap(),
         @SerializedName("bank_account") val soloBank: Double = 0.0,
         val currencies: Currencies = Currencies(),
         var profile: SkyblockProfile? = null,

@@ -8,6 +8,7 @@ import co.stellarskys.stella.api.hypixel.HypixelApi
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.Feature
+import co.stellarskys.stella.features.msc.profileUtils.CollectionUtils
 import co.stellarskys.stella.features.msc.profileUtils.PvScreen
 import co.stellarskys.stella.features.msc.profileUtils.SkillUtils
 import co.stellarskys.stella.utils.config
@@ -16,9 +17,11 @@ import kotlin.time.Duration.Companion.minutes
 @Module
 object ProfileViewer: Feature("profileViewer") {
     val pv by config.property<Boolean>("profileViewer.pv")
+    val showRarity by config.property<Boolean>("profileViewer.showRarity")
 
     override fun initialize() {
         SkillUtils.load()
+        CollectionUtils.load()
     }
 
     fun view(name: String) {
