@@ -165,12 +165,23 @@ data class SkyblockResponse(
         @SerializedName("backpack_contents") val backpackContents: Map<String, InventoryContents> = emptyMap(),
         @SerializedName("inv_armor") val invArmor: InventoryContents = InventoryContents(),
         @SerializedName("wardrobe_contents") val wardrobeContents: InventoryContents = InventoryContents(),
+        @SerializedName( "wardrobe_equipped_slot") val wdEquipped: Int = 0,
         @SerializedName("equipment_contents") val equipment: InventoryContents = InventoryContents(),
         @SerializedName("personal_vault_contents") val personalVault: InventoryContents = InventoryContents(),
         @SerializedName("bag_contents") val bags: BagContents = BagContents(),
         @SerializedName("sacks_counts") val sacks: Map<String, Long> = emptyMap()
     ) {
         val enderChestPages get() = eChestContents.items().chunked(45)
+        val invAndHotbar get() = invContents.items().take(9) to invContents.items().drop(9)
+
+        val fullWardrobe get() = wardrobeContents.items().toMutableList().apply {
+            if (isEmpty() || wdEquipped <= 0) return@apply
+
+            invArmor.items().reversed().forEachIndexed { row, armorPiece ->
+                val slotIdx = (((wdEquipped - 1) / 9) * 36) + (row * 9) + ((wdEquipped - 1) % 9)
+                if (slotIdx < size && !armorPiece.isEmpty) this[slotIdx] = armorPiece
+            }
+        }
     }
 
     data class BagContents(

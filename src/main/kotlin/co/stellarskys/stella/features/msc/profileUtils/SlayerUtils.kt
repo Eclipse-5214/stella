@@ -26,11 +26,8 @@ object SlayerUtils {
             var level = 0
             
             for (i in xpTable.indices) {
-                if (xp >= xpTable[i]) {
-                    level = i + 1
-                } else {
-                    break
-                }
+                if (xp >= xpTable[i]) level = i + 1
+                else break
             }
             
             val currentLevelXp = if (level == 0) 0L else xpTable[level - 1]
@@ -44,24 +41,10 @@ object SlayerUtils {
     }
 
     fun getSlayerData(member: SkyblockResponse.SkyblockMember): Map<SlayerType, SlayerLevel> {
-        return SlayerType.entries.associateWith { type ->
-            val xp = member.slayer.bosses[type.apiName]?.xp ?: 0L
-            type.getLevel(xp)
-        }
+        return SlayerType.entries.associateWith { it.getLevel( member.slayer.bosses[it.apiName]?.xp ?: 0L) }
     }
 
-    fun getTotalXp(member: SkyblockResponse.SkyblockMember): Long {
-        return SlayerType.entries.sumOf { member.slayer.bosses[it.apiName]?.xp ?: 0L }
-    }
-
-    fun getTotalLevel(member: SkyblockResponse.SkyblockMember): Int {
-        return SlayerType.entries.sumOf { type ->
-            val xp = member.slayer.bosses[type.apiName]?.xp ?: 0L
-            type.getLevel(xp).level
-        }
-    }
-
-    fun getTotalBosses(member: SkyblockResponse.SkyblockMember): Int {
-        return SlayerType.entries.sumOf { member.slayer.bosses[it.apiName]?.totalKills ?: 0 }
-    }
+    fun getTotalXp(member: SkyblockResponse.SkyblockMember) = SlayerType.entries.sumOf { member.slayer.bosses[it.apiName]?.xp ?: 0L }
+    fun getTotalLevel(member: SkyblockResponse.SkyblockMember) = SlayerType.entries.sumOf { it.getLevel(member.slayer.bosses[it.apiName]?.xp ?: 0L).level }
+    fun getTotalBosses(member: SkyblockResponse.SkyblockMember) = SlayerType.entries.sumOf { member.slayer.bosses[it.apiName]?.totalKills ?: 0 }
 }

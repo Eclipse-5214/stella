@@ -10,6 +10,7 @@ import java.util.Locale
 
 object SkillUtils {
     private const val BASE_URL = "https://api.hypixel.net/v2/resources/skyblock/skills"
+    private val overflow by config.property<Boolean>("profileViewer.overflow")
 
     @Volatile
     private var skillRegistry: Map<SkillType, ApiSkillData> = emptyMap()
@@ -113,27 +114,19 @@ object SkillUtils {
     fun getSkillAverage(member: SkyblockResponse.SkyblockMember, includeProgress: Boolean = true): Double {
         val valid = getValidSkills(member.playerData)
         if (valid.isEmpty()) return 0.0
-        val getOverflow = config["profileViewer.overflow"] as Boolean
-        return valid.sumOf { if (getOverflow) getOverflowSkill(it, member, includeProgress).level else getSkillLevel(it, member, includeProgress) } / valid.size
+        return valid.sumOf { if (overflow) getOverflowSkill(it, member, includeProgress).level else getSkillLevel(it, member, includeProgress) } / valid.size
     }
 
     fun getCappedSkillAverage(member: SkyblockResponse.SkyblockMember, includeProgress: Boolean = true): Double {
         val valid = getValidSkills(member.playerData)
         if (valid.isEmpty()) return 0.0
-        val getOverflow = config["profileViewer.overflow"] as Boolean
         return valid.sumOf { type ->
-            if (getOverflow) {
-                getOverflowSkill(type, member, includeProgress).level
-            } else {
-                getSkillLevel(type, member, includeProgress).coerceAtMost(getEffectiveCap(type, member).toDouble())
-            }
+            if (overflow) getOverflowSkill(type, member, includeProgress).level
+            else getSkillLevel(type, member, includeProgress).coerceAtMost(getEffectiveCap(type, member).toDouble())
         } / valid.size
     }
 
-    fun getSkill(skillType: SkillType, member: SkyblockResponse.SkyblockMember): Skill {
-        val getOverflow = config["profileViewer.overflow"] as Boolean
-        return if (getOverflow) getOverflowSkill(skillType, member) else getNormalSkill(skillType, member)
-    }
+    fun getSkill(skillType: SkillType, member: SkyblockResponse.SkyblockMember) = if (overflow) getOverflowSkill(skillType, member) else getNormalSkill(skillType, member)
 
     private fun getNormalSkill(skillType: SkillType, member: SkyblockResponse.SkyblockMember): Skill {
         val lvl = getSkillLevel(skillType, member, includeProgress = true)
