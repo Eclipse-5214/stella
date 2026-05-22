@@ -100,6 +100,6 @@ class Main(
         ren2d.renderItem(context, skilltype.icon(), x.toFloat() + 5f, y.toFloat() + 5f, 1f)
         drawComp(context, skillComp, x + 25, y + 5)
         ren2d.drawRect(context, x + 25, y + 15, 80, 5, Palette.Crust)
-        ren2d.drawRect(context, x + 25, y + 15, (80f * skill.progress).toInt(), 5, if (skill.level == skill.cap.toDouble()) Palette.Sapphire else Palette.Green)
+        ren2d.drawRect(context, x + 25, y + 15, (80f * skill.progress).toInt(), 5, if (skill.level >= skill.cap.toDouble()) Palette.Sapphire else Palette.Green)
     }
 }

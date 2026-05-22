@@ -2,6 +2,7 @@ package co.stellarskys.stella.features.msc.profileUtils
 
 import co.stellarskys.stella.api.handlers.Quasar
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
+import co.stellarskys.stella.utils.config
 import com.google.gson.JsonObject
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -112,20 +113,82 @@ object SkillUtils {
     fun getSkillAverage(member: SkyblockResponse.SkyblockMember, includeProgress: Boolean = true): Double {
         val valid = getValidSkills(member.playerData)
         if (valid.isEmpty()) return 0.0
-        return valid.sumOf { getSkillLevel(it, member, includeProgress) } / valid.size
+        val getOverflow = config["profileViewer.overflow"] as Boolean
+        return valid.sumOf { if (getOverflow) getOverflowSkill(it, member, includeProgress).level else getSkillLevel(it, member, includeProgress) } / valid.size
     }
 
     fun getCappedSkillAverage(member: SkyblockResponse.SkyblockMember, includeProgress: Boolean = true): Double {
         val valid = getValidSkills(member.playerData)
         if (valid.isEmpty()) return 0.0
+        val getOverflow = config["profileViewer.overflow"] as Boolean
         return valid.sumOf { type ->
-            getSkillLevel(type, member, includeProgress).coerceAtMost(getEffectiveCap(type, member).toDouble())
+            if (getOverflow) {
+                getOverflowSkill(type, member, includeProgress).level
+            } else {
+                getSkillLevel(type, member, includeProgress).coerceAtMost(getEffectiveCap(type, member).toDouble())
+            }
         } / valid.size
     }
 
     fun getSkill(skillType: SkillType, member: SkyblockResponse.SkyblockMember): Skill {
+        val getOverflow = config["profileViewer.overflow"] as Boolean
+        return if (getOverflow) getOverflowSkill(skillType, member) else getNormalSkill(skillType, member)
+    }
+
+    private fun getNormalSkill(skillType: SkillType, member: SkyblockResponse.SkyblockMember): Skill {
         val lvl = getSkillLevel(skillType, member, includeProgress = true)
         val prog = getProgressToNextLevel(skillType, member)
         return Skill(lvl, prog, getEffectiveCap(skillType, member),member.playerData.experience[skillType.apiKey] ?: 0.0)
+    }
+
+    private val levelingExp = listOf(
+        50L, 125L, 200L, 300L, 500L, 750L, 1000L, 1500L, 2000L, 3500L,
+        5000L, 7500L, 10000L, 15000L, 20000L, 30000L, 50000L, 75000L, 100000L, 200000L,
+        300000L, 400000L, 500000L, 600000L, 700000L, 800000L, 900000L, 1000000L, 1100000L, 1200000L,
+        1300000L, 1400000L, 1500000L, 1600000L, 1700000L, 1800000L, 1900000L, 2000000L, 2100000L, 2200000L,
+        2300000L, 2400000L, 2500000L, 2600000L, 2750000L, 2900000L, 3100000L, 3400000L, 3700000L, 4000000L,
+        4300000L, 4600000L, 4900000L, 5200000L, 5500000L, 5800000L, 6100000L, 6400000L, 6700000L, 7000000L
+    )
+
+    private fun getOverflowSkill(skillType: SkillType, member: SkyblockResponse.SkyblockMember, includeProgress: Boolean = true): Skill {
+        val totalXp = member.playerData.experience[skillType.apiKey] ?: 0.0
+        val skillData = skillRegistry[skillType] ?: return Skill(0.0, 0f, 0, totalXp)
+        val naturalCap = skillData.maxLevel
+
+        var level = 0
+        var xpRemaining = totalXp
+
+        while (level < 60) {
+            val nextLevel = level + 1
+            val cost = if (nextLevel <= naturalCap) {
+                val currentTotal = skillData.levels[level] ?: 0L
+                val nextTotal = skillData.levels[nextLevel] ?: Long.MAX_VALUE
+                (nextTotal - currentTotal).toDouble()
+            } else {
+                levelingExp.getOrNull(nextLevel - 1)?.toDouble() ?: Double.MAX_VALUE
+            }
+
+            if (xpRemaining < cost) {
+                val progress = if (cost <= 0) 0f else (xpRemaining / cost).toFloat()
+                val finalLevel = if (includeProgress) level + progress.toDouble() else level.toDouble()
+                return Skill(finalLevel, progress, naturalCap, totalXp)
+            }
+            xpRemaining -= cost
+            level++
+        }
+
+        var slope = 600_000L
+        var cost = 7_000_000L + slope
+
+        while (xpRemaining >= cost) {
+            xpRemaining -= cost
+            level++
+            if (level % 10 == 0) slope *= 2
+            cost += slope
+        }
+
+        val progress = if (cost <= 0) 0f else (xpRemaining / cost).toFloat()
+        val finalLevel = if (includeProgress) level + progress.toDouble() else level.toDouble()
+        return Skill(finalLevel, progress, naturalCap, totalXp)
     }
 }

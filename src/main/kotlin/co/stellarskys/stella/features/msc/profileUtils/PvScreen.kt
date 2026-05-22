@@ -17,7 +17,10 @@ class PvScreen private constructor(
     init {
         pages = listOf(
             Main(name, member, ::switchTo),
+            Inventory(name, member, ::switchTo),
             Cata(name, member, ::switchTo),
+            Slayer(name, member, ::switchTo),
+            Collection(name, member, ::switchTo),
         )
         pages.forEach { it.siblings = pages }
         currentPage = pages.first()

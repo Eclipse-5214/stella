@@ -1272,6 +1272,20 @@ val config = Config(Stella.NAMESPACE) {
                 name = "PV command"
                 description = "use /pv as an alias to /sa pv"
             }
+
+            toggle {
+                configName = "profileViewer.showRarity"
+                name = "Show Rarity"
+                description = "Shows item rarity as the slot background in the inventories"
+                default = true
+            }
+
+            toggle {
+                configName = "profileViewer.overflow"
+                name = "Overflow Skills"
+                description = "Shows overflow levels for skills on the main page"
+                default = false
+            }
         }
 
         /*

@@ -46,6 +46,7 @@ data class SkyblockResponse(
         val dungeons: DungeonsData = DungeonsData(),
         @SerializedName("accessory_bag_storage") val accessoryBag: AccessoryBagStorage = AccessoryBagStorage(),
         val inventory: Inventory = Inventory(),
+        val collection: Map<String, Double> = emptyMap(),
         @SerializedName("bank_account") val soloBank: Double = 0.0,
         val currencies: Currencies = Currencies(),
         var profile: SkyblockProfile? = null,
@@ -86,11 +87,11 @@ data class SkyblockResponse(
     data class SlayerBoss(
         @SerializedName("claimed_levels") val claimedLevels: Map<String, Boolean> = emptyMap(),
         val xp: Long = 0,
-        @SerializedName("boss_attempts_tier_0") val t1Kills: Int = 0,
-        @SerializedName("boss_attempts_tier_1") val t2Kills: Int = 0,
-        @SerializedName("boss_attempts_tier_2") val t3Kills: Int = 0,
-        @SerializedName("boss_attempts_tier_3") val t4Kills: Int = 0,
-        @SerializedName("boss_attempts_tier_4") val t5Kills: Int = 0
+        @SerializedName("boss_kills_tier_0") val t1Kills: Int = 0,
+        @SerializedName("boss_kills_tier_1") val t2Kills: Int = 0,
+        @SerializedName("boss_kills_tier_2") val t3Kills: Int = 0,
+        @SerializedName("boss_kills_tier_3") val t4Kills: Int = 0,
+        @SerializedName("boss_kills_tier_4") val t5Kills: Int = 0
     ) {
         val totalKills get() = t1Kills + t2Kills + t3Kills + t4Kills + t5Kills
     }
@@ -103,8 +104,14 @@ data class SkyblockResponse(
 
     data class EssenceData(val current: Long = 0)
 
-    data class PlayerStats(val kills: Map<String, Float> = emptyMap()) {
-        val bloodMobKills get() = ((kills["watcher_summon_undead"] ?: 0f) + (kills["master_watcher_summon_undead"] ?: 0f)).toInt()
+    data class PlayerStats(
+        val kills: Map<String, Double> = emptyMap(),
+        val deaths: Map<String, Double> = emptyMap(),
+        @SerializedName("highest_damage") val highestDamage: Double = 0.0
+    ) {
+        val totalKills get() = kills["total"] ?: 0.0
+        val totalDeaths get() = deaths["total"] ?: 0.0
+        val bloodMobKills get() = ((kills["watcher_summon_undead"] ?: 0.0) + (kills["master_watcher_summon_undead"] ?: 0.0)).toInt()
     }
 
     data class DungeonsData(
