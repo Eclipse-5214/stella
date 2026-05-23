@@ -78,8 +78,8 @@ class Storage(
         }
     }
 
-    private fun drawPageBar(context: GuiGraphics, startX: Int, totalPages: Int, activeIdx: Int, mx: Float, my: Float): Int {
-        if (totalPages <= 1) return activeIdx
+    private fun drawPageBar(context: GuiGraphics, startX: Int, totalPages: Int, activeIdx: Int, mx: Float, my: Float) {
+        if (totalPages <= 1) return
         val bw = PAGE_BAR_WIDTH / totalPages
 
         for (i in 0 until totalPages) {
@@ -95,14 +95,13 @@ class Storage(
             val txt = (i + 1).toString()
             ren2d.drawString(context, (if (isSelected) "§d" else "§7") + txt, bx + (bw / 2) - (txt.width() / 2), 36, 1f)
         }
-        return activeIdx
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (super.mouseClicked(mouseX, mouseY, button)) return true
         subPages.forEachIndexed { i, page ->
             if (isAreaHovered(10f, 25 + i * 31.8f, 26f, 26f, mouseX, mouseY)) {
-                currentPage = page.apply { resetPage() }; return true
+                currentPage = page; return true
             }
         }
         return currentPage.mouseClicked(mouseX, mouseY, button)
@@ -114,14 +113,14 @@ class Storage(
         open fun resetPage() { pageIdx = 0 }
         abstract fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float)
         open fun mouseClicked(mx: Float, my: Float, button: Int): Boolean = false
-        protected val startX: Int = 45 + (295 - PAGE_BAR_WIDTH) / 2
+        protected val startX: Int = 45 + (300 - PAGE_BAR_WIDTH) / 2
     }
 
     abstract inner class PagedSubPage(name: String) : SubPage(name) {
-        abstract fun getPages(): List<List<ItemStack>>
+        abstract val cachedPages: List<List<ItemStack>>
 
         override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) {
-            val pages = getPages()
+            val pages = cachedPages
             drawPageBar(context, startX, pages.size, pageIdx, mouseX, mouseY)
 
             val currentItems = pages.getOrNull(pageIdx) ?: emptyList()
@@ -130,7 +129,7 @@ class Storage(
         }
 
         override fun mouseClicked(mx: Float, my: Float, button: Int): Boolean {
-            val total = getPages().size
+            val total = cachedPages.size
             if (total <= 1) return false
             val bw = PAGE_BAR_WIDTH / total
             for (i in 0 until total) {
@@ -145,35 +144,46 @@ class Storage(
 
     inner class NormalInventory : SubPage("Inventory") {
         override val icon: ItemStack = Items.CHEST.defaultInstance
-        override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) = with(member.inventory) {
-            renderItemGrid(context, startX, 37, invArmor.items().reversed(), mouseX, mouseY)
-            renderItemGrid(context, startX + (5 * STEP_SIZE), 37, equipment.items(), mouseX, mouseY)
-            renderItemGrid(context, startX, 77, invAndHotbar.second, mouseX, mouseY)
-            renderItemGrid(context, startX, 173, invAndHotbar.first, mouseX, mouseY)
+        private val cachedData by lazy {
+            val armor = member.inventory.invArmor.items().reversed()
+            val eq = member.inventory.equipment.items()
+            val (hotbar, inv) = member.inventory.invAndHotbar
+            Triple(armor, eq, hotbar to inv)
+        }
+
+        override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) {
+            val (armor, eq, invHotbar) = cachedData
+            renderItemGrid(context, startX, 37, armor, mouseX, mouseY)
+            renderItemGrid(context, startX + (5 * STEP_SIZE), 37, eq, mouseX, mouseY)
+            renderItemGrid(context, startX, 77, invHotbar.second, mouseX, mouseY)
+            renderItemGrid(context, startX, 173, invHotbar.first, mouseX, mouseY)
         }
     }
 
     inner class PersonalVault : SubPage("Personal Vault") {
         override val icon: ItemStack = Items.IRON_DOOR.defaultInstance
-        override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) = with(member.inventory.personalVault) {
-            val startY = 35 + (VIEW_HEIGHT_LIMIT - ((items().size / GRID_ROW_COLS) * STEP_SIZE)).coerceAtLeast(0) / 2
-            renderItemGrid(context, startX, startY, items(), mouseX, mouseY)
+        private val cachedItems by lazy { member.inventory.personalVault.items() }
+
+        override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) {
+            val items = cachedItems
+            val startY = 35 + (VIEW_HEIGHT_LIMIT - (((items.size + 8) / GRID_ROW_COLS) * STEP_SIZE)).coerceAtLeast(0) / 2
+            renderItemGrid(context, startX, startY, items, mouseX, mouseY)
         }
     }
 
     inner class EnderChest : PagedSubPage("Ender Chest") {
         override val icon: ItemStack = Items.ENDER_CHEST.defaultInstance
-        override fun getPages() = member.inventory.enderChestPages
+        override val cachedPages by lazy { member.inventory.enderChestPages }
     }
 
     inner class Backpacks : PagedSubPage("Backpacks") {
         override val icon: ItemStack = RepoItemsAPI.getItem("SMALL_BACKPACK")
-        override fun getPages() = (0 until 18).mapNotNull { member.inventory.backpackContents[it.toString()]?.items() }
+        override val cachedPages by lazy { (0 until 18).mapNotNull { member.inventory.backpackContents[it.toString()]?.items() } }
     }
 
     inner class AccessoryBag : PagedSubPage("Accessory Bag") {
         override val icon: ItemStack = Items.BOOK.defaultInstance
-        override fun getPages() = member.inventory.bags.accessoryBagPages
+        override val cachedPages by lazy { member.inventory.bags.accessoryBagPages }
         override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) {
             val mp = "§dMP§7: §6${member.assumedMagicalPower}"
             ren2d.drawString(context, mp, 340 - mp.width(), 10, 1f)
@@ -183,6 +193,6 @@ class Storage(
 
     inner class Wardrobe : PagedSubPage("Wardrobe") {
         override val icon: ItemStack = Items.LEATHER_CHESTPLATE.defaultInstance
-        override fun getPages() = member.inventory.fullWardrobe.chunked(36)
+        override val cachedPages by lazy { member.inventory.fullWardrobe.chunked(36) }
     }
 }
