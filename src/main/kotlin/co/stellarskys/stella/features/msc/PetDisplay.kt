@@ -10,7 +10,7 @@ import co.stellarskys.stella.api.handlers.Capsule
 import co.stellarskys.stella.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphics
 import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
-import tech.thatgravyboat.skyblockapi.api.remote.RepoPetsAPI
+import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockPetsRepo
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 @Module
@@ -128,7 +128,11 @@ object PetDisplay: Feature("petDisplay", true) {
     ){
         Render2D.drawString(context,"§bEnder Dragon", 40, 7)
         Render2D.drawString(context,"§7[Lvl 100]", 40, 17)
-        val stack = RepoPetsAPI.getPetAsItem("ENDER_DRAGON", SkyBlockRarity.LEGENDARY)
+
+        val stack = SkyBlockPetsRepo.getItemStackOrDefault {
+            id ="ENDER_DRAGON"
+            rarity = SkyBlockRarity.LEGENDARY
+        }
 
         Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
     }
@@ -148,7 +152,11 @@ object PetDisplay: Feature("petDisplay", true) {
         Render2D.drawString(context,"§b$activePet", 40, 7)
         Render2D.drawString(context,"§7[Lvl $activePetLvl]", 40, 17)
 
-        val stack = RepoPetsAPI.getPetAsItem(activePet?.replace(" ", "_").orEmpty().uppercase(), SkyBlockRarity.LEGENDARY)
+        val stack = SkyBlockPetsRepo.getItemStackOrDefault {
+            id = activePet?.replace(" ", "_").orEmpty().uppercase()
+            rarity = SkyBlockRarity.LEGENDARY
+        }
+
         Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
 
         matrix.popMatrix()

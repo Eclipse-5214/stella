@@ -5,7 +5,7 @@ import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import com.google.gson.JsonObject
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
+import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 
 object CollectionUtils {
     private const val BASE_URL = "https://api.hypixel.net/v2/resources/skyblock/collections"
@@ -57,5 +57,5 @@ object CollectionUtils {
         }.sortedWith(compareByDescending<ItemProgress> { it.amount > 0 }.thenByDescending { it.amount })
     }
 
-    fun getIcon(id: String): ItemStack = RepoItemsAPI.getItemOrNull(id) ?: Items.PAPER.defaultInstance
+    fun getIcon(id: String): ItemStack = SkyBlockItemsRepo.getItemStack(id) ?: Items.PAPER.defaultInstance
 }

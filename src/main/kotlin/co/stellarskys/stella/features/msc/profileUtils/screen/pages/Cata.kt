@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.world.item.ItemStack
-import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
+import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 import java.util.Locale
 import kotlin.collections.sumOf
 
@@ -20,7 +20,7 @@ class Cata(
     val member: SkyblockResponse.SkyblockMember,
     navigate: (Page) -> Unit
 ) : Page("catacombs stats", name, navigate) {
-    override val icon: ItemStack = RepoItemsAPI.getItem("dungeon_chest_key")
+    override val icon: ItemStack = SkyBlockItemsRepo.getItemStackOrDefault("dungeon_chest_key")
 
     override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
         drawCatacombs(context, 10, 25)

@@ -17,10 +17,11 @@ class PvScreen private constructor(
     init {
         pages = listOf(
             Main(name, member, ::switchTo),
-            Storage(name, member, ::switchTo),
             Cata(name, member, ::switchTo),
             Slayer(name, member, ::switchTo),
-            Collection(name, member, ::switchTo),
+            Storage(name, member, ::switchTo),
+            Pets(name, member, ::switchTo),
+            Collection(name, member, ::switchTo)
         )
         pages.forEach { it.siblings = pages }
         currentPage = pages.first()

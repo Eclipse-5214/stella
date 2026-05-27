@@ -148,8 +148,18 @@ data class SkyblockResponse(
         @SerializedName("pet_types_sacrificed") val petTypesSacrificed: List<String> = emptyList()
     )
 
-    data class Pet(val type: String = "", val active: Boolean = false, val tier: String = "", val heldItem: String? = null) {
-        val rarity = SkyBlockRarity.entries.find { it.name == tier } ?: SkyBlockRarity.COMMON
+    data class Pet(
+        val uuid: UUID? = null,
+        val uniqueId: UUID? = null,
+        val type: String = "",
+        val exp: Double = 0.0,
+        val active: Boolean = false,
+        val tier: String = "",
+        val heldItem: String? = null,
+        val candyUsed: Int = 0,
+        val skin: String? = null
+    ) {
+        val rarity by lazy { SkyBlockRarity.entries.find { it.name == tier } ?: SkyBlockRarity.COMMON }
     }
 
     data class AccessoryBagStorage(

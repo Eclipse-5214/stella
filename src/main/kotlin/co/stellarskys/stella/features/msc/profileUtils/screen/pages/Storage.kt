@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
-import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
+import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 import tech.thatgravyboat.skyblockapi.utils.extentions.get
 import java.awt.Color
 
@@ -147,7 +147,9 @@ class Storage(
         private val cachedData by lazy {
             val armor = member.inventory.invArmor.items().reversed()
             val eq = member.inventory.equipment.items()
-            val (hotbar, inv) = member.inventory.invAndHotbar
+            val allInv = member.inventory.invContents.items()
+            val hotbar = allInv.take(9)
+            val inv = allInv.drop(9)
             Triple(armor, eq, hotbar to inv)
         }
 
@@ -177,7 +179,7 @@ class Storage(
     }
 
     inner class Backpacks : PagedSubPage("Backpacks") {
-        override val icon: ItemStack = RepoItemsAPI.getItem("SMALL_BACKPACK")
+        override val icon: ItemStack = SkyBlockItemsRepo.getItemStackOrDefault("SMALL_BACKPACK")
         override val cachedPages by lazy { (0 until 18).mapNotNull { member.inventory.backpackContents[it.toString()]?.items() } }
     }
 

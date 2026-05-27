@@ -13,7 +13,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
-import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
+import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 
 class Main(
@@ -34,14 +34,14 @@ class Main(
 
     init {
         member.uuid?.let {
-            FakePlayer.Companion.fromUUID(it, member.inventory.invArmor.items() ).thenAccept { plr ->
+            FakePlayer.fromUUID(it, member.inventory.invArmor.items() ).thenAccept { plr ->
                 client.execute { entity = plr }
             }
         }
 
     }
 
-    override val icon: ItemStack = RepoItemsAPI.getItem("HYPERION")
+    override val icon: ItemStack = SkyBlockItemsRepo.getItemStackOrDefault("HYPERION")
 
     override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
         // Paper Doll

@@ -17,7 +17,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
-import tech.thatgravyboat.skyblockapi.api.remote.RepoItemsAPI
+import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 import java.io.File
 import kotlin.jvm.optionals.getOrNull
 
@@ -211,5 +211,5 @@ object ButtonManager {
 
     fun getItem(id: String) = ResourceLocation.tryParse(if (":" in id) id.lowercase() else "minecraft:${id.lowercase()}")?.let {
         BuiltInRegistries.ITEM.getOptional(it).getOrNull()?.defaultInstance
-    } ?: RepoItemsAPI.getItem(id.uppercase())
+    } ?: SkyBlockItemsRepo.getItemStackOrDefault(id.uppercase())
 }
