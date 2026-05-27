@@ -14,6 +14,7 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 import java.awt.Color
 
@@ -106,6 +107,12 @@ class Pets(
             val maxLvlX = x + (PREVIEW_WIDTH - client.font.width(maxLvlText)) / 2
             ren2d.drawString(context, maxLvlText, maxLvlX, y + 130)
             drawBar(context, barX, y + 142, progressToMax)
+        }
+
+        pet.heldItem?.let {
+            val stack = SkyBlockItemsRepo.getItemStackOrDefault(it)
+            ren2d.renderItem(context, stack, x + 75f, y + 45f, 1f)
+            if (isAreaHovered(x + 75f, y + 45f, 16f, 16f)) hoveredPet = stack
         }
     }
 
