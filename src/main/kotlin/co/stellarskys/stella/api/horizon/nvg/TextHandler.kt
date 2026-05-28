@@ -4,7 +4,7 @@ import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.nvg.Font
 import co.stellarskys.stella.api.zenith.client
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.math.abs
 
 /*
@@ -57,7 +57,7 @@ class TextHandler(
         updateCaretPosition()
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (dragging && isFocused) {
             caretFromMouse(mouseX)
             updateCaretPosition()

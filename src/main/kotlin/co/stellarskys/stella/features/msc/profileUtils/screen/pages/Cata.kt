@@ -7,7 +7,7 @@ import co.stellarskys.stella.api.handlers.Signal.color
 import co.stellarskys.stella.api.handlers.Signal.onHover
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.world.item.ItemStack
@@ -22,14 +22,14 @@ class Cata(
 ) : Page("catacombs stats", name, navigate) {
     override val icon: ItemStack = SkyBlockItemsRepo.getItemStackOrDefault("dungeon_chest_key")
 
-    override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         drawCatacombs(context, 10, 25)
         drawBossCollections(context, 10, 80)
         drawClassLevels(context, 120, 25)
         drawFloorLogs(context, 235, 25)
     }
 
-    private fun drawLevelBox(context: GuiGraphics, x: Int, y: Int, w: Int, h: Int, icon: ItemStack?, textComp: MutableComponent, progress: Double, lvl: Int) {
+    private fun drawLevelBox(context: GuiGraphicsExtractor, x: Int, y: Int, w: Int, h: Int, icon: ItemStack?, textComp: MutableComponent, progress: Double, lvl: Int) {
         ren2d.drawHollowRect(context, x, y, w, h, 1, Palette.Purple)
         icon?.let { ren2d.renderItem(context, it, x + 3f, y + 6f, 1f) }
 
@@ -41,7 +41,7 @@ class Cata(
         ren2d.drawRect(context, textX, y + 16, (75f * progress).toInt(), 5, barColor)
     }
 
-    private fun drawCatacombs(context: GuiGraphics, x: Int, y: Int) {
+    private fun drawCatacombs(context: GuiGraphicsExtractor, x: Int, y: Int) {
         val normalData = member.dungeons.dungeonTypes.catacombs
         val level = calculateLevel(normalData.experience)
         val cataComp = Component.literal("§dCatacombs§7: §6${level.first}")
@@ -55,7 +55,7 @@ class Cata(
         ren2d.drawString(context, "§bProgress§7: §e${(level.second * 100).toInt()}%", x + 12, y + 29)
     }
 
-    private fun drawBossCollections(context: GuiGraphics, x: Int, y: Int) = with(member.dungeons.dungeonTypes) {
+    private fun drawBossCollections(context: GuiGraphicsExtractor, x: Int, y: Int) = with(member.dungeons.dungeonTypes) {
         ren2d.drawHollowRect(context, x, y, 105, 130, 1, Palette.Purple)
         ren2d.drawString(context, "§b§nBoss Collections", x + 5, y + 5)
 
@@ -67,7 +67,7 @@ class Cata(
         ren2d.drawString(context, "§cMaster Runs§7: §a${(1..7).sumOf { mastermode.tierComps[it.toString()]?.toInt() ?: 0 }}", x + 5, y + 116)
     }
 
-    private fun drawClassLevels(context: GuiGraphics, x: Int, y: Int) {
+    private fun drawClassLevels(context: GuiGraphicsExtractor, x: Int, y: Int) {
         ren2d.drawHollowRect(context, x, y, 110, 185, 1, Palette.Purple)
         ren2d.drawString(context, "§b§nClass Levels", x + 5, y + 5)
 
@@ -81,7 +81,7 @@ class Cata(
         }
     }
 
-    private fun drawFloorLogs(context: GuiGraphics, x: Int, y: Int) = with(member.dungeons) {
+    private fun drawFloorLogs(context: GuiGraphicsExtractor, x: Int, y: Int) = with(member.dungeons) {
         val avgC = DungeonClass.Companion.valid.sumOf { Dungeon.calculateDungeonLevel(classes[it.name.lowercase(Locale.ROOT)]?.experience ?: 0.0) }.let { if (DungeonClass.Companion.valid.isNotEmpty()) it / DungeonClass.Companion.valid.size else 0.0 }
 
         ren2d.drawHollowRect(context, x, y, 105, 45, 1, Palette.Purple)

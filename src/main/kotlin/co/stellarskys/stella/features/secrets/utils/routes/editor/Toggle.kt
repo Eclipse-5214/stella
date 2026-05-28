@@ -3,7 +3,7 @@ package co.stellarskys.stella.features.secrets.utils.routes.editor
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
 import co.stellarskys.stella.utils.Utils
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class Toggle(initial: Boolean = true) : BaseElement() {
     var value = initial
@@ -12,7 +12,7 @@ class Toggle(initial: Boolean = true) : BaseElement() {
 
     init { anim = if (initial) 1f else 0f }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         nvg.push()
         nvg.translate(x, y)
         nvg.rect(0f, 0f, width, height, if (value) Palette.Purple.rgb else Palette.Surface1.rgb, height / 2f)

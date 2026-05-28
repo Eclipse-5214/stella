@@ -12,7 +12,7 @@ import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.core.BlockPos
 
 class WaypointEditor(val pos: BlockPos) : Aperture("Add Custom Waypoint") {
@@ -22,7 +22,7 @@ class WaypointEditor(val pos: BlockPos) : Aperture("Add Custom Waypoint") {
     private val my get() = mouse.rawY.toFloat() / ConfigUI.Companion.UI_SCALE
 
     private val dialogPanel = object : ParentElement() {
-        override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+        override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
             width = DIALOG_W; height = DIALOG_H
             x = (rez.windowWidth / ConfigUI.Companion.UI_SCALE) / 2f - DIALOG_W / 2f
             y = (rez.windowHeight / ConfigUI.Companion.UI_SCALE) / 2f - DIALOG_H / 2f
@@ -78,7 +78,7 @@ class WaypointEditor(val pos: BlockPos) : Aperture("Add Custom Waypoint") {
         .apply { width = BTN_W; height = BTN_H; x = DIALOG_W - PADDING - BTN_W; y = BTN_Y }
         .addTo(dialogPanel)
 
-    override fun onRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) {
         context.fill(0, 0, width, height, 0x90000000.toInt())
         context.drawNVG(false) {
             nvg.push()
@@ -109,7 +109,7 @@ class WaypointEditor(val pos: BlockPos) : Aperture("Add Custom Waypoint") {
         onClose()
     }
 
-    override fun onBackgroundRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) {}
+    override fun onBackgroundRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) {}
 
     companion object {
         const val DIALOG_W = 380f

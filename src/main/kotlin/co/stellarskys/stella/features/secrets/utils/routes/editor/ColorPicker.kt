@@ -7,7 +7,7 @@ import co.stellarskys.stella.api.horizon.nvg.TextBox
 import co.stellarskys.stella.api.nvg.Gradient
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.Utils.toHex
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
 class ColorPicker(pickerWidth: Float) : BaseElement() {
@@ -37,7 +37,7 @@ class ColorPicker(pickerWidth: Float) : BaseElement() {
         hexBox.setText(currentColor.toHex(includeAlpha = false))
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (draggingArea || draggingHue) updateFromMouse(mouseX, mouseY)
 
         nvg.push()

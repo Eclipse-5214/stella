@@ -2,7 +2,7 @@ package co.stellarskys.stella.features.secrets.utils.routes.editor
 
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
 class Button(
@@ -10,7 +10,7 @@ class Button(
     private val baseColor: Color,
     private val onClick: () -> Unit
 ) : BaseElement() {
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         val hovered = isAreaHovered(0f, 0f, width, height)
         nvg.push()
         nvg.translate(x, y)

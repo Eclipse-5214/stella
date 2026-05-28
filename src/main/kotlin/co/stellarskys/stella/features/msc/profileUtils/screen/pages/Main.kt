@@ -9,7 +9,7 @@ import co.stellarskys.stella.features.msc.profileUtils.NetworthUtils
 import co.stellarskys.stella.features.msc.profileUtils.NetworthUtils.toReadable
 import co.stellarskys.stella.features.msc.profileUtils.SkillUtils
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
@@ -43,7 +43,7 @@ class Main(
 
     override val icon: ItemStack = SkyBlockItemsRepo.getItemStackOrDefault("HYPERION")
 
-    override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         // Paper Doll
         drawPlayer(context, 10, 25, 80, 100)
 
@@ -76,7 +76,7 @@ class Main(
 
     }
 
-    private fun drawPlayer(context: GuiGraphics, x: Int, y: Int, width: Int, height: Int) {
+    private fun drawPlayer(context: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int) {
         ren2d.drawHollowRect(context, 10, 25, width, height, 1, Palette.Purple)
         val player = entity ?: return ren2d.drawString(context, "§cLoading Model...", x + 5, y + 5)
         val x0 = (absoluteX + x).toInt()
@@ -84,14 +84,14 @@ class Main(
 
         context.pushPop {
             context.pose().identity()
-            InventoryScreen.renderEntityInInventoryFollowsMouse(
+            InventoryScreen.extractEntityInInventoryFollowsMouse(
                 context, x0, y0, x0 + width, y0 + height, 42, 0.0625f,
                 mouse.scaledX.toFloat(), mouse.scaledY.toFloat(), player
             )
         }
     }
 
-    private fun drawSkill(context: GuiGraphics, x: Int, y: Int, skilltype: SkillUtils.SkillType) {
+    private fun drawSkill(context: GuiGraphicsExtractor, x: Int, y: Int, skilltype: SkillUtils.SkillType) {
         val skill = SkillUtils.getSkill(skilltype, member)
         val skillComp = Component.literal("§d${skilltype.displayName}§7: §6${skill.level.toInt()}")
             .onHover("§b${skilltype.displayName}\n§dXP§7: §6" + "%,.3f".format(skill.xp))

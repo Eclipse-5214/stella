@@ -6,7 +6,7 @@ import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.features.msc.profileUtils.SlayerUtils
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
 import co.stellarskys.stella.features.msc.profileUtils.NetworthUtils.toReadable
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -21,7 +21,7 @@ class Slayer(
     private val slayerData = SlayerUtils.getSlayerData(member)
     private val totalXp = SlayerUtils.getTotalXp(member)
 
-    override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         ren2d.drawString(context, "§d§nSlayer Statistics", 10, 23)
         drawSlayer(context, 10, 35, SlayerUtils.SlayerType.ZOMBIE, "§2", Items.ROTTEN_FLESH.defaultInstance)
         drawSlayer(context, 10, 95, SlayerUtils.SlayerType.WOLF, "§f", Items.BONE.defaultInstance)
@@ -48,7 +48,7 @@ class Slayer(
         return list.joinToString("\n")
     }
 
-    private fun drawSlayer(context: GuiGraphics, x: Int, y: Int, type: SlayerUtils.SlayerType, color: String, icon: ItemStack) {
+    private fun drawSlayer(context: GuiGraphicsExtractor, x: Int, y: Int, type: SlayerUtils.SlayerType, color: String, icon: ItemStack) {
         val d = slayerData[type] ?: return
         val isMax = d.level == type.maxLevel
         val hover = getKillsTooltip(type)
@@ -63,7 +63,7 @@ class Slayer(
         ren2d.drawString(context, "§7XP: §f${"%,d".format(d.currentXp)}", x + 5, y + 35, 1f)
     }
 
-    private fun drawOverallStats(context: GuiGraphics, x: Int, y: Int) {
+    private fun drawOverallStats(context: GuiGraphicsExtractor, x: Int, y: Int) {
         ren2d.drawHollowRect(context, x, y, 110, 175, 1, Palette.Purple)
         ren2d.drawString(context, "§b§nOverall Stats", x + 5, y + 5, 1f)
         ren2d.drawString(context, "§dTotal Slayer XP", x + 5, y + 23, 1f)

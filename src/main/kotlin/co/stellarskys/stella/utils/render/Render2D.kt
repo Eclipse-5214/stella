@@ -8,13 +8,13 @@ import co.stellarskys.stella.api.nvg.NVGPIPRenderer
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.ChatFormatting
-import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.gui.components.PlayerFaceRenderer
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 import org.joml.Matrix3x2f
 import java.awt.Color
@@ -32,18 +32,18 @@ object Render2D {
     private var lastCacheClear = Chronos.zero
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
 
-    fun drawImage(ctx: GuiGraphics, image: ResourceLocation?, x: Int, y: Int, width: Int, height: Int) {
+    fun drawImage(ctx: GuiGraphicsExtractor, image: Identifier?, x: Int, y: Int, width: Int, height: Int) {
         if (image == null) return
         ctx.blit(RenderPipelines.GUI_TEXTURED, image, x, y, 0f, 0f, width, height, width, height, width, height)
     }
 
     @JvmOverloads
-    fun drawRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
+    fun drawRect(ctx: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
         ctx.fill(RenderPipelines.GUI, x, y, x + width, y + height, color.rgb)
     }
 
     @JvmOverloads
-    fun drawHollowRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, thickness: Int, color: Color = Color.WHITE) {
+    fun drawHollowRect(ctx: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, thickness: Int, color: Color = Color.WHITE) {
         if (thickness <= 0) return
         val rgb = color.rgb
         ctx.fill(RenderPipelines.GUI, x, y, x + width, y + thickness, rgb)
@@ -53,14 +53,14 @@ object Render2D {
     }
 
     @JvmOverloads
-    fun drawString(ctx: GuiGraphics, str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
+    fun drawString(ctx: GuiGraphicsExtractor, str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
         val matrices = ctx.pose()
         if (scale != 1f) {
             matrices.pushMatrix()
             matrices.scale(scale, scale)
         }
 
-        ctx.drawString(
+        ctx.text(
             client.font,
             str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
             x,
@@ -73,14 +73,14 @@ object Render2D {
     }
 
     @JvmOverloads
-    fun drawString(ctx: GuiGraphics, str: Component, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
+    fun drawString(ctx: GuiGraphicsExtractor, str: Component, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
         val matrices = ctx.pose()
         if (scale != 1f) {
             matrices.pushMatrix()
             matrices.scale(scale, scale)
         }
 
-        ctx.drawString(
+        ctx.text(
             client.font,
             str,
             x,
@@ -93,14 +93,14 @@ object Render2D {
     }
 
     @JvmOverloads
-    fun drawString(ctx: GuiGraphics, str: String, x: Int, y: Int, scale: Float = 1f, color: Color, shadow: Boolean = true) {
+    fun drawString(ctx: GuiGraphicsExtractor, str: String, x: Int, y: Int, scale: Float = 1f, color: Color, shadow: Boolean = true) {
         val matrices = ctx.pose()
         if (scale != 1f) {
             matrices.pushMatrix()
             matrices.scale(scale, scale)
         }
 
-        ctx.drawString(
+        ctx.text(
             client.font,
             str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
             x,
@@ -112,16 +112,16 @@ object Render2D {
         if (scale != 1f) matrices.popMatrix()
     }
 
-    fun renderItem(context: GuiGraphics, item: ItemStack, x: Float, y: Float, scale: Float) {
+    fun renderItem(context: GuiGraphicsExtractor, item: ItemStack, x: Float, y: Float, scale: Float) {
         context.pose().pushMatrix()
         context.pose().translate(x, y)
         context.pose().scale(scale, scale)
-        context.renderItem(item, 0, 0)
-        context.renderItemDecorations(client.font, item, 0, 0)
+        context.item(item, 0, 0)
+        context.itemDecorations(client.font, item, 0, 0)
         context.pose().popMatrix()
     }
 
-    fun drawPlayerHead(context: GuiGraphics, x: Int, y: Int, size: Int, uuid: UUID) {
+    fun drawPlayerHead(context: GuiGraphicsExtractor, x: Int, y: Int, size: Int, uuid: UUID) {
         if (lastCacheClear.since.millis > 300000L) {
             textureCache.clear()
             lastCacheClear = Chronos.now
@@ -136,7 +136,7 @@ object Render2D {
         }
 
         textures.textureUrl
-        PlayerFaceRenderer.draw(context, textures, x, y, size)
+        PlayerFaceExtractor.extractRenderState(context, textures, x, y, size)
     }
 
 
@@ -160,7 +160,7 @@ object Render2D {
         return client.font.lineHeight * lineCount
     }
 
-    fun GuiGraphics.drawNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
+    fun GuiGraphicsExtractor.drawNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
         val snapshot = Matrix3x2f(this.pose())
 
         NVGPIPRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
@@ -180,10 +180,10 @@ object Render2D {
         }
     }
 
-    fun GuiGraphics.batchNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) { Batcher.queue(this, scaled, block) }
-    fun GuiGraphics.flushNVG() { Batcher.flush(this) }
+    fun GuiGraphicsExtractor.batchNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) { Batcher.queue(this, scaled, block) }
+    fun GuiGraphicsExtractor.flushNVG() { Batcher.flush(this) }
 
-    fun renderScrolled(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, scrollOffset: Float, block: () -> Unit) {
+    fun renderScrolled(ctx: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, scrollOffset: Float, block: () -> Unit) {
         ctx.enableScissor(x, y, x + width, y + height)
         ctx.pushPop {
             ctx.pose().translate(x.toFloat(), y.toFloat())
@@ -199,7 +199,7 @@ object Render2D {
         return (currentTarget + amount * speed).coerceIn(-maxScroll, 0f)
     }
 
-    fun drawScrollbar(ctx: GuiGraphics, x: Int, y: Int, viewportHeight: Int, scrollOffset: Float, totalHeight: Int, color: Color) {
+    fun drawScrollbar(ctx: GuiGraphicsExtractor, x: Int, y: Int, viewportHeight: Int, scrollOffset: Float, totalHeight: Int, color: Color) {
         if (totalHeight <= viewportHeight) return
         val barHeight = (viewportHeight.toFloat() / totalHeight) * viewportHeight
         val barY = (-scrollOffset / totalHeight) * viewportHeight

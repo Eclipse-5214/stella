@@ -3,7 +3,7 @@ package co.stellarskys.stella.features.msc.profileUtils.screen
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.horizon.mc.BaseElement
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.world.item.ItemStack
 import tech.thatgravyboat.skyblockapi.platform.pushPop
 
@@ -21,7 +21,7 @@ class NavBar: BaseElement() {
         this.y = -(slotSize + gap).toFloat()
     }
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         context.pushPop {
             context.pose().translate(x, y)
             pages.entries.forEachIndexed { i, (icon, _) ->

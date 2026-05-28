@@ -5,7 +5,8 @@ import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.horizon.mc.ParentElement
 import co.stellarskys.stella.api.horizon.mc.addTo
 import co.stellarskys.stella.api.zenith.client
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.world.item.ItemStack
@@ -43,23 +44,27 @@ abstract class Page(
 
     fun navigateTo(page: Page) = navigate(page)
 
-    fun drawComp(context: GuiGraphics, comp: MutableComponent, x: Int, y: Int) {
+    fun drawComp(context: GuiGraphicsExtractor, comp: MutableComponent, x: Int, y: Int) {
         ren2d.drawString(context, comp, x, y)
         comp.style.hoverEvent?.let {
             componentsTooltips.add(Tooltip(x, y, client.font.width(comp), client.font.lineHeight, comp.style))
         }
     }
 
-    private fun renderTooltips(context: GuiGraphics, mouseX: Int, mouseY: Int) {
+    private fun renderTooltips(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         val tooltip = componentsTooltips.firstOrNull {
             isAreaHovered(it.x.toFloat(), it.y.toFloat(), it.width.toFloat(), it.height.toFloat())
         } ?: return
-        context.renderComponentHoverEffect(client.font, tooltip.comp, mouseX, mouseY)
+
+        // Mimics GuiGraphicsExtractor L 777 - 787
+        val hoverEvent = (tooltip.comp.hoverEvent as? HoverEvent.ShowText)?.value ?: return
+        val text = client.font.split(hoverEvent, (context.guiWidth() / 2).coerceAtLeast(200))
+        context.setTooltipForNextFrame(client.font, text, mouseX, mouseY)
     }
 
-    open fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {}
+    open fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {}
 
-    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         x = screenX
         y = screenY
         context.pushPop {

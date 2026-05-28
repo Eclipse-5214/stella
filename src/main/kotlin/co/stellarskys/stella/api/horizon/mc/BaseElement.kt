@@ -3,7 +3,7 @@ package co.stellarskys.stella.api.horizon.mc
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.width
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 abstract class BaseElement {
     val ren2d get() = Render2D
@@ -32,7 +32,7 @@ abstract class BaseElement {
         isAreaHovered(rx, ry, width, text.width().toFloat() * scale, mx, my)
 
     // Rendering
-    abstract fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float)
+    abstract fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float)
     open fun setVisibility(value: Boolean) {
         if (visible == value) return
         visible = value

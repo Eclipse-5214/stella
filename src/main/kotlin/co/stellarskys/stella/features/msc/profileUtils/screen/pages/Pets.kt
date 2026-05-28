@@ -10,7 +10,7 @@ import co.stellarskys.stella.features.msc.profileUtils.PetUtils
 import co.stellarskys.stella.features.msc.profileUtils.PetUtils.item
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
 import co.stellarskys.stella.utils.Utils
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -48,7 +48,7 @@ class Pets(
         const val BAR_WIDTH = 90
     }
 
-    override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         // Pets Scroller
         ren2d.drawHollowRect(context, 10, 25, 190, 185, 1, Palette.Purple)
         renderPets(context, 15, 30, mouseX, mouseY)
@@ -62,13 +62,13 @@ class Pets(
         hoveredPet = null
     }
 
-    private fun renderPets(context: GuiGraphics, x: Int, y: Int, mouseX: Float, mouseY: Float) {
+    private fun renderPets(context: GuiGraphicsExtractor, x: Int, y: Int, mouseX: Float, mouseY: Float) {
         ren2d.renderScrolled(context, x, y, 190, 175, scrollOffset) {
             renderPetsGrid(context, 8, 0, x, y, sortedPets, mouseX, mouseY)
         }
     }
 
-    private fun renderPetOverview(context: GuiGraphics, x: Int, y: Int) {
+    private fun renderPetOverview(context: GuiGraphicsExtractor, x: Int, y: Int) {
         val pet = selectedPet ?: run {
             val noPetText = "§cNo Selected Pet"
             val textX = x + (PREVIEW_WIDTH - client.font.width(noPetText)) / 2
@@ -84,7 +84,7 @@ class Pets(
         context.pushPop {
             context.pose().translate(itemX, y + 15f)
             context.pose().scale(itemScale)
-            context.renderItem(pet.item(), -8, 0)
+            context.item(pet.item(), -8, 0)
         }
 
         with(petLevel) {
@@ -116,12 +116,12 @@ class Pets(
         }
     }
 
-    private fun renderPetsGrid(context: GuiGraphics, sx: Int, sy: Int, ox: Int, oy: Int, pets: List<SkyblockResponse.Pet>, mouseX: Float, mouseY: Float) =
+    private fun renderPetsGrid(context: GuiGraphicsExtractor, sx: Int, sy: Int, ox: Int, oy: Int, pets: List<SkyblockResponse.Pet>, mouseX: Float, mouseY: Float) =
         pets.forEachIndexed { i, stack ->
             drawPet(context, sx + (i % GRID_ROW_COLS) * STEP_SIZE, sy + (i / GRID_ROW_COLS) * STEP_SIZE, ox, oy, stack, mouseX, mouseY)
         }
 
-    private fun drawPet(ctx: GuiGraphics, ix: Int, iy: Int, ox: Int, oy: Int, pet: SkyblockResponse.Pet, mx: Float, my: Float) {
+    private fun drawPet(ctx: GuiGraphicsExtractor, ix: Int, iy: Int, ox: Int, oy: Int, pet: SkyblockResponse.Pet, mx: Float, my: Float) {
         val bgColor = Color(pet.rarity.color).withAlpha(40)
         val petItem = pet.item()
 
@@ -138,7 +138,7 @@ class Pets(
         }
     }
 
-    private fun drawBar(context: GuiGraphics, x: Int, y: Int, filledPercent: Float) {
+    private fun drawBar(context: GuiGraphicsExtractor, x: Int, y: Int, filledPercent: Float) {
         ren2d.drawRect(context, x, y, BAR_WIDTH, 5, Palette.Crust)
         ren2d.drawRect(context, x, y, (BAR_WIDTH * filledPercent).toInt(), 5, Palette.Green)
     }

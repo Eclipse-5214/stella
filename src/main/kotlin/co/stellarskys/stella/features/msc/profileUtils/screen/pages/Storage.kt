@@ -7,7 +7,7 @@ import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.ProfileViewer
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
 import co.stellarskys.stella.utils.render.Render2D.width
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
@@ -35,7 +35,7 @@ class Storage(
         const val VIEW_HEIGHT_LIMIT = 160
     }
 
-    override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         subPages.forEachIndexed { i, page ->
             val by = (25 + i * 31.8f).toInt()
             val isSelected = currentPage == page
@@ -55,12 +55,12 @@ class Storage(
         hoveredStack = null
     }
 
-    fun renderItemGrid(context: GuiGraphics, startX: Int, startY: Int, items: List<ItemStack>, mouseX: Float, mouseY: Float) =
+    fun renderItemGrid(context: GuiGraphicsExtractor, startX: Int, startY: Int, items: List<ItemStack>, mouseX: Float, mouseY: Float) =
         items.forEachIndexed { i, stack ->
             drawSlot(context, startX + (i % GRID_ROW_COLS) * STEP_SIZE, startY + (i / GRID_ROW_COLS) * STEP_SIZE, stack, mouseX, mouseY)
         }
 
-    private fun drawSlot(ctx: GuiGraphics, ix: Int, iy: Int, stack: ItemStack, mx: Float, my: Float) {
+    private fun drawSlot(ctx: GuiGraphicsExtractor, ix: Int, iy: Int, stack: ItemStack, mx: Float, my: Float) {
         var bgColor = Palette.Crust.withAlpha(100)
         if (ProfileViewer.showRarity && !stack.isEmpty) stack[DataTypes.RARITY]?.let { bgColor = Color(it.color).withAlpha(40) }
 
@@ -78,7 +78,7 @@ class Storage(
         }
     }
 
-    private fun drawPageBar(context: GuiGraphics, startX: Int, totalPages: Int, activeIdx: Int, mx: Float, my: Float) {
+    private fun drawPageBar(context: GuiGraphicsExtractor, startX: Int, totalPages: Int, activeIdx: Int, mx: Float, my: Float) {
         if (totalPages <= 1) return
         val bw = PAGE_BAR_WIDTH / totalPages
 
@@ -111,7 +111,7 @@ class Storage(
         abstract val icon: ItemStack
         protected var pageIdx = 0
         open fun resetPage() { pageIdx = 0 }
-        abstract fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float)
+        abstract fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float)
         open fun mouseClicked(mx: Float, my: Float, button: Int): Boolean = false
         protected val startX: Int = 45 + (300 - PAGE_BAR_WIDTH) / 2
     }
@@ -119,7 +119,7 @@ class Storage(
     abstract inner class PagedSubPage(name: String) : SubPage(name) {
         abstract val cachedPages: List<List<ItemStack>>
 
-        override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) {
+        override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {
             val pages = cachedPages
             drawPageBar(context, startX, pages.size, pageIdx, mouseX, mouseY)
 
@@ -153,7 +153,7 @@ class Storage(
             Triple(armor, eq, hotbar to inv)
         }
 
-        override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) {
+        override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {
             val (armor, eq, invHotbar) = cachedData
             renderItemGrid(context, startX, 37, armor, mouseX, mouseY)
             renderItemGrid(context, startX + (5 * STEP_SIZE), 37, eq, mouseX, mouseY)
@@ -166,7 +166,7 @@ class Storage(
         override val icon: ItemStack = Items.IRON_DOOR.defaultInstance
         private val cachedItems by lazy { member.inventory.personalVault.items() }
 
-        override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) {
+        override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {
             val items = cachedItems
             val startY = 35 + (VIEW_HEIGHT_LIMIT - (((items.size + 8) / GRID_ROW_COLS) * STEP_SIZE)).coerceAtLeast(0) / 2
             renderItemGrid(context, startX, startY, items, mouseX, mouseY)
@@ -186,7 +186,7 @@ class Storage(
     inner class AccessoryBag : PagedSubPage("Accessory Bag") {
         override val icon: ItemStack = Items.BOOK.defaultInstance
         override val cachedPages by lazy { member.inventory.bags.accessoryBagPages }
-        override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) {
+        override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {
             val mp = "§dMP§7: §6${member.assumedMagicalPower}"
             ren2d.drawString(context, mp, 340 - mp.width(), 10, 1f)
             super.onRender(context, mouseX, mouseY)

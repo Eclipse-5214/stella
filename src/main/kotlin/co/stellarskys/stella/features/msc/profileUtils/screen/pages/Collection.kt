@@ -7,7 +7,7 @@ import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.features.msc.profileUtils.CollectionUtils
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
 import co.stellarskys.stella.utils.Utils
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
@@ -24,7 +24,7 @@ class Collection(
     private var scrollOffset by Utils.animate<Float>(0.2, AnimType.EASE_OUT)
     private var targetOffset = 0f
 
-    override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         drawSidebar(context, mouseX, mouseY)
         
         if (!CollectionUtils.isLoaded()) {
@@ -60,7 +60,7 @@ class Collection(
         ren2d.drawScrollbar(context, 338, 25, 185, scrollOffset, totalHeight, Palette.Purple)
     }
 
-    private fun drawSidebar(context: GuiGraphics, mouseX: Float, mouseY: Float) {
+    private fun drawSidebar(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {
         ren2d.drawHollowRect(context, 10, 25, 90, 185, 1, Palette.Purple)
         CollectionUtils.CollectionType.entries.forEachIndexed { i, cat ->
             val bx = 12; val by = 27 + (i * 26); val sel = currentCategory == cat

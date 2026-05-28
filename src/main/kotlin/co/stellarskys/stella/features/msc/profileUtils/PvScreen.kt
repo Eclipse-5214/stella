@@ -5,7 +5,7 @@ import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.features.msc.profileUtils.screen.pages.*
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class PvScreen private constructor(
     val name: String,
@@ -29,7 +29,7 @@ class PvScreen private constructor(
 
     private fun switchTo(page: Page) { currentPage = page }
 
-    override fun onRender(context: GuiGraphics, mouseX: Int, mouseY: Int, tickDelta: Float) =
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) =
         currentPage.render(context, mouseX.toFloat(), mouseY.toFloat(), tickDelta)
 
     override fun onMouseClick(button: Int, x: Double, y: Double, modifiers: Int) =

@@ -9,15 +9,9 @@ import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRegistry
 import co.stellarskys.stella.hud.HUDEditor
+import net.minecraft.util.Util
 import java.awt.Color
 import java.net.URI
-
-//? if <= 1.21.10 {
-import net.minecraft.Util
-//?} else {
- /*import net.minecraft.util.Util
-*///?}
-
 
 val config = Config(Stella.NAMESPACE) {
     category("General") {
