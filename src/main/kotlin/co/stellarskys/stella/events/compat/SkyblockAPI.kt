@@ -40,12 +40,12 @@ object SkyblockAPI {
 
     @Subscription
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        EventBus.post(ScoreboardEvent.Update(event.old, event.new, event.components))
+        EventBus.post(ScoreboardEvent.Update(event.old, event.new, event.newComponents))
     }
 
     @Subscription
     fun onPlayerHotbarUpdate(event: PlayerHotbarChangeEvent) {
-        EventBus.post(PlayerEvent.HotbarChange(event.slot, event.item))
+        EventBus.post(PlayerEvent.HotbarChange(event.slotIndex, event.item))
     }
 
     @Subscription

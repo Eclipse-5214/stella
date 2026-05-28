@@ -2,7 +2,7 @@ package co.stellarskys.stella.api.handlers
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.zenith.client
-import com.google.gson.*
+import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import java.net.URI
@@ -32,10 +32,8 @@ object Quasar {
     }
 
     suspend fun downloadFile(url: String, targetPath: Path): Result<Path> = suspendCancellableCoroutine { cont ->
-        val request = request(url).GET().build()
-        val future = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofFile(targetPath))
+        val future = httpClient.sendAsync(request(url).GET().build(), HttpResponse.BodyHandlers.ofFile(targetPath))
         cont.invokeOnCancellation { future.cancel(true) }
-
         future.whenComplete { res, err ->
             val result = when {
                 err != null -> Result.failure(err)

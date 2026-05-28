@@ -12,7 +12,7 @@ object NetworthUtils {
 
     fun getProfileNetworth(member: SkyblockResponse.SkyblockMember): NetworthResult {
         val breakdown = mutableMapOf(
-            "Purse" to getCurrencyNetworth(member),
+            "Currency" to getCurrencyNetworth(member),
             "Sacks" to getSacksNetworth(member),
             "Pets" to getPetsNetworth(member)
         ).apply {

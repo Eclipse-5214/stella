@@ -74,7 +74,7 @@ class Collection(
         }
     }
 
-    override fun mouseScrolled(mouseX: Float, mouseY: Float, amount: Float, hamount: Float): Boolean {
+    override fun mouseScrolled(mouseX: Float, mouseY: Float, amount: Float, horizontalAmount: Float): Boolean {
         if (!isAreaHovered(105f, 25f, 235f, 185f, mouseX, mouseY)) return false
         val total = (CollectionUtils.getCategoryProgress(currentCategory, member).size / 2 + 1) * 31
         targetOffset = ren2d.calculateScroll(targetOffset, amount, total, 185)
@@ -82,10 +82,10 @@ class Collection(
         return true
     }
 
-    override fun mouseClicked(mx: Float, my: Float, btn: Int): Boolean {
-        if (super.mouseClicked(mx, my, btn)) return true
+    override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
+        if (super.mouseClicked(mouseX, mouseY, button)) return true
         CollectionUtils.CollectionType.entries.forEachIndexed { i, cat ->
-            if (isAreaHovered(12f, 27f + (i * 26), 86f, 25f, mx, my)) {
+            if (isAreaHovered(12f, 27f + (i * 26), 86f, 25f, mouseX, mouseY)) {
                 if (currentCategory != cat) { currentCategory = cat; targetOffset = 0f; scrollOffset = 0f }
                 return true
             }
