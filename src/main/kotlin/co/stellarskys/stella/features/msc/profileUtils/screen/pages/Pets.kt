@@ -2,6 +2,7 @@ package co.stellarskys.stella.features.msc.profileUtils.screen.pages
 
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
+import co.stellarskys.stella.api.handlers.Signal.onHover
 import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.zenith.client
@@ -93,9 +94,11 @@ class Pets(
 
             val nameComp = Component.literal("§7[Lvl $level] ")
                 .append(Component.literal(petName).withColor(pet.rarity.color))
+                .onHover("§bPet candy used §7(§6${pet.candyUsed}§7/§610§7)")
+
 
             val nameX = x + (PREVIEW_WIDTH - client.font.width(nameComp)) / 2
-            ren2d.drawString(context, nameComp, nameX, y + 70)
+            drawComp(context, nameComp, nameX, y + 70)
             drawBar(context, barX, y + 82, (level.toFloat() / levelCap.toFloat()).coerceIn(0f, 1f))
 
             val nextLvlText = "§dTo Next §6${(progressToNextLevel * 100f).toInt()}%"
