@@ -14,7 +14,7 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 object EventBusManager {
     private data class ConditionalEventHandle(
         val islands: Set<SkyBlockIsland>?,
-        val arias: Set<SkyBlockArea>?,
+        val areas: Set<SkyBlockArea>?,
         val floors: Set<DungeonFloor>?,
         val skyblockOnly: Boolean,
         val handle: EventHandle<*>,
@@ -40,7 +40,7 @@ object EventBusManager {
             val shouldBeRegistered = when {
                 call.skyblockOnly && !onSkyblock -> false
                 call.islands != null && currentIsland !in call.islands -> false
-                call.arias   != null && currentAria   !in call.arias   -> false
+                call.areas   != null && currentAria   !in call.areas   -> false
                 call.floors  != null && currentFloor  !in call.floors  -> false
                 else -> true
             }

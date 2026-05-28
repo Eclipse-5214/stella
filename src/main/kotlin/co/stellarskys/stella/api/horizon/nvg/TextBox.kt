@@ -1,4 +1,4 @@
-package co.stellarskys.stella.api.config.ui.base
+package co.stellarskys.stella.api.horizon.nvg
 
 import co.stellarskys.stella.api.nvg.Font
 import co.stellarskys.stella.api.nvg.NVGRenderer

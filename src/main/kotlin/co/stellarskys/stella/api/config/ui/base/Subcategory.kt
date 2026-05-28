@@ -4,7 +4,8 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.api.config.core.ConfigSubcategory
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
-import net.minecraft.client.gui.GuiGraphicsExtractor
+import co.stellarskys.stella.api.horizon.nvg.ParentElement
+import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color
 
 class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory): ParentElement() {
@@ -37,7 +38,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
         get() = super.canReceiveInput && open
 
     override fun render(
-        context: GuiGraphicsExtractor,
+        context: GuiGraphics,
         mouseX: Float,
         mouseY: Float,
         delta: Float

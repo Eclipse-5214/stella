@@ -1,13 +1,19 @@
 package co.stellarskys.stella.api.config.core
 
 import co.stellarskys.stella.Stella
+import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.KeyEvent
 import java.awt.Color
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 open class ConfigCategory(val name: String, val config: Config) {
     val subcategories = mutableMapOf<String, ConfigSubcategory>()
 
+    /**
+     * Finds or creates a [ConfigSubcategory] within this category.
+     */
     fun subcategory(name: String, configName: String = "", description: String = "" , builder: ConfigSubcategory.() -> Unit = {}) {
         subcategories[name] = ConfigSubcategory(
             name,
@@ -39,6 +45,7 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         elements[button.configName] = button
     }
 
+
     /**
      * Adds a [ColorPicker] element to the config category.
      *
@@ -48,6 +55,10 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         val color = ColorPicker().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[color.configName] = color
     }
+
+    fun colorpicker(id: String, name: String, desc: String = "", def: Color = Color.WHITE, show: ((Config) -> Boolean)? = null) =
+        add(ColorPicker().apply { configName = id; this.name = name; description = desc; default = def; showIf = show }, def)
+
 
     /**
      * Adds a [Dropdown] element to the config category.
@@ -59,6 +70,9 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         elements[dropdown.configName] = dropdown
     }
 
+    fun dropdown(id: String, name: String, desc: String = "", options: List<String>, def: Int = 0, show: ((Config) -> Boolean)? = null) =
+        add(Dropdown().apply { configName = id; this.name = name; description = desc; this.options = options; default = def; showIf = show }, def)
+
     /**
      * Adds a [Keybind] element to the config category.
      *
@@ -67,6 +81,16 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
     fun keybind(builder: Keybind.() -> Unit) {
         val keybind = Keybind().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[keybind.configName] = keybind
+    }
+
+    fun keybind(id: String, name: String, desc: String = "", def: Int = 0, show: ((Config) -> Boolean)? = null): ReadWriteProperty<Any?, Keybind.Handler> {
+        val kb = Keybind().apply { configName = id; this.name = name; description = desc; default = def; showIf = show; config = this@ConfigSubcategory.config }
+        elements[id] = kb
+        config?.registerInternalElement(id, kb)
+        return object : ReadWriteProperty<Any?, Keybind.Handler> {
+            override fun getValue(thisRef: Any?, property: KProperty<*>) = kb.value as Keybind.Handler
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Keybind.Handler) { kb.value = value.keyCode() }
+        }
     }
 
     /**
@@ -79,6 +103,10 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         elements[slider.configName] = slider
     }
 
+    fun slider(id: String, name: String, desc: String = "", min: Float = 0f, max: Float = 1f, def: Float = 0.5f, show: ((Config) -> Boolean)? = null) =
+        add(Slider().apply { configName = id; this.name = name; description = desc; this.min = min; this.max = max; default = def; showIf = show }, def)
+
+
     /**
      * Adds a [StepSlider] element to the config category.
      *
@@ -89,6 +117,9 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         elements[step.configName] = step
     }
 
+    fun stepslider(id: String, name: String, desc: String = "", min: Int = 0, max: Int = 10, step: Int = 1, def: Int = 0, show: ((Config) -> Boolean)? = null) =
+        add(StepSlider().apply { configName = id; this.name = name; description = desc; this.min = min; this.max = max; this.step = step; default = def; showIf = show }, def)
+
     /**
      * Adds a [TextInput] element to the config category.
      *
@@ -98,6 +129,10 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         val input = TextInput().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[input.configName] = input
     }
+
+    fun textinput(id: String, name: String, desc: String = "", def: String = "", show: ((Config) -> Boolean)? = null, onChange: ((String) -> Unit)? = null) =
+        add(TextInput().apply { configName = id; this.name = name; description = desc; placeholder = def; showIf = show; onValueChanged = onChange }, def)
+
 
     /**
      * Adds a [TextParagraph] element to the config category.
@@ -119,6 +154,10 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         elements[toggle.configName] = toggle
     }
 
+    fun toggle(id: String, name: String, desc: String = "", def: Boolean = false, show: ((Config) -> Boolean)? = null) =
+        add(Toggle().apply { configName = id; this.name = name; description = desc; default = def; showIf = show }, def)
+
+
     /**
      * Sets the click behavior for a [Button].
      *
@@ -135,6 +174,27 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
      */
     fun TextInput.onvaluechange(cb: (String) -> Unit) {
         this.onValueChanged = cb
+    }
+
+    /**
+     * Internal helper to register an element and return a ReadWrite property delegate.
+     * This links the local property directly to the [Config] value cache.
+     */
+    private fun <T : Any> add(el: ConfigElement, def: T): ReadWriteProperty<Any?, T> {
+        el.config = this.config
+        elements[el.configName] = el
+        config?.registerInternalElement(el.configName, el)
+
+        return object : ReadWriteProperty<Any?, T> {
+            @Suppress("UNCHECKED_CAST")
+            override fun getValue(thisRef: Any?, property: KProperty<*>): T {
+                return config?.get(el.configName) as? T ?: def
+            }
+
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+                el.value = value
+            }
+        }
     }
 }
 
@@ -236,6 +296,7 @@ class Keybind : ConfigElement() {
 
             init {
                 EventBus.on<KeyEvent.Press> {
+                    if (client.screen != null) return@on
                     if (it.keyCode == keyCode && !isDown) {
                         isDown = true
                         pressListeners.forEach { fn -> fn() }
@@ -243,6 +304,7 @@ class Keybind : ConfigElement() {
                 }
 
                 EventBus.on<KeyEvent.Release> {
+                    if (client.screen != null) return@on
                     if (it.keyCode == keyCode && isDown) {
                         isDown = false
                         releaseListeners.forEach { fn -> fn() }

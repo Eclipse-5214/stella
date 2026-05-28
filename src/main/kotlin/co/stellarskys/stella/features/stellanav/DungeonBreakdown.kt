@@ -2,87 +2,74 @@ package co.stellarskys.stella.features.stellanav
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.api.handlers.Signal.onHover
-import co.stellarskys.stella.api.dungeons.map.MapScanner
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayer
-import co.stellarskys.stella.api.dungeons.players.DungeonPlayerManager
 import co.stellarskys.stella.api.handlers.Chronos
+import co.stellarskys.stella.api.hypixel.HypixelApi
+import co.stellarskys.stella.events.core.LocationEvent
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
+import kotlin.collections.MutableMap
+import kotlin.let
 
 @Module
 object DungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE_CATACOMBS) {
+    private val initSecrets: MutableMap<String, Int> = mutableMapOf()
+    private val deltaSecrets: MutableMap<String, Int> = mutableMapOf()
 
     override fun initialize() {
-        on<DungeonEvent.End> {
-            Chronos.Tick.after(3 * 20) run {
-                Signal.fakeMessage(Stella.PREFIX + " §bCleared room counts:")
-                DungeonPlayerManager.players.forEach { player ->
-                    if (player == null) return@forEach
-
-                    val name = player.name
-                    val secrets = player.secrets
-                    val minmax = "${player.minRooms}-${player.maxRooms}"
-                    val deaths = player.deaths
-                    val roomLore = buildRoomLore(player)
-
-                    val mesage = Component.literal("§d| §b$name §fcleared §b$minmax §frooms | §b$secrets §fsecrets | §b$deaths §fdeaths").onHover(roomLore)
-                    Signal.fakeMessage(mesage)
+        on<DungeonEvent.Start> {
+            Dungeon.players.forEach { player ->
+                player.uuid?.toString()?.let { uuid ->
+                    HypixelApi.fetchSecrets(uuid, 120_000) { it?.let { count -> initSecrets[player.name] = count } }
                 }
             }
+        }
+
+        on<DungeonEvent.End> {
+            Dungeon.players.forEach { player ->
+                player.uuid?.toString()?.let { uuid ->
+                    HypixelApi.fetchSecrets(uuid, 0) { secrets ->
+                        secrets?.let { count -> deltaSecrets[player.name] = count - (initSecrets[player.name] ?: -1) }
+                    }
+                }
+            }
+
+            Chronos.Tick.after(3 * 20) run {
+                Signal.fakeMessage(Stella.PREFIX + " §bCleared room counts:")
+                Dungeon.players.forEach { player ->
+                    val secrets = deltaSecrets[player.name]?.let { "§b$it" } ?: "§cAPI Err"
+                    val lore = buildRoomLore(player)
+                    val msg = "§d| §b${player.name} §fcleared §b${player.minRooms}-${player.maxRooms} §frooms | $secrets §fsecrets | §b${player.deaths} §fdeaths"
+                    Signal.fakeMessage(Component.literal(msg).onHover(lore))
+                }
+            }
+        }
+
+        on<LocationEvent.ServerChange> {
+            initSecrets.clear()
+            deltaSecrets.clear()
         }
     }
 
     fun buildRoomLore(player: DungeonPlayer): String {
-        val greenRooms = player.getGreenChecks()
-        val whiteRooms = player.getWhiteChecks()
+        val greenNames = player.getGreenChecks().values.mapNotNull { it.room.name }.toSet()
+        val allRooms = (player.getGreenChecks().values + player.getWhiteChecks().values.filter { it.room.name !in greenNames })
 
-        val visitedGreenNames = mutableSetOf<String>()
-        val lore = StringBuilder()
-
-        fun formatRoomInfo(info: MapScanner.RoomClearInfo, checkColor: String, isLast: Boolean = false): String {
+        return allRooms.joinToString("\n") { info ->
             val room = info.room
             val name = if (room.name == "Default") room.shape else room.name ?: room.shape
-            val type = room.type.name
-            val color = room.type.colorCode
-            val time = info.time
-
-            val stackStr = if (info.solo) "" else {
-                val others = room.players
-                    .filter { it.name != player.name }
-                    .map { it.name }
-
-                if (others.isEmpty()) "."
-                else ", Stacked with ${others.joinToString(", ")}."
+            val stack = if (info.solo) "" else {
+                val others = room.players.filter { it.name != player.name }.map { it.name }
+                if (others.isEmpty()) "." else ", Stacked with ${others.joinToString(", ")}."
             }
 
-            val line = "§$color$name §7(§$color$type§7) §7[§$checkColor✔§7]§$color in ${time}$stackStr"
-            return if (isLast) line else "$line\n"
+            val check = if (room.name in greenNames) "§a✔" else "§f✔"
+            "§${room.type.colorCode}$name §7(§${room.type.colorCode}${room.type.name}§7) §7[$check§7]§${room.type.colorCode} in ${info.time}$stack"
         }
-
-        val allRooms = mutableListOf<MapScanner.RoomClearInfo>()
-
-        for ((_, info) in greenRooms) {
-            allRooms += info
-            info.room.name?.let { visitedGreenNames.add(it) }
-        }
-        for ((_, info) in whiteRooms) {
-            if (info.room.name !in visitedGreenNames) {
-                allRooms += info
-            }
-        }
-
-        allRooms.forEachIndexed { i, info ->
-            if (info.solo) player.minRooms++
-            player.maxRooms++
-
-            val checkColor = if (info.room.name in visitedGreenNames) "a" else "f"
-            lore.append(formatRoomInfo(info, checkColor, isLast = i == allRooms.lastIndex))
-        }
-
-        return lore.toString()
     }
 }

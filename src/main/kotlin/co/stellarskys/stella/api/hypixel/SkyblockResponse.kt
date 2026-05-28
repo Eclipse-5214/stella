@@ -1,8 +1,13 @@
 package co.stellarskys.stella.api.hypixel
 
 import com.google.gson.annotations.SerializedName
+import com.mojang.util.UndashedUuid
 import net.minecraft.nbt.NbtAccounter
 import net.minecraft.nbt.NbtIo
+import net.minecraft.world.item.ItemStack
+import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
+import tech.thatgravyboat.skyblockapi.api.remote.hypixel.legacyStack
+import java.util.UUID
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.optionals.getOrNull
@@ -14,24 +19,42 @@ data class SkyblockResponse(
     fun getActiveMember(uuid: String): SkyblockMember? {
         val cleanUuid = uuid.replace("-", "")
         val activeProfile = profiles?.find { it.selected } ?: return null
-        return activeProfile.members[cleanUuid]
+        val member = activeProfile.members[cleanUuid] ?: return null
+        member.profile = activeProfile
+        member.uuid = UndashedUuid.fromStringLenient(cleanUuid)
+        return member
     }
-
 
     data class SkyblockProfile(
         @SerializedName("profile_id") val id: String,
         val selected: Boolean = false,
         @SerializedName("cute_name") val cuteName: String? = null,
-        val members: Map<String, SkyblockMember> = emptyMap()
+        val members: Map<String, SkyblockMember> = emptyMap(),
+        val banking: Banking = Banking()
+    )
+
+    data class Banking(
+        val balance: Double = 0.0
     )
 
     data class SkyblockMember(
         @SerializedName("player_stats") val stats: PlayerStats = PlayerStats(),
+        @SerializedName("player_data") val playerData: PlayerData = PlayerData(), // Added
+        @SerializedName("leveling") val leveling: Leveling = Leveling(),         // Added
+        val slayer: SlayerData = SlayerData(),
         @SerializedName("pets_data") val petsData: PetsData = PetsData(),
         val dungeons: DungeonsData = DungeonsData(),
         @SerializedName("accessory_bag_storage") val accessoryBag: AccessoryBagStorage = AccessoryBagStorage(),
-        val inventory: Inventory = Inventory()
+        val inventory: Inventory = Inventory(),
+        val collection: Map<String, Double> = emptyMap(),
+        @SerializedName("bank_account") val soloBank: Double = 0.0,
+        val currencies: Currencies = Currencies(),
+        var profile: SkyblockProfile? = null,
+        var uuid: UUID? = null
     ) {
+        val sbLevel get() = leveling.experience / 100
+        val sbLevelProgress get() = leveling.experience % 100
+
         val inventoryApi get() = inventory.invContents.data.isNotEmpty()
         val assumedMagicalPower get() =
             if (accessoryBag.highestMP > 0) accessoryBag.highestMP
@@ -39,11 +62,56 @@ data class SkyblockResponse(
 
         val allItems get() = inventory.invContents.itemStacks +
                 inventory.eChestContents.itemStacks +
+                inventory.wardrobeContents.itemStacks +
+                inventory.equipment.itemStacks +
+                inventory.bags.fishingBag.itemStacks +
+                inventory.bags.talismanBag.itemStacks +
+                inventory.bags.quiver.itemStacks +
+                inventory.personalVault.itemStacks +
                 inventory.backpackContents.flatMap { it.value.itemStacks }
     }
 
-    data class PlayerStats(val kills: Map<String, Float> = emptyMap()) {
-        val bloodMobKills get() = ((kills["watcher_summon_undead"] ?: 0f) + (kills["master_watcher_summon_undead"] ?: 0f)).toInt()
+    data class Leveling(
+        val experience: Int = 0,
+    )
+
+    data class PlayerData(
+        val experience: Map<String, Double> = emptyMap(),
+        val perks: Map<String, Int> = emptyMap()
+    )
+
+    data class SlayerData(
+        @SerializedName("slayer_bosses") val bosses: Map<String, SlayerBoss> = emptyMap()
+    )
+
+    data class SlayerBoss(
+        @SerializedName("claimed_levels") val claimedLevels: Map<String, Boolean> = emptyMap(),
+        val xp: Long = 0,
+        @SerializedName("boss_kills_tier_0") val t1Kills: Int = 0,
+        @SerializedName("boss_kills_tier_1") val t2Kills: Int = 0,
+        @SerializedName("boss_kills_tier_2") val t3Kills: Int = 0,
+        @SerializedName("boss_kills_tier_3") val t4Kills: Int = 0,
+        @SerializedName("boss_kills_tier_4") val t5Kills: Int = 0
+    ) {
+        val totalKills get() = t1Kills + t2Kills + t3Kills + t4Kills + t5Kills
+    }
+
+    data class Currencies(
+        @SerializedName("coin_purse") val purse: Double = 0.0,
+        @SerializedName("motes_purse") val motes: Double = 0.0,
+        val essence: Map<String, EssenceData> = emptyMap()
+    )
+
+    data class EssenceData(val current: Long = 0)
+
+    data class PlayerStats(
+        val kills: Map<String, Double> = emptyMap(),
+        val deaths: Map<String, Double> = emptyMap(),
+        @SerializedName("highest_damage") val highestDamage: Double = 0.0
+    ) {
+        val totalKills get() = kills["total"] ?: 0.0
+        val totalDeaths get() = deaths["total"] ?: 0.0
+        val bloodMobKills get() = ((kills["watcher_summon_undead"] ?: 0.0) + (kills["master_watcher_summon_undead"] ?: 0.0)).toInt()
     }
 
     data class DungeonsData(
@@ -69,11 +137,30 @@ data class SkyblockResponse(
 
     data class ClassData(val experience: Double = 0.0)
 
-    data class PetsData(val pets: List<Pet> = emptyList()) {
+    data class PetsData(
+        val pets: List<Pet> = emptyList(),
+        @SerializedName("pet_care") val petCare: PetCare = PetCare()
+    ) {
         val activePet get() = pets.find { it.active }
     }
 
-    data class Pet(val type: String = "", val active: Boolean = false, val tier: String = "", val heldItem: String? = null)
+    data class PetCare(
+        @SerializedName("pet_types_sacrificed") val petTypesSacrificed: List<String> = emptyList()
+    )
+
+    data class Pet(
+        val uuid: UUID? = null,
+        val uniqueId: UUID? = null,
+        val type: String = "",
+        val exp: Double = 0.0,
+        val active: Boolean = false,
+        val tier: String = "",
+        val heldItem: String? = null,
+        val candyUsed: Int = 0,
+        val skin: String? = null
+    ) {
+        val rarity by lazy { SkyBlockRarity.entries.find { it.name == tier } ?: SkyBlockRarity.COMMON }
+    }
 
     data class AccessoryBagStorage(
         @SerializedName("highest_magical_power") val highestMP: Long = 0,
@@ -86,11 +173,38 @@ data class SkyblockResponse(
         @SerializedName("inv_contents") val invContents: InventoryContents = InventoryContents(),
         @SerializedName("ender_chest_contents") val eChestContents: InventoryContents = InventoryContents(),
         @SerializedName("backpack_contents") val backpackContents: Map<String, InventoryContents> = emptyMap(),
-        @SerializedName("inv_armor") val invArmor: InventoryContents = InventoryContents()
-    )
+        @SerializedName("inv_armor") val invArmor: InventoryContents = InventoryContents(),
+        @SerializedName("wardrobe_contents") val wardrobeContents: InventoryContents = InventoryContents(),
+        @SerializedName( "wardrobe_equipped_slot") val wdEquipped: Int = 0,
+        @SerializedName("equipment_contents") val equipment: InventoryContents = InventoryContents(),
+        @SerializedName("personal_vault_contents") val personalVault: InventoryContents = InventoryContents(),
+        @SerializedName("bag_contents") val bags: BagContents = BagContents(),
+        @SerializedName("sacks_counts") val sacks: Map<String, Long> = emptyMap()
+    ) {
+        val enderChestPages get() = eChestContents.items().chunked(45)
+        val invAndHotbar get() = invContents.items().take(9) to invContents.items().drop(9)
 
+        val fullWardrobe get() = wardrobeContents.items().toMutableList().apply {
+            if (isEmpty() || wdEquipped <= 0) return@apply
+
+            invArmor.items().reversed().forEachIndexed { row, armorPiece ->
+                val slotIdx = (((wdEquipped - 1) / 9) * 36) + (row * 9) + ((wdEquipped - 1) % 9)
+                if (slotIdx < size && !armorPiece.isEmpty) this[slotIdx] = armorPiece
+            }
+        }
+    }
+
+    data class BagContents(
+        @SerializedName("talisman_bag") val talismanBag: InventoryContents = InventoryContents(),
+        @SerializedName("quiver") val quiver: InventoryContents = InventoryContents(),
+        @SerializedName("fishing_bag") val fishingBag: InventoryContents = InventoryContents(),
+        @SerializedName("potion_bag") val potionBag: InventoryContents = InventoryContents(),
+    ) {
+        val accessoryBagPages get() = talismanBag.items().chunked(45)
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
     data class InventoryContents(val type: Int? = null, val data: String = "") {
-        @OptIn(ExperimentalEncodingApi::class)
         val itemStacks: List<ItemData?> get() = with(data) {
             if (isEmpty()) return emptyList()
             val nbtCompound = NbtIo.readCompressed(Base64.decode(this).inputStream(), NbtAccounter.unlimitedHeap())
@@ -102,10 +216,20 @@ data class SkyblockResponse(
                 val display = tag.get("display")?.asCompound()?.get() ?: return@map null
                 val name = display.get("Name")?.asString()?.get() ?: ""
                 val lore = display.get("Lore")?.asList()?.get()?.mapNotNull { it.asString().getOrNull() } ?: emptyList()
+
                 ItemData(name, id, lore)
+            }
+        }
+
+        fun items(): List<ItemStack> = with(data) {
+            if (isEmpty()) return emptyList()
+            val nbtCompound = NbtIo.readCompressed(Base64.decode(this).inputStream(), NbtAccounter.unlimitedHeap())
+            val itemNBTList = nbtCompound.getList("i").getOrNull() ?: return emptyList()
+            itemNBTList.mapNotNull {
+               runCatching { it.legacyStack() }.getOrDefault(ItemStack.EMPTY)
             }
         }
     }
 
-    data class ItemData(val name: String, val id: String, val lore: List<String>)
+    data class ItemData(val name: String, val id: String, val lore: List<String>, )
 }

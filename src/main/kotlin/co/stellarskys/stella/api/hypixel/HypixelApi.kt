@@ -15,8 +15,8 @@ import kotlin.jvm.optionals.getOrNull
 
 @Module
 object HypixelApi {
-    private val UUID2NameCache = mutableMapOf<String, String>()
-    private val Name2UUIDCache = mutableMapOf<String, String>()
+    private val UUID2NameCache = object : LinkedHashMap<String, String>(64, 0.75f, true) { override fun removeEldestEntry(eldest: Map.Entry<String, String>) = size > 512 }
+    private val Name2UUIDCache = object : LinkedHashMap<String, String>(64, 0.75f, true) { override fun removeEldestEntry(eldest: Map.Entry<String, String>) = size > 512 }
 
     data class MojangProfile(val name: String, val id: String)
 
@@ -45,7 +45,7 @@ object HypixelApi {
     fun fetchSkyblockProfile(
         uuid: String,
         cacheMs: Long = 300_000L,
-        force: Boolean = false, // New parameter
+        force: Boolean = false,
         onResult: (SkyblockResponse.SkyblockMember?) -> Unit
     ) {
         if (!force) {

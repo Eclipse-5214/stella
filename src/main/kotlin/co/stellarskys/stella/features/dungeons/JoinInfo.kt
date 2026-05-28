@@ -16,7 +16,7 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 @Module
-object JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
+object  JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
     private val JoinRegex = "Party Finder > (\\w+) joined the dungeon group!".toRegex()
 
     override fun initialize() {

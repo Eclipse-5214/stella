@@ -1,5 +1,6 @@
 package co.stellarskys.stella.api.handlers
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
 import net.minecraft.network.chat.Component
@@ -29,6 +30,11 @@ object Signal {
     @JvmStatic
     fun fakeMessage(message: String) {
         fakeMessage(Component.literal(message))
+    }
+
+    @JvmStatic
+    fun modMessage(message: String) {
+        fakeMessage("${Stella.PREFIX}§r $message")
     }
 
     @JvmStatic
@@ -75,4 +81,6 @@ object Signal {
         this.withStyle{ it.withColor(textColor) }
         return this
     }
+
+    fun MutableComponent.chat() { fakeMessage(this) }
 }

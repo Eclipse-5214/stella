@@ -44,7 +44,7 @@ object HUDManager {
     }
 
     fun saveAllLayouts() {
-        layoutStore.updateAndSave {
+        layoutStore.update {
             elements.forEach { (id, element) ->
                 this[id] = HudLayoutData(element.x, element.y, element.scale)
             }

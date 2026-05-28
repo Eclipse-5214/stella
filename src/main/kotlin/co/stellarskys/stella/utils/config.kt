@@ -2,14 +2,22 @@ package co.stellarskys.stella.utils
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.config.core.Config
+import co.stellarskys.stella.api.handlers.Signal
+import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
-import co.stellarskys.stella.features.secrets.utils.RouteRecorder
-import co.stellarskys.stella.features.secrets.utils.RouteRegistry
+import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
+import co.stellarskys.stella.features.secrets.utils.routes.RouteRegistry
 import co.stellarskys.stella.hud.HUDEditor
-import net.minecraft.util.Util
 import java.awt.Color
 import java.net.URI
+
+//? if <= 1.21.10 {
+import net.minecraft.Util
+//?} else {
+ /*import net.minecraft.util.Util
+*///?}
+
 
 val config = Config(Stella.NAMESPACE) {
     category("General") {
@@ -679,6 +687,11 @@ val config = Config(Stella.NAMESPACE) {
                 default = Color(107, 58, 17, 255)
             }
             colorpicker {
+                configName = "rareRoomColor"
+                name = "Rare"
+                default = Color(107, 58, 17, 255)
+            }
+            colorpicker {
                 configName = "puzzleRoomColor"
                 name = "Puzzle"
                 default = Color(117, 0, 133, 255)
@@ -787,6 +800,13 @@ val config = Config(Stella.NAMESPACE) {
     category("Secrets") {
         subcategory("Waypoints", "secretWaypoints", "Renders Secret Waypoints") {
             toggle {
+                configName = "secretWaypoints.missingRoute"
+                name = "with routes"
+                description = "Renders waypoints in rooms without routes"
+                shouldShow { settings -> settings["secretRoutes"] as Boolean }
+            }
+            
+            toggle {
                 configName = "secretWaypoints.text"
                 name = "Waypoint Text"
                 description = "Renders Secret Waypoints text"
@@ -836,6 +856,13 @@ val config = Config(Stella.NAMESPACE) {
                 description = "Highlight color for Chest waypoints"
                 default = Color(255, 255, 0, 255) // yellow
             }
+
+            colorpicker {
+                configName = "secretWaypointColor.lever"
+                name = "Lever Color"
+                description = "Highlight color for Lever waypoints"
+                default = Color(0, 255, 255, 255) // cyan
+            }
         }
 
         subcategory("Routes","secretRoutes", "Enable rendering of route waypoints.") {
@@ -863,10 +890,28 @@ val config = Config(Stella.NAMESPACE) {
             button {
                 configName = "secretRoutes.reload"
                 name = "Reload Routes"
-                description = "reloads the secret routes from the config file"
+                description = "Reloads the secret routes from the config file"
 
                 onclick {
                     RouteRegistry.reload()
+                }
+            }
+
+            button {
+                configName = "secretRoutes.update"
+                name = "Update Routes"
+                description = "Updates the secret routes from ether"
+
+                onclick {
+                    Signal.fakeMessage("${Stella.PREFIX} §bStarting redownload...")
+                    RouteRegistry.redownload { success ->
+                        if (success) {
+                            RouteRegistry.reload()
+                            Signal.fakeMessage("${Stella.PREFIX} §aSuccessfully updated routes!")
+                        } else {
+                            Signal.fakeMessage("${Stella.PREFIX} §cFailed to download routes. Check your internet or GitHub Pages status.")
+                        }
+                    }
                 }
             }
 
@@ -874,12 +919,21 @@ val config = Config(Stella.NAMESPACE) {
                 configName = "secretRoutes.nextStep"
                 name = "Next Step Bind"
                 description = "Goes to the next step of a route"
+                default = Zenith.Keys.R_BRACKET
             }
 
             keybind {
                 configName = "secretRoutes.lastStep"
                 name = "Last Step Bind"
                 description = "Goes to the last step of a route"
+                default = Zenith.Keys.L_BRACKET
+            }
+
+            keybind {
+                configName = "secretRoutes.addCustom"
+                name = "Custom Waypoint Bind"
+                description = "Adds a custom waypoint to the route"
+                default = Zenith.Keys.C
             }
         }
 
@@ -889,6 +943,13 @@ val config = Config(Stella.NAMESPACE) {
                 name = "Waypoint Text"
                 description = "Renders Secret Routes Waypoints text"
                 default = true
+            }
+
+            toggle {
+                configName = "secretRoutes.startEsp"
+                name = "Start ESP"
+                description = "Renders start text through walls"
+                default = false
             }
 
             slider {
@@ -1204,6 +1265,28 @@ val config = Config(Stella.NAMESPACE) {
 
         subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
         subcategory("Sword Blocking", "swordBlocking", "Enables 1.8.9 style sword blocking")
+
+        subcategory("Profile Viewer", "profileViewer", "Super minimal profile viewer") {
+            toggle {
+                configName = "profileViewer.pv"
+                name = "PV command"
+                description = "use /pv as an alias to /sa pv"
+            }
+
+            toggle {
+                configName = "profileViewer.showRarity"
+                name = "Show Rarity"
+                description = "Shows item rarity as the slot background in the inventories"
+                default = true
+            }
+
+            toggle {
+                configName = "profileViewer.overflow"
+                name = "Overflow Skills"
+                description = "Shows overflow levels for skills on the main page"
+                default = false
+            }
+        }
 
         /*
         subcategory("Custom Nametags") {

@@ -4,7 +4,7 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.generated.GeneratedFeatureRegistry
+import co.stellarskys.stella.generated.ModuleList
 import co.stellarskys.stella.utils.config
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import java.util.concurrent.ConcurrentHashMap
@@ -44,8 +44,8 @@ object FeatureManager {
     fun loadFeatures() {
         val startTime = System.currentTimeMillis()
 
-        val modules = GeneratedFeatureRegistry.modules
-        val commands = GeneratedFeatureRegistry.commands
+        val modules = ModuleList.modules
+        val commands = ModuleList.commands
 
         for (module in modules) {
             runCatching {
@@ -60,6 +60,7 @@ object FeatureManager {
 
         for (command in commands) {
             runCatching {
+                if (!command.isEnabled()) return@runCatching
                 ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
                     command.register(dispatcher)
                 }
@@ -85,9 +86,13 @@ object FeatureManager {
             if (feature.dungeonFloors.isNotEmpty()) dungeonFloorFeatures.add(feature)
             if (feature.skyblockOnly) skyblockFeatures.add(feature)
 
-            feature.initialize()
-            feature.configName?.let { registerListener(it, feature) }
-            feature.update()
+            runCatching {
+                feature.initialize()
+                feature.configName?.let { registerListener(it, feature) }
+                feature.update()
+            }.onFailure { e ->
+                Stella.LOGGER.error("Error initializing feature ${feature::class.simpleName}: $e")
+            }
         }
 
         pendingFeatures.clear()

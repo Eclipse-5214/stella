@@ -1,4 +1,4 @@
-package co.stellarskys.stella.features.secrets.utils
+package co.stellarskys.stella.features.secrets.utils.routes
 
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render3D
@@ -10,6 +10,7 @@ import java.awt.Color
 object RoutePlayer {
     val text by config.property<Boolean>("secretRoutes.text")
     val textScale by config.property<Float>("secretRoutes.textScale")
+    val startEsp by config.property<Boolean>("secretRoutes.startEsp")
 
     fun renderRoute(data: StepData, firstStep: Boolean) {
         val room = Dungeon.currentRoom ?: return
@@ -34,7 +35,7 @@ object RoutePlayer {
         if (firstStep) {
             val startPoint = room.getRealCoord(data.line.first())
             val startPos = Vec3(startPoint.center.x, startPoint.center.y + 1, startPoint.center.z)
-            Render3D.drawText("Start!", startPos, bgBox = true)
+            Render3D.drawText("Start!", startPos, bgBox = true, depth = !startEsp)
         }
 
         data.line.zipWithNext { a, b ->
@@ -66,7 +67,7 @@ object RoutePlayer {
 
     private fun renderWaypoint(waypoint: WaypointData, room: Room, name: Boolean = true){
         val realPos = room.getRealCoord(waypoint.pos)
-        Render3D.outlineBlock(realPos, waypoint.type.color, 3f, true)
-        if (name && text) Render3D.drawText(waypoint.type.label, realPos.center, scale = textScale, depth = false)
+        Render3D.outlineBlock(realPos, waypoint.col, 3f, waypoint.dep)
+        if (name && text) Render3D.drawText(waypoint.label, realPos.center, scale = textScale, depth = false)
     }
 }

@@ -6,10 +6,11 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
+import com.google.devtools.ksp.symbol.KSValueParameter
 
-class FeatureProcessor(
-    private val codeGenerator: CodeGenerator
-) : SymbolProcessor {
+class FeatureProcessor(private val codeGenerator: CodeGenerator) : SymbolProcessor {
     private var invoked = false
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -17,21 +18,39 @@ class FeatureProcessor(
 
         val modules = resolver.getSymbolsWithAnnotation("co.stellarskys.stella.annotations.Module")
         val commands = resolver.getSymbolsWithAnnotation("co.stellarskys.stella.annotations.Command")
+        val skips = resolver.getSymbolsWithAnnotation("co.stellarskys.stella.annotations.Skip")
 
-        generateRegistry(modules, commands)
+        generateRegistry(modules, commands, skips)
         invoked = true
 
         return emptyList()
     }
 
-    private fun generateRegistry(
-        modules: Sequence<KSAnnotated>,
-        commands: Sequence<KSAnnotated>
-    ) {
+    private fun generateRegistry(modules: Sequence<KSAnnotated>, commands: Sequence<KSAnnotated>, skips: Sequence<KSAnnotated>) {
+        val moduleDecls = modules.filterIsInstance<KSClassDeclaration>().toList()
+        val commandDecls = commands.filterIsInstance<KSClassDeclaration>().toList()
+        val skipDecls = skips.filterIsInstance<KSDeclaration>().toList()
+
+        val skipTypeNames = skipDecls.mapNotNull { symbol ->
+            when (symbol) {
+                is KSPropertyDeclaration -> symbol.type.resolve().declaration.qualifiedName?.asString()
+                is KSClassDeclaration -> symbol.qualifiedName?.asString()
+                is KSValueParameter -> symbol.type.resolve().declaration.qualifiedName?.asString()
+                else -> null
+            }
+        }.distinct()
+
+        val sourceFiles = (moduleDecls + commandDecls + skipDecls)
+            .mapNotNull { it.containingFile }
+            .distinct()
+            .toTypedArray()
+
+        val deps = if (sourceFiles.isEmpty()) Dependencies.ALL_FILES else Dependencies(true, *sourceFiles)
+
         val file = codeGenerator.createNewFile(
-            Dependencies.ALL_FILES,
+            deps,
             "co.stellarskys.stella.generated",
-            "GeneratedFeatureRegistry"
+            "ModuleList"
         )
 
         file.writer().use { out ->
@@ -39,21 +58,25 @@ class FeatureProcessor(
             out.appendLine()
             out.appendLine("import co.stellarskys.stella.api.handlers.Atlas")
             out.appendLine()
-            out.appendLine("object GeneratedFeatureRegistry {")
+            out.appendLine("object ModuleList {")
             out.appendLine("  val modules: List<Class<*>> = listOf(")
 
-            modules.forEach { sym ->
-                val name = (sym as KSClassDeclaration).qualifiedName!!.asString()
-                out.appendLine("    $name::class.java,")
+            moduleDecls.forEach { decl ->
+                out.appendLine("    ${decl.qualifiedName!!.asString()}::class.java,")
             }
             out.appendLine("  )")
             out.appendLine("  val commands: List<Atlas> = listOf(")
 
-            commands.forEach { sym ->
-                val name = (sym as KSClassDeclaration).qualifiedName!!.asString()
-                out.appendLine("    $name,")
+            commandDecls.forEach { decl ->
+                out.appendLine("    ${decl.qualifiedName!!.asString()},")
             }
 
+            out.appendLine("  )")
+            out.appendLine("  val skippedTypes: List<Class<*>> = listOf(")
+
+            skipTypeNames.forEach { type ->
+                out.appendLine("    $type::class.java,")
+            }
             out.appendLine("  )")
             out.appendLine("}")
         }

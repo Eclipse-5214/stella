@@ -1,13 +1,13 @@
 package co.stellarskys.stella.api.config.ui.elements
 
 import co.stellarskys.stella.utils.Utils
-import co.stellarskys.stella.api.animation.AnimType
+import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.config.core.Button
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
-import co.stellarskys.stella.api.config.ui.base.BaseElement
-import net.minecraft.client.gui.GuiGraphicsExtractor
+import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import net.minecraft.client.gui.GuiGraphics
 import java.awt.Color
 
 class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
@@ -24,7 +24,7 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): BaseElement() {
     }
 
     override fun render(
-        context: GuiGraphicsExtractor,
+        context: GuiGraphics,
         mouseX: Float,
         mouseY: Float,
         delta: Float

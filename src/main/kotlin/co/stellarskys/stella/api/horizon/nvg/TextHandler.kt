@@ -1,10 +1,11 @@
-package co.stellarskys.stella.api.config.ui.base
+package co.stellarskys.stella.api.horizon.nvg
 
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.nvg.Font
 import co.stellarskys.stella.api.zenith.client
-import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.gui.GuiGraphics
+import kotlin.math.abs
 
 /*
  * Adapted from TextInputHandler.kt in OdinFabric
@@ -45,12 +46,18 @@ class TextHandler(
     private val history = mutableListOf<String>()
     private var historyIndex = -1
 
+    private var cachedPosText = ""
+    private var cachedPosCaret = -1
+    private var cachedPosSelection = -1
+    private var cachedPosFontSize = -1f
+    private var cachedPosFont: Font? = null
+
     init {
         saveState()
         updateCaretPosition()
     }
 
-    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
+    override fun render(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
         if (dragging && isFocused) {
             caretFromMouse(mouseX)
             updateCaretPosition()
@@ -69,7 +76,7 @@ class TextHandler(
 
         if (selectionWidth != 0f) {
             val selX = nvg.textWidth(text.substring(0, minOf(selection, caret)), fontSize, font)
-            nvg.rect(renderX + selX, textY, kotlin.math.abs(selectionWidth), fontSize, 0x665555FF)
+            nvg.rect(renderX + selX, textY, abs(selectionWidth), fontSize, 0x665555FF)
         }
 
         nvg.text(text, renderX, textY, fontSize, textColor, font)
@@ -141,9 +148,18 @@ class TextHandler(
     }
 
     fun updateCaretPosition() {
-        caretX = nvg.textWidth(text.substring(0, caret), fontSize, font)
-        val anchorX = nvg.textWidth(text.substring(0, selection), fontSize, font)
-        selectionWidth = caretX - anchorX
+        val curText = text
+        if (curText != cachedPosText || caret != cachedPosCaret || selection != cachedPosSelection
+            || fontSize != cachedPosFontSize || font !== cachedPosFont) {
+            cachedPosText = curText
+            cachedPosCaret = caret
+            cachedPosSelection = selection
+            cachedPosFontSize = fontSize
+            cachedPosFont = font
+            caretX = nvg.textWidth(curText.substring(0, caret), fontSize, font)
+            val anchorX = nvg.textWidth(curText.substring(0, selection), fontSize, font)
+            selectionWidth = caretX - anchorX
+        }
 
         if (caretX - textOffset > width) textOffset = caretX - width
         if (caretX - textOffset < 0f) textOffset = caretX
@@ -182,7 +198,7 @@ class TextHandler(
         } else 0f
 
         val localX = mouseX - (absoluteX - textOffset + centeringOffset + textSidePadding)
-        caret = (0..text.length).minByOrNull { kotlin.math.abs(nvg.textWidth(text.substring(0, it), fontSize, font) - localX) } ?: 0
+        caret = (0..text.length).minByOrNull { abs(nvg.textWidth(text.substring(0, it), fontSize, font) - localX) } ?: 0
     }
 
     private fun saveState() {

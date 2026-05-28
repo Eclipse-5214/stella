@@ -1,4 +1,4 @@
-package co.stellarskys.stella.features.secrets.utils
+package co.stellarskys.stella.features.secrets.utils.routes
 
 import co.stellarskys.stella.features.secrets.SecretRoutes
 import java.awt.Color
@@ -46,6 +46,12 @@ enum class WaypointType {
             START -> ""
             CUSTOM -> name
         }
+
+    val depth get() = when (this) {
+        START -> !RoutePlayer.startEsp
+        CHEST, ITEM, ESSENCE, BAT -> false
+        else -> true
+    }
 
     companion object {
         fun fromString(value: String?): WaypointType? {

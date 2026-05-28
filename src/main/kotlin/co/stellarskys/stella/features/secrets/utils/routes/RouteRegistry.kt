@@ -1,10 +1,13 @@
-package co.stellarskys.stella.features.secrets.utils
+package co.stellarskys.stella.features.secrets.utils.routes
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.api.handlers.Quasar
+import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.secrets.SecretRoutes
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
+import kotlinx.coroutines.launch
 import net.minecraft.core.BlockPos
 import java.awt.Color
 import java.io.File
@@ -12,11 +15,58 @@ import java.io.File
 @Module
 object RouteRegistry {
     private val ROUTES_FILE get() = File("${Stella.PATH}/routes/${SecretRoutes.routeFile}")
+    private val BASE_URL = "https://ether.stellarskys.co/routes"
     private val gson = GsonBuilder().disableHtmlEscaping().create()
     private var routeFile: RouteFile = RouteFile()
 
     init {
+        Stella.scope.launch {
+            if (!ROUTES_FILE.exists()) {
+                Stella.LOGGER.info("RouteRegistry: Local file missing, attempting download...")
+                tryDownloadAndLoad()
+            } else {
+                load()
+            }
+        }
+    }
+
+    private suspend fun tryDownloadAndLoad() {
+        val primaryUrl = "$BASE_URL/${SecretRoutes.routeFile}"
+        val result = Quasar.fetchString(primaryUrl)
+
+        result.onSuccess { content ->
+            saveDownloadedContent(content)
+            Stella.LOGGER.info("RouteRegistry: Downloaded primary routes: ${SecretRoutes.routeFile}")
+        }.onFailure {
+            Stella.LOGGER.warn("RouteRegistry: Primary download failed, trying default.json...")
+
+            val fallbackUrl = "$BASE_URL/default.json"
+            Quasar.fetchString(fallbackUrl).onSuccess { content ->
+                saveDownloadedContent(content)
+                Stella.LOGGER.info("RouteRegistry: Downloaded fallback routes: default.json")
+            }.onFailure {
+                Stella.LOGGER.error("RouteRegistry: All downloads failed. Creating blank file.")
+            }
+        }
+    }
+
+    private fun saveDownloadedContent(content: String) {
+        ROUTES_FILE.parentFile.mkdirs()
+        ROUTES_FILE.writeText(content)
         load()
+    }
+
+    fun redownload(onComplete: (Boolean) -> Unit = {}) {
+        Stella.scope.launch {
+            val url = "$BASE_URL/${SecretRoutes.routeFile}"
+            Quasar.fetchString(url).onSuccess { content ->
+                saveDownloadedContent(content)
+                client.execute { onComplete(true) }
+            }.onFailure {
+                Stella.LOGGER.error("RouteRegistry: Redownload failed - ${it.message}")
+                client.execute { onComplete(false) }
+            }
+        }
     }
 
     fun load() {

@@ -2,10 +2,13 @@ package co.stellarskys.stella.api.config.ui
 
 import co.stellarskys.stella.hud.HUDEditor
 import co.stellarskys.stella.utils.Utils
-import co.stellarskys.stella.api.animation.AnimType
+import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.config.core.*
 import co.stellarskys.stella.api.config.ui.base.*
 import co.stellarskys.stella.api.config.ui.elements.*
+import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import co.stellarskys.stella.api.horizon.nvg.ParentElement
+import co.stellarskys.stella.api.horizon.nvg.TextHandler
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.api.nvg.Gradient
 import co.stellarskys.stella.api.nvg.NVGRenderer
@@ -69,6 +72,11 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         tooltip = Tooltip()
         searchQuery = ""
         super.onInitialize(width, height)
+    }
+
+    override fun onScreenClose() {
+        imageCacheMap.clear()
+        super.onScreenClose()
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -321,7 +329,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     companion object {
         val caretImage = NVGRenderer.createImage( "/assets/stella/logos/dropdown.svg")
         val pencilImage = NVGRenderer.createImage( "/assets/stella/logos/editLocations.svg")
-        val UI_SCALE get() = (Zenith.Res.windowWidth.toFloat() / 1920f).coerceAtLeast(0.5f)
+        val UI_SCALE get() = minOf(Zenith.Res.windowWidth.toFloat() / 1920f, Zenith.Res.windowHeight.toFloat() / 1080f).coerceAtLeast(0.5f)
         lateinit var tooltip: Tooltip
             private set
     }

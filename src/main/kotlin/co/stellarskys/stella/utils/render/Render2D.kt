@@ -2,50 +2,65 @@ package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
+import co.stellarskys.stella.api.nvg.Batcher
 import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.nvg.NVGPIPRenderer
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.ChatFormatting
-import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.gui.components.PlayerFaceExtractor
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.components.PlayerFaceRenderer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.resources.DefaultPlayerSkin
-import net.minecraft.resources.Identifier
+import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.ItemStack
 import org.joml.Matrix3x2f
 import java.awt.Color
 import java.util.Optional
 import java.util.UUID
 import tech.thatgravyboat.skyblockapi.platform.PlayerSkin
+import tech.thatgravyboat.skyblockapi.platform.pushPop
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.platform.textureUrl
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
+import tech.thatgravyboat.skyblockapi.utils.text.TextUtils.splitLines
 
 object Render2D {
     private val textureCache = mutableMapOf<UUID, PlayerSkin>()
     private var lastCacheClear = Chronos.zero
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
 
-    fun drawImage(ctx: GuiGraphicsExtractor, image: Identifier?, x: Int, y: Int, width: Int, height: Int) {
+    fun drawImage(ctx: GuiGraphics, image: ResourceLocation?, x: Int, y: Int, width: Int, height: Int) {
         if (image == null) return
         ctx.blit(RenderPipelines.GUI_TEXTURED, image, x, y, 0f, 0f, width, height, width, height, width, height)
     }
 
     @JvmOverloads
-    fun drawRect(ctx: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
+    fun drawRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, color: Color = Color.WHITE) {
         ctx.fill(RenderPipelines.GUI, x, y, x + width, y + height, color.rgb)
     }
 
     @JvmOverloads
-    fun drawString(ctx: GuiGraphicsExtractor, str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
+    fun drawHollowRect(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, thickness: Int, color: Color = Color.WHITE) {
+        if (thickness <= 0) return
+        val rgb = color.rgb
+        ctx.fill(RenderPipelines.GUI, x, y, x + width, y + thickness, rgb)
+        ctx.fill(RenderPipelines.GUI, x, y + height - thickness, x + width, y + height, rgb)
+        ctx.fill(RenderPipelines.GUI, x, y + thickness, x + thickness, y + height - thickness, rgb)
+        ctx.fill(RenderPipelines.GUI, x + width - thickness, y + thickness, x + width, y + height - thickness, rgb)
+    }
+
+    @JvmOverloads
+    fun drawString(ctx: GuiGraphics, str: String, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
         val matrices = ctx.pose()
         if (scale != 1f) {
             matrices.pushMatrix()
             matrices.scale(scale, scale)
         }
 
-        ctx.text(
+        ctx.drawString(
             client.font,
             str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
             x,
@@ -58,14 +73,34 @@ object Render2D {
     }
 
     @JvmOverloads
-    fun drawString(ctx: GuiGraphicsExtractor, str: String, x: Int, y: Int, scale: Float = 1f, color: Color, shadow: Boolean = true) {
+    fun drawString(ctx: GuiGraphics, str: Component, x: Int, y: Int, scale: Float = 1f, shadow: Boolean = true) {
         val matrices = ctx.pose()
         if (scale != 1f) {
             matrices.pushMatrix()
             matrices.scale(scale, scale)
         }
 
-        ctx.text(
+        ctx.drawString(
+            client.font,
+            str,
+            x,
+            y,
+            -1,
+            shadow
+        )
+
+        if (scale != 1f) matrices.popMatrix()
+    }
+
+    @JvmOverloads
+    fun drawString(ctx: GuiGraphics, str: String, x: Int, y: Int, scale: Float = 1f, color: Color, shadow: Boolean = true) {
+        val matrices = ctx.pose()
+        if (scale != 1f) {
+            matrices.pushMatrix()
+            matrices.scale(scale, scale)
+        }
+
+        ctx.drawString(
             client.font,
             str.replace(formattingRegex, "${ChatFormatting.PREFIX_CODE}"),
             x,
@@ -77,15 +112,16 @@ object Render2D {
         if (scale != 1f) matrices.popMatrix()
     }
 
-    fun renderItem(context: GuiGraphicsExtractor, item: ItemStack, x: Float, y: Float, scale: Float) {
+    fun renderItem(context: GuiGraphics, item: ItemStack, x: Float, y: Float, scale: Float) {
         context.pose().pushMatrix()
         context.pose().translate(x, y)
         context.pose().scale(scale, scale)
-        context.item(item, 0, 0)
+        context.renderItem(item, 0, 0)
+        context.renderItemDecorations(client.font, item, 0, 0)
         context.pose().popMatrix()
     }
 
-    fun drawPlayerHead(context: GuiGraphicsExtractor, x: Int, y: Int, size: Int, uuid: UUID) {
+    fun drawPlayerHead(context: GuiGraphics, x: Int, y: Int, size: Int, uuid: UUID) {
         if (lastCacheClear.since.millis > 300000L) {
             textureCache.clear()
             lastCacheClear = Chronos.now
@@ -100,7 +136,7 @@ object Render2D {
         }
 
         textures.textureUrl
-        PlayerFaceExtractor.extractRenderState(context, textures, x, y, size)
+        PlayerFaceRenderer.draw(context, textures, x, y, size)
     }
 
 
@@ -109,12 +145,22 @@ object Render2D {
         return lines.maxOf { client.font.width(it.stripColor()) }
     }
 
+    fun MutableComponent.width(): Int {
+        val lines = splitLines()
+        return lines.maxOf { client.font.width(it)}
+    }
+
     fun String.height(): Int {
         val lineCount = count { it == '\n' } + 1
         return client.font.lineHeight * lineCount
     }
 
-    fun GuiGraphicsExtractor.drawNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
+    fun MutableComponent.height(): Int {
+        val lineCount = this.string.count { it == '\n' } + 1
+        return client.font.lineHeight * lineCount
+    }
+
+    fun GuiGraphics.drawNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
         val snapshot = Matrix3x2f(this.pose())
 
         NVGPIPRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
@@ -132,5 +178,31 @@ object Render2D {
 
             block(snapshot)
         }
+    }
+
+    fun GuiGraphics.batchNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) { Batcher.queue(this, scaled, block) }
+    fun GuiGraphics.flushNVG() { Batcher.flush(this) }
+
+    fun renderScrolled(ctx: GuiGraphics, x: Int, y: Int, width: Int, height: Int, scrollOffset: Float, block: () -> Unit) {
+        ctx.enableScissor(x, y, x + width, y + height)
+        ctx.pushPop {
+            ctx.pose().translate(x.toFloat(), y.toFloat())
+            ctx.pose().translate(0f, scrollOffset)
+            block()
+        }
+
+        ctx.disableScissor()
+    }
+
+    fun calculateScroll(currentTarget: Float, amount: Float, totalHeight: Int, viewportHeight: Int, speed: Float = 20f): Float {
+        val maxScroll = (totalHeight - viewportHeight).toFloat().coerceAtLeast(0f)
+        return (currentTarget + amount * speed).coerceIn(-maxScroll, 0f)
+    }
+
+    fun drawScrollbar(ctx: GuiGraphics, x: Int, y: Int, viewportHeight: Int, scrollOffset: Float, totalHeight: Int, color: Color) {
+        if (totalHeight <= viewportHeight) return
+        val barHeight = (viewportHeight.toFloat() / totalHeight) * viewportHeight
+        val barY = (-scrollOffset / totalHeight) * viewportHeight
+        drawRect(ctx, x, y + barY.toInt(), 1, barHeight.toInt(), color)
     }
 }

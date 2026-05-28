@@ -61,6 +61,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
 
     // map colors
     val NormalColor by config.property<Color>("normalRoomColor")
+    val RareColor by config.property<Color>("rareRoomColor")
     val PuzzleColor by config.property<Color>("puzzleRoomColor")
     val TrapColor by config.property<Color>("trapRoomColor")
     val MinibossColor by config.property<Color>("minibossRoomColor")
@@ -85,11 +86,11 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     val dontShowOwn by config.property<Boolean>("dontShowOwn")
 
     // other
-    val hiddenRooms = false
-    val tint = 0.7
+    var hiddenRooms = false
+    var tint = 0.7
 
     override fun initialize() {
-        HUDManager.registerCustom(name, 148, 148, this::hudEditorRender)
+        HUDManager.registerCustom(name, 148, 148, this::hudEditorRender, "mapEnabled")
 
         on<GuiEvent.RenderHUD> { event ->
             renderMap(event.context)

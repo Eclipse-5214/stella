@@ -18,6 +18,8 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.SkullBlockEntity
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonAPI
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
+import tech.thatgravyboat.skyblockapi.api.data.MayorPerks
+import tech.thatgravyboat.skyblockapi.api.location.LocationAPI
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.platform.properties
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
@@ -35,6 +37,7 @@ object Dungeon {
 
     // Regex patterns for chat parsing
     private val WATCHER_PATTERN = Regex("""\[BOSS] The Watcher: That will be enough for now\.""")
+    private val DUNGEON_START_PATTERN = "[NPC] Mort: Good luck."
     private val DUNGEON_COMPLETE_PATTERN = Regex("""^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$""")
     private val ROOM_SECRETS_PATTERN = Regex("""\b([0-9]|10)/([0-9]|10)\s+Secrets\b""")
 
@@ -57,13 +60,14 @@ object Dungeon {
     val floor: DungeonFloor? get() = DungeonAPI.dungeonFloor
     val floorNumber: Int? get() = floor?.floorNumber
     val inBoss: Boolean get() = DungeonAPI.inBoss
+    val inDungeon: Boolean get() = LocationAPI.island == SkyBlockIsland.THE_CATACOMBS
 
     // HUD lines
     var mapLine1 = ""
     var mapLine2 = ""
 
     // Shortcuts
-    val players get() = DungeonPlayerManager.players
+    val players get() = DungeonPlayerManager.players.filterNotNull()
     val score get() = DungeonScore.score
 
     // Class Colors
@@ -114,9 +118,9 @@ object Dungeon {
 
         EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val msg = event.message.stripped
+            if (msg == DUNGEON_START_PATTERN) floor?.let { EventBus.post(DungeonEvent.Start(it)) }
             if (WATCHER_PATTERN.containsMatchIn(msg)) bloodDone = true
             if (DUNGEON_COMPLETE_PATTERN.containsMatchIn(msg)) {
-                DungeonPlayerManager.updateAllSecrets()
                 complete = true
                 floor?.let { EventBus.post(DungeonEvent.End(it)) }
             }
@@ -143,17 +147,7 @@ object Dungeon {
             val world = world ?: return@on
             val entity = world.getEntity(event.packet.itemId) as? ItemEntity ?: return@on
             val name = entity.item.displayName.stripped.drop(1).dropLast(1)
-
-            if (secretItems.contains(name)) {
-                EventBus.post(DungeonEvent.Secrets.Item(event.packet.itemId, entity))
-
-                currentRoom?.roomData?.secretCoords?.item?.find {
-                    Utils.calcDistance(
-                        currentRoom!!.getRealCoord(it.toBlockPos()),
-                        entity.blockPosition()
-                    ) < 25
-                }?.collected = true
-            }
+            if (secretItems.contains(name)) EventBus.post(DungeonEvent.Secrets.Item(event.packet.itemId, entity))
         }
 
         EventBus.on<PacketEvent.Sent>(SkyBlockIsland.THE_CATACOMBS) { event ->
@@ -163,35 +157,15 @@ object Dungeon {
             val blockState = world.getBlockState(pos)
 
             when (blockState.block) {
-                Blocks.CHEST, Blocks.TRAPPED_CHEST -> {
-                    EventBus.post(DungeonEvent.Secrets.Chest(blockState, pos))
-
-                    currentRoom?.roomData?.secretCoords?.chest?.find {
-                        currentRoom?.getRealCoord(it.toBlockPos()) == pos
-                    }?.collected = true
-                }
-                Blocks.LEVER -> {
-                    EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.LEVER, pos))
-                }
+                Blocks.CHEST, Blocks.TRAPPED_CHEST -> EventBus.post(DungeonEvent.Secrets.Chest(blockState, pos))
+                Blocks.LEVER -> EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.LEVER, pos))
                 else -> {
                     val entity = world.getBlockEntity(pos) ?: return@on
                     if (entity is SkullBlockEntity) {
                         val texture = entity.ownerProfile?.properties?.get("textures")?.firstOrNull()?.value
                         when (texture) {
-                            WITHER_ESSENCE_TEXTURE -> {
-                                EventBus.post(DungeonEvent.Secrets.Essence(entity, pos))
-
-                                currentRoom?.roomData?.secretCoords?.wither?.find {
-                                    currentRoom?.getRealCoord(it.toBlockPos()) == pos
-                                }?.collected = true
-                            }
-                            RED_SKULL_TEXTURE -> {
-                                EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.RED_SKULL, pos))
-
-                                currentRoom?.roomData?.secretCoords?.redstoneKey?.find {
-                                    currentRoom?.getRealCoord(it.toBlockPos()) == pos
-                                }?.collected = true
-                            }
+                            WITHER_ESSENCE_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Essence(entity, pos))
+                            RED_SKULL_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.RED_SKULL, pos))
                         }
                     }
                 }
@@ -201,16 +175,9 @@ object Dungeon {
         EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val entity = event.entity
             if (entity !is Bat) return@on
-            if (entity.maxHealth != 100f) return@on
+            if (entity.maxHealth != if(MayorPerks.DOUBLE_MOBS_HP.active) 200f else 100f) return@on
             val pos = entity.blockPosition()
             EventBus.post(DungeonEvent.Secrets.Bat(pos, entity))
-
-            currentRoom?.roomData?.secretCoords?.bat?.find {
-                Utils.calcDistance(
-                    currentRoom!!.getRealCoord(it.toBlockPos()),
-                    pos
-                ) < 100
-            }?.collected = true
         }
 
         RoomRegistry.loadFromRemote()
@@ -238,7 +205,6 @@ object Dungeon {
         DungeonPlayerManager.reset()
         DungeonScore.reset()
         MapUtils.reset()
-        RoomRegistry.resetSecrets()
     }
 
     /** Updates HUD lines for map overlay */
@@ -288,7 +254,7 @@ object Dungeon {
     fun getDoorAt(x: Int, z: Int) = getDoorAtComp(WorldScanUtils.realCoordToComponent(x, z))
 
     /** Adds a door to the map and tracks it as unique */
-    fun addDoor(door: co.stellarskys.stella.api.dungeons.map.Door) {
+    fun addDoor(door: Door) {
         val idx = getDoorIdx(door.getComp())
         if (idx in doors.indices) {
             doors[idx] = door

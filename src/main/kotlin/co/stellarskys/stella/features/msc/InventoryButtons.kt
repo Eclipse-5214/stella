@@ -9,6 +9,7 @@ import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.utils.config
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import kotlin.time.Duration.Companion.milliseconds
@@ -75,6 +76,7 @@ object InventoryButtons : Feature("buttons",true) {
             dungeonMenuPrefixes.any { title.startsWith(it) }
 
     private fun validScreen(screen: Screen): Boolean {
+        if (screen !is AbstractContainerScreen<*>) return false
         if (screen !is InventoryScreen && invOnly) return false
         if (screen.javaClass.simpleName in menueBlacklist) return false
         if (isTerm(screen.title.stripped) && hideInTerms) return false

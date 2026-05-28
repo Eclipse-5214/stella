@@ -14,7 +14,7 @@ object TeammateMissing: Feature("teammateMissing", island = SkyBlockIsland.THE_C
     override fun initialize() {
         on<ChatEvent.Receive> { event ->
             if(event.message.stripped != "Starting in 4 seconds.") return@on
-            val players = Dungeon.players.count { it != null }
+            val players = Dungeon.players.size
             if (players < 5) Utils.alert("§c$players/5 Players!", SoundEvents.NOTE_BLOCK_PLING.value())
         }
     }

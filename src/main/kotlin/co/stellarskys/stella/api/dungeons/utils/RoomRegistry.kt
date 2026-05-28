@@ -21,7 +21,7 @@ object RoomRegistry {
             }
 
             result.onFailure { error ->
-                Stella.LOGGER.info("RoomRegistry: Failed to load room data — ${error.message}")
+                Stella.LOGGER.warn("RoomRegistry: Failed to load room data — ${error.message}")
                 loadFromLocal()
             }
         }
@@ -37,7 +37,7 @@ object RoomRegistry {
             populateRooms(rooms)
             Stella.LOGGER.info("RoomRegistry: Loaded ${rooms.size} rooms from local config")
         }.onFailure {
-            Stella.LOGGER.info("RoomRegistry: Failed to load local room data — ${it.message}")
+            Stella.LOGGER.warn("RoomRegistry: Failed to load local room data — ${it.message}")
         }
     }
 
@@ -46,18 +46,6 @@ object RoomRegistry {
         for (room in rooms) {
             for (core in room.cores) {
                 byCore[core] = room
-            }
-        }
-    }
-
-    fun resetSecrets() {
-        allRooms.forEach { room ->
-            room.secretCoords?.let { coords ->
-                coords.redstoneKey.forEach { it.collected = false }
-                coords.wither.forEach { it.collected = false }
-                coords.bat.forEach { it.collected = false }
-                coords.item.forEach { it.collected = false }
-                coords.chest.forEach { it.collected = false }
             }
         }
     }

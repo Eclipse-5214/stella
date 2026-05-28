@@ -11,9 +11,15 @@ import co.stellarskys.stella.api.zenith.client
 import com.google.gson.*
 import java.awt.Color
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KProperty
 
-//Main config Shananagens
+/**
+ * Main configuration system for Stella.
+ * Handles the DSL building, serialization to JSON, and property delegation.
+ * * @param modID Unique identifier for the mod, used for the folder name.
+ * @param configPath Optional custom file path for the settings JSON.
+ */
 class Config(
     val modID: String,
     val configPath: File? = null,
@@ -22,8 +28,7 @@ class Config(
     @PublishedApi internal val valueCache = mutableMapOf<String, Any?>()
     private val elementMap = mutableMapOf<String, ConfigElement>()
     private val categories = mutableMapOf<String, ConfigCategory>()
-    private val listeners = mutableListOf<(String, Any?) -> Unit>()
-
+    private val listeners = CopyOnWriteArrayList<(String, Any?) -> Unit>()
     private var configUI: ConfigUI? = null
     private var loaded = false
     private var loading = false
@@ -55,6 +60,33 @@ class Config(
         valueCache[configName] = newValue
         listeners.forEach { it(configName, newValue) }
         configUI?.updateUI(this)
+    }
+
+    internal fun registerInternalElement(id: String, element: ConfigElement) {
+        elementMap[id] = element
+        if (!valueCache.containsKey(id)) {
+            valueCache[id] = element.value
+        }
+    }
+
+    /**
+     * Finds or creates a subcategory.
+     * If [category] is null, it searches existing ones by Name or ConfigID.
+     * If provided and not found, it creates a new box in that category.
+     */
+    fun subcategory(name: String, category: String? = null, configName: String = "", desc: String = ""): ConfigSubcategory {
+        for (cat in categories.values) {
+            cat.subcategories.values.find { it.configName == name }?.let { return it }
+            cat.subcategories[name]?.let { return it }
+        }
+
+        if (category == null) { error("Could not find subcategory '$name' and no category was provided to create it!") }
+        val cat = categories.getOrPut(category) { ConfigCategory(category, this) }
+        val sub = ConfigSubcategory(name, this, configName, desc)
+        cat.subcategories[name] = sub
+        if (configName.isNotBlank()) registerInternalElement(configName, sub)
+
+        return sub
     }
 
     private fun toJson() = JsonObject().apply {

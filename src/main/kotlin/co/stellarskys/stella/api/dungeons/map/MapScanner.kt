@@ -250,21 +250,22 @@ object MapScanner {
 
         players.forEach { player ->
             val alreadyCleared = player.getWhiteChecks().containsKey(roomKey) || player.getGreenChecks().containsKey(roomKey)
+            val solo = players.size == 1
 
             if (!alreadyCleared) {
-                if (players.size == 1) player.minRooms++
+                if (solo) player.minRooms++
                 player.maxRooms++
             }
 
-            val colorKey = if (isGreen) "GREEN" else "WHITE"
-            val clearedMap = player.clearedRooms[colorKey]
+            val checkmark = if (isGreen) Checkmark.GREEN else Checkmark.WHITE
+            val clearedMap = player.clearedRooms[checkmark]
 
             clearedMap?.putIfAbsent(
                 room.name ?: "unknown",
                 RoomClearInfo(
                     time = room.clearTime.since,
                     room = room,
-                    solo = players.size == 1
+                    solo = solo
                 )
             )
         }

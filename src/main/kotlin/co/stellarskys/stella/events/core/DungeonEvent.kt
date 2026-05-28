@@ -41,6 +41,10 @@ sealed class DungeonEvent {
             val newState: Checkmark,
             val roomPlayers: List<DungeonPlayer>
         ) : Event()
+
+        class Cleared(
+            val room: co.stellarskys.stella.api.dungeons.map.Room
+        )
     }
 
     class KeyPickUp(

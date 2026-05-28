@@ -1,4 +1,4 @@
-package co.stellarskys.stella.api.animation
+package co.stellarskys.stella.api.horizon.animation
 
 import co.stellarskys.stella.Stella
 import java.awt.Color
