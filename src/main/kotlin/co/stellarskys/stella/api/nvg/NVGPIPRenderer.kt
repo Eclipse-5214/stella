@@ -42,6 +42,8 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
         state.renderContent()
         NVGRenderer.endFrame()
 
+
+
         GlStateManager._disableDepthTest()
         GlStateManager._disableCull()
         GlStateManager._enableBlend()
