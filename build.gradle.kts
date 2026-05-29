@@ -119,11 +119,21 @@ tasks {
         dependsOn(generateBuildInfo)
     }
 
+    matching { it.name.startsWith("kspKotlin") }.configureEach {
+        dependsOn(generateBuildInfo)
+    }
+
     register<Copy>("buildAndCollect") {
         group = "build"
         from(remapJar.map { it.archiveFile }, remapSourcesJar.map { it.archiveFile })
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
         dependsOn("build")
+    }
+}
+
+kotlin {
+    sourceSets.main {
+        kotlin.srcDir(layout.buildDirectory.dir("generated/sources/buildinfo/kotlin"))
     }
 }
 

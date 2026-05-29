@@ -36,7 +36,6 @@ object UpdateChecker {
     init { if (check) check() }
 
     fun check() {
-        if (BuildInfo.BUILD_TIMESTAMP.startsWith("$")) return Stella.LOGGER.info("[Stella UpdateChecker] Dev env detected. Skipping.")
         when (stream) {
             UpdateStream.RELEASE -> checkModrinth(false)
             UpdateStream.BETA -> checkModrinth(true)
