@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.time.Instant
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.loom)
@@ -86,6 +89,34 @@ tasks {
         )
 
         filesMatching("fabric.mod.json") { expand(props) }
+    }
+
+    val generateBuildInfo by registering {
+        group = "build"
+        description = "Generates the dynamic BuildInfo metadata source file."
+
+        val targetDir = layout.buildDirectory.dir("generated/sources/buildinfo/kotlin/co/stellarskys/stella/api/update")
+        outputs.dir(targetDir)
+
+        doLast {
+            val buildVersion = project.property("mod.version") as String
+            val buildTime = Instant.now().toString()
+
+            val outputFile = targetDir.get().file("BuildInfo.kt").asFile
+            outputFile.parentFile.mkdirs()
+            outputFile.writeText("""
+                package co.stellarskys.stella.api.update
+
+                object BuildInfo {
+                    const val VERSION = "$buildVersion"
+                    const val BUILD_TIMESTAMP = "$buildTime"
+                }
+            """.trimIndent())
+        }
+    }
+
+    withType<KotlinCompile>().configureEach {
+        dependsOn(generateBuildInfo)
     }
 
     register<Copy>("buildAndCollect") {
