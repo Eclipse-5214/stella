@@ -136,7 +136,7 @@ class EditButtonPopup : BaseElement() {
         if (id.isEmpty() || cmd.isEmpty()) {
             ButtonManager.remove(anchor, activeIndex)
         } else {
-            val background = !anchor.name.contains("PLAYER")
+            val background = anchor !in AnchorType.invOnly
             val existing = ButtonManager.getButtonAt(anchor, activeIndex)
             if (existing != null) {
                 existing.iconId = id

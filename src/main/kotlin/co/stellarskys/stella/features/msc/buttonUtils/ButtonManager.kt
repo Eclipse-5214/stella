@@ -27,6 +27,7 @@ object ButtonManager {
 
     val width get()  = Zenith.Res.scaledWidth.toFloat()
     val height get() = Zenith.Res.scaledHeight.toFloat()
+    val isPlayerInv get() = client.screen is InventoryScreen
 
     var invX = 0; var invY = 0
     var invW = 0; var invH = 0
@@ -59,9 +60,6 @@ object ButtonManager {
     }
 
     fun renderAll(context: GuiGraphics, invX: Int = 0, invY: Int = 0, invW: Int = 176, invH: Int = 166, width: Float = this.width, height: Float = this.height) {
-        val currentScreen = client.screen ?: return
-        val isPlayerInv = currentScreen is InventoryScreen
-
         this.invX = invX; this.invY = invY
         this.invW = invW; this.invH = invH
 
@@ -107,6 +105,8 @@ object ButtonManager {
             val (x, y) = resolveAnchorPosition(button.anchor, button.index, invX, invY, invW, invH)
 
             if (mouseX in x..(x + slotSize) && mouseY in y..(y + slotSize)) {
+                if (!isPlayerInv && button.invOnly) continue
+
                 var command = button.command.trim()
 
                 if (!command.startsWith("/")) {
@@ -127,60 +127,41 @@ object ButtonManager {
 
         val spacing = 24
         val slotSize = 20
+        val vanillaSlotSpacing = 18
 
         return when (anchor) {
             // Screen corners
-            AnchorType.SCREEN_TOP_LEFT ->
-                10 + (index * spacing) to 5
-
-            AnchorType.SCREEN_TOP_RIGHT ->
-                screenWidth - slotSize - 10 - (index * spacing) to 5
-
-            AnchorType.SCREEN_BOTTOM_LEFT ->
-                10 + (index * spacing) to screenHeight - slotSize - 5
-
-            AnchorType.SCREEN_BOTTOM_RIGHT ->
-                screenWidth - slotSize - 10 - (index * spacing) to screenHeight - slotSize - 5
+            AnchorType.SCREEN_TOP_LEFT -> 10 + (index * spacing) to 5
+            AnchorType.SCREEN_TOP_RIGHT -> screenWidth - slotSize - 10 - (index * spacing) to 5
+            AnchorType.SCREEN_BOTTOM_LEFT -> 10 + (index * spacing) to screenHeight - slotSize - 5
+            AnchorType.SCREEN_BOTTOM_RIGHT -> screenWidth - slotSize - 10 - (index * spacing) to screenHeight - slotSize - 5
 
             // Screen edges
-            AnchorType.SCREEN_TOP ->
-                (screenWidth / 2 - (2 * spacing)) + (index * spacing) - 10 to 5
-
-            AnchorType.SCREEN_BOTTOM ->
-                (screenWidth / 2 - (2 * spacing)) + (index * spacing) - 10 to screenHeight - slotSize - 5
-
-            AnchorType.SCREEN_LEFT ->
-                5 to (screenHeight / 2 - (2 * spacing)) + (index * spacing)
-
-            AnchorType.SCREEN_RIGHT ->
-                screenWidth - slotSize - 5 to (screenHeight / 2 - (2 * spacing)) + (index * spacing)
+            AnchorType.SCREEN_TOP -> (screenWidth / 2 - (2 * spacing)) + (index * spacing) - 10 to 5
+            AnchorType.SCREEN_BOTTOM -> (screenWidth / 2 - (2 * spacing)) + (index * spacing) - 10 to screenHeight - slotSize - 5
+            AnchorType.SCREEN_LEFT -> 5 to (screenHeight / 2 - (2 * spacing)) + (index * spacing)
+            AnchorType.SCREEN_RIGHT -> screenWidth - slotSize - 5 to (screenHeight / 2 - (2 * spacing)) + (index * spacing)
 
             // Inventory frame
-            AnchorType.INVENTORY_TOP ->
-                invX + 6 + (index * spacing) to invY - slotSize - 5
-
-            AnchorType.INVENTORY_BOTTOM ->
-                invX + 6 + (index * spacing) to invY + invH + 5
-
-            AnchorType.INVENTORY_LEFT ->
-                invX - slotSize - 5 to invY + 12 + (index * spacing)
-
-            AnchorType.INVENTORY_RIGHT ->
-                invX + invW + 5 to invY + 12 + (index * spacing)
+            AnchorType.INVENTORY_TOP -> invX + 6 + (index * spacing) to invY - slotSize - 5
+            AnchorType.INVENTORY_BOTTOM -> invX + 6 + (index * spacing) to invY + invH + 5
+            AnchorType.INVENTORY_LEFT -> invX - slotSize - 5 to invY + 12 + (index * spacing)
+            AnchorType.INVENTORY_RIGHT -> invX + invW + 5 to invY + 12 + (index * spacing)
 
             // Player model corners (explicit anchors are cleaner)
-            AnchorType.PLAYER_MODEL_TOP_LEFT ->
-                invX + 25 to invY + 8
+            AnchorType.PLAYER_MODEL_TOP_LEFT -> invX + 25 to invY + 8
+            AnchorType.PLAYER_MODEL_TOP_RIGHT -> invX + 58 to invY + 8
+            AnchorType.PLAYER_MODEL_BOTTOM_LEFT -> invX + 25 to invY + 58
+            AnchorType.PLAYER_MODEL_BOTTOM_RIGHT -> invX + 58 to invY + 58
 
-            AnchorType.PLAYER_MODEL_TOP_RIGHT ->
-                invX + 58 to invY + 8
+            // Crafting Grid 2x2 Coordinates
+            AnchorType.CRAFTING_TOP_LEFT -> invX + 96 to invY + 16
+            AnchorType.CRAFTING_TOP_RIGHT -> invX + 96 + vanillaSlotSpacing to invY + 16
+            AnchorType.CRAFTING_BOTTOM_LEFT -> invX + 96 to invY + 16 + vanillaSlotSpacing
+            AnchorType.CRAFTING_BOTTOM_RIGHT -> invX + 96 + vanillaSlotSpacing to invY + 16 + vanillaSlotSpacing
 
-            AnchorType.PLAYER_MODEL_BOTTOM_LEFT ->
-                invX + 25 to invY + 58
-
-            AnchorType.PLAYER_MODEL_BOTTOM_RIGHT ->
-                invX + 58 to invY + 58
-
+            // Crafting Result Slot Coordinate
+            AnchorType.CRAFTING_RESULT -> invX + 152 to invY + 26
         }
     }
 

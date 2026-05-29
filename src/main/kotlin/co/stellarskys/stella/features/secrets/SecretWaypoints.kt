@@ -48,7 +48,7 @@ object SecretWaypoints: Feature("secretWaypoints", island = SkyBlockIsland.THE_C
 
         on<RenderEvent.World.Last> {
             if (Dungeon.inBoss) return@on
-            if (missingRoute && RouteRecorder.currentMissing()) return@on
+            if (missingRoute && !RouteRecorder.currentMissing()) return@on
             val room = Dungeon.currentRoom ?: return@on
             val data = SecretsRegistry.getById(room.id) ?: return@on
             if(room.checkmark == Checkmark.GREEN) return@on
