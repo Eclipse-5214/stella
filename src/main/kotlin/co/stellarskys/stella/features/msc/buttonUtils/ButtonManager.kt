@@ -12,11 +12,11 @@ import co.stellarskys.stella.api.zenith.client
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 import java.io.File
 import kotlin.jvm.optionals.getOrNull
@@ -59,7 +59,7 @@ object ButtonManager {
         buttons.clear()
     }
 
-    fun renderAll(context: GuiGraphics, invX: Int = 0, invY: Int = 0, invW: Int = 176, invH: Int = 166, width: Float = this.width, height: Float = this.height) {
+    fun renderAll(context: GuiGraphicsExtractor, invX: Int = 0, invY: Int = 0, invW: Int = 176, invH: Int = 166, width: Float = this.width, height: Float = this.height) {
         this.invX = invX; this.invY = invY
         this.invW = invW; this.invH = invH
 
@@ -71,7 +71,7 @@ object ButtonManager {
         }
     }
 
-    private fun renderButton(context: GuiGraphics, button: StellaButton, pos: Pair<Int, Int>) {
+    private fun renderButton(context: GuiGraphicsExtractor, button: StellaButton, pos: Pair<Int, Int>) {
         if (button.iconId == "NONE") return
         val stack = getItem(button.iconId)
         val (x, y) = pos
@@ -82,7 +82,7 @@ object ButtonManager {
         Render2D.renderItem(context, stack, x.toFloat() + offsetX, y.toFloat() + offsetY, 1f)
     }
 
-    private fun renderButtonBackgroud(context: GuiGraphics, button: StellaButton, pos: Pair<Int, Int>){
+    private fun renderButtonBackgroud(context: GuiGraphicsExtractor, button: StellaButton, pos: Pair<Int, Int>){
         if(!button.background) return
         val (x, y) = pos
         context.drawNVG {
@@ -190,7 +190,7 @@ object ButtonManager {
         }
     }
 
-    fun getItem(id: String) = ResourceLocation.tryParse(if (":" in id) id.lowercase() else "minecraft:${id.lowercase()}")?.let {
+    fun getItem(id: String) = Identifier.tryParse(if (":" in id) id.lowercase() else "minecraft:${id.lowercase()}")?.let {
         BuiltInRegistries.ITEM.getOptional(it).getOrNull()?.defaultInstance
     } ?: SkyBlockItemsRepo.getItemStackOrDefault(id.uppercase())
 }
