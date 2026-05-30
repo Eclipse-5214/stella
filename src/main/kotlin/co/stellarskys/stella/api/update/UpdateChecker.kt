@@ -23,7 +23,7 @@ object UpdateChecker {
 
     private const val MODRINTH_PROJECT_ID = "ZSWJelST"
     private const val GITHUB_REPO = "Eclipse-5214/stella"
-    private const val CURRENT_BRANCH = "main"
+    private const val CURRENT_BRANCH = "26.1"
 
     data class ModrinthVersion(
         @SerializedName("id") val versionId: String,
