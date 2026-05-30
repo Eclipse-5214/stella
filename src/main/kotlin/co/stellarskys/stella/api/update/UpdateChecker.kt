@@ -23,6 +23,7 @@ object UpdateChecker {
 
     private const val MODRINTH_PROJECT_ID = "ZSWJelST"
     private const val GITHUB_REPO = "Eclipse-5214/stella"
+    private const val CURRENT_BRANCH = "main"
 
     data class ModrinthVersion(
         @SerializedName("id") val versionId: String,
@@ -35,15 +36,15 @@ object UpdateChecker {
 
     init { if (check) check() }
 
-    fun check() {
+    fun check(cb: (Boolean) -> Unit = {}) {
         when (stream) {
-            UpdateStream.RELEASE -> checkModrinth(false)
-            UpdateStream.BETA -> checkModrinth(true)
-            UpdateStream.NIGHTLY -> checkGitHubNightly()
+            UpdateStream.RELEASE -> checkModrinth(false, cb)
+            UpdateStream.BETA -> checkModrinth(true, cb)
+            UpdateStream.NIGHTLY -> checkGitHubNightly(cb)
         }
     }
 
-    private fun checkModrinth(isBeta: Boolean) {
+    private fun checkModrinth(isBeta: Boolean, cb: (Boolean) -> Unit) {
         val mc = SharedConstants.getCurrentVersion().id()
         val url = "https://api.modrinth.com/v2/project/$MODRINTH_PROJECT_ID/version?loaders=[%22fabric%22]&game_versions=[%22$mc%22]&include_changelog=false"
 
@@ -53,24 +54,27 @@ object UpdateChecker {
                 val target = versions.firstOrNull { it.versionType == targetType } ?: return@fetch
                 runCatching {
                     if (isBeta) {
-                        if (Instant.parse(target.datePublished).isAfter(Instant.parse(BuildInfo.BUILD_TIMESTAMP)))
-                            triggerNotification("https://modrinth.com/mod/$MODRINTH_PROJECT_ID/version/${target.versionId}")
+                        if (Instant.parse(target.datePublished).isAfter(Instant.parse(BuildInfo.BUILD_TIMESTAMP))) {
+                            triggerNotification("https://modrinth.com/mod/$MODRINTH_PROJECT_ID/version/${target.versionId}"); cb(true)
+                        } else cb(false)
                     } else if (Version.parse(target.versionNumber) > Version.parse(BuildInfo.VERSION)) {
-                        triggerNotification("https://modrinth.com/mod/$MODRINTH_PROJECT_ID/version/${target.versionId}")
-                    }
-                }.onFailure { Stella.LOGGER.error("[Stella UpdateChecker] Modrinth check error: ${it.message}") }
+                        triggerNotification("https://modrinth.com/mod/$MODRINTH_PROJECT_ID/version/${target.versionId}"); cb(true)
+                    } else cb(false)
+                }.onFailure { Stella.LOGGER.error("[Stella UpdateChecker] Modrinth check error: ${it.message}"); cb(false) }
             }
         }
     }
 
-    private fun checkGitHubNightly() {
-        val url = "https://api.github.com/repos/$GITHUB_REPO/actions/runs?per_page=1&status=success"
+    private fun checkGitHubNightly(cb: (Boolean) -> Unit) {
+        val url = "https://api.github.com/repos/$GITHUB_REPO/actions/runs?per_page=1&status=success&branch=$CURRENT_BRANCH"
         Quasar.fetch<GitHubRunsResponse>(url) { res ->
             res.onSuccess { resp ->
                 val run = resp.workflowRuns.firstOrNull() ?: return@fetch
                 runCatching {
-                    if (Instant.parse(run.createdAt).isAfter(Instant.parse(BuildInfo.BUILD_TIMESTAMP))) triggerNotification(run.htmlUrl)
-                }.onFailure { Stella.LOGGER.error("[Stella UpdateChecker] GitHub check error: ${it.message}") }
+                    if (Instant.parse(run.createdAt).isAfter(Instant.parse(BuildInfo.BUILD_TIMESTAMP))) {
+                        triggerNotification(run.htmlUrl); cb(true)
+                    } else cb(false)
+                }.onFailure { Stella.LOGGER.error("[Stella UpdateChecker] GitHub check error: ${it.message}"); cb(false) }
             }
         }
     }
