@@ -89,7 +89,12 @@ val config = Config(Stella.NAMESPACE) {
                 name = "Check Now"
 
                 onclick {
-                    UpdateChecker.check()
+                    Signal.fakeMessage("${Stella.PREFIX} §bChecking for updates")
+
+                    UpdateChecker.check { success ->
+                        if (success) return@check
+                        Signal.fakeMessage("${Stella.PREFIX} §aYou are on the latest version of Stella!")
+                    }
                 }
             }
         }
