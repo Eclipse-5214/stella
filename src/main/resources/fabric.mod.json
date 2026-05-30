@@ -3,6 +3,7 @@
     "id": "${id}",
     "version": "${version}",
     "name": "${name}",
+    "icon": "assets/stella/icon.png",
     "description": "QOL / Dungeons skyblock mod",
     "authors": [
         "Eclipse / NEXD_"

@@ -3,6 +3,7 @@ package co.stellarskys.stella.utils
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.config.core.Config
 import co.stellarskys.stella.api.handlers.Signal
+import co.stellarskys.stella.api.update.UpdateChecker
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
@@ -57,6 +58,32 @@ val config = Config(Stella.NAMESPACE) {
                 onclick {
                     val uri = URI("https://github.com/Eclipse-5214/stella")
                     Util.getPlatform().openUri(uri)
+                }
+            }
+        }
+
+        subcategory("Updates") {
+            toggle {
+                configName = "update"
+                name = "Check for Updates"
+                description = "Checks for updates on startup"
+                default = true
+            }
+
+            dropdown {
+                configName = "update.stream"
+                name = "Update Stream"
+                description = "Choose which channel to monitor for updates."
+                options = listOf("Release", "Beta", "Nightly")
+                default = 0
+            }
+
+            button {
+                configName + "update.check"
+                name = "Check Now"
+
+                onclick {
+                    UpdateChecker.check()
                 }
             }
         }

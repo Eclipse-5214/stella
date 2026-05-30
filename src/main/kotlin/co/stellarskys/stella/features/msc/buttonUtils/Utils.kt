@@ -21,14 +21,26 @@ enum class AnchorType(val slots: Int) {
     PLAYER_MODEL_TOP_LEFT(1),
     PLAYER_MODEL_TOP_RIGHT(1),
     PLAYER_MODEL_BOTTOM_LEFT(1),
-    PLAYER_MODEL_BOTTOM_RIGHT(1);
+    PLAYER_MODEL_BOTTOM_RIGHT(1),
+
+    // Crafting slots (1 each)
+    CRAFTING_TOP_LEFT(1),
+    CRAFTING_TOP_RIGHT(1),
+    CRAFTING_BOTTOM_LEFT(1),
+    CRAFTING_BOTTOM_RIGHT(1),
+    CRAFTING_RESULT(1);
 
     companion object  {
-        val model = setOf(
+        val invOnly = setOf(
             PLAYER_MODEL_TOP_LEFT,
             PLAYER_MODEL_TOP_RIGHT,
+            PLAYER_MODEL_BOTTOM_LEFT,
             PLAYER_MODEL_BOTTOM_RIGHT,
-            PLAYER_MODEL_BOTTOM_RIGHT
+            CRAFTING_TOP_LEFT,
+            CRAFTING_TOP_RIGHT,
+            CRAFTING_BOTTOM_LEFT,
+            CRAFTING_BOTTOM_RIGHT,
+            CRAFTING_RESULT
         )
     }
 }
@@ -40,5 +52,5 @@ data class StellaButton(
     val index: Int = 0,
     val background: Boolean = true,
 ) {
-    val invOnly get() = anchor in AnchorType.model
+    val invOnly get() = anchor in AnchorType.invOnly
 }

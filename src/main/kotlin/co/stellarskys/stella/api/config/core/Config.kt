@@ -11,6 +11,7 @@ import co.stellarskys.stella.api.zenith.client
 import com.google.gson.*
 import java.awt.Color
 import java.io.File
+import java.lang.reflect.Method
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KProperty
 
@@ -181,7 +182,7 @@ class Config(
         if (loading) return
         loading = true
         try {
-            // 1. Map the elements FIRST so fromJson has something to work with
+            // Map the elements FIRST so fromJson has something to work with
             categories.values.forEach { cat ->
                 cat.subcategories.values.forEach { sub ->
                     if (sub.configName.isNotBlank()) {
@@ -197,7 +198,7 @@ class Config(
                 }
             }
 
-            // 2. Now overwrite those defaults with the file content
+            // Now overwrite those defaults with the file content
             if (resolvedFile.exists()) {
                 val json = Gson().fromJson(resolvedFile.readText(), JsonObject::class.java)
                 fromJson(json)
@@ -234,24 +235,24 @@ class Config(
         private val key: String,
         private val type: Class<T>
     ) {
+        @Suppress("UNCHECKED_CAST")
         operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
             ensureLoaded()
-            val value = valueCache[key]
-                ?: run {
-                    Stella.LOGGER.error("FATAL CONFIG ERROR: Missing config value for '$key'")
-                    error("Missing config value for '$key'")
-                }
-            return if (type.isInstance(value)) {
-                type.cast(value)
-            } else {
-                Stella.LOGGER.error("FATAL CONFIG ERROR: '$key' expected ${type.simpleName}, got ${value::class.simpleName}")
-                error("Config value for '$key' is not of type ${type.simpleName}")
+            val value = valueCache[key] ?: error("FATAL CONFIG ERROR: Missing config value for '$key'")
+
+            if (type.isInstance(value)) return type.cast(value)
+            if (type.isEnum && value is Number) {
+                val constants = type.enumConstants
+                val index = value.toInt()
+                if (index in constants.indices) return constants[index] as T
             }
+
+            error("FATAL CONFIG ERROR: '$key' expected ${type.simpleName}, got ${value::class.simpleName}")
         }
 
         operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
             val element = elementMap[key] ?: error("No config entry found for key '$key'")
-            element.value = value
+            element.value = if (value is Enum<*>) value.ordinal else value
             notifyListeners(key, value)
         }
     }
