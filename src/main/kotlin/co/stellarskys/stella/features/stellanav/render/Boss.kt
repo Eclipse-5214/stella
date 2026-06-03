@@ -39,10 +39,12 @@ object Boss {
                 if (dp == null || (!dp.alive && dp.name != you)) continue
 
                 val pos = if (Map.smoothMovement) dp.pos.getLerped() else dp.pos.raw
-                val hudX = toHud(pos.realX, bMap.topLeftLocation[0], sizeInWorld, viewX)
-                val hudY = toHud(pos.realZ, bMap.topLeftLocation[1], sizeInWorld, viewZ)
+                val rx = pos?.realX ?: continue
+                val rz = pos.realZ ?: continue
+                val hudX = toHud(rx, bMap.topLeftLocation[0], sizeInWorld, viewX)
+                val hudY = toHud(rz, bMap.topLeftLocation[1], sizeInWorld, viewZ)
 
-                MapRenderer.renderPlayerIcon(context, dp, hudX, hudY, pos.yaw.toFloat())
+                MapRenderer.renderPlayerIcon(context, dp, hudX, hudY, pos.yaw?.toFloat() ?: 0f)
             }
 
             context.disableScissor()

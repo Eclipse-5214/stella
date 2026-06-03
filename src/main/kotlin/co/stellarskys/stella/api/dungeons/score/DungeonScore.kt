@@ -88,13 +88,7 @@ object DungeonScore {
     }
     val secretsRemaining by Flare(0) { (minSecrets - secretsFound).coerceAtLeast(0) }
 
-    val score by Flare(0) {
-        (skillScore + exploreScore + speedScore + bonusScore).toInt().also {
-            if (it >= 270 && !had270) had270 = true
-            if (it >= 300 && !had300) had300 = true
-            if (crypts >= 5 && !hadCrypts) hadCrypts = true
-        }
-    }
+    val score by Flare(0) { (skillScore + exploreScore + speedScore + bonusScore).toInt() }
 
     fun reset() {
         had270 = false; had300 = false; hadCrypts = false; MimicTrigger.reset()
@@ -124,11 +118,20 @@ object DungeonScore {
         openedRooms = msg.extractInt(OPENED_ROOMS_PATTERN, openedRooms)
         milestone = msg.extractString(MILESTONES_PATTERN, milestone)
         puzzlePenalty = Dungeon.puzzles.count { it.checkmark !in setOf(Checkmark.GREEN, Checkmark.WHITE) } * 10
+        checkMilestones()
     }
 
     private fun parseSidebar(msg: String) {
         msg.match(CLEAR_PERCENT_PATTERN)?.let { clearedPercent = it.groupValues[1].toIntOrNull() ?: clearedPercent }
         secretsPercentNeeded = floorSecrets[Dungeon.floor?.name] ?: 1.0
+        checkMilestones()
+    }
+
+    private fun checkMilestones() {
+        val currentScore = score
+        if (currentScore >= 270 && !had270) had270 = true
+        if (currentScore >= 300 && !had300) had300 = true
+        if (crypts >= 5 && !hadCrypts) hadCrypts = true
     }
 
     private fun calculateSpeedScore(time: Int, scale: Double): Int = when {
