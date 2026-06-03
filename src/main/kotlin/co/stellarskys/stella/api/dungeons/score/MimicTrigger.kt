@@ -5,9 +5,9 @@ import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.EntityEvent
 import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.api.handlers.Spark
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import net.minecraft.world.entity.EquipmentSlot
-import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 //? if <= 1.21.10 {
 import net.minecraft.world.entity.monster.Zombie
@@ -22,15 +22,15 @@ import net.minecraft.world.entity.monster.Zombie
 object MimicTrigger {
     val MIMIC_PATTERN = Regex("""^Party > (?:\[[\w+]+] )?\w{1,16}: (.*)$""")
 
-    var mimicDead = false
-    var princeDead = false
+    var mimicDead by Spark(false)
+    var princeDead by Spark(false)
 
     val mimicMessages = listOf("mimic dead", "mimic dead!", "mimic killed", "mimic killed!", "\$skytils-dungeon-score-mimic$")
 
     fun init() {
         EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
             if (Dungeon.floorNumber !in 6..7 || Dungeon.floor == null) return@on
-            val msg = event.message.stripped.lowercase()
+            val msg = event.stripped.lowercase()
 
             when {
                 MIMIC_PATTERN.matches(msg) && mimicMessages.any { msg.contains(it) } -> mimicDead = true

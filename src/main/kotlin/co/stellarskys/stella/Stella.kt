@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import kotlinx.coroutines.*
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
+import net.fabricmc.loader.api.FabricLoader
 
 object Stella: ClientModInitializer {
     @JvmStatic val LOGGER: Logger = LogManager.getLogger("stella")

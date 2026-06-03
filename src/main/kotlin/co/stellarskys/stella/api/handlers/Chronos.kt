@@ -21,6 +21,7 @@ object Chronos {
     inline val now get() = SimpleTimeMark(System.currentTimeMillis())
     inline val zero get() = SimpleTimeMark(0)
     inline val max get() = SimpleTimeMark(Long.MAX_VALUE)
+    inline val Duration.isZero get() = this == Duration.ZERO
     inline val Duration.fromNow get() = now + this
     inline val Long.asTimeMark get() = SimpleTimeMark(this)
     inline val Duration.millis get() = inWholeMilliseconds

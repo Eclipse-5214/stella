@@ -13,7 +13,6 @@ import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.features.Feature
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 @Module
 object  JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
@@ -21,7 +20,7 @@ object  JoinInfo: Feature("joinInfo", island = SkyBlockIsland.DUNGEON_HUB) {
 
     override fun initialize() {
         on<ChatEvent.Receive> { event ->
-            val person = JoinRegex.find(event.message.stripped)?.groups?.get(1)?.value ?: return@on
+            val person = JoinRegex.find(event.stripped)?.groups?.get(1)?.value ?: return@on
             fetchAndDisplayStats(person)
         }
     }

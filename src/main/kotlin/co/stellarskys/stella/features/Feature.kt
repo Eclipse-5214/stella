@@ -6,6 +6,7 @@ import co.stellarskys.stella.api.events.EventHandle
 import co.stellarskys.stella.managers.FeatureManager
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.events.core.ChatEvent
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.LocationAPI
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
@@ -76,5 +77,5 @@ open class Feature(
         }
     }
 
-    inline fun <reified T : Event> on(priority: Int = 0,noinline cb: (T) -> Unit) { events += EventBus.on<T>(register = false, priority = priority, handler = cb) }
+    inline fun <reified T : Event> on(priority: Int = 0,noinline cb: (T) -> Unit) = EventBus.on<T>(register = false, priority = priority, handler = cb).also { events += it }
 }

@@ -48,26 +48,23 @@ object DungeonPlayerManager {
             }
         }
 
-        EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { onDeath(it.message.string) }
-    }
+        EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            event matchesRaw playerGhostPattern run { match ->
+                var name = match.groups["name"]?.value ?: return@run
+                if (name == "You") player?.let { name = it.name.stripped }
 
-
-    private fun onDeath(text: String) {
-        val match = playerGhostPattern.find(text) ?: return
-
-        var name = match.groups["name"]?.value ?: return
-        if (name == "You") player?.let { name = it.name.stripped }
-
-        val player = getPlayer(name)
-        if (player != null) {
-            player.deaths ++
-            EventBus.post(DungeonEvent.Player.Death(player))
-        } else {
-            Stella.LOGGER.error(
-                "[Dungeon Player Manager] Received ghost message for player '{}' but player was not found in the player list: {}",
-                match.groups["name"]?.value,
-                players.contentToString()
-            )
+                val player = getPlayer(name)
+                if (player != null) {
+                    player.deaths ++
+                    EventBus.post(DungeonEvent.Player.Death(player))
+                } else {
+                    Stella.LOGGER.error(
+                        "[Dungeon Player Manager] Received ghost message for player '{}' but player was not found in the player list: {}",
+                        match.groups["name"]?.value,
+                        players.contentToString()
+                    )
+                }
+            }
         }
     }
 

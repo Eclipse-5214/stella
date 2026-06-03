@@ -6,7 +6,6 @@ import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.api.handlers.Signal
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 @Module
 object TermTracker : Feature("termTracker", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -16,23 +15,13 @@ object TermTracker : Feature("termTracker", island = SkyBlockIsland.THE_CATACOMB
     override fun initialize() {
         completed = mutableMapOf()
         on<ChatEvent.Receive> { event ->
-            val msg = event.message.stripped
-            val matcher = pattern.find(msg)
+            if (event.stripped == "The Core entrance is opening!" ) completed.forEach { (user, data) ->
+                Signal.fakeMessage("$SHORTPREFIX §b$user §7completed §f${data["terminal"] ?: 0} §7 terms, §f${data["device"] ?: 0} §7devices, and §f${data["lever"] ?: 0} §7levers!")
+            }
 
-            when {
-                msg == "The Core entrance is opening!" -> {
-                    completed.forEach { (user, data) ->
-                        Signal.fakeMessage("$SHORTPREFIX §b$user §7completed §f${data["terminal"] ?: 0} §7 terms, §f${data["device"] ?: 0} §7devices, and §f${data["lever"] ?: 0} §7levers!")
-                    }
-                }
-                pattern.matches(msg) -> {
-                    val match = pattern.matchEntire(msg)!!
-                    val (user, type) = match.destructured
-                    if (type in listOf("terminal", "lever", "device")) {
-                        completed.getOrPut(user) { mutableMapOf() }[type] =
-                            (completed[user]?.get(type) ?: 0) + 1
-                    }
-                }
+            event matches pattern run {
+                val (user, type) = it.destructured
+                if (type in listOf("terminal", "lever", "device")) completed.getOrPut(user){ mutableMapOf() }[type] = (completed[user]?.get(type) ?: 0) + 1
             }
         }
     }

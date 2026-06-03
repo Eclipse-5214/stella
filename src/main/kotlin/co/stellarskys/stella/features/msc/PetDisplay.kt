@@ -63,13 +63,9 @@ object PetDisplay: Feature("petDisplay", true) {
         }
 
         on<ChatEvent.Receive> { event ->
-            val msg = event.message.stripped
-
-            // Pet summon/despawn matcher
-            val summonMatch = petSummon.find(msg)
-            if (summonMatch != null) {
-                val action = summonMatch.groupValues[1] // "summoned" or "despawned"
-                val petName = summonMatch.groupValues[2].trim()
+            event matches petSummon run { match ->
+                val action = match.groupValues[1] // "summoned" or "despawned"
+                val petName = match.groupValues[2].trim()
                 //Stella.LOGGER.info("Pet $action: $petName")
 
                 when (action) {
@@ -82,22 +78,15 @@ object PetDisplay: Feature("petDisplay", true) {
                         activePetLvl = 0
                     }
                 }
-
-
-                return@on
             }
 
-            // Autopet matcher
-            val autoMatch = autoPet.find(msg)
-            if (autoMatch != null) {
-                val level = autoMatch.groupValues[1].toInt()
-                val petName = autoMatch.groupValues[2].trim()
+            event matches autoPet run { match ->
+                val level = match.groupValues[1].toInt()
+                val petName = match.groupValues[2].trim()
                 //Stella.LOGGER.info("Autopet equipped: Lvl $level $petName")
                 activePet = petName
                 activePetLvl = level
                 cachePet(petName, level)
-
-                return@on
             }
         }
 

@@ -12,7 +12,6 @@ import co.stellarskys.stella.api.dungeons.utils.DoorType
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.utils.config
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
 
 @Module
@@ -29,25 +28,11 @@ object BoxWitherDoors: Feature("boxWitherDoors", island = SkyBlockIsland.THE_CAT
 
     override fun initialize() {
         on<ChatEvent.Receive> { event ->
-            val msg = event.message.stripped
-
-            val doorMatch = openedDoor.find(msg)
-            if (doorMatch != null){
-                keyObtained = false
-                return@on
-            }
-
-            val bloodMatch = bloodOpened.find(msg)
-            if (bloodMatch != null){
-                keyObtained = false
-                bloodOpen = true
-                return@on
-            }
+            event matches openedDoor run { keyObtained = false}
+            event matches bloodOpened run { bloodOpen = true}
         }
 
-        on<DungeonEvent.KeyPickUp> {
-            keyObtained = true
-        }
+        on<DungeonEvent.KeyPickUp> { keyObtained = true }
 
         on<RenderEvent.World.Last> {
             if(bloodOpen) return@on

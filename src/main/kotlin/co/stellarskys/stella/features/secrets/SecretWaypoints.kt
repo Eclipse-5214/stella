@@ -16,7 +16,6 @@ import co.stellarskys.stella.features.secrets.utils.waypoints.*
 import co.stellarskys.stella.utils.Utils
 import net.minecraft.core.BlockPos
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
 @Module
 object SecretWaypoints: Feature("secretWaypoints", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -41,7 +40,7 @@ object SecretWaypoints: Feature("secretWaypoints", island = SkyBlockIsland.THE_C
         }
 
         on<ChatEvent.Receive> { event ->
-            if (event.message.stripped.lowercase() != "that chest is locked!") return@on
+            if (event.stripped.lowercase() != "that chest is locked!") return@on
             val pos = player?.blockPosition() ?: return@on
             updateSecret( {it.chest}, false) { Utils.calcDistance(pos, it.real) < 25 }
         }

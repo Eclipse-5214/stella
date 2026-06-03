@@ -23,7 +23,6 @@ import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.features.secrets.utils.waypoints.SecretData
 import co.stellarskys.stella.features.secrets.utils.waypoints.SecretsRegistry
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
-import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
 
 @Module
@@ -96,7 +95,7 @@ object SecretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
         }
 
         on<ChatEvent.Receive> { event ->
-            if (event.message.stripped.lowercase() != "that chest is locked!") return@on
+            if (event.stripped.lowercase() != "that chest is locked!") return@on
             lockedChest = true
             previousStep()
         }
