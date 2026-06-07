@@ -85,7 +85,12 @@ object Clear {
 
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored || room.type == RoomType.ENTRANCE) return@forEach
-            val show = if (room.type.isNormal && room.secrets > 0) Map.roomCheck else if (room.type.isPuzzle) Map.puzzleCheck else true
+            val show = when {
+                Map.replaceText && room.checkmark == Checkmark.GREEN -> true
+                room.type.isNormal && room.secrets > 0 -> Map.roomCheck
+                room.type.isPuzzle -> Map.puzzleCheck
+                else -> true
+            }
             if (!show) return@forEach
             val tex = room.checkmark.texture ?: return@forEach
             val anchor = Anchor.fromInt(Map.checkAnchor)
