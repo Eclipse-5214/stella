@@ -15,7 +15,7 @@ object CleanPrefix: Feature("cleanPrefix") {
             event matches guildRegex modify { m ->
                 val hRank = m.groupValues[1].color()
                 val gRank = m.groupValues[3].takeIf { it.isNotEmpty() }?.let { "§8$it " } ?: ""
-                "§aG §8> $gRank§$hRank${m.groupValues[2]}§f: ${m.groupValues[4]}"
+                "§2G §8> $gRank§$hRank${m.groupValues[2]}§f: ${m.groupValues[4]}"
             }
 
             event matches partyRegex modify { m ->
