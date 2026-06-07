@@ -1314,6 +1314,8 @@ val config = Config(Stella.NAMESPACE) {
             }
         }
 
+        subcategory("Clean Prefixes", "cleanPrefix", "Guild -> G / Party -> P")
+
         /*
         subcategory("Custom Nametags") {
             toggle {

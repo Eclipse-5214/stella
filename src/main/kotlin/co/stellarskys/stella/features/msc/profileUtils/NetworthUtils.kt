@@ -49,6 +49,6 @@ object NetworthUtils {
         }
     }
 
-    fun SkyblockResponse.Pet.getValue() = (LowestBinAPI.getLowestPrice("pet:${this.type}:${this.tier}") ?: 0L) + Pricing.getPrice(this.heldItem)
+    fun SkyblockResponse.Pet.getValue() = (LowestBinAPI.getLowestPrice("pet:${this.type}:${this.tier}") ?: 0L) + Pricing.getPrice(this.heldItem) + Pricing.getPrice(this.skin)
     fun SkyblockResponse.InventoryContents.getValue() = this.items().filterNot { it.isEmpty }.sumOf { it.getItemValue().price }
 }

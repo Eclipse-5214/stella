@@ -91,17 +91,16 @@ object MainCommand : Atlas("stella", "sta", "sa") {
                     Signal.fakeMessage("${Stella.PREFIX} §cError: Not in dungeon")
                 }
 
-                val data = DungeonScore.data
 
                 Signal.fakeMessage("§d§m------------------------------------------")
                 Signal.fakeMessage("§bDungeon Score Breakdown §7(§6${Dungeon.floor?.name ?: "?"}§7)")
                 Signal.fakeMessage("§d§m------------------------------------------")
-                Signal.fakeMessage("                 §bScore: §6${data.score}")
+                Signal.fakeMessage("                 §bScore: §6${DungeonScore.score}")
                 Signal.fakeMessage("")
-                Signal.fakeMessage("§7Skill Score§8: §b${data.skillScore}")
-                Signal.fakeMessage("§7Explore Score§8: §b${data.exploreScore}")
-                Signal.fakeMessage("§7Speed Score§8: §b${data.speedScore}")
-                Signal.fakeMessage("§7Bonus Score§8: §b${data.bonusScore}")
+                Signal.fakeMessage("§7Skill Score§8: §b${DungeonScore.skillScore}")
+                Signal.fakeMessage("§7Explore Score§8: §b${DungeonScore.exploreScore}")
+                Signal.fakeMessage("§7Speed Score§8: §b${DungeonScore.speedScore}")
+                Signal.fakeMessage("§7Bonus Score§8: §b${DungeonScore.bonusScore}")
                 Signal.fakeMessage("")
                 Signal.fakeMessage("§d§m------------------------------------------")
             }

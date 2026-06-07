@@ -13,6 +13,8 @@ import net.minecraft.sounds.SoundEvent
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.sqrt
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 object Utils {
     /**
@@ -132,4 +134,14 @@ object Utils {
 
     inline fun <reified T : Any> animate(coeff: Double = 0.2, type: AnimType = AnimType.LINEAR, error: Double = 0.001) =
         Animation<T>(coeff, error, type, isColor = (T::class == Color::class))
+
+    class Apogee(private val threshold: Int, private val onTrigger: () -> Unit) : ReadWriteProperty<Any?, Int> {
+        private var internalValue = 0
+
+        override fun getValue(thisRef: Any?, property: KProperty<*>): Int = internalValue
+        override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
+            if (value > internalValue && threshold in (internalValue + 1)..value) onTrigger()
+            internalValue = value
+        }
+    }
 }

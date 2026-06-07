@@ -20,7 +20,7 @@ object CryptReminder: Feature("cryptReminder", island = SkyBlockIsland.THE_CATAC
     private val party by config.property<Boolean>("cryptReminder.sendParty")
 
     private var reminderHandle: Chronos.Task? = null
-    private val crypts get() = DungeonScore.data.crypts
+    private val crypts get() = DungeonScore.crypts
 
     override fun initialize() {
         on<DungeonEvent.Start> { event ->
