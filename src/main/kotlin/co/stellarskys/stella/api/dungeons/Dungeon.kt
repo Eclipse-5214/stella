@@ -62,10 +62,6 @@ object Dungeon {
     val inBoss: Boolean get() = DungeonAPI.inBoss
     val inDungeon: Boolean get() = LocationAPI.island == SkyBlockIsland.THE_CATACOMBS
 
-    // HUD lines
-    var mapLine1 = ""
-    var mapLine2 = ""
-
     // Shortcuts
     val players get() = DungeonPlayerManager.players.filterNotNull()
     val score get() = DungeonScore.score
@@ -115,6 +111,7 @@ object Dungeon {
         }
 
         EventBus.on<LocationEvent.IslandChange> { reset() }
+        EventBus.on<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) { updateHeldItem() }
 
         EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val msg = event.stripped
@@ -124,8 +121,9 @@ object Dungeon {
                 complete = true
                 floor?.let { EventBus.post(DungeonEvent.End(it)) }
             }
+        }
 
-            if (!event.isActionBar) return@on
+        EventBus.on<ChatEvent.ActionBar>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val room = currentRoom ?: return@on
             event matches ROOM_SECRETS_PATTERN run {
                 val (found, total) = it.destructured
@@ -134,12 +132,6 @@ object Dungeon {
                 if (secrets != room.secretsFound) room.secretsFound = secrets
                 if (max != room.secrets) room.secrets = max
             }
-        }
-
-
-        EventBus.on<TickEvent.Client>(SkyBlockIsland.THE_CATACOMBS) {
-            updateHudLines()
-            updateHeldItem()
         }
 
         EventBus.on<PacketEvent.Received>(SkyBlockIsland.THE_CATACOMBS) { event ->
@@ -199,34 +191,10 @@ object Dungeon {
         bloodDone = false
         complete = false
         holdingLeaps = false
-        mapLine1 = ""
-        mapLine2 = ""
         WorldScanner.reset()
         DungeonPlayerManager.reset()
         DungeonScore.reset()
         MapUtils.reset()
-    }
-
-    /** Updates HUD lines for map overlay */
-    private fun updateHudLines() {
-        val dSecrets = "§7Secrets: §b${DungeonScore.secretsFound}§8-§e${DungeonScore.secretsRemaining}§8-§c${DungeonScore.totalSecrets}"
-        val dCrypts = "§7Crypts: " + when {
-            DungeonScore.crypts >= 5 -> "§a${DungeonScore.crypts}"
-            DungeonScore.crypts > 0  -> "§e${DungeonScore.crypts}"
-            else            -> "§c0"
-        }
-        val mMimic = if (MimicTrigger.mimicDead) "§a✔" else "§c✘"
-        val mPrince = if (MimicTrigger.princeDead) "§a✔" else "§c✘"
-        val dMimicPrince = "§7M: $mMimic §8| §7P: $mPrince"
-        val dDeaths = "§7Deaths: " + if (DungeonScore.teamDeaths > 0) "§c${DungeonScore.teamDeaths}" else "§a0"
-        val dScore = "§7Score: " + when {
-            DungeonScore.score >= 300 -> "§a${DungeonScore.score}"
-            DungeonScore.score >= 270 -> "§e${DungeonScore.score}"
-            else             -> "§c${DungeonScore.score}"
-        } + if (DungeonScore.hasPaul) " §b★" else ""
-
-        mapLine1 = "$dSecrets        $dScore".trim()
-        mapLine2 = "$dDeaths §8| $dMimicPrince §8| $dCrypts".trim()
     }
 
     /** Updates leap detection based on held item */

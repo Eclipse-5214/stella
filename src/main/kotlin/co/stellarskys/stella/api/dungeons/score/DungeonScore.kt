@@ -16,7 +16,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 /**
- * Tracks and calculates dungeon score metrics dynamically using a Fuel graph network.
+ * Tracks and calculates dungeon score metrics dynamically.
  */
 object DungeonScore {
     private val milestones = listOf("⓿", "❶", "❷", "❸", "❹", "❺", "❻", "❼", "❽", "❾")

@@ -9,7 +9,6 @@ import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.zenith.*
 import co.stellarskys.stella.events.core.*
 import co.stellarskys.stella.managers.EventBusManager
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
@@ -39,7 +38,8 @@ object EventBus : EventBus() {
         }
 
         ClientReceiveMessageEvents.ALLOW_GAME.register { message, isActionBar ->
-            !post(ChatEvent.Receive(message, isActionBar))
+            if (isActionBar) !post(ChatEvent.ActionBar(message))
+            else !post(ChatEvent.Receive(message)) and (ChatEvent.Channel.match(message)?.let { !post(it) } ?: true)
         }
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->

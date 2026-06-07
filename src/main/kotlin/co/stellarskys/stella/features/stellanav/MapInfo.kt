@@ -7,8 +7,10 @@ import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.utils.render.*
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.api.dungeons.Dungeon
+import co.stellarskys.stella.features.stellanav.render.MapRenderer
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import net.minecraft.client.gui.GuiGraphics
+import tech.thatgravyboat.skyblockapi.platform.pushPop
 
 @Module
 object MapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS) {
@@ -16,49 +18,19 @@ object MapInfo: Feature("separateMapInfo", island = SkyBlockIsland.THE_CATACOMBS
 
     override fun initialize() {
         HUDManager.registerCustom(name, 200, 30,this::hudEditorRender, "separateMapInfo")
-
         on<GuiEvent.RenderHUD> { event -> renderNormal(event.context) }
     }
 
-    fun hudEditorRender(context: GuiGraphics){
+    fun hudEditorRender(context: GuiGraphics) {
         renderMapInfo(context, true)
     }
 
-    fun renderNormal(context: GuiGraphics) {
-        val matrix = context.pose()
-
-        val x = HUDManager.getX(name)
-        val y = HUDManager.getY(name)
-        val scale = HUDManager.getScale(name)
-
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-        matrix.scale(scale, scale)
-
+    fun renderNormal(context: GuiGraphics) = HUDManager.renderHud(name, context) {
         renderMapInfo(context, false)
-
-        matrix.popMatrix()
     }
 
-    fun renderMapInfo(context: GuiGraphics, preview: Boolean) {
-        val matrix = context.pose()
-
-        var mapLine1 = Dungeon.mapLine1
-        var mapLine2 = Dungeon.mapLine2
-
-        if (preview) {
-            mapLine1 = "§7Secrets: §b?§8-§e?§8-§c?        §7Score: §c0"
-            mapLine2 = "§7Deaths: §a0 §8| §7M: §c✘ §8| §7P: §c✘ §8| §7Crypts: §c0"
-        }
-        val w1 = mapLine1.width()
-        val w2 = mapLine2.width()
-
-        matrix.pushMatrix()
-        matrix.translate( 100f, 5f,)
-
-        Render2D.drawString(context, mapLine1,-w1 / 2, 0)
-        Render2D.drawString(context, mapLine2,-w2 / 2, 10)
-
-        matrix.popMatrix()
+    fun renderMapInfo(context: GuiGraphics, preview: Boolean) = context.pushPop {
+        context.pose().translate(100f, 5f)
+        MapRenderer.renderStats(context, preview, 0f, 0f)
     }
 }

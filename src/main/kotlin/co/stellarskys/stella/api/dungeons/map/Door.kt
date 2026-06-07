@@ -17,11 +17,7 @@ class Door(val worldPos: Pair<Int, Int>, val componentPos: Pair<Int, Int>) {
         return Triple(worldPos.first, 69, worldPos.second)
     }
 
-    init {
-        if (worldPos.first != 0 && worldPos.second != 0) {
-            checkType()
-        }
-    }
+    init { if (worldPos.first != 0 && worldPos.second != 0) checkType() }
 
     fun getComp(): Pair<Int, Int> {
         return componentPos

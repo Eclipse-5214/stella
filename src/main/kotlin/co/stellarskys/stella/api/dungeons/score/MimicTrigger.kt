@@ -20,29 +20,25 @@ import net.minecraft.world.entity.monster.Zombie
  * Updates via chat messages or entity death detection.
  */
 object MimicTrigger {
-    val MIMIC_PATTERN = Regex("""^Party > (?:\[[\w+]+] )?\w{1,16}: (.*)$""")
-
     var mimicDead by Spark(false)
     var princeDead by Spark(false)
 
     val mimicMessages = listOf("mimic dead", "mimic dead!", "mimic killed", "mimic killed!", "\$skytils-dungeon-score-mimic$")
 
     fun init() {
-        EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.on<ChatEvent.Channel.Party>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            println("Party message found from ${event.name}: ${event.contents}")
             if (Dungeon.floorNumber !in 6..7 || Dungeon.floor == null) return@on
-            val msg = event.stripped.lowercase()
+            if (mimicMessages.any { event.contents.lowercase().contains(it) }) mimicDead = true
+        }
 
-            when {
-                MIMIC_PATTERN.matches(msg) && mimicMessages.any { msg.contains(it) } -> mimicDead = true
-                msg == "a prince falls. +1 bonus score" -> {
-                    princeDead = true
-                    EventBus.post(DungeonEvent.Score.PrinceDead())
-                }
-            }
+        EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
+            if(event.stripped.lowercase() != "a prince falls. +1 bonus score") return@on
+            princeDead = true; EventBus.post(DungeonEvent.Score.PrinceDead())
         }
 
         EventBus.on<EntityEvent.Death>(SkyBlockIsland.THE_CATACOMBS) { event ->
-            if (Dungeon.floor?.floorNumber !in listOf(6, 7) || mimicDead || Dungeon.inBoss) return@on
+            if (Dungeon.floorNumber !in listOf(6, 7) || mimicDead || Dungeon.inBoss) return@on
             val entity = event.entity as? Zombie ?: return@on
             if (!entity.isBaby || entity.hasItemInSlot(EquipmentSlot.HEAD)) return@on
             mimicDead = true
