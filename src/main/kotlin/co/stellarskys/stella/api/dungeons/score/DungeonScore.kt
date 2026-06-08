@@ -8,7 +8,7 @@ import co.stellarskys.stella.api.handlers.Flare
 import co.stellarskys.stella.api.handlers.Spark
 import co.stellarskys.stella.utils.config
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
-import tech.thatgravyboat.skyblockapi.api.data.Perk
+import tech.thatgravyboat.skyblockapi.api.data.MayorPerks
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
@@ -41,7 +41,7 @@ object DungeonScore {
         set(value) { field = value; if (value) EventBus.post(DungeonEvent.Score.AllCrypts()) }
 
     val forcePaul by config.property<Boolean>("forcePaul")
-    val hasPaul get() = Perk.EZPZ.active || forcePaul
+    val hasPaul get() = MayorPerks.EZPZ.active || forcePaul
     var hasSpiritPet = true
 
     var dungeonSeconds by Spark(0)
