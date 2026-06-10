@@ -37,17 +37,21 @@ data class SkyblockResponse(
         val balance: Double = 0.0
     )
 
+    data class MemberProfile(
+        @SerializedName("bank_account") val personalBank: Double = 0.0
+    )
+
     data class SkyblockMember(
         @SerializedName("player_stats") val stats: PlayerStats = PlayerStats(),
         @SerializedName("player_data") val playerData: PlayerData = PlayerData(), // Added
         @SerializedName("leveling") val leveling: Leveling = Leveling(),         // Added
+        @SerializedName("profile") val memberProfile: MemberProfile? = null,
         val slayer: SlayerData = SlayerData(),
         @SerializedName("pets_data") val petsData: PetsData = PetsData(),
         val dungeons: DungeonsData = DungeonsData(),
         @SerializedName("accessory_bag_storage") val accessoryBag: AccessoryBagStorage = AccessoryBagStorage(),
         val inventory: Inventory = Inventory(),
         val collection: Map<String, Double> = emptyMap(),
-        @SerializedName("bank_account") val soloBank: Double = 0.0,
         val currencies: Currencies = Currencies(),
         var profile: SkyblockProfile? = null,
         var uuid: UUID? = null
