@@ -35,7 +35,7 @@ object NetworthUtils {
     fun getPetsNetworth(m: SkyblockResponse.SkyblockMember) = m.petsData.pets.sumOf { it.getValue() }
 
     fun getCurrencyNetworth(m: SkyblockResponse.SkyblockMember) =
-        (m.currencies.purse + m.soloBank + (m.profile?.banking?.balance ?: 0.0)).toLong()
+        (m.currencies.purse + (m.memberProfile?.personalBank ?: 0.0) + (m.profile?.banking?.balance ?: 0.0)).toLong()
 
     fun getSacksNetworth(m: SkyblockResponse.SkyblockMember) =
         m.inventory.sacks.entries.sumOf { (id, amt) -> Pricing.getPrice(id) * amt }

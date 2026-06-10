@@ -135,7 +135,7 @@ class Pets(
         val centerOffset = (SLOT_SIZE - (16 * itemScale)) / 2f
         ren2d.renderItem(ctx, petItem, ix + centerOffset, iy + centerOffset, itemScale)
 
-        if (isAreaHovered((ix + ox).toFloat(), (iy + oy).toFloat() + scrollOffset, SLOT_SIZE.toFloat(), SLOT_SIZE.toFloat(), mx, my)) {
+        if (isAreaHovered(15f, 30f, 190f, 175f, mx, my) && isAreaHovered((ix + ox).toFloat(), (iy + oy).toFloat() + scrollOffset, SLOT_SIZE.toFloat(), SLOT_SIZE.toFloat(), mx, my)) {
             hoveredPet = petItem
             ren2d.drawRect(ctx, ix + 1, iy + 1, SLOT_SIZE - 2, SLOT_SIZE - 2, Palette.Surface1.withAlpha(80))
         }

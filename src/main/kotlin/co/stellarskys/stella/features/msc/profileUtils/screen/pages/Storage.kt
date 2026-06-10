@@ -6,6 +6,8 @@ import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.ProfileViewer
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
+import co.stellarskys.stella.api.horizon.mc.addTo
+import co.stellarskys.stella.features.msc.profileUtils.screen.SearchBar
 import co.stellarskys.stella.utils.render.Render2D.width
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.item.ItemStack
@@ -13,6 +15,8 @@ import net.minecraft.world.item.Items
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 import tech.thatgravyboat.skyblockapi.utils.extentions.get
+import tech.thatgravyboat.skyblockapi.utils.extentions.getLore
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
 
 class Storage(
@@ -25,6 +29,19 @@ class Storage(
     private val subPages = listOf(NormalInventory(), EnderChest(), Backpacks(), AccessoryBag(), PersonalVault(), Wardrobe())
     private var currentPage: SubPage = subPages.first()
     private var hoveredStack: ItemStack? = null
+    
+    private val searchCache = java.util.IdentityHashMap<ItemStack, Boolean>()
+    private val searchBar = SearchBar(230f, 6f, 110f, 14f) { searchCache.clear() }.addTo(this)
+
+    private fun matchesSearch(stack: ItemStack): Boolean {
+        if (searchBar.query.isEmpty() || stack.isEmpty) return false
+        return searchCache.getOrPut(stack) {
+            val q = searchBar.query.lowercase()
+            val name = stack.hoverName.stripped.lowercase()
+            if (name.contains(q)) true
+            else stack.getLore().any { it.stripped.lowercase().contains(q) }
+        }
+    }
 
     companion object {
         const val SLOT_SIZE = 26
@@ -36,6 +53,8 @@ class Storage(
     }
 
     override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float, delta: Float) {
+        searchBar.render(context, mouseX, mouseY, delta)
+
         subPages.forEachIndexed { i, page ->
             val by = (25 + i * 31.8f).toInt()
             val isSelected = currentPage == page
@@ -62,10 +81,20 @@ class Storage(
 
     private fun drawSlot(ctx: GuiGraphics, ix: Int, iy: Int, stack: ItemStack, mx: Float, my: Float) {
         var bgColor = Palette.Crust.withAlpha(100)
-        if (ProfileViewer.showRarity && !stack.isEmpty) stack[DataTypes.RARITY]?.let { bgColor = Color(it.color).withAlpha(40) }
+        var borderColor = Palette.Surface0
+        var borderWidth = 1
+
+        if (!stack.isEmpty) {
+            if (ProfileViewer.showRarity) stack[DataTypes.RARITY]?.let { bgColor = Color(it.color).withAlpha(40) }
+            if (searchBar.query.isNotEmpty() && matchesSearch(stack)) {
+                borderColor = Palette.Purple
+                borderWidth = 2
+                bgColor = Palette.Purple.withAlpha(50)
+            }
+        }
 
         ren2d.drawRect(ctx, ix, iy, SLOT_SIZE, SLOT_SIZE, bgColor)
-        ren2d.drawHollowRect(ctx, ix, iy, SLOT_SIZE, SLOT_SIZE, 1, Palette.Surface0)
+        ren2d.drawHollowRect(ctx, ix, iy, SLOT_SIZE, SLOT_SIZE, borderWidth, borderColor)
         if (stack.isEmpty) return
 
         val itemScale = 1.5f
@@ -186,11 +215,6 @@ class Storage(
     inner class AccessoryBag : PagedSubPage("Accessory Bag") {
         override val icon: ItemStack = Items.BOOK.defaultInstance
         override val cachedPages by lazy { member.inventory.bags.accessoryBagPages }
-        override fun onRender(context: GuiGraphics, mouseX: Float, mouseY: Float) {
-            val mp = "§dMP§7: §6${member.assumedMagicalPower}"
-            ren2d.drawString(context, mp, 340 - mp.width(), 10, 1f)
-            super.onRender(context, mouseX, mouseY)
-        }
     }
 
     inner class Wardrobe : PagedSubPage("Wardrobe") {
