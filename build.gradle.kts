@@ -50,6 +50,10 @@ dependencies {
     }
 }
 
+java {
+    withSourcesJar()
+}
+
 ksp {
     arg("stella.id", modID)
 }
