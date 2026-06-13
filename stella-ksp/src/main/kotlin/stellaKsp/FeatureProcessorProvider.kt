@@ -7,5 +7,8 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 
 @AutoService(SymbolProcessorProvider::class)
 class FeatureProcessorProvider : SymbolProcessorProvider {
-    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor = FeatureProcessor(environment.codeGenerator)
+    override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
+        val projectName = environment.options["stella.id"] ?: "Core"
+        return FeatureProcessor(environment.codeGenerator, projectName)
+    }
 }

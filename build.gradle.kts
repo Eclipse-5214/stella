@@ -10,9 +10,10 @@ plugins {
 
 val mc = stonecutter.current.version
 val loader = "fabric"
+val modID = property("mod.id") as String
 
 version = "${property("mod.version")}+${mc}"
-base.archivesName = property("mod.id") as String
+base.archivesName = modID
 
 repositories {
     @Suppress("UnstableApiUsage")
@@ -47,6 +48,10 @@ dependencies {
     listOf("windows", "linux", "linux-arm64", "macos", "macos-arm64").forEach { os ->
         shadow("${libs.lwjgl.nanovg.get()}:natives-$os")
     }
+}
+
+ksp {
+    arg("stella.id", modID)
 }
 
 publishing {

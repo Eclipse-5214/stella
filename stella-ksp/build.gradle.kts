@@ -1,10 +1,20 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ksp)
+    `maven-publish`
 }
 
 repositories {
     mavenCentral()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifactId = "stella-ksp"
+            from(components["java"])
+        }
+    }
 }
 
 dependencies {

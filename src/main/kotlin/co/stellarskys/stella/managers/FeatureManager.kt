@@ -4,9 +4,9 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.generated.ModuleList
 import co.stellarskys.stella.utils.config
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import java.util.ServiceLoader
 import java.util.concurrent.ConcurrentHashMap
 
 object FeatureManager {
@@ -43,31 +43,31 @@ object FeatureManager {
 
     fun loadFeatures() {
         val startTime = System.currentTimeMillis()
+        val providers = ServiceLoader.load(ModuleProvider::class.java, FeatureManager::class.java.classLoader)
 
-        val modules = ModuleList.modules
-        val commands = ModuleList.commands
-
-        for (module in modules) {
-            runCatching {
-                // Force initialization to register the feature
-                Class.forName(module.name)
-                moduleCount++
-                Stella.LOGGER.debug("Loaded module: ${module.name}")
-            }.onFailure { e ->
-                Stella.LOGGER.error("Error initializing module ${module.name}: $e")
-            }
-        }
-
-        for (command in commands) {
-            runCatching {
-                if (!command.isEnabled()) return@runCatching
-                ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-                    command.register(dispatcher)
+        for (provider in providers) {
+            for (module in provider.modules) {
+                runCatching {
+                    // Force initialization to register the feature
+                    Class.forName(module.name)
+                    moduleCount++
+                    Stella.LOGGER.debug("Loaded module: ${module.name}")
+                }.onFailure { e ->
+                    Stella.LOGGER.error("Error initializing module ${module.name}: $e")
                 }
-                commandCount++
-                Stella.LOGGER.debug("Loaded command: ${command::class.java.name}")
-            }.onFailure { e ->
-                Stella.LOGGER.error("Error initializing command ${command::class.java.name}: $e")
+            }
+
+            for (command in provider.commands) {
+                runCatching {
+                    if (!command.isEnabled()) return@runCatching
+                    ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+                        command.register(dispatcher)
+                    }
+                    commandCount++
+                    Stella.LOGGER.debug("Loaded command: ${command::class.java.name}")
+                }.onFailure { e ->
+                    Stella.LOGGER.error("Error initializing command ${command::class.java.name}: $e")
+                }
             }
         }
 
