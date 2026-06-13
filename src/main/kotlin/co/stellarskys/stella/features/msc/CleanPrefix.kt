@@ -11,7 +11,7 @@ object CleanPrefix: Feature("cleanPrefix") {
     private val rankRegex = """\[(.+?)]""".toRegex()
 
     override fun initialize() {
-        on<ChatEvent.Receive>(-1){ event ->
+        on<ChatEvent.Modify.Receive>(-1){ event ->
             event matches guildRegex modify { m ->
                 val hRank = m.groupValues[1].color()
                 val gRank = m.groupValues[3].takeIf { it.isNotEmpty() }?.let { "§8$it " } ?: ""
@@ -31,7 +31,7 @@ object CleanPrefix: Feature("cleanPrefix") {
             "MVP++" -> "6"
             "MVP+", "MVP" -> "b"
             "VIP+", "VIP" -> "a"
-            else -> "c"
+            else -> "c" // YouTube or Admin
         }
     }
 }

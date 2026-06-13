@@ -1,7 +1,6 @@
 package co.stellarskys.stella.events.core
 
 import co.stellarskys.stella.api.events.Event
-import co.stellarskys.stella.api.handlers.Signal
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 
@@ -9,26 +8,34 @@ abstract class ChatEvent(val message: Component): Event(cancelable = true) {
     val stripped get() = message.stripped
     val string: String get() = message.string
 
-    class Receive(message: Component): ChatEvent(message) {
-        fun modify(new: String) = modify(Component.literal(new))
-        fun modify(new: Component) { cancel(); Signal.fakeMessage(new) }
+    open infix fun matches(regex: Regex) = Match(regex.find(stripped))
+    open infix fun matchesRaw(regex: Regex) = Match(regex.find(string))
 
-        infix fun matches(regex: Regex) = RMatch(this, regex.find(stripped))
-        infix fun matchesRaw(regex: Regex) = RMatch(this, regex.find(string))
+    class Receive(message: Component): ChatEvent(message)
+    class ActionBar(message: Component): ChatEvent(message)
 
-        class RMatch(val event: Receive, match: MatchResult?): Match(match) {
+    abstract class Modify(message: Component): ChatEvent(message) {
+        private var result: Component = message
+        fun getResult(): Component = if(cancelled) Component.empty() else result
+
+        fun modify(new: String) { result = Component.literal(new) }
+        fun modify(new: Component) { result = new }
+
+        override infix fun matches(regex: Regex) = MMatch(this, regex.find(stripped))
+        override infix fun matchesRaw(regex: Regex) = MMatch(this, regex.find(string))
+
+        class MMatch(val event: Modify, match: MatchResult?): Match(match) {
             infix fun modifyC(new: (MatchResult) -> Component) { match?.let { event.modify(new(it)) } }
             infix fun modify(new: (MatchResult) -> String) { match?.let { event.modify(new(it)) } }
         }
+
+        class Receive(message: Component): Modify(message)
+        class ActionBar(message: Component): Modify(message)
     }
 
-    class ActionBar(message: Component): ChatEvent(message) {
-        infix fun matches(regex: Regex) = Match(regex.find(stripped))
-        infix fun matchesRaw(regex: Regex) = Match(regex.find(string))
-    }
 
     abstract class Channel(message: Component, val name: String, val contents: String): ChatEvent(message) {
-        infix fun matches(regex: Regex) = Match(regex.find(contents))
+        override infix fun matches(regex: Regex) = Match(regex.find(contents))
 
         class Party(message: Component, name: String, contents: String): Channel(message, name, contents)
         class Guild(message: Component, name: String, contents: String): Channel(message, name, contents)

@@ -42,6 +42,11 @@ object EventBus : EventBus() {
             else !post(ChatEvent.Receive(message)) and (ChatEvent.Channel.match(message)?.let { !post(it) } ?: true)
         }
 
+        ClientReceiveMessageEvents.MODIFY_GAME.register { message, isActionBar ->
+            val event = if (isActionBar) ChatEvent.Modify.ActionBar(message) else ChatEvent.Modify.Receive(message)
+            post(event); event.getResult()
+        }
+
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             post(ServerEvent.Connect())
         }

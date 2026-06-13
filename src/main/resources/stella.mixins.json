@@ -5,8 +5,7 @@
     "injectors": {
         "defaultRequire": 1
     },
-    "mixins": [
-    ],
+    "mixins": [],
     "client": [
       "MixinFont",
       "MixinClientLevel",

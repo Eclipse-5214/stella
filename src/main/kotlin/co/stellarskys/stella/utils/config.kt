@@ -1290,7 +1290,6 @@ val config = Config(Stella.NAMESPACE) {
         }
 
         subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
-        subcategory("Sword Blocking", "swordBlocking", "Enables 1.8.9 style sword blocking")
 
         subcategory("Profile Viewer", "profileViewer", "Super minimal profile viewer") {
             toggle {
