@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.loom)
     alias(libs.plugins.ksp)
+    `maven-publish`
 }
 
 val mc = stonecutter.current.version
@@ -21,7 +22,6 @@ repositories {
     strictMaven("https://repo.hypixel.net/repository/Hypixel", "net.hypixel")
     strictMaven("https://api.modrinth.com/maven", "maven.modrinth")
     strictMaven("https://maven.teamresourceful.com/repository/maven-public/", "tech.thatgravyboat", "com.terraformersmc", "me.owdding")
-    strictMaven("https://maven.cassian.cc", "cc.cassian")
 }
 
 dependencies {
@@ -46,6 +46,15 @@ dependencies {
     shadow(libs.lwjgl.nanovg)
     listOf("windows", "linux", "linux-arm64", "macos", "macos-arm64").forEach { os ->
         shadow("${libs.lwjgl.nanovg.get()}:natives-$os")
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifactId = "${property("mod.id")}-$mc"
+            from(components["java"])
+        }
     }
 }
 
