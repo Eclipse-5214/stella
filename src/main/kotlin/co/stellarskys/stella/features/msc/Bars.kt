@@ -1,6 +1,7 @@
 package co.stellarskys.stella.features.msc
 
 import co.stellarskys.stella.annotations.Module
+import co.stellarskys.stella.api.events.Event
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
@@ -12,6 +13,7 @@ import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.Render2D.width
 import co.stellarskys.stella.api.nvg.NVGRenderer
+import co.stellarskys.stella.events.core.ChatEvent
 import co.stellarskys.stella.utils.render.Render2D.batchNVG
 import co.stellarskys.stella.utils.render.Render2D.flushNVG
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -89,6 +91,10 @@ object Bars : Feature("bars", true) {
             if (ofMana) ofManaHud(it.context)
 
             it.context.flushNVG()
+        }
+
+        on<ChatEvent.Modify.ActionBar> { event ->
+            event.modify(cleanAB(event.message))
         }
     }
 

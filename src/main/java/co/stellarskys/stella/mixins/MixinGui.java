@@ -17,11 +17,6 @@ public class MixinGui {
      * Modified from Devonian code
      * Under GPL 3.0 License
      */
-    @Inject(method = "extractEffects", at = @At("HEAD"), cancellable = true)
-    private void stella$renderEffects(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (InventoryButtons.INSTANCE.isEnabled()) ci.cancel();
-    }
-
     @Inject(method = "extractHearts", at = @At("HEAD"), cancellable = true)
     private void stella$onRenderHealthBar(GuiGraphicsExtractor graphics, Player player, int xLeft, int yLineBase, int healthRowHeight, int heartOffsetIndex, float maxHealth, int currentHealth, int oldHealth, int absorption, boolean blink, CallbackInfo ci) {
         if (Bars.INSTANCE.getHideVanillaHealth() && Bars.INSTANCE.isEnabled()) ci.cancel();

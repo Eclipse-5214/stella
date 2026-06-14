@@ -16,7 +16,6 @@
       "MixinLivingEntity",
       "MixinContainer",
       "MixinKeyboardHandler",
-      "MixinChatListener",
       "accessors.AccessorMapState",
       "accessors.AccessorGpuDevice"
     ]
