@@ -959,7 +959,7 @@ val config = Config(Stella.NAMESPACE) {
                 configName = "secretRoutes.addCustom"
                 name = "Custom Waypoint Bind"
                 description = "Adds a custom waypoint to the route"
-                default = Zenith.Keys.C
+                default = Zenith.Keys.NONE
             }
         }
 
