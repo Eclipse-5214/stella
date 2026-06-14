@@ -37,10 +37,13 @@ object Boss {
             val you = p.name.string
             for (dp in DungeonPlayerManager.players) {
                 if (dp == null || (!dp.alive && dp.name != you)) continue
+                val entity = dp.entity ?: continue
 
                 val pos = if (Map.smoothMovement) dp.pos.getLerped() else dp.pos.raw
                 val rx = pos?.realX ?: continue
                 val rz = pos.realZ ?: continue
+                if (!bMap.contains(rx, entity.y, rz)) continue
+
                 val hudX = toHud(rx, bMap.topLeftLocation[0], sizeInWorld, viewX)
                 val hudY = toHud(rz, bMap.topLeftLocation[1], sizeInWorld, viewZ)
 
@@ -56,7 +59,13 @@ object Boss {
         val width: Int, val height: Int,
         val widthInWorld: Int, val heightInWorld: Int,
         val topLeftLocation: List<Int>, val renderSize: Int? = null
-    )
+    ) {
+        fun contains(x: Double, y: Double, z: Double): Boolean {
+            return x in bounds[0][0]..bounds[1][0] &&
+                    y in bounds[0][1]..bounds[1][1] &&
+                    z in bounds[0][2]..bounds[1][2]
+        }
+    }
 
     object BossMapRegistry {
         private val gson = Gson()
