@@ -1,6 +1,7 @@
 package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.api.handlers.Capsule
+import co.stellarskys.stella.utils.render.Render2D
 import com.google.gson.reflect.TypeToken
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import tech.thatgravyboat.skyblockapi.platform.pushPop

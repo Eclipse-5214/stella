@@ -54,7 +54,6 @@ object Bars : Feature("bars", true) {
     private var healthDelta: Float? = null
     private var lastHealthDeltaTime = Chronos.zero
 
-
     val HPHudName = "hpHud"
     val HPChangeHudName = "hpChangeHud"
     val HPNumHudName = "hpNumHud"

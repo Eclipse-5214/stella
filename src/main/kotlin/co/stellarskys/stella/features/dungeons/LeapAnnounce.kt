@@ -6,6 +6,7 @@ import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.utils.config
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
+
 @Module
 object LeapAnnounce: Feature("leapAnnounce", island = SkyBlockIsland.THE_CATACOMBS) {
     private val leapRegex = "^You have teleported to (\\w+)".toRegex()
