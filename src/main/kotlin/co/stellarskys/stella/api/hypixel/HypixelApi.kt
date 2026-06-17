@@ -17,6 +17,8 @@ import kotlin.jvm.optionals.getOrNull
 object HypixelApi {
     private val UUID2NameCache = object : LinkedHashMap<String, String>(64, 0.75f, true) { override fun removeEldestEntry(eldest: Map.Entry<String, String>) = size > 512 }
     private val Name2UUIDCache = object : LinkedHashMap<String, String>(64, 0.75f, true) { override fun removeEldestEntry(eldest: Map.Entry<String, String>) = size > 512 }
+    private val ProfileCache = TtlCache<String, SkyblockResponse.SkyblockMember>(5 * 60 * 1000L)
+    private val SecretsCache = TtlCache<String, Int>(5 * 60 * 1000L)
 
     data class MojangProfile(val name: String, val id: String)
 
@@ -128,47 +130,24 @@ object HypixelApi {
         }
     }
 
-    object ProfileCache {
-        private val data = mutableMapOf<String, Pair<Chronos.SimpleTimeMark, SkyblockResponse.SkyblockMember>>()
-        private const val EXPIRY_MS = 5 * 60 * 1000L
+    class TtlCache<K, V>(private val defaultExpiryMs: Long) {
+        private val data = mutableMapOf<K, Pair<Chronos.SimpleTimeMark, V>>()
 
-        fun get(uuid: String, cacheMs: Long): SkyblockResponse.SkyblockMember? {
-            val entry = data[uuid] ?: return null
+        fun get(key: K, cacheMs: Long = defaultExpiryMs): V? {
+            val entry = data[key] ?: return null
             if (entry.first.since.millis > cacheMs) {
-                data.remove(uuid)
+                data.remove(key)
                 return null
             }
             return entry.second
         }
 
-        fun put(uuid: String, member: SkyblockResponse.SkyblockMember) {
-            data[uuid] = Chronos.now to member
+        fun put(key: K, value: V) {
+            data[key] = Chronos.now to value
         }
 
         fun cleanup() {
-            data.entries.removeIf { it.value.first.since.millis > EXPIRY_MS }
-        }
-    }
-
-    object SecretsCache {
-        private val data = mutableMapOf<String, Pair<Chronos.SimpleTimeMark, Int>>()
-        private const val DEFAULT_EXPIRY = 5 * 60 * 1000L
-
-        fun get(uuid: String, cacheMs: Long): Int? {
-            val entry = data[uuid] ?: return null
-            if (entry.first.since.millis > cacheMs) {
-                data.remove(uuid)
-                return null
-            }
-            return entry.second
-        }
-
-        fun put(uuid: String, count: Int) {
-            data[uuid] = Chronos.now to count
-        }
-
-        fun cleanup() {
-            data.entries.removeIf { it.value.first.since.millis > DEFAULT_EXPIRY }
+            data.entries.removeIf { it.value.first.since.millis > defaultExpiryMs }
         }
     }
 }

@@ -25,7 +25,7 @@ object Stella: ClientModInitializer {
         FeatureManager.loadFeatures()
         FeatureManager.initializeFeatures()
 
-        PictureInPictureRendererRegistry.register { NVGPIPRenderer(it.bufferSource()) }
+        PictureInPictureRendererRegistry.register { NVGPIPRenderer(it.minecraft().renderBuffers().bufferSource()) }
     }
 }
 

@@ -200,14 +200,33 @@ class Config(
 
             // Now overwrite those defaults with the file content
             if (resolvedFile.exists()) {
-                val json = Gson().fromJson(resolvedFile.readText(), JsonObject::class.java)
-                fromJson(json)
+                try {
+                    val json = Gson().fromJson(resolvedFile.readText(), JsonObject::class.java)
+                    fromJson(json)
+                } catch (e: Exception) {
+                    Stella.LOGGER.error("Config for '$modID' is corrupted, falling back to defaults: ${e.message}")
+                    backupCorruptedFile()
+                }
             }
         } catch (e: Exception) {
             Stella.LOGGER.error("Failed to load config: ${e.message}")
         } finally {
             loading = false
             loaded = true
+        }
+    }
+
+    /**
+     * Copies the corrupted settings file aside before defaults silently overwrite it on the next [save],
+     * so the user doesn't lose their old config without a trace.
+     */
+    private fun backupCorruptedFile() {
+        try {
+            val backup = File(resolvedFile.parentFile, "${resolvedFile.name}.corrupted")
+            resolvedFile.copyTo(backup, overwrite = true)
+            Stella.LOGGER.error("Backed up corrupted config for '$modID' to '${backup.absolutePath}'")
+        } catch (e: Exception) {
+            Stella.LOGGER.error("Failed to back up corrupted config for '$modID': ${e.message}")
         }
     }
 

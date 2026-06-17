@@ -7,6 +7,8 @@ import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
+import co.stellarskys.stella.api.handlers.Flare
+import co.stellarskys.stella.api.handlers.Spark
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render2D
@@ -51,8 +53,16 @@ object Bars : Feature("bars", true) {
     val ofmColor by config.property<Color>("bars.ofmColor")
 
     private var lastHealth = StatsAPI.health.toFloat()
-    private var healthDelta: Float? = null
     private var lastHealthDeltaTime = Chronos.zero
+
+    private var health by Spark(StatsAPI.health.toFloat())
+    var healthDelta by Flare<Float?>(null) {
+        val current = health
+        val delta = if (current == lastHealth) null else current - lastHealth
+        lastHealth = current
+        lastHealthDeltaTime = Chronos.now
+        delta
+    }
 
     val HPHudName = "hpHud"
     val HPChangeHudName = "hpChangeHud"
@@ -207,13 +217,7 @@ object Bars : Feature("bars", true) {
     }
 
     private fun updateHealthDelta() {
-        val current = StatsAPI.health.toFloat()
-
-        if (current != lastHealth) {
-            healthDelta = current - lastHealth
-            lastHealthDeltaTime = Chronos.now
-            lastHealth = current
-        }
+        health = StatsAPI.health.toFloat()
 
         if (healthDelta != null && lastHealthDeltaTime.since.millis > 3000) {
             healthDelta = null
