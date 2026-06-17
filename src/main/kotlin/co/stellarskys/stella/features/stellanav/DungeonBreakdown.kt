@@ -39,7 +39,7 @@ object DungeonBreakdown: Feature("dungeonBreakdown", island = SkyBlockIsland.THE
                 }
             }
 
-            Chronos.Tick.after(3 * 20) run {
+            Chronos.Tick.after(2 * 20) run {
                 Signal.fakeMessage(Stella.PREFIX + " §bCleared room counts:")
                 Dungeon.players.forEach { player ->
                     val secrets = deltaSecrets[player.name]?.let { "§b$it" } ?: "§cAPI Err"
