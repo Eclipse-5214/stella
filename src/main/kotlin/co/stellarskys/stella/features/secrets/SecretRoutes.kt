@@ -103,7 +103,7 @@ object SecretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
         on<RenderEvent.World.Last> {
             if (currentRoom == null || route.isEmpty() || currentStep == null) return@on
             if (onlyRenderAfterClear && currentRoom?.checkmark in setOf(Checkmark.NONE, Checkmark.UNEXPLORED, Checkmark.UNDISCOVERED)) return@on
-            if (stopRenderAfterGreen && currentRoom?.checkmark == Checkmark.GREEN) return@on
+            if (stopRenderAfterGreen && currentRoom?.checkmark == Checkmark.GREEN && currentRoom?.name != "Golden Oasis") return@on
             RoutePlayer.renderRoute(currentStep!!, firstStep)
 
             if (Dungeon.inBoss || !lockedChest) return@on
