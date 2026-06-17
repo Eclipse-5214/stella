@@ -14,6 +14,10 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import kotlin.time.Duration.Companion.milliseconds
 
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.screen
+*///? }
+
 @Module
 object InventoryButtons : Feature("buttons",true) {
     private var lastClick = Chronos.zero

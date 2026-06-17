@@ -33,6 +33,10 @@ import java.awt.Color
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.collections.setOf
 
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.setScreen
+*///? }
+
 @Module
 object RouteRecorder {
     private val addCustomBind by config.property<Keybind.Handler>("secretRoutes.addCustom")

@@ -9,6 +9,10 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.TextColor
 import kotlin.math.roundToInt
 
+//? if > 26.1 {
+/*import co.stellarskys.stella.api.zenith.chat
+*///?}
+
 object Signal {
     const val LINE = "---------------------------------------------"
 

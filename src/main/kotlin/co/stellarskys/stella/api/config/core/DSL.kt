@@ -8,6 +8,10 @@ import java.awt.Color
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.screen
+*///? }
+
 open class ConfigCategory(val name: String, val config: Config) {
     val subcategories = mutableMapOf<String, ConfigSubcategory>()
 

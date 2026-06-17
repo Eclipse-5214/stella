@@ -4,6 +4,9 @@ import co.stellarskys.stella.api.config.core.Config
 import co.stellarskys.stella.api.dungeons.map.Room
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render3D
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.center
+*///? }
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState

@@ -7,6 +7,10 @@ import co.stellarskys.stella.api.dungeons.map.Room
 import net.minecraft.world.phys.Vec3
 import java.awt.Color
 
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.center
+*///? }
+
 object RoutePlayer {
     val text by config.property<Boolean>("secretRoutes.text")
     val textScale by config.property<Float>("secretRoutes.textScale")

@@ -108,16 +108,17 @@ object Utils {
     }
 
     fun alert(title: String, sound: SoundEvent? = null, volume: Float = 1f, pitch: Float = 1f) {
-        client.gui.setTimes(0, 20, 5)
-        client.gui.setTitle(Component.literal(title))
-
-        if (sound == null) return
-        player?.playSound(sound, volume, pitch)
+        alert(Component.literal(title), sound, volume, pitch)
     }
 
     fun alert(title: Component, sound: SoundEvent? = null, volume: Float = 1f, pitch: Float = 1f) {
-        client.gui.setTimes(0, 20, 5)
-        client.gui.setTitle(title)
+        //? if < 26.2 {
+         client.gui.setTimes(0, 20, 5)
+           client.gui.setTitle(title)
+         //? } else {
+        /*client.gui.hud.setTimes(0 ,20, 5)
+        client.gui.hud.setTitle(title)
+        *///? }
 
         if (sound == null) return
         player?.playSound(sound, volume, pitch)

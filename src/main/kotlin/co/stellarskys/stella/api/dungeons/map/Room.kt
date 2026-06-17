@@ -140,7 +140,7 @@ class Room(
                 if (!isX || !isZ) return@firstOrNull false
 
                 val (nx, nz) = WorldScanUtils.componentToRealCoords(cx, cz).let { it.first + OFFSETS[i].first to it.second + OFFSETS[i].second }
-                WorldScanUtils.isChunkLoaded(nx, h, nz) && Orbit.getBlockStateAt(nx, h, nz)?.`is`(Blocks.BLUE_TERRACOTTA) == true
+                WorldScanUtils.isChunkLoaded(nx, h, nz) && Orbit.getBlockStateAt(nx, h, nz)?.`is`( /*? if < 26.2 { */ Blocks.BLUE_TERRACOTTA /*?} else {*/ /*Blocks.DYED_TERRACOTTA.blue *//*?}*/) == true
             }?.let { i ->
                 rotation = i * 90
                 val (rx, rz) = WorldScanUtils.componentToRealCoords(cx, cz)

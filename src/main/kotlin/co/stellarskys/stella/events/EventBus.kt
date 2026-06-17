@@ -83,19 +83,23 @@ object EventBus : EventBus() {
         }
 
         LevelRenderEvents.AFTER_SOLID_FEATURES.register { context ->
-            post(RenderEvent.World.AfterEntities(context.poseStack()))
+            post(RenderEvent.World.AfterEntities(context.poseStack(), context.submitNodeCollector()))
         }
 
         LevelRenderEvents.END_MAIN.register { context ->
-           post(RenderEvent.World.Last(context.poseStack()))
+           post(RenderEvent.World.Last(context.poseStack(), context.submitNodeCollector()))
         }
 
         LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
-           !post(RenderEvent.World.BlockOutline(context.poseStack(), outlineRenderState.pos(), outlineRenderState.shape))
+           !post(RenderEvent.World.BlockOutline(context.poseStack(), context.submitNodeCollector(),outlineRenderState.pos(), outlineRenderState.shape))
         }
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP, STELLA_HUDS) { context, _ ->
+            //? if < 26.2 {
             if (client.options.hideGui || world == null || player == null) return@attachElementBefore
+            //? } else {
+            /*if (client.gameRenderer.gameRenderState().guiRenderState.isHudHidden || world == null || player == null) return@attachElementBefore
+            *///? }
             post(GuiEvent.RenderHUD(context))
             Stella.DELTA.updateDelta()
         }

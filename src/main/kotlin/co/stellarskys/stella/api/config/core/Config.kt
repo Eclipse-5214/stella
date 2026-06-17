@@ -11,9 +11,12 @@ import co.stellarskys.stella.api.zenith.client
 import com.google.gson.*
 import java.awt.Color
 import java.io.File
-import java.lang.reflect.Method
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KProperty
+
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.setScreen
+*///? }
 
 /**
  * Main configuration system for Stella.

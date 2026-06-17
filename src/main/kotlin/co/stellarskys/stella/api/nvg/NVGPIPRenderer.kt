@@ -9,11 +9,16 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
-import net.minecraft.client.renderer.MultiBufferSource
 import com.mojang.blaze3d.opengl.GlDevice
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import org.joml.Matrix3x2f
 import org.lwjgl.opengl.GL33C
+
+//? if < 26.2 {
+import net.minecraft.client.renderer.MultiBufferSource
+//? } else {
+/*import net.minecraft.client.renderer.SubmitNodeCollector
+*///? }
 
 /*
  * Adapted from NVGSpecialRenderer.kt in OdinFabric
@@ -23,18 +28,32 @@ import org.lwjgl.opengl.GL33C
  * Copyright (c) 2025, odtheking
  * See full license at: https://opensource.org/licenses/BSD-3-Clause
  */
+//? if < 26.2 {
 class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPictureRenderer<NVGPIPRenderer.NVGRenderState>(bufferSource) {
     override fun renderToTexture(state: NVGRenderState, poseStack: PoseStack) {
+//? } else {
+/*class NVGPIPRenderer : PictureInPictureRenderer<NVGPIPRenderer.NVGRenderState>() {
+    override fun renderToTexture(state: NVGRenderState, poseStack: PoseStack, submitNodeCollector: SubmitNodeCollector) {
+*///? }
         val device = RenderSystem.getDevice() as? AccessorGpuDevice ?: return
         val colorTex = RenderSystem.outputColorTextureOverride ?: return
-        val bufferManager = (device.backend as? GlDevice)?.directStateAccess() ?: return
         val glDepthTex = (RenderSystem.outputDepthTextureOverride?.texture() as? GlTexture) ?: return
 
         val (width, height) = colorTex.let { it.getWidth(0) to it.getHeight(0) }
+
+        //? if < 26.2 {
+        val bufferManager = (device.backend as? GlDevice)?.directStateAccess() ?: return
         (colorTex.texture() as? GlTexture)?.getFbo(bufferManager, glDepthTex)?.apply {
             GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, this)
             GlStateManager._viewport(0, 0, width, height)
         }
+        //? } else {
+        /*val glDevice = device.backend as? GlDevice ?: return
+        val glColorTex = colorTex.texture() as? GlTexture ?: return
+        val fbo = glDevice.frameBufferCache().getFbo(glDevice.directStateAccess(), listOf(glColorTex), glDepthTex)
+        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, fbo)
+        GlStateManager._viewport(0, 0, width, height)
+        *///? }
 
         GL33C.glBindSampler(0, 0)
 
@@ -42,11 +61,9 @@ class NVGPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPi
         state.renderContent()
         NVGRenderer.endFrame()
 
-
-
         GlStateManager._disableDepthTest()
         GlStateManager._disableCull()
-        GlStateManager._enableBlend()
+        GlStateManager._enableBlend(/*? if >= 26.2 { */ /*0 *//*? } */)
         GlStateManager._blendFuncSeparate(770, 771, 1, 0)
     }
 

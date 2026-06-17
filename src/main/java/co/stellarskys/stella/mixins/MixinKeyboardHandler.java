@@ -27,7 +27,12 @@ public class MixinKeyboardHandler {
 
     @Inject(method = "charTyped", at = @At("HEAD"), cancellable = true)
     private void stella$onChar(long handle, net.minecraft.client.input.CharacterEvent event, CallbackInfo ci) {
-        Screen screen = Zenith.getClient().screen;
+        //? if < 26.2 {
+         Screen screen = Zenith.getClient().screen;
+        //? } else {
+        /*Screen screen = Zenith.getClient().gui.screen();
+        *///? }
+
         if (screen == null) return;
         char charTyped = (char) event.codepoint();
         boolean cancelled = EventBus.INSTANCE.post(new GuiEvent.Key(null, GLFW.GLFW_KEY_UNKNOWN, charTyped, 0, screen));

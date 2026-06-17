@@ -14,6 +14,10 @@ import net.minecraft.util.Util
 import java.awt.Color
 import java.net.URI
 
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.setScreen
+*///? }
+
 val config = Config(Stella.NAMESPACE) {
     category("General") {
         subcategory("Info") {

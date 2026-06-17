@@ -25,7 +25,11 @@ object Stella: ClientModInitializer {
         FeatureManager.loadFeatures()
         FeatureManager.initializeFeatures()
 
+        //? if < 26.2 {
         PictureInPictureRendererRegistry.register { NVGPIPRenderer(it.minecraft().renderBuffers().bufferSource()) }
+        //? } else {
+        /*PictureInPictureRendererRegistry.register { NVGPIPRenderer() }
+        *///? }
     }
 }
 

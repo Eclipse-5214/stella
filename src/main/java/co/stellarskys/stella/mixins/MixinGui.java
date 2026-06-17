@@ -1,9 +1,6 @@
 package co.stellarskys.stella.mixins;
 
 import co.stellarskys.stella.features.msc.Bars;
-import co.stellarskys.stella.features.msc.InventoryButtons;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,12 +8,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//? if < 26.2 {
+import net.minecraft.client.gui.Gui;
+//? } else {
+/*import net.minecraft.client.gui.Hud;
+*///? }
+
+/*
+ * Modified from Devonian code
+ * Under GPL 3.0 License
+ */
+//? if < 26.2 {
 @Mixin(Gui.class)
+//? } else {
+/*@Mixin(Hud.class)
+*///? }
 public class MixinGui {
-    /*
-     * Modified from Devonian code
-     * Under GPL 3.0 License
-     */
     @Inject(method = "extractHearts", at = @At("HEAD"), cancellable = true)
     private void stella$onRenderHealthBar(GuiGraphicsExtractor graphics, Player player, int xLeft, int yLineBase, int healthRowHeight, int heartOffsetIndex, float maxHealth, int currentHealth, int oldHealth, int absorption, boolean blink, CallbackInfo ci) {
         if (Bars.INSTANCE.getHideVanillaHealth() && Bars.INSTANCE.isEnabled()) ci.cancel();

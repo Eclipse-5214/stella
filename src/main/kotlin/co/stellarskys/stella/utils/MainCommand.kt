@@ -14,6 +14,11 @@ import co.stellarskys.stella.features.msc.ProfileViewer
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
+
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.setScreen
+*///? }
+
 @Command
 object MainCommand : Atlas("stella", "sta", "sa") {
     init {

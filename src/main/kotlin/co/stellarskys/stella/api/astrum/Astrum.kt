@@ -8,13 +8,20 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.Camera
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.Shapes
 import net.minecraft.world.phys.shapes.VoxelShape
 import java.awt.Color
+
+//? if < 26.2 {
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource
+//? } else {
+/*import net.minecraft.client.gui.font.TextRenderable
+import net.minecraft.client.renderer.SubmitNodeCollector
+*///? }
+
 
 @Module
 object Astrum {
@@ -27,15 +34,21 @@ object Astrum {
     private val lineQueue = mutableListOf<QueuedLine>()
     private val textQueue = mutableListOf<QueuedText>()
 
-    private lateinit var buffers: MultiBufferSource.BufferSource
+    //? if < 26.2 {
+    private lateinit var buffers: BufferSource
+    //? }
     private lateinit var cam: Camera
 
     init {
         EventBus.on<RenderEvent.World.Last> { event ->
             if (lineQueue.isEmpty() && textQueue.isEmpty() && outlineVoxelQueue.isEmpty() && filledVoxelQueue.isEmpty()) return@on
-            cam = client.gameRenderer.mainCamera
+            cam = client.gameRenderer /*? if < 26.2 { */ .mainCamera /*? } else { */ /*.mainCamera() *//*? } */
+            //? if < 26.2 {
             buffers = client.renderBuffers().bufferSource()
             flush(event.matrices)
+            //? } else {
+            /*flush(event.matrices, event.collector)
+            *///? }
         }
     }
 
@@ -63,6 +76,7 @@ object Astrum {
     }
 
     // Actually rendering
+    //? if < 26.2 {
     fun flush(pose: PoseStack) {
         val pos = cam.position()
         pose.pushPose()
@@ -74,7 +88,6 @@ object Astrum {
             renderVoxelBatch(depth, AstrumLayers.getLines(true), poseEntry) { b, p, v ->
                 addVoxelOutlineVertices(b, p, v)
             }
-
             renderVoxelBatch(noDepth, AstrumLayers.getLines(false), poseEntry) { b, p, v ->
                 addVoxelOutlineVertices(b, p, v)
             }
@@ -92,12 +105,10 @@ object Astrum {
 
         if (lineQueue.isNotEmpty()) {
             val (depth, noDepth) = lineQueue.partition { it.depth }
-
-            depth.groupBy { it.width }.forEach { (width, lines) ->
+            depth.groupBy { it.width }.forEach { (_, lines) ->
                 renderLineBatch(lines, AstrumLayers.getLines(true), poseEntry)
             }
-
-            noDepth.groupBy { it.width }.forEach { (width, lines) ->
+            noDepth.groupBy { it.width }.forEach { (_, lines) ->
                 renderLineBatch(lines, AstrumLayers.getLines(false), poseEntry)
             }
         }
@@ -111,8 +122,56 @@ object Astrum {
         outlineVoxelQueue.clear()
         filledVoxelQueue.clear()
     }
+    //? } else {
+    /*fun flush(pose: PoseStack, collector: SubmitNodeCollector) {
+        val pos = cam.position()
+        pose.pushPose()
+        pose.translate(-pos.x, -pos.y, -pos.z)
+
+        if (outlineVoxelQueue.isNotEmpty()) {
+            val (depth, noDepth) = outlineVoxelQueue.partition { it.depth }
+            renderVoxelBatch(depth, AstrumLayers.getLines(true), pose, collector) { b, p, v ->
+                addVoxelOutlineVertices(b, p, v)
+            }
+            renderVoxelBatch(noDepth, AstrumLayers.getLines(false), pose, collector) { b, p, v ->
+                addVoxelOutlineVertices(b, p, v)
+            }
+        }
+
+        if (filledVoxelQueue.isNotEmpty()) {
+            val (depth, noDepth) = filledVoxelQueue.partition { it.depth }
+            renderVoxelBatch(depth, AstrumLayers.getFilled(true), pose, collector) { b, p, v ->
+                addVoxelFillVertices(b, p, v)
+            }
+            renderVoxelBatch(noDepth, AstrumLayers.getFilled(false), pose, collector) { b, p, v ->
+                addVoxelFillVertices(b, p, v)
+            }
+        }
+
+        if (lineQueue.isNotEmpty()) {
+            val (depth, noDepth) = lineQueue.partition { it.depth }
+            depth.groupBy { it.width }.forEach { (_, lines) ->
+                renderLineBatch(lines, AstrumLayers.getLines(true), pose, collector)
+            }
+            noDepth.groupBy { it.width }.forEach { (_, lines) ->
+                renderLineBatch(lines, AstrumLayers.getLines(false), pose, collector)
+            }
+        }
+
+
+        if (textQueue.isNotEmpty()) renderTextBatch(textQueue, pose, collector)
+
+        pose.popPose()
+
+        lineQueue.clear()
+        textQueue.clear()
+        outlineVoxelQueue.clear()
+        filledVoxelQueue.clear()
+    }
+    *///? }
 
     // Batch Renderers
+    //? if < 26.2 {
     fun renderVoxelBatch(
         batch: List<QueuedVoxel>,
         layer: RenderType,
@@ -123,7 +182,22 @@ object Astrum {
         val buffer = buffers.getBuffer(layer)
         batch.forEach { processor(buffer, pose, it) }
     }
+    //? } else {
+    /*fun renderVoxelBatch(
+        batch: List<QueuedVoxel>,
+        layer: RenderType,
+        pose: PoseStack,
+        collector: SubmitNodeCollector,
+        processor: (buffer: VertexConsumer, pose: PoseStack.Pose, QueuedVoxel) -> Unit
+    ) {
+        if (batch.isEmpty()) return
+        collector.submitCustomGeometry(pose, layer) { poseEntry, buffer ->
+            batch.forEach { processor(buffer, poseEntry, it) }
+        }
+    }
+    *///? }
 
+    //? if < 26.2 {
     fun renderLineBatch(
         batch: List<QueuedLine>,
         layer: RenderType,
@@ -133,10 +207,23 @@ object Astrum {
         val buffer = buffers.getBuffer(layer)
         batch.forEach { addLineVertices(buffer, pose, it) }
     }
+    //? } else {
+    /*fun renderLineBatch(
+        batch: List<QueuedLine>,
+        layer: RenderType,
+        pose: PoseStack,
+        collector: SubmitNodeCollector
+    ) {
+        if (batch.isEmpty()) return
+        collector.submitCustomGeometry(pose, layer) { poseEntry, buffer ->
+            batch.forEach { addLineVertices(buffer, poseEntry, it) }
+        }
+    }
+    *///? }
 
+    //? if < 26.2 {
     fun renderTextBatch(batch: List<QueuedText>, pose: PoseStack) {
         if (batch.isEmpty()) return
-
         val font = client.font
         val source = client.renderBuffers().bufferSource()
 
@@ -144,10 +231,8 @@ object Astrum {
             pose.pushPose()
             pose.translate(queued.pos.x, queued.pos.y, queued.pos.z)
             pose.mulPose(cam.rotation())
-
             val s = queued.scale * 0.025f
             pose.scale(s, -s, s)
-
             val textWidth = font.width(queued.text)
             val xOffset = -textWidth / 2f
             val matrix = pose.last().pose()
@@ -163,10 +248,36 @@ object Astrum {
                 queued.bgColor,
                 0xF000F0
             )
-
             pose.popPose()
         }
     }
+    //? } else {
+    /*fun renderTextBatch(batch: List<QueuedText>, pose: PoseStack, collector: SubmitNodeCollector) {
+        if (batch.isEmpty()) return
+        val font = client.font
+
+        batch.forEach { queued ->
+            pose.pushPose()
+            pose.translate(queued.pos.x, queued.pos.y, queued.pos.z)
+            pose.mulPose(cam.rotation())
+            val s = queued.scale * 0.025f
+            pose.scale(s, -s, s)
+            val textWidth = font.width(queued.text)
+            val xOffset = -textWidth / 2f
+            val displayMode = if (queued.depth) Font.DisplayMode.NORMAL else Font.DisplayMode.SEE_THROUGH
+
+            val prepared = font.prepareText(queued.text, xOffset, 0f, queued.color, queued.shadow, queued.bgColor)
+            prepared.visit(object : Font.GlyphVisitor {
+                override fun acceptRenderable(renderable: TextRenderable) {
+                    collector.submitCustomGeometry(pose, renderable.renderType(displayMode)) { poseEntry, buffer ->
+                        renderable.render(poseEntry.pose(), buffer, 0xF000F0, false)
+                    }
+                }
+            })
+            pose.popPose()
+        }
+    }
+    *///? }
 
     // Vertex Processors
     fun addVoxelOutlineVertices(buffer: VertexConsumer, pose: PoseStack.Pose, queued: QueuedVoxel) {
@@ -204,8 +315,8 @@ object Astrum {
         val ny = e.yf - s.yf
         val nz = e.zf - s.zf
 
-        buffer.addVertex(pose, s.xf, s.yf, s.zf).setColor(color).setNormal(pose, nx, ny, nz) /*? if > 1.21.10 { */.setLineWidth(line.width) /*?}*/
-        buffer.addVertex(pose, e.xf, e.yf, e.zf).setColor(color).setNormal(pose, nx, ny, nz) /*? if > 1.21.10 { */.setLineWidth(line.width) /*?}*/
+        buffer.addVertex(pose, s.xf, s.yf, s.zf).setColor(color).setNormal(pose, nx, ny, nz).setLineWidth(line.width)
+        buffer.addVertex(pose, e.xf, e.yf, e.zf).setColor(color).setNormal(pose, nx, ny, nz).setLineWidth(line.width)
     }
 
     fun addFilledBoxVertices(

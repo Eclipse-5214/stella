@@ -9,6 +9,9 @@ import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.screen
+*///? }
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
