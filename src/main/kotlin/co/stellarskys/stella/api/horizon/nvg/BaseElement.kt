@@ -2,13 +2,12 @@ package co.stellarskys.stella.api.horizon.nvg
 
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.horizon.nvg.ParentElement
-import co.stellarskys.stella.api.nvg.Font
-import co.stellarskys.stella.api.nvg.NVGRenderer
+import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.api.zenith.Zenith
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 abstract class BaseElement {
-    val nvg get() = NVGRenderer
+    val nvg get() = Lumina
     val rez get() = Zenith.Res
     val mouse = Zenith.Mouse
 
@@ -30,7 +29,7 @@ abstract class BaseElement {
     open fun isAreaHovered(rx: Float, ry: Float, rw: Float, rh: Float, mx: Float = mouse.rawX.toFloat() / ConfigUI.UI_SCALE, my: Float = mouse.rawY.toFloat()  / ConfigUI.UI_SCALE) =
         mx in (absoluteX + rx)..(absoluteX + rx + rw) && my in (absoluteY + ry)..(absoluteY + ry + rh)
 
-    open fun isTextHovered(text: String, rx: Float, ry: Float, size: Float = 16f, font: Font = nvg.inter, mx: Float = mouse.rawX.toFloat() / ConfigUI.UI_SCALE, my: Float = mouse.rawY.toFloat()  / ConfigUI.UI_SCALE) =
+    open fun isTextHovered(text: String, rx: Float, ry: Float, size: Float = 16f, font: co.stellarskys.stella.api.lumina.types.LuminaFont = nvg.inter, mx: Float = mouse.rawX.toFloat() / ConfigUI.UI_SCALE, my: Float = mouse.rawY.toFloat()  / ConfigUI.UI_SCALE) =
         isAreaHovered(rx, ry, nvg.textWidth(text, size, font), size, mx, my)
 
 

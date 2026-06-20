@@ -4,7 +4,7 @@ import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
 import co.stellarskys.stella.api.horizon.nvg.TextBox
-import co.stellarskys.stella.api.nvg.Gradient
+import co.stellarskys.stella.api.lumina.Lumina.Gradient
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.Utils.toHex
 import net.minecraft.client.gui.GuiGraphicsExtractor

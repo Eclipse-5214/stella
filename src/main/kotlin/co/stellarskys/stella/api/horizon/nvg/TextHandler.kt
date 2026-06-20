@@ -2,7 +2,8 @@ package co.stellarskys.stella.api.horizon.nvg
 
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
-import co.stellarskys.stella.api.nvg.Font
+import co.stellarskys.stella.api.lumina.Lumina
+import co.stellarskys.stella.api.lumina.types.LuminaFont
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.math.abs
@@ -19,7 +20,7 @@ import kotlin.math.abs
 class TextHandler(
     private val textProvider: () -> String,
     private val textSetter: (String) -> Unit,
-    var font: Font, var fontSize: Float, var textColor: Int,
+    var font: LuminaFont, var fontSize: Float, var textColor: Int,
     var filter: (Char) -> Boolean, var maxLength: Int,
     var centerIfSmall: Boolean = true
 ) : BaseElement() {
@@ -50,7 +51,7 @@ class TextHandler(
     private var cachedPosCaret = -1
     private var cachedPosSelection = -1
     private var cachedPosFontSize = -1f
-    private var cachedPosFont: Font? = null
+    private var cachedPosFont: LuminaFont? = null
 
     init {
         saveState()

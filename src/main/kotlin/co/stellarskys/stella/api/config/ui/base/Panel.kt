@@ -4,7 +4,7 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.horizon.nvg.ParentElement
-import co.stellarskys.stella.api.nvg.Gradient
+import co.stellarskys.stella.api.lumina.Lumina.Gradient
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class Panel(initX: Float, initY: Float, val title: String = ""): ParentElement() {

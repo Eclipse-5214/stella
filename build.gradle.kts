@@ -43,11 +43,6 @@ dependencies {
     include(libs.skyblock.api) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc") }
     }
-
-    shadow(libs.lwjgl.nanovg)
-    listOf("windows", "linux", "linux-arm64", "macos", "macos-arm64").forEach { os ->
-        shadow("${libs.lwjgl.nanovg.get()}:natives-$os")
-    }
 }
 
 java {
@@ -76,9 +71,10 @@ loom {
     }
 
     runConfigs.all {
-        ideConfigGenerated(true)
-        vmArgs("-Dmixin.debug.export=true") // Exports transformed classes for debugging
-        runDir = "../../run" // Shares the run directory between versions
+        preferGradleTask = true
+        generateRunConfig = true
+        runDirectory = rootProject.file("run") // Shares the run directory between versions
+        jvmArguments.add("-Dmixin.debug.export=true") // Exports transformed classes for debugging
     }
 }
 

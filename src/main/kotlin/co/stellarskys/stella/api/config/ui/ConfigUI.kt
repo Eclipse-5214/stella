@@ -9,9 +9,8 @@ import co.stellarskys.stella.api.config.ui.elements.*
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
 import co.stellarskys.stella.api.horizon.nvg.ParentElement
 import co.stellarskys.stella.api.horizon.nvg.TextHandler
-import co.stellarskys.stella.utils.render.Render2D.drawNVG
-import co.stellarskys.stella.api.nvg.Gradient
-import co.stellarskys.stella.api.nvg.NVGRenderer
+import co.stellarskys.stella.api.lumina.Lumina.Gradient
+import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.api.zenith.*
 import com.mojang.blaze3d.opengl.GlTexture
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -25,11 +24,11 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private val elementContainers = mutableMapOf<String, BaseElement>()
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private var needsVisibilityUpdate = false
-    private val imageCacheMap = HashMap<String, Int>()
+    private val imageCacheMap = HashMap<String, Any?>()
     private val revealDelegate = Utils.animate<Float>(0.0375, AnimType.EASE_OUT)
     private var reveal by revealDelegate
     private var opening = true
-    private val nvg get() = NVGRenderer
+    private val nvg get() = Lumina
     private val rez get() = Zenith.Res
     private val mouse = Zenith.Mouse
     private val mx get() = mouse.rawX.toFloat() / UI_SCALE
@@ -88,7 +87,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     override fun onRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) {
         super.onRender(context, mouseX, mouseY, tickDelta)
 
-        context.drawNVG(false) {
+        val renderBlock: () -> Unit = {
             nvg.push()
             applyOpeningScissor()
             nvg.scale(UI_SCALE, UI_SCALE)
@@ -104,6 +103,9 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
             nvg.popScissor()
             nvg.pop()
         }
+
+        renderBlock()
+        nvg.flush(context)
     }
 
     private fun buildCategory(x: Float, y: Float, category: ConfigCategory, title: String, config: Config): Panel {
@@ -327,8 +329,8 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     }
 
     companion object {
-        val caretImage = NVGRenderer.createImage( "/assets/stella/logos/dropdown.svg")
-        val pencilImage = NVGRenderer.createImage( "/assets/stella/logos/editLocations.svg")
+        val caretImage = Lumina.createImage("/assets/stella/logos/dropdown.svg")
+        val pencilImage = Lumina.createImage("/assets/stella/logos/editLocations.svg")
         val UI_SCALE get() = minOf(Zenith.Res.windowWidth.toFloat() / 1920f, Zenith.Res.windowHeight.toFloat() / 1080f).coerceAtLeast(0.5f)
         lateinit var tooltip: Tooltip
             private set

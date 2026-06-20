@@ -1,7 +1,6 @@
 package co.stellarskys.stella.features.msc
 
 import co.stellarskys.stella.annotations.Module
-import co.stellarskys.stella.api.events.Event
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
@@ -9,15 +8,13 @@ import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.handlers.Flare
 import co.stellarskys.stella.api.handlers.Spark
+import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.render.Render2D.drawNVG
 import co.stellarskys.stella.utils.render.Render2D.width
-import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.events.core.ChatEvent
-import co.stellarskys.stella.utils.render.Render2D.batchNVG
-import co.stellarskys.stella.utils.render.Render2D.flushNVG
+import co.stellarskys.stella.utils.render.Render2D.drawLumina
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.profile.StatsAPI
@@ -99,7 +96,7 @@ object Bars : Feature("bars", true) {
             if (mpNum) mpNumHud(it.context)
             if (ofMana) ofManaHud(it.context)
 
-            it.context.flushNVG()
+            if(healthBar || manaBar) Lumina.flush(it.context)
         }
 
         on<ChatEvent.Modify.ActionBar> { event ->
@@ -107,8 +104,8 @@ object Bars : Feature("bars", true) {
         }
     }
 
-    fun hpHudPreview(context: GuiGraphicsExtractor) = context.drawNVG {
-        NVGRenderer.rect(5f, 5f, 80f, 5f, healthColor.rgb, 3f)
+    fun hpHudPreview(context: GuiGraphicsExtractor) = context.drawLumina {
+        Lumina.rect(5f, 5f, 80f, 5f, healthColor.rgb, 3f)
     }
 
 
@@ -126,8 +123,8 @@ object Bars : Feature("bars", true) {
         Render2D.drawString(context, "§a$string", x,5)
     }
 
-    fun mpHudPreview(context: GuiGraphicsExtractor) = context.drawNVG {
-            NVGRenderer.rect(5f, 5f, 80f, 5f, manaColor.rgb, 3f)
+    fun mpHudPreview(context: GuiGraphicsExtractor) = context.drawLumina {
+            Lumina.rect(5f, 5f, 80f, 5f, manaColor.rgb, 3f)
     }
 
     fun mpNumPreview(context: GuiGraphicsExtractor) {
@@ -225,12 +222,12 @@ object Bars : Feature("bars", true) {
     }
 
     private fun drawBar(context: GuiGraphicsExtractor, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color) {
-        context.batchNVG {
-            NVGRenderer.drawMasked(0f, 0f, 80f, 5f, 3f) {
-                NVGRenderer.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
-                NVGRenderer.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
+        context.drawLumina(flush = false) {
+            Lumina.drawMasked(0f, 0f, 80f, 5f, 3f) {
+                Lumina.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
+                Lumina.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
                 if (showSecondary) {
-                    NVGRenderer.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.rgb, 3f)
+                    Lumina.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.rgb, 3f)
                 }
             }
         }

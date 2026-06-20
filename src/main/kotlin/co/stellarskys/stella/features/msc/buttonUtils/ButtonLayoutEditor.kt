@@ -1,11 +1,11 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.api.config.ui.ConfigUI.Companion.UI_SCALE
+import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.render.Render2D.drawNVG
-import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith
+import co.stellarskys.stella.utils.render.Render2D.drawLumina
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class ButtonLayoutEditor : Aperture() {
@@ -22,8 +22,8 @@ class ButtonLayoutEditor : Aperture() {
         val invX = (width - 176) / 2
         val invY = (height - 166) / 2
 
-        context.drawNVG {
-            NVGRenderer.hollowRect(
+        context.drawLumina {
+            Lumina.hollowRect(
                 invX.toFloat(),
                 invY.toFloat(),
                 176f,
@@ -37,7 +37,7 @@ class ButtonLayoutEditor : Aperture() {
                 for (index in 0 until anchor.slots) {
                     val (x, y) = ButtonManager.resolveAnchorPosition(anchor, index, invX, invY)
 
-                    NVGRenderer.hollowRect(
+                    Lumina.hollowRect(
                         x.toFloat(),
                         y.toFloat(),
                         slotSize.toFloat(),
@@ -61,11 +61,11 @@ class ButtonLayoutEditor : Aperture() {
             }
         }
 
-        context.drawNVG(false) {
-            NVGRenderer.push()
-            NVGRenderer.scale(UI_SCALE, UI_SCALE)
+        context.drawLumina(false) {
+            Lumina.push()
+            Lumina.scale(UI_SCALE, UI_SCALE)
             popup.render(context, mx, my, tickDelta)
-            NVGRenderer.pop()
+            Lumina.pop()
         }
 
         super.onRender(context, mouseX, mouseY, tickDelta)

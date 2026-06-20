@@ -4,14 +4,11 @@ import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.api.handlers.Signal
+import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.utils.render.Render2D
-import co.stellarskys.stella.utils.render.Render2D.drawNVG
-import co.stellarskys.stella.api.nvg.NVGRenderer
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
-//? if >= 26.2 {
-/*import co.stellarskys.stella.api.zenith.screen
-*///? }
+import co.stellarskys.stella.utils.render.Render2D.drawLumina
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -23,6 +20,10 @@ import net.minecraft.resources.Identifier
 import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 import java.io.File
 import kotlin.jvm.optionals.getOrNull
+
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.screen
+*///? }
 
 object ButtonManager {
     private val buttons = mutableListOf<StellaButton>()
@@ -88,8 +89,8 @@ object ButtonManager {
     private fun renderButtonBackgroud(context: GuiGraphicsExtractor, button: StellaButton, pos: Pair<Int, Int>){
         if(!button.background) return
         val (x, y) = pos
-        context.drawNVG {
-            NVGRenderer.hollowRect(
+        context.drawLumina {
+            Lumina.hollowRect(
                 x.toFloat(),
                 y.toFloat(),
                 20f,

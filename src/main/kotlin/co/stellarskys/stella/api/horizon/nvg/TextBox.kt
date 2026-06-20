@@ -1,7 +1,7 @@
 package co.stellarskys.stella.api.horizon.nvg
 
-import co.stellarskys.stella.api.nvg.Font
-import co.stellarskys.stella.api.nvg.NVGRenderer
+import co.stellarskys.stella.api.lumina.Lumina
+import co.stellarskys.stella.api.lumina.types.LuminaFont
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class TextBox(
@@ -9,7 +9,7 @@ class TextBox(
     initialText: String,
     var color: Int = 0xAA111111.toInt(),
     var textColor: Int = 0xFFFFFFFF.toInt(),
-    var font: Font = NVGRenderer.inter,
+    var font: LuminaFont = Lumina.inter,
     var fontSize: Float = 18f,
     var radius: Float = 4f,
     var borderColor: Int = 0xFF333333.toInt(),

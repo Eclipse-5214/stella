@@ -6,17 +6,17 @@ import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.horizon.nvg.ParentElement
 import co.stellarskys.stella.api.horizon.nvg.TextBox
 import co.stellarskys.stella.api.horizon.nvg.addTo
-import co.stellarskys.stella.api.nvg.Gradient
-import co.stellarskys.stella.api.nvg.NVGRenderer
+import co.stellarskys.stella.api.lumina.Lumina
+import co.stellarskys.stella.api.lumina.Lumina.Gradient
 import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
-import co.stellarskys.stella.utils.render.Render2D.drawNVG
+import co.stellarskys.stella.utils.render.Render2D.drawLumina
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.core.BlockPos
 
 class WaypointEditor(val pos: BlockPos) : Aperture("Add Custom Waypoint") {
-    private val nvg get() = NVGRenderer
+    private val nvg get() = Lumina
     private val mouse = Zenith.Mouse
     private val mx get() = mouse.rawX.toFloat() / ConfigUI.Companion.UI_SCALE
     private val my get() = mouse.rawY.toFloat() / ConfigUI.Companion.UI_SCALE
@@ -80,7 +80,7 @@ class WaypointEditor(val pos: BlockPos) : Aperture("Add Custom Waypoint") {
 
     override fun onRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) {
         context.fill(0, 0, width, height, 0x90000000.toInt())
-        context.drawNVG(false) {
+        context.drawLumina(false) {
             nvg.push()
             nvg.scale(ConfigUI.Companion.UI_SCALE, ConfigUI.Companion.UI_SCALE)
             dialogPanel.render(context, mx, my, tickDelta)

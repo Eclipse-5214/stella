@@ -4,7 +4,7 @@ import co.stellarskys.stella.api.config.core.ConfigElement
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
-import co.stellarskys.stella.api.nvg.Gradient
+import co.stellarskys.stella.api.lumina.Lumina.Gradient
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class Tooltip: BaseElement() {

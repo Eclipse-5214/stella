@@ -2,9 +2,7 @@ package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
-import co.stellarskys.stella.api.nvg.Batcher
-import co.stellarskys.stella.api.nvg.NVGRenderer
-import co.stellarskys.stella.api.nvg.NVGPIPRenderer
+import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.ChatFormatting
@@ -160,28 +158,22 @@ object Render2D {
         return client.font.lineHeight * lineCount
     }
 
-    fun GuiGraphicsExtractor.drawNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
+    fun GuiGraphicsExtractor.drawLumina(scaled: Boolean = true, flush: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
         val snapshot = Matrix3x2f(this.pose())
-
-        NVGPIPRenderer.draw(this, 0, 0, this.guiWidth(), this.guiHeight()) {
-            val n = NVGRenderer
-            val sf = Zenith.Res.scaleFactor.toFloat() / n.dpr
-
-            if (scaled) {
-                n.resetTransform()
-                n.setTransform(
-                    snapshot.m00 * sf, snapshot.m01 * sf,
-                    snapshot.m10 * sf, snapshot.m11 * sf,
-                    snapshot.m20 * sf, snapshot.m21 * sf
-                )
-            }
-
-            block(snapshot)
+        Lumina.push()
+        if (scaled) {
+            val sf = Zenith.Res.scaleFactor.toFloat() / Lumina.dpr
+            Lumina.resetTransform()
+            Lumina.setTransform(Matrix3x2f(
+                snapshot.m00 * sf, snapshot.m01 * sf,
+                snapshot.m10 * sf, snapshot.m11 * sf,
+                snapshot.m20 * sf, snapshot.m21 * sf
+            ))
         }
+        block(snapshot)
+        Lumina.pop()
+        if (flush) Lumina.flush(this)
     }
-
-    fun GuiGraphicsExtractor.batchNVG(scaled: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) { Batcher.queue(this, scaled, block) }
-    fun GuiGraphicsExtractor.flushNVG() { Batcher.flush(this) }
 
     fun renderScrolled(ctx: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, scrollOffset: Float, block: () -> Unit) {
         ctx.enableScissor(x, y, x + width, y + height)

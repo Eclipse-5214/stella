@@ -1,8 +1,8 @@
 package co.stellarskys.stella
 
 import co.stellarskys.stella.api.horizon.animation.DeltaTracker
+import co.stellarskys.stella.api.lumina.LuminaPIPRenderer
 import co.stellarskys.stella.managers.FeatureManager
-import co.stellarskys.stella.api.nvg.NVGPIPRenderer
 import co.stellarskys.stella.utils.config
 import net.fabricmc.api.ClientModInitializer
 import org.apache.logging.log4j.LogManager
@@ -26,10 +26,11 @@ object Stella: ClientModInitializer {
         FeatureManager.initializeFeatures()
 
         //? if < 26.2 {
-        PictureInPictureRendererRegistry.register { NVGPIPRenderer(it.minecraft().renderBuffers().bufferSource()) }
+        PictureInPictureRendererRegistry.register { LuminaPIPRenderer(it.minecraft().renderBuffers().bufferSource()) }
         //? } else {
-        /*PictureInPictureRendererRegistry.register { NVGPIPRenderer() }
+        /*PictureInPictureRendererRegistry.register { LuminaPIPRenderer() }
         *///? }
+
     }
 }
 
