@@ -38,6 +38,7 @@ object Lumina {
     private val scissorStack = ArrayDeque<ScissorRect>()
     private var currentTransform = Matrix3x2f()
     private var alpha = 1f
+    @JvmStatic var renderFrameId = 0; internal set
     private val imageCache = HashMap<String, LuminaImage>()
     private val wrappedTextures = HashMap<Int, LuminaImage>()
     private var nextWrappedId = -1000

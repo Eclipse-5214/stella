@@ -2,6 +2,7 @@ package co.stellarskys.stella.api.lumina.renderer.vk
 
 import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.api.lumina.renderer.LuminaBackend
+import co.stellarskys.stella.mixins.accessors.AccessorGpuDevice
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vulkan.VulkanConst
 import org.lwjgl.system.MemoryStack
@@ -27,7 +28,7 @@ object VKBackend : LuminaBackend {
     private var nextTexId = 1
 
     private var commandBuffer: VkCommandBuffer? = null
-    private var fence: Long = VK_NULL_HANDLE
+    private var lastResetFrame = -1
 
     private var framebuffer: Long = VK_NULL_HANDLE
     private var targetImageView: Long = VK_NULL_HANDLE
@@ -83,21 +84,8 @@ object VKBackend : LuminaBackend {
             VKPipelineManager.texturePipeline, VKPipelineManager.renderPass)
         VKShapeRenderer.init()
         VKTextureRenderer.init()
-        createFence()
-        commandBuffer = VKUtils.allocateCommandBuffer()
         initialized = true
         logger.info("VKBackend fully initialized")
-    }
-
-    private fun createFence() {
-        MemoryStack.stackPush().use { stack ->
-            val info = VkFenceCreateInfo.calloc(stack)
-                .sType(VK_STRUCTURE_TYPE_FENCE_CREATE_INFO)
-                .flags(VK_FENCE_CREATE_SIGNALED_BIT)
-            val pFence = stack.mallocLong(1)
-            check(vkCreateFence(VKUtils.device, info, null, pFence) == VK_SUCCESS)
-            fence = pFence[0]
-        }
     }
 
     override fun renderShapes(shapes: List<Lumina.QueuedShape>, vw: Int, vh: Int) {
@@ -231,10 +219,17 @@ object VKBackend : LuminaBackend {
         if (frameCount <= 5) logger.info("setupRenderTarget: image=0x{}, {}x{}, format={}",
             java.lang.Long.toHexString(targetId), width, height, vkFormat)
 
-        // Recreate render pass + framebuffer if target changed
+        // Recreate framebuffer if target image changed
         if (targetId != lastTargetImage || fbWidth != width || fbHeight != height || framebuffer == VK_NULL_HANDLE) {
-            if (targetImageView != VK_NULL_HANDLE) vkDestroyImageView(VKUtils.device, targetImageView, null)
-            if (framebuffer != VK_NULL_HANDLE) vkDestroyFramebuffer(VKUtils.device, framebuffer, null)
+            // Queue old resources for deferred destruction (previous frames may still reference them)
+            if (targetImageView != VK_NULL_HANDLE) {
+                val oldView = targetImageView
+                val oldFb = framebuffer
+                VKUtils.mcVkDevice.createCommandEncoder().queueForDestroy(com.mojang.blaze3d.vulkan.Destroyable {
+                    vkDestroyImageView(VKUtils.device, oldView, null)
+                    if (oldFb != VK_NULL_HANDLE) vkDestroyFramebuffer(VKUtils.device, oldFb, null)
+                })
+            }
 
             // Recreate render pass if format changed
             VKPipelineManager.ensureRenderPass(vkFormat)
@@ -264,18 +259,17 @@ object VKBackend : LuminaBackend {
             lastTargetImage = targetId; fbWidth = width; fbHeight = height
         }
 
-        // Begin command buffer (render pass is started later, before draws)
-        val cmd = commandBuffer!!
-        vkWaitForFences(VKUtils.device, fence, true, Long.MAX_VALUE)
-        vkResetFences(VKUtils.device, fence)
-        vkResetCommandBuffer(cmd, 0)
-
-        MemoryStack.stackPush().use { stack ->
-            val beginInfo = VkCommandBufferBeginInfo.calloc(stack)
-                .sType(VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO)
-                .flags(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT)
-            vkBeginCommandBuffer(cmd, beginInfo)
+        // Reset vertex buffer offsets once per MC frame (not per PIP render).
+        // All PIP command buffers from the same frame share the vertex buffer
+        // and are submitted together, so each must reference its own region.
+        if (Lumina.renderFrameId != lastResetFrame) {
+            VKShapeRenderer.resetFrame()
+            VKTextureRenderer.resetFrame()
+            lastResetFrame = Lumina.renderFrameId
         }
+
+        // Allocate a fresh command buffer from MC's encoder for this PIP render
+        commandBuffer = VKUtils.mcVkDevice.createCommandEncoder().allocateAndBeginTransientCommandBuffer()
         renderPassActive = false
     }
 
@@ -289,14 +283,8 @@ object VKBackend : LuminaBackend {
         }
         vkEndCommandBuffer(cmd)
 
-        MemoryStack.stackPush().use { stack ->
-            val submitInfo = VkSubmitInfo.calloc(stack)
-                .sType(VK_STRUCTURE_TYPE_SUBMIT_INFO)
-                .pCommandBuffers(stack.pointers(cmd))
-            vkQueueSubmit(VKUtils.queue, submitInfo, fence)
-        }
-        // Wait for our commands to complete before MC reads the PIP texture
-        vkQueueWaitIdle(VKUtils.queue)
+        // Inject our command buffer into MC's submission pipeline
+        VKUtils.mcVkDevice.createCommandEncoder().execute(cmd)
     }
 
     override fun destroy() {
@@ -308,7 +296,6 @@ object VKBackend : LuminaBackend {
         VKTextureRenderer.destroy()
         VKShapeRenderer.destroy()
         VKPipelineManager.destroy()
-        vkDestroyFence(VKUtils.device, fence, null)
         VKUtils.destroy()
         initialized = false
     }

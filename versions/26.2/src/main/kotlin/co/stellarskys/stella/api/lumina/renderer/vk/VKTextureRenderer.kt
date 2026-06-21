@@ -21,6 +21,7 @@ internal object VKTextureRenderer {
 
     private var buf: FloatBuffer = MemoryUtil.memAllocFloat(MAX_VERTS * FLOATS)
     private var vCount = 0
+    private var bufferOffset = 0
 
     private var vertexBuf: VKUtils.VmaBuffer? = null
 
@@ -33,6 +34,8 @@ internal object VKTextureRenderer {
         val bufSize = MAX_VERTS.toLong() * FLOATS * 4
         vertexBuf = VKUtils.createHostVertexBuffer(bufSize)
     }
+
+    fun resetFrame() { bufferOffset = 0 }
 
     fun render(cmd: VkCommandBuffer, text: List<LuminaBackend.TextEntry>,
                images: List<LuminaBackend.ImageEntry>, vw: Int, vh: Int) {
@@ -59,15 +62,16 @@ internal object VKTextureRenderer {
         }
         if (vCount == 0) return
 
-        // Upload (direct to host-visible vertex buffer)
+        // Upload at current offset
         val vb = vertexBuf!!
+        val byteOffset = bufferOffset.toLong() * FLOATS * 4
         buf.position(0).limit(vCount * FLOATS)
-        MemoryUtil.memCopy(MemoryUtil.memAddress(buf), vb.mappedPtr, vCount.toLong() * FLOATS * 4)
+        MemoryUtil.memCopy(MemoryUtil.memAddress(buf), vb.mappedPtr + byteOffset, vCount.toLong() * FLOATS * 4)
 
         // Begin render pass + draw
         VKBackend.beginRenderPassIfNeeded()
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, VKPipelineManager.texturePipeline)
-        vkCmdBindVertexBuffers(cmd, 0, longArrayOf(vb.buffer), longArrayOf(0))
+        vkCmdBindVertexBuffers(cmd, 0, longArrayOf(vb.buffer), longArrayOf(byteOffset))
 
         MemoryStack.stackPush().use { stack ->
             val projBuf = stack.mallocFloat(16)
@@ -104,6 +108,7 @@ internal object VKTextureRenderer {
             applyScissor(cmd, r.scissor, vw, vh)
             vkCmdDraw(cmd, r.count, 1, r.start, 0)
         }
+        bufferOffset += vCount
     }
 
     private fun getOrCreateDescriptorSet(textureId: Int): Long {
@@ -147,7 +152,7 @@ internal object VKTextureRenderer {
             val rect = VkRect2D.calloc(1, stack)
             if (scissor != null) {
                 val sx = maxOf(0, scissor.x.toInt())
-                val sy = maxOf(0, scissor.y.toInt())
+                val sy = maxOf(0, vh - scissor.y.toInt() - scissor.h.toInt())
                 rect[0].offset().x(sx).y(sy)
                 rect[0].extent().width(maxOf(0, scissor.w.toInt())).height(maxOf(0, scissor.h.toInt()))
             } else {

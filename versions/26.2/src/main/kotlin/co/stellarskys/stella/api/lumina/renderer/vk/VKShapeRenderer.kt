@@ -18,6 +18,7 @@ internal object VKShapeRenderer {
     // CPU-side tessellation buffer (same as GL)
     private var buf: FloatBuffer = MemoryUtil.memAllocFloat(MAX_VERTS * FLOATS)
     private var vCount = 0
+    private var bufferOffset = 0  // running offset into GPU buffer (vertices used so far this frame)
 
     private var vertexBuf: VKUtils.VmaBuffer? = null
 
@@ -28,6 +29,8 @@ internal object VKShapeRenderer {
         val bufSize = MAX_VERTS.toLong() * FLOATS * 4
         vertexBuf = VKUtils.createHostVertexBuffer(bufSize)
     }
+
+    fun resetFrame() { bufferOffset = 0 }
 
     fun render(cmd: VkCommandBuffer, shapes: List<Lumina.QueuedShape>, vw: Int, vh: Int) {
         if (shapes.isEmpty()) return
@@ -62,14 +65,15 @@ internal object VKShapeRenderer {
         if (vCount > rs) runs.add(DrawRun(sc, rs, vCount - rs))
         if (vCount == 0) return
 
-        // === UPLOAD (direct to host-visible vertex buffer) ===
+        // === UPLOAD at current offset (so previous batches aren't overwritten) ===
         val vb = vertexBuf!!
+        val byteOffset = bufferOffset.toLong() * FLOATS * 4
         buf.position(0).limit(vCount * FLOATS)
-        MemoryUtil.memCopy(MemoryUtil.memAddress(buf), vb.mappedPtr, vCount.toLong() * FLOATS * 4)
+        MemoryUtil.memCopy(MemoryUtil.memAddress(buf), vb.mappedPtr + byteOffset, vCount.toLong() * FLOATS * 4)
 
         // === BEGIN RENDER PASS + DRAW ===
         VKBackend.beginRenderPassIfNeeded()
-        vkCmdBindVertexBuffers(cmd, 0, longArrayOf(vb.buffer), longArrayOf(0))
+        vkCmdBindVertexBuffers(cmd, 0, longArrayOf(vb.buffer), longArrayOf(byteOffset))
 
         // Push projection matrix
         val proj = VKUtils.orthoProjection(vw, vh)
@@ -113,6 +117,7 @@ internal object VKShapeRenderer {
                 }
             }
         }
+        bufferOffset += vCount
     }
 
     private fun applyScissor(cmd: VkCommandBuffer, scissor: Lumina.ScissorRect?, vw: Int, vh: Int) {
@@ -120,7 +125,7 @@ internal object VKShapeRenderer {
             val rect = VkRect2D.calloc(1, stack)
             if (scissor != null) {
                 val sx = maxOf(0, scissor.x.toInt())
-                val sy = maxOf(0, scissor.y.toInt())
+                val sy = maxOf(0, vh - scissor.y.toInt() - scissor.h.toInt())
                 rect[0].offset().x(sx).y(sy)
                 rect[0].extent().width(maxOf(0, scissor.w.toInt())).height(maxOf(0, scissor.h.toInt()))
             } else {

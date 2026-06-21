@@ -17,6 +17,7 @@
       "MixinContainer",
       "MixinKeyboardHandler",
       "accessors.AccessorMapState",
-      "accessors.AccessorGpuDevice"
+      "accessors.AccessorGpuDevice",
+      "accessors.AccessorCommandEncoder"
     ]
 }

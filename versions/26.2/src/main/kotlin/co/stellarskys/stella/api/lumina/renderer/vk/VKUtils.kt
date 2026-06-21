@@ -169,12 +169,12 @@ internal object VKUtils {
     }
 
     fun orthoProjection(w: Int, h: Int): FloatArray {
-        // Vulkan clip space: Y points down (matches 2D coords), Z range [0,1]
+        // Match GL: Y=0 at top, Y=h at bottom. Identical to GLUtils.orthoProjection.
         return floatArrayOf(
-            2f / w, 0f,     0f, 0f,
-            0f,     2f / h, 0f, 0f,
-            0f,     0f,     1f, 0f,
-            -1f,   -1f,     0f, 1f
+            2f / w, 0f,      0f, 0f,
+            0f,    -2f / h,  0f, 0f,
+            0f,     0f,      1f, 0f,
+            -1f,    1f,      0f, 1f
         )
     }
 
