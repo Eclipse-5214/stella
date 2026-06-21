@@ -15,11 +15,7 @@ import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import org.joml.Matrix3x2f
 
 class LuminaPIPRenderer : PictureInPictureRenderer<LuminaPIPRenderer.LuminaRenderState>() {
-    override fun renderToTexture(
-        state: LuminaRenderState,
-        poseStack: PoseStack,
-        submitNodeCollector: SubmitNodeCollector
-    ) {
+    override fun renderToTexture(state: LuminaRenderState, poseStack: PoseStack, submitNodeCollector: SubmitNodeCollector) {
         val device = RenderSystem.getDevice() as? AccessorGpuDevice ?: return
         val colorTex = RenderSystem.outputColorTextureOverride ?: return
         val depthTex = RenderSystem.outputDepthTextureOverride ?: return

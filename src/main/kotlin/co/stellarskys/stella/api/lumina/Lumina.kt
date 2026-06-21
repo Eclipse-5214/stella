@@ -6,6 +6,8 @@ import co.stellarskys.stella.api.lumina.types.LuminaFont
 import co.stellarskys.stella.api.lumina.types.LuminaImage
 import co.stellarskys.stella.api.lumina.types.LuminaSvg
 import co.stellarskys.stella.api.zenith.Zenith
+import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.GameEvent
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import org.joml.Matrix3x2f
 import org.joml.Vector2f
@@ -63,6 +65,9 @@ object Lumina {
         val stencilOp: Int = 0
     )
 
+    init {
+        EventBus.on<GameEvent.Stop>{ backend.destroy() }
+    }
 
     fun push() { transformStack.addLast(Matrix3x2f(currentTransform)) }
     fun pop() { currentTransform = transformStack.removeLastOrNull() ?: Matrix3x2f() }
