@@ -1,7 +1,8 @@
 package co.stellarskys.stella.api.lumina
 
-import co.stellarskys.stella.api.lumina.renderer.gl.GLBackend
 import co.stellarskys.stella.api.lumina.renderer.LuminaBackend
+import co.stellarskys.stella.api.lumina.renderer.gl.GLBackend
+import co.stellarskys.stella.api.lumina.renderer.vk.VKBackend
 import co.stellarskys.stella.api.lumina.types.LuminaFont
 import co.stellarskys.stella.api.lumina.types.LuminaImage
 import co.stellarskys.stella.api.lumina.types.LuminaSvg
@@ -14,8 +15,21 @@ import org.lwjgl.system.MemoryUtil
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
+//? if >= 26.2 {
+/*import co.stellarskys.stella.mixins.accessors.AccessorGpuDevice
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vulkan.VulkanDevice
+*///? }
+
 object Lumina {
-    internal val backend: LuminaBackend = GLBackend
+    internal val backend: LuminaBackend by lazy {
+        //? if >= 26.2 {
+        /*val device = RenderSystem.getDevice() as? AccessorGpuDevice
+        if (device?.getBackend() is VulkanDevice) VKBackend else GLBackend
+        *///? } else {
+        GLBackend
+        //? }
+    }
     private val shapeBatch = mutableListOf<QueuedShape>()
     private val textBatch = mutableListOf<LuminaBackend.TextEntry>()
     private val imageBatch = mutableListOf<LuminaBackend.ImageEntry>()

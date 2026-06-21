@@ -40,4 +40,4 @@ replay_*.log
 *.jfr
 
 # planning docs
-RENDERER_PLAN.md
+.claude/

@@ -1,37 +1,46 @@
 package co.stellarskys.stella.api.lumina
 
 import co.stellarskys.stella.mixins.accessors.AccessorGpuDevice
+import com.mojang.blaze3d.opengl.GlDevice
 import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vulkan.VulkanDevice
+import com.mojang.blaze3d.vulkan.VulkanGpuTexture
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
-import com.mojang.blaze3d.opengl.GlDevice
-import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import org.joml.Matrix3x2f
 
-/*
- * Adapted from NVGSpecialRenderer.kt in OdinFabric.
- *
- * OdinFabric: https://github.com/odtheking/OdinFabric
- * BSD 3-Clause License, Copyright (c) 2025, odtheking
- */
-
-
-class LuminaPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPictureRenderer<LuminaPIPRenderer.LuminaRenderState>(bufferSource) {
-    override fun renderToTexture(state: LuminaRenderState, poseStack: PoseStack) {
+class LuminaPIPRenderer : PictureInPictureRenderer<LuminaPIPRenderer.LuminaRenderState>() {
+    override fun renderToTexture(
+        state: LuminaRenderState,
+        poseStack: PoseStack,
+        submitNodeCollector: SubmitNodeCollector
+    ) {
         val device = RenderSystem.getDevice() as? AccessorGpuDevice ?: return
         val colorTex = RenderSystem.outputColorTextureOverride ?: return
-        val glDepthTex = (RenderSystem.outputDepthTextureOverride?.texture() as? GlTexture) ?: return
-        val (width, height) = colorTex.let { it.getWidth(0) to it.getHeight(0) }
-        val bufferManager = (device.backend as? GlDevice)?.directStateAccess() ?: return
-        val fboId = (colorTex.texture() as? GlTexture)?.getFbo(bufferManager, glDepthTex) ?: return
+        val depthTex = RenderSystem.outputDepthTextureOverride ?: return
+        val width = colorTex.getWidth(0)
+        val height = colorTex.getHeight(0)
 
-        Lumina.backend.setupRenderTarget(fboId.toLong(), width, height)
-        state.renderContent(width, height)
-        Lumina.backend.resetAfterRender()
+        val backend = device.getBackend()
+
+        if (backend is VulkanDevice) {
+            val vkColorTex = colorTex.texture() as? VulkanGpuTexture ?: return
+            Lumina.backend.setupRenderTarget(vkColorTex.vkImage(), width, height)
+            state.renderContent(width, height)
+            Lumina.backend.resetAfterRender()
+        } else if (backend is GlDevice) {
+            val glColorTex = colorTex.texture() as? GlTexture ?: return
+            val glDepthTex = depthTex.texture() as? GlTexture ?: return
+            val fboId = backend.frameBufferCache().getFbo(backend.directStateAccess(), listOf(glColorTex), glDepthTex)
+            Lumina.backend.setupRenderTarget(fboId.toLong(), width, height)
+            state.renderContent(width, height)
+            Lumina.backend.resetAfterRender()
+        }
     }
 
     override fun getTranslateY(height: Int, windowScaleFactor: Int): Float = height / 2f

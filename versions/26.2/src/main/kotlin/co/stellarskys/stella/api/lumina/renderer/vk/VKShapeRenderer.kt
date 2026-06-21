@@ -1,40 +1,39 @@
-package co.stellarskys.stella.api.lumina.renderer.gl
+package co.stellarskys.stella.api.lumina.renderer.vk
 
 import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.api.lumina.renderer.LuminaBackend
 import org.joml.Matrix3x2f
 import org.joml.Vector2f
-import org.lwjgl.opengl.GL33C
+import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
+import org.lwjgl.vulkan.*
+import org.lwjgl.vulkan.VK13.*
 import java.nio.FloatBuffer
 import kotlin.math.*
 
-/*
- * Shape tessellation and AA fringe technique adapted from NanoVG by Mikko Mononen.
- * Porter-Duff SOURCE_IN masking adapted from NVGRenderer.kt in OdinFabric.
- * Built with the assistance of Claude (Anthropic).
- *
- * NanoVG: https://github.com/memononen/nanovg (zlib license)
- * OdinFabric: https://github.com/odtheking/OdinFabric
- * BSD 3-Clause License, Copyright (c) 2025, odtheking
- */
-internal object GLShapeRenderer {
-    private const val FLOATS = 7
+internal object VKShapeRenderer {
+    private const val FLOATS = 7   // matches GL: x, y, r, g, b, a, coverage
     private const val MAX_VERTS = 65536
 
-    private var program = 0; private var vao = 0; private var vbo = 0
-    private var uProjection = -1; private var initialized = false
+    // CPU-side tessellation buffer (same as GL)
     private var buf: FloatBuffer = MemoryUtil.memAllocFloat(MAX_VERTS * FLOATS)
     private var vCount = 0
+
+    private var vertexBuf: VKUtils.VmaBuffer? = null
 
     private data class DrawRun(val scissor: Lumina.ScissorRect?, val start: Int, val count: Int, val stencilOp: Int = 0)
     private val runs = mutableListOf<DrawRun>()
 
-    fun render(shapes: List<Lumina.QueuedShape>, vw: Int, vh: Int) {
+    fun init() {
+        val bufSize = MAX_VERTS.toLong() * FLOATS * 4
+        vertexBuf = VKUtils.createHostVertexBuffer(bufSize)
+    }
+
+    fun render(cmd: VkCommandBuffer, shapes: List<Lumina.QueuedShape>, vw: Int, vh: Int) {
         if (shapes.isEmpty()) return
-        ensureInit()
         vCount = 0; buf.clear(); runs.clear()
 
+        // === TESSELLATION (copy-paste from GLShapeRenderer) ===
         var sc = shapes.firstOrNull()?.scissor
         var rs = 0
         for (s in shapes) {
@@ -52,7 +51,10 @@ internal object GLShapeRenderer {
                     rs = vCount
                 }
                 else -> {
-                    if (s.scissor != sc) { if (vCount > rs) runs.add(DrawRun(sc, rs, vCount - rs)); sc = s.scissor; rs = vCount }
+                    if (s.scissor != sc) {
+                        if (vCount > rs) runs.add(DrawRun(sc, rs, vCount - rs))
+                        sc = s.scissor; rs = vCount
+                    }
                     if (s.border > 0f) hollowRect(s) else filledRect(s)
                 }
             }
@@ -60,51 +62,86 @@ internal object GLShapeRenderer {
         if (vCount > rs) runs.add(DrawRun(sc, rs, vCount - rs))
         if (vCount == 0) return
 
-        val state = GLUtils.saveGLState()
-        GL33C.glUseProgram(program); GL33C.glBindVertexArray(vao)
-        GL33C.glEnable(GL33C.GL_BLEND); GL33C.glDisable(GL33C.GL_DEPTH_TEST); GL33C.glDisable(GL33C.GL_CULL_FACE)
-        GL33C.glBlendFunc(GL33C.GL_ONE, GL33C.GL_ONE_MINUS_SRC_ALPHA)
-        GL33C.glUniformMatrix4fv(uProjection, false, GLUtils.orthoProjection(vw, vh))
-        GLUtils.uploadVertices(vbo, buf, vCount, FLOATS)
+        // === UPLOAD (direct to host-visible vertex buffer) ===
+        val vb = vertexBuf!!
+        buf.position(0).limit(vCount * FLOATS)
+        MemoryUtil.memCopy(MemoryUtil.memAddress(buf), vb.mappedPtr, vCount.toLong() * FLOATS * 4)
+
+        // === BEGIN RENDER PASS + DRAW ===
+        VKBackend.beginRenderPassIfNeeded()
+        vkCmdBindVertexBuffers(cmd, 0, longArrayOf(vb.buffer), longArrayOf(0))
+
+        // Push projection matrix
+        val proj = VKUtils.orthoProjection(vw, vh)
+        MemoryStack.stackPush().use { stack ->
+            val projBuf = stack.mallocFloat(16)
+            projBuf.put(proj).flip()
+            vkCmdPushConstants(cmd, VKPipelineManager.shapePipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT or VK_SHADER_STAGE_FRAGMENT_BIT,
+                0, projBuf)
+        }
+
+        // Set viewport
+        MemoryStack.stackPush().use { stack ->
+            val viewport = VkViewport.calloc(1, stack)
+            viewport[0].x(0f).y(0f).width(vw.toFloat()).height(vh.toFloat())
+                .minDepth(0f).maxDepth(1f)
+            vkCmdSetViewport(cmd, 0, viewport)
+        }
+
+        var currentPipeline = VKPipelineManager.shapePipeline
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, currentPipeline)
+
         for (r in runs) {
             when (r.stencilOp) {
                 1 -> {
-                    GLUtils.applyScissor(r.scissor, vh)
-                    GL33C.glDrawArrays(GL33C.GL_TRIANGLES, r.start, r.count)
-                    GL33C.glBlendFunc(GL33C.GL_DST_ALPHA, GL33C.GL_ZERO)
+                    // Draw the mask shape normally, then switch to masked blend
+                    applyScissor(cmd, r.scissor, vw, vh)
+                    vkCmdDraw(cmd, r.count, 1, r.start, 0)
+                    // Switch to masked pipeline
+                    currentPipeline = VKPipelineManager.shapePipelineMasked
+                    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, currentPipeline)
                 }
-                2 -> GL33C.glBlendFunc(GL33C.GL_ONE, GL33C.GL_ONE_MINUS_SRC_ALPHA)
+                2 -> {
+                    // End masking — switch back to normal pipeline
+                    currentPipeline = VKPipelineManager.shapePipeline
+                    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, currentPipeline)
+                }
                 else -> {
-                    GLUtils.applyScissor(r.scissor, vh)
-                    GL33C.glDrawArrays(GL33C.GL_TRIANGLES, r.start, r.count)
+                    applyScissor(cmd, r.scissor, vw, vh)
+                    vkCmdDraw(cmd, r.count, 1, r.start, 0)
                 }
             }
         }
-        state.restore()
+    }
+
+    private fun applyScissor(cmd: VkCommandBuffer, scissor: Lumina.ScissorRect?, vw: Int, vh: Int) {
+        MemoryStack.stackPush().use { stack ->
+            val rect = VkRect2D.calloc(1, stack)
+            if (scissor != null) {
+                val sx = maxOf(0, scissor.x.toInt())
+                val sy = maxOf(0, scissor.y.toInt())
+                rect[0].offset().x(sx).y(sy)
+                rect[0].extent().width(maxOf(0, scissor.w.toInt())).height(maxOf(0, scissor.h.toInt()))
+            } else {
+                rect[0].offset().x(0).y(0)
+                rect[0].extent().width(vw).height(vh)
+            }
+            vkCmdSetScissor(cmd, 0, rect)
+        }
     }
 
     fun destroy() {
-        if (!initialized) return
-        GL33C.glDeleteProgram(program); GL33C.glDeleteVertexArrays(vao); GL33C.glDeleteBuffers(vbo)
-        MemoryUtil.memFree(buf); program = 0; vao = 0; vbo = 0; initialized = false
+        vertexBuf?.let { VKUtils.destroyBuffer(it) }; vertexBuf = null
+        MemoryUtil.memFree(buf)
     }
 
-    private fun ensureInit() {
-        if (initialized) return
-        program = GLUtils.linkProgram("shaders/gl/lumina_shape.vsh", "shaders/gl/lumina_shape.fsh", "LuminaGL")
-        uProjection = GL33C.glGetUniformLocation(program, "uProjection")
-        vao = GL33C.glGenVertexArrays(); vbo = GL33C.glGenBuffers()
-        GL33C.glBindVertexArray(vao)
-        GL33C.glBindBuffer(GL33C.GL_ARRAY_BUFFER, vbo)
-        GL33C.glBufferData(GL33C.GL_ARRAY_BUFFER, MAX_VERTS.toLong() * FLOATS * 4L, GL33C.GL_DYNAMIC_DRAW)
-        val stride = FLOATS * 4
-        GL33C.glEnableVertexAttribArray(0); GL33C.glVertexAttribPointer(0, 2, GL33C.GL_FLOAT, false, stride, 0L)
-        GL33C.glEnableVertexAttribArray(1); GL33C.glVertexAttribPointer(1, 4, GL33C.GL_FLOAT, false, stride, 8L)
-        GL33C.glEnableVertexAttribArray(2); GL33C.glVertexAttribPointer(2, 1, GL33C.GL_FLOAT, false, stride, 24L)
-        GL33C.glBindVertexArray(0); GL33C.glBindBuffer(GL33C.GL_ARRAY_BUFFER, 0)
-        initialized = true
-    }
-
+    // === TESSELLATION METHODS — copy from GLShapeRenderer unchanged ===
+    // filledRect(s), hollowRect(s), emitFringe(...), computeNormals(...),
+    // emit(p, c, cov), tp(x, y, t), tp(p, t), colorAt(s, lx, ly), fringeWidth(t)
+    //
+    // Only change: GLUtils.unpackPremultiplied → VKUtils.unpackPremultiplied
+    
     private fun filledRect(s: Lumina.QueuedShape) {
         val fw = fringeWidth(s.transform); val hf = fw * 0.5f
         val outline = LuminaBackend.generateOutline(s.x + hf, s.y + hf, max(0f, s.w - fw), max(0f, s.h - fw),
@@ -172,7 +209,7 @@ internal object GLShapeRenderer {
         if (vCount >= MAX_VERTS) return
         buf.put(p.x).put(p.y).put(c[0]).put(c[1]).put(c[2]).put(c[3]).put(cov); vCount++
     }
-
+    
     private fun tp(x: Float, y: Float, t: Matrix3x2f) = t.transformPosition(Vector2f(x, y))
     private fun tp(p: Vector2f, t: Matrix3x2f) = t.transformPosition(Vector2f(p))
 
@@ -185,9 +222,9 @@ internal object GLShapeRenderer {
                 val ty = if (s.h > 0f) (ly - s.y) / s.h else 0f
                 ((tx + ty) * 0.5f).coerceIn(0f, 1f)
             }
-            else -> return GLUtils.unpackPremultiplied(s.color)
+            else -> return VKUtils.unpackPremultiplied(s.color)
         }
-        val c1 = GLUtils.unpackPremultiplied(s.gradC1); val c2 = GLUtils.unpackPremultiplied(s.gradC2)
+        val c1 = VKUtils.unpackPremultiplied(s.gradC1); val c2 = VKUtils.unpackPremultiplied(s.gradC2)
         return floatArrayOf(c1[0]+(c2[0]-c1[0])*t, c1[1]+(c2[1]-c1[1])*t, c1[2]+(c2[2]-c1[2])*t, c1[3]+(c2[3]-c1[3])*t)
     }
 

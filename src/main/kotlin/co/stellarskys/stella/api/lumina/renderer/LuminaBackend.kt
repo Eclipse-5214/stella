@@ -15,7 +15,7 @@ interface LuminaBackend {
     fun renderTextured(text: List<TextEntry>, images: List<ImageEntry>, vw: Int, vh: Int)
     fun uploadTexture(width: Int, height: Int, data: ByteBuffer, format: TextureFormat, mipmap: Boolean = false): Int
     fun deleteTexture(id: Int)
-    fun setupRenderTarget(fboId: Int, width: Int, height: Int)
+    fun setupRenderTarget(targetId: Long, width: Int, height: Int)
     fun resetAfterRender()
     fun destroy()
 

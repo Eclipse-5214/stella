@@ -131,7 +131,7 @@ internal object GLTextureRenderer {
 
     private fun ensureInit() {
         if (initialized) return
-        program = GLUtils.linkProgram("shaders/core/lumina_tex.vsh", "shaders/core/lumina_tex.fsh", "LuminaImg")
+        program = GLUtils.linkProgram("shaders/gl/lumina_tex.vsh", "shaders/gl/lumina_tex.fsh", "LuminaImg")
         uProjection = GL33C.glGetUniformLocation(program, "uProjection")
         uTexture = GL33C.glGetUniformLocation(program, "uTex")
         uMode = GL33C.glGetUniformLocation(program, "uMode")

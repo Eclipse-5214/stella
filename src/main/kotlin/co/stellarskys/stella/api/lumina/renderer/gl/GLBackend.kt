@@ -33,8 +33,8 @@ object GLBackend : LuminaBackend {
 
     override fun deleteTexture(id: Int) { GL33C.glDeleteTextures(id) }
 
-    override fun setupRenderTarget(fboId: Int, width: Int, height: Int) {
-        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, fboId)
+    override fun setupRenderTarget(targetId: Long, width: Int, height: Int) {
+        GlStateManager._glBindFramebuffer(GlConst.GL_FRAMEBUFFER, targetId.toInt())
         GlStateManager._viewport(0, 0, width, height)
         GL33C.glBindSampler(0, 0)
     }
