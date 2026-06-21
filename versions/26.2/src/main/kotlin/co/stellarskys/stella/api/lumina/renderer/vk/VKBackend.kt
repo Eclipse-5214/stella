@@ -1,5 +1,6 @@
 package co.stellarskys.stella.api.lumina.renderer.vk
 
+import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.api.lumina.renderer.LuminaBackend
 import co.stellarskys.stella.mixins.accessors.AccessorGpuDevice
@@ -28,7 +29,7 @@ object VKBackend : LuminaBackend {
     private var nextTexId = 1
 
     private var commandBuffer: VkCommandBuffer? = null
-    private var lastResetFrame = -1
+    private var lastResetFrame = -1L
 
     private var framebuffer: Long = VK_NULL_HANDLE
     private var targetImageView: Long = VK_NULL_HANDLE
@@ -262,10 +263,10 @@ object VKBackend : LuminaBackend {
         // Reset vertex buffer offsets once per MC frame (not per PIP render).
         // All PIP command buffers from the same frame share the vertex buffer
         // and are submitted together, so each must reference its own region.
-        if (Lumina.renderFrameId != lastResetFrame) {
+        if (Stella.DELTA.frame != lastResetFrame) {
             VKShapeRenderer.resetFrame()
             VKTextureRenderer.resetFrame()
-            lastResetFrame = Lumina.renderFrameId
+            lastResetFrame = Stella.DELTA.frame
         }
 
         // Allocate a fresh command buffer from MC's encoder for this PIP render

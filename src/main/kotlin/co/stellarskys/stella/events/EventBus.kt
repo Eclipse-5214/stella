@@ -100,7 +100,6 @@ object EventBus : EventBus() {
             //? } else {
             /*if (client.gameRenderer.gameRenderState().guiRenderState.isHudHidden || world == null || player == null) return@attachElementBefore
             *///? }
-            co.stellarskys.stella.api.lumina.Lumina.renderFrameId++
             post(GuiEvent.RenderHUD(context))
             Stella.DELTA.updateDelta()
         }
