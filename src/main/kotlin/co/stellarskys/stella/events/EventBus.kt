@@ -88,6 +88,7 @@ object EventBus : EventBus() {
 
         LevelRenderEvents.END_MAIN.register { context ->
            post(RenderEvent.World.Last(context.poseStack(), context.submitNodeCollector()))
+           Stella.DELTA.updateDelta()
         }
 
         LevelRenderEvents.BEFORE_BLOCK_OUTLINE.register { context, outlineRenderState ->
@@ -101,7 +102,6 @@ object EventBus : EventBus() {
             /*if (client.gameRenderer.gameRenderState().guiRenderState.isHudHidden || world == null || player == null) return@attachElementBefore
             *///? }
             post(GuiEvent.RenderHUD(context))
-            Stella.DELTA.updateDelta()
         }
     }
 
