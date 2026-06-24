@@ -6,7 +6,6 @@ import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.api.hypixel.HypixelApi
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
-import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.msc.profileUtils.CollectionUtils
 import co.stellarskys.stella.features.msc.profileUtils.PvScreen
@@ -46,14 +45,22 @@ object ProfileViewer: Feature("profileViewer") {
                 return@getUuid
             }
 
-            HypixelApi.fetchSkyblockProfile(uuid, 5.minutes.millis) { profile ->
-                if (profile == null) {
+            HypixelApi.fetchSkyblockProfile(uuid, 5.minutes.millis) { member ->
+                if (member == null) {
                     Signal.modMessage("§cError: Could not fetch profile for $name")
                     callback(null)
                     return@fetchSkyblockProfile
                 }
 
-                callback(profile)
+                val profileId = member.profile?.id
+                if (profileId != null) {
+                    HypixelApi.fetchMuseum(profileId, uuid) { museumValue ->
+                        member.museumValue = museumValue ?: 0L
+                        callback(member)
+                    }
+                } else {
+                    callback(member)
+                }
             }
         }
     }

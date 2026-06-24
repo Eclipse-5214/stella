@@ -14,15 +14,15 @@ object NetworthUtils {
         val breakdown = mutableMapOf(
             "Currency" to getCurrencyNetworth(member),
             "Sacks" to getSacksNetworth(member),
-            "Pets" to getPetsNetworth(member)
+            "Pets" to getPetsNetworth(member),
+            "Museum" to member.museumValue
         ).apply {
             with(member.inventory) {
                 put("Inventory", invContents.getValue())
                 put("E-Chest", eChestContents.getValue())
                 put("Backpacks", backpackContents.values.sumOf { it.getValue() })
-                put("Armor", invArmor.getValue())
+                put("Armors", invArmor.getValue() + fullWardrobe.filterNot { it.isEmpty }.sumOf { it.getItemValue().price })
                 put("Equipment", equipment.getValue())
-                put("Wardrobe", wardrobeContents.getValue())
                 put("Talisman Bag", bags.talismanBag.getValue())
                 put("Fishing Bag", bags.fishingBag.getValue())
                 put("Quiver", bags.quiver.getValue())
@@ -35,7 +35,7 @@ object NetworthUtils {
     fun getPetsNetworth(m: SkyblockResponse.SkyblockMember) = m.petsData.pets.sumOf { it.getValue() }
 
     fun getCurrencyNetworth(m: SkyblockResponse.SkyblockMember) =
-        (m.currencies.purse + m.soloBank + (m.profile?.banking?.balance ?: 0.0)).toLong()
+        (m.currencies.purse + (m.memberProfile?.personalBank ?: 0.0) + (m.profile?.banking?.balance ?: 0.0)).toLong()
 
     fun getSacksNetworth(m: SkyblockResponse.SkyblockMember) =
         m.inventory.sacks.entries.sumOf { (id, amt) -> Pricing.getPrice(id) * amt }
@@ -49,6 +49,19 @@ object NetworthUtils {
         }
     }
 
-    fun SkyblockResponse.Pet.getValue() = (LowestBinAPI.getLowestPrice("pet:${this.type}:${this.tier}") ?: 0L) + Pricing.getPrice(this.heldItem) + Pricing.getPrice(this.skin)
+    fun SkyblockResponse.Pet.getValue(): Long {
+        val petKey = "pet:${this.type.uppercase()}:${this.tier.uppercase()}"
+        val petBase = LowestBinAPI.getLowestPrice(petKey) ?: 0L
+        val heldItemVal = this.heldItem?.let {
+            val key = if (it.uppercase().startsWith("PET_ITEM_")) it.uppercase() else "PET_ITEM_${it.uppercase()}"
+            LowestBinAPI.getLowestPrice(key) ?: Pricing.getPrice(it)
+        } ?: 0L
+        val skinVal = this.skin?.let {
+            val id = it.uppercase()
+            val queryId = if (id.startsWith("PET_SKIN_")) id else "PET_SKIN_$id"
+            LowestBinAPI.getLowestPrice(queryId) ?: LowestBinAPI.getLowestPrice(it) ?: Pricing.getPrice(it)
+        } ?: 0L
+        return petBase + heldItemVal + skinVal
+    }
     fun SkyblockResponse.InventoryContents.getValue() = this.items().filterNot { it.isEmpty }.sumOf { it.getItemValue().price }
 }

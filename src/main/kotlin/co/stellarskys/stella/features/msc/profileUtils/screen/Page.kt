@@ -74,6 +74,7 @@ abstract class Page(
             ren2d.drawString(context, "§d$name's $title!", 10, 10)
             navBar.render(context, mouseX, mouseY, delta)
             onRender(context, mouseX, mouseY, delta)
+            elements.find { it is ProfileDropdown }?.render(context, mouseX, mouseY, delta)
         }
         renderTooltips(context, mouseX.toInt(), mouseY.toInt())
         componentsTooltips.clear()

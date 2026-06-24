@@ -8,6 +8,7 @@ import co.stellarskys.stella.api.zenith.Zenith
 *///? }
 import co.stellarskys.stella.features.msc.profileUtils.screen.pages.*
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
+import co.stellarskys.stella.features.msc.profileUtils.screen.ProfileDropdown
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class PvScreen private constructor(
@@ -16,6 +17,7 @@ class PvScreen private constructor(
 ) : Aperture("Profile Viewer") {
     private val pages: List<Page>
     private var currentPage: Page
+    private val profileDropdown = ProfileDropdown(name, member)
 
     init {
         pages = listOf(
@@ -28,12 +30,20 @@ class PvScreen private constructor(
         )
         pages.forEach { it.siblings = pages }
         currentPage = pages.first()
+        profileDropdown.parent = currentPage
+        currentPage.elements.add(profileDropdown)
     }
 
-    private fun switchTo(page: Page) { currentPage = page }
+    private fun switchTo(page: Page) {
+        currentPage.elements.remove(profileDropdown)
+        currentPage = page
+        profileDropdown.parent = currentPage
+        currentPage.elements.add(profileDropdown)
+    }
 
-    override fun onRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) =
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, tickDelta: Float) {
         currentPage.render(context, mouseX.toFloat(), mouseY.toFloat(), tickDelta)
+    }
 
     override fun onMouseClick(button: Int, x: Double, y: Double, modifiers: Int) =
         currentPage.mouseClicked(x.toFloat(), y.toFloat(), button)

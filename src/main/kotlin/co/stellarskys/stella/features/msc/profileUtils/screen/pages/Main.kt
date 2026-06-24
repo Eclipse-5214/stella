@@ -31,6 +31,17 @@ class Main(
     val saComp = Component.literal("§dSA§7: ")
         .append("§6" + skillAverage.first)
         .onHover("§bWith Progress§7: §6${String.format("%.2f", skillAverage.second)}")
+    val coopBank = member.profile?.banking?.balance ?: 0.0
+    val personalBank = member.memberProfile?.personalBank ?: 0.0
+
+    val bankComp = if (coopBank > 0) {
+        Component.literal("§dBank§7: ")
+            .append("§6" + coopBank.toLong().toReadable())
+            .onHover("§bPersonal Bank§7: §6${personalBank.toLong().toReadable()}")
+    } else {
+        Component.literal("§dBank§7: ")
+            .append("§6" + personalBank.toLong().toReadable())
+    }
 
     init {
         member.uuid?.let {
@@ -52,7 +63,7 @@ class Main(
         ren2d.drawString(context, "§b§n${member.profile?.cuteName ?: ""}", 15, 140)
         ren2d.drawString(context, "§dLevel§7: §6${member.sbLevel}", 15, 150)
         ren2d.drawString(context, "§dPurse§7: §6${member.currencies.purse.toLong().toReadable()}", 15, 160)
-        ren2d.drawString(context, "§dBank§7: §6${member.profile?.banking?.balance?.toLong()?.toReadable() ?: ""}", 15, 170)
+        drawComp(context, bankComp, 15, 170)
         drawComp(context, nwComp, 15, 180)
         ren2d.drawString(context, "§dMP§7: §6${member.assumedMagicalPower}", 15, 190)
         drawComp(context, saComp, 15, 200)

@@ -21,7 +21,9 @@ data class SkyblockResponse(
         val activeProfile = profiles?.find { it.selected } ?: return null
         val member = activeProfile.members[cleanUuid] ?: return null
         member.profile = activeProfile
+        member.allProfiles = profiles
         member.uuid = UndashedUuid.fromStringLenient(cleanUuid)
+        member.inventory.loadout = member.loadout
         return member
     }
 
@@ -37,6 +39,10 @@ data class SkyblockResponse(
         val balance: Double = 0.0
     )
 
+    data class MemberProfile(
+        @SerializedName("bank_account") val personalBank: Double = 0.0
+    )
+
     data class SkyblockMember(
         @SerializedName("player_stats") val stats: PlayerStats = PlayerStats(),
         @SerializedName("player_data") val playerData: PlayerData = PlayerData(), // Added
@@ -47,10 +53,13 @@ data class SkyblockResponse(
         @SerializedName("accessory_bag_storage") val accessoryBag: AccessoryBagStorage = AccessoryBagStorage(),
         val inventory: Inventory = Inventory(),
         val collection: Map<String, Double> = emptyMap(),
-        @SerializedName("bank_account") val soloBank: Double = 0.0,
+        @SerializedName("profile") val memberProfile: MemberProfile? = null,
         val currencies: Currencies = Currencies(),
-        var profile: SkyblockProfile? = null,
-        var uuid: UUID? = null
+        @SerializedName("loadout") val loadout: Loadout = Loadout(),
+        @Transient var profile: SkyblockProfile? = null,
+        @Transient var allProfiles: List<SkyblockProfile>? = null,
+        @Transient var uuid: UUID? = null,
+        @Transient var museumValue: Long = 0L
     ) {
         val sbLevel get() = leveling.experience / 100
         val sbLevelProgress get() = leveling.experience % 100
@@ -62,7 +71,7 @@ data class SkyblockResponse(
 
         val allItems get() = inventory.invContents.itemStacks +
                 inventory.eChestContents.itemStacks +
-                inventory.wardrobeContents.itemStacks +
+                inventory.loadoutItemStacks +
                 inventory.equipment.itemStacks +
                 inventory.bags.fishingBag.itemStacks +
                 inventory.bags.talismanBag.itemStacks +
@@ -175,22 +184,83 @@ data class SkyblockResponse(
         @SerializedName("backpack_contents") val backpackContents: Map<String, InventoryContents> = emptyMap(),
         @SerializedName("inv_armor") val invArmor: InventoryContents = InventoryContents(),
         @SerializedName("wardrobe_contents") val wardrobeContents: InventoryContents = InventoryContents(),
-        @SerializedName( "wardrobe_equipped_slot") val wdEquipped: Int = 0,
+        @SerializedName("wardrobe_equipped_slot") val wdEquipped: Int = 0,
         @SerializedName("equipment_contents") val equipment: InventoryContents = InventoryContents(),
         @SerializedName("personal_vault_contents") val personalVault: InventoryContents = InventoryContents(),
         @SerializedName("bag_contents") val bags: BagContents = BagContents(),
         @SerializedName("sacks_counts") val sacks: Map<String, Long> = emptyMap()
     ) {
+        @Transient var loadout: Loadout = Loadout()
+
         val enderChestPages get() = eChestContents.items().chunked(45)
         val invAndHotbar get() = invContents.items().take(9) to invContents.items().drop(9)
 
-        val fullWardrobe get() = wardrobeContents.items().toMutableList().apply {
-            if (isEmpty() || wdEquipped <= 0) return@apply
+        val fullWardrobe: List<ItemStack> get() {
+            val armorMap = loadout.armor
+            if (armorMap.isEmpty()) return emptyList()
+            val maxSlot = armorMap.keys.mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 0
+            val totalPages = (maxSlot + 8) / 9
+            val items = mutableListOf<ItemStack>()
 
-            invArmor.items().reversed().forEachIndexed { row, armorPiece ->
-                val slotIdx = (((wdEquipped - 1) / 9) * 36) + (row * 9) + ((wdEquipped - 1) % 9)
-                if (slotIdx < size && !armorPiece.isEmpty) this[slotIdx] = armorPiece
+            for (page in 0 until totalPages) {
+                val startSlot = page * 9 + 1
+                val endSlot = startSlot + 8
+
+                for (piece in listOf("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS")) {
+                    for (slotId in startSlot..endSlot) {
+                        val slotData = armorMap[slotId.toString()]
+                        val contents = when (piece) {
+                            "HELMET" -> slotData?.helmet
+                            "CHESTPLATE" -> slotData?.chestplate
+                            "LEGGINGS" -> slotData?.leggings
+                            "BOOTS" -> slotData?.boots
+                            else -> null
+                        }
+                        val decoded = contents?.items()?.firstOrNull() ?: ItemStack.EMPTY
+                        items.add(decoded)
+                    }
+                }
             }
+
+            if (items.isNotEmpty() && wdEquipped > 0) {
+                invArmor.items().reversed().forEachIndexed { row, armorPiece ->
+                    val slotIdx = (((wdEquipped - 1) / 9) * 36) + (row * 9) + ((wdEquipped - 1) % 9)
+                    if (slotIdx < items.size && !armorPiece.isEmpty) {
+                        items[slotIdx] = armorPiece
+                    }
+                }
+            }
+
+            return items
+        }
+
+        val loadoutItemStacks: List<ItemData?> get() {
+            val armorMap = loadout.armor
+            if (armorMap.isEmpty()) return emptyList()
+            val maxSlot = armorMap.keys.mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 0
+            val totalPages = (maxSlot + 8) / 9
+            val itemDatas = mutableListOf<ItemData?>()
+
+            for (page in 0 until totalPages) {
+                val startSlot = page * 9 + 1
+                val endSlot = startSlot + 8
+                
+                for (piece in listOf("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS")) {
+                    for (slotId in startSlot..endSlot) {
+                        val slotData = armorMap[slotId.toString()]
+                        val contents = when (piece) {
+                            "HELMET" -> slotData?.helmet
+                            "CHESTPLATE" -> slotData?.chestplate
+                            "LEGGINGS" -> slotData?.leggings
+                            "BOOTS" -> slotData?.boots
+                            else -> null
+                        }
+                        val decoded = contents?.itemStacks?.firstOrNull()
+                        itemDatas.add(decoded)
+                    }
+                }
+            }
+            return itemDatas
         }
     }
 
@@ -202,6 +272,18 @@ data class SkyblockResponse(
     ) {
         val accessoryBagPages get() = talismanBag.items().chunked(45)
     }
+
+    data class Loadout(
+        val armor: Map<String, LoadoutArmor> = emptyMap()
+    )
+
+    data class LoadoutArmor(
+        val id: Int = 0,
+        @SerializedName("HELMET") val helmet: InventoryContents = InventoryContents(),
+        @SerializedName("CHESTPLATE") val chestplate: InventoryContents = InventoryContents(),
+        @SerializedName("LEGGINGS") val leggings: InventoryContents = InventoryContents(),
+        @SerializedName("BOOTS") val boots: InventoryContents = InventoryContents(),
+    )
 
     @OptIn(ExperimentalEncodingApi::class)
     data class InventoryContents(val type: Int? = null, val data: String = "") {
@@ -232,4 +314,14 @@ data class SkyblockResponse(
     }
 
     data class ItemData(val name: String, val id: String, val lore: List<String>, )
+
+    data class MuseumResponse(
+        val success: Boolean = false,
+        val members: Map<String, MuseumMember> = emptyMap()
+    )
+
+    data class MuseumMember(
+        val value: Long = 0L,
+        val appraisal: Boolean = false
+    )
 }

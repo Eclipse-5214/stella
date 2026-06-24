@@ -6,13 +6,17 @@ import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.ProfileViewer
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
+import co.stellarskys.stella.features.msc.profileUtils.screen.SearchBar
 import co.stellarskys.stella.utils.render.Render2D.width
+import co.stellarskys.stella.api.horizon.mc.addTo
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import tech.thatgravyboat.skyblockapi.utils.extentions.getLore
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.repo.apis.SkyBlockItemsRepo
 import tech.thatgravyboat.skyblockapi.utils.extentions.get
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import java.awt.Color
 
 class Storage(
@@ -25,6 +29,7 @@ class Storage(
     private val subPages = listOf(NormalInventory(), EnderChest(), Backpacks(), AccessoryBag(), PersonalVault(), Wardrobe())
     private var currentPage: SubPage = subPages.first()
     private var hoveredStack: ItemStack? = null
+    val searchBar = SearchBar().addTo(this)
 
     companion object {
         const val SLOT_SIZE = 26
@@ -33,6 +38,11 @@ class Storage(
         const val GRID_ROW_COLS = 9
         const val PAGE_BAR_WIDTH = GRID_ROW_COLS * STEP_SIZE
         const val VIEW_HEIGHT_LIMIT = 160
+    }
+    
+    init {
+        searchBar.x = 215f
+        searchBar.y = 5f
     }
 
     override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
@@ -49,6 +59,9 @@ class Storage(
             ren2d.renderItem(context, page.icon, 15f, by + 5f, 1f)
         }
         ren2d.drawHollowRect(context, 40, 25, 300, 185, 1, Palette.Purple)
+        
+        searchBar.render(context, mouseX, mouseY, delta)
+        
         currentPage.onRender(context, mouseX, mouseY)
 
         hoveredStack?.let { if (!it.isEmpty) context.setTooltipForNextFrame(client.font, it, mouseX.toInt(), mouseY.toInt()) }
@@ -72,7 +85,13 @@ class Storage(
         val centerOffset = (SLOT_SIZE - (16 * itemScale)) / 2f // (26 - 24) / 2 = 1.0f
         ren2d.renderItem(ctx, stack, ix + centerOffset, iy + centerOffset, itemScale)
 
-        if (isAreaHovered(ix.toFloat(), iy.toFloat(), SLOT_SIZE.toFloat(), SLOT_SIZE.toFloat(), mx, my)) {
+        val q = searchBar.query.lowercase()
+        val itemName = stack.hoverName.string
+        val matches = itemName.lowercase().contains(q) || stack.getLore().any { it.stripped.lowercase().contains(q) }
+        
+        if (q.isNotEmpty() && !matches) {
+            ren2d.drawRect(ctx, ix, iy, SLOT_SIZE, SLOT_SIZE, Palette.Crust.withAlpha(200))
+        } else if (isAreaHovered(ix.toFloat(), iy.toFloat(), SLOT_SIZE.toFloat(), SLOT_SIZE.toFloat(), mx, my)) {
             hoveredStack = stack
             ren2d.drawRect(ctx, ix + 1, iy + 1, SLOT_SIZE - 2, SLOT_SIZE - 2, Palette.Surface1.withAlpha(80))
         }
@@ -186,11 +205,6 @@ class Storage(
     inner class AccessoryBag : PagedSubPage("Accessory Bag") {
         override val icon: ItemStack = Items.BOOK.defaultInstance
         override val cachedPages by lazy { member.inventory.bags.accessoryBagPages }
-        override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {
-            val mp = "§dMP§7: §6${member.assumedMagicalPower}"
-            ren2d.drawString(context, mp, 340 - mp.width(), 10, 1f)
-            super.onRender(context, mouseX, mouseY)
-        }
     }
 
     inner class Wardrobe : PagedSubPage("Wardrobe") {
