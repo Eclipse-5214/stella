@@ -53,7 +53,7 @@ abstract class Page(
 
     private fun renderTooltips(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         val tooltip = componentsTooltips.firstOrNull {
-            isAreaHovered(it.x.toFloat(), it.y.toFloat(), it.width.toFloat(), it.height.toFloat())
+            isAreaHovered(it.x.toFloat(), it.y.toFloat(), it.width.toFloat(), it.height.toFloat(), mouseX.toFloat(), mouseY.toFloat())
         } ?: return
 
         // Mimics GuiGraphicsExtractor L 777 - 787

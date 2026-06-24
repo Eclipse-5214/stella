@@ -123,16 +123,18 @@ class TextHandler(
                     } else {
                         boundary += 1
                     }
-                    textSetter(text.removeRange(boundary, caret))
+                    setTextAndSave(text.removeRange(boundary, caret))
                     caret = boundary
                     selection = caret
                 } else {
-                    textSetter(text.removeRange(caret - 1, caret))
+                    setTextAndSave(text.removeRange(caret - 1, caret))
                     caret--
                     selection = caret
                 }
             }
-            Keys.DELETE -> if (selection != caret) deleteSelection() else if (caret < text.length) textSetter(text.removeRange(caret, caret + 1)) // Delete
+            Keys.DELETE -> if (selection != caret) deleteSelection() else if (caret < text.length) {
+                setTextAndSave(text.removeRange(caret, caret + 1)) // Delete
+            }
             Keys.LEFT -> { if (caret > 0) caret--; if (!shift) selection = caret } // Left
             Keys.RIGHT -> { if (caret < text.length) caret++; if (!shift) selection = caret } // Right
             Keys.A -> if (ctrl) { selection = 0; caret = text.length } // Ctrl+A
@@ -181,21 +183,25 @@ class TextHandler(
         updateCaretPosition()
     }
 
+    private fun setTextAndSave(newText: String) {
+        textSetter(newText)
+        saveState()
+    }
+
     private fun insert(string: String) {
         if (selection != caret) deleteSelection()
         val result = text.substring(0, caret) + string + text.substring(caret)
         if (result.length <= maxLength) {
-            textSetter(result)
+            setTextAndSave(result)
             caret += string.length
             selection = caret
             updateCaretPosition()
-            saveState()
         }
     }
 
     private fun deleteSelection() {
         val start = minOf(caret, selection)
-        textSetter(text.removeRange(start, maxOf(caret, selection)))
+        setTextAndSave(text.removeRange(start, maxOf(caret, selection)))
         caret = start
         selection = caret
     }
@@ -208,7 +214,27 @@ class TextHandler(
         } else 0f
 
         val localX = mouseX - (absoluteX - textOffset + centeringOffset + textSidePadding)
-        caret = (0..text.length).minByOrNull { abs(textWidth(text.substring(0, it)) - localX) } ?: 0
+        
+        var low = 0
+        var high = text.length
+        var bestIndex = 0
+        var bestDiff = Float.MAX_VALUE
+        
+        while (low <= high) {
+            val mid = (low + high) ushr 1
+            val w = textWidth(text.substring(0, mid))
+            val diff = abs(w - localX)
+            if (diff < bestDiff) {
+                bestDiff = diff
+                bestIndex = mid
+            }
+            if (w < localX) {
+                low = mid + 1
+            } else {
+                high = mid - 1
+            }
+        }
+        caret = bestIndex
     }
 
     private fun saveState() {

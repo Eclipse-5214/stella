@@ -29,7 +29,7 @@ class Main(
 
     val skillAverage = SkillUtils.getCappedSkillAverage(member, false) to SkillUtils.getCappedSkillAverage(member)
     val saComp = Component.literal("§dSA§7: ")
-        .append("§6" + skillAverage.first)
+        .append("§6" + String.format("%.2f", skillAverage.first))
         .onHover("§bWith Progress§7: §6${String.format("%.2f", skillAverage.second)}")
     val coopBank = member.profile?.banking?.balance ?: 0.0
     val personalBank = member.memberProfile?.personalBank ?: 0.0

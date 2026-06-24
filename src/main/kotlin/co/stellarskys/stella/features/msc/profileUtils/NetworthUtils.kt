@@ -21,7 +21,16 @@ object NetworthUtils {
                 put("Inventory", invContents.getValue())
                 put("E-Chest", eChestContents.getValue())
                 put("Backpacks", backpackContents.values.sumOf { it.getValue() })
-                put("Armors", invArmor.getValue() + fullWardrobe.filterNot { it.isEmpty }.sumOf { it.getItemValue().price })
+                val equippedIndices = if (wdEquipped > 0) {
+                    val pageBase = ((wdEquipped - 1) / 9) * 36
+                    val slotOffset = (wdEquipped - 1) % 9
+                    (0..3).map { row -> pageBase + (row * 9) + slotOffset }.toSet()
+                } else emptySet()
+
+                val wardrobeVal = fullWardrobe.filterIndexed { index, item ->
+                    !item.isEmpty && index !in equippedIndices
+                }.sumOf { it.getItemValue().price }
+                put("Armors", invArmor.getValue() + wardrobeVal)
                 put("Equipment", equipment.getValue())
                 put("Talisman Bag", bags.talismanBag.getValue())
                 put("Fishing Bag", bags.fishingBag.getValue())

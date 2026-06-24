@@ -81,8 +81,10 @@ object HypixelApi {
         force: Boolean = false,
         onResult: (Long?) -> Unit
     ) {
+        val cleanUuid = playerUuid.replace("-", "")
+        val cacheKey = "$profileId-$cleanUuid"
         if (!force) {
-            MuseumCache.get(profileId, cacheMs)?.let {
+            MuseumCache.get(cacheKey, cacheMs)?.let {
                 onResult(it)
                 return
             }
@@ -93,10 +95,9 @@ object HypixelApi {
 
         Quasar.fetch<SkyblockResponse.MuseumResponse>(url) { result ->
             result.onSuccess { response ->
-                val cleanUuid = playerUuid.replace("-", "")
                 val memberMuseum = response.members[cleanUuid]
                 val value = memberMuseum?.value ?: 0L
-                MuseumCache.put(profileId, value)
+                MuseumCache.put(cacheKey, value)
                 onResult(value)
             }.onFailure {
                 onResult(null)

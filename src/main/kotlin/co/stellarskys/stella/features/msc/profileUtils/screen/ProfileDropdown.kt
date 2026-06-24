@@ -71,12 +71,15 @@ class ProfileDropdown(
             profiles.forEach { profile ->
                 if (isAreaHovered(0f, currentY, buttonWidth, buttonHeight, mouseX, mouseY)) {
                     if (profile != currentMember.profile) {
-                        val newMember = profile.members[currentMember.uuid.toString().replace("-", "")]
-                        if (newMember != null) {
-                            newMember.profile = profile
-                            newMember.allProfiles = profiles
-                            newMember.uuid = currentMember.uuid
-                            PvScreen.open(playerName, newMember)
+                        val uuid = currentMember.uuid
+                        if (uuid != null) {
+                            val newMember = profile.members[uuid.toString().replace("-", "")]
+                            if (newMember != null) {
+                                newMember.profile = profile
+                                newMember.allProfiles = profiles
+                                newMember.uuid = uuid
+                                PvScreen.open(playerName, newMember)
+                            }
                         }
                     }
                     isOpen = false

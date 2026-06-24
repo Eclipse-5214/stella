@@ -56,7 +56,7 @@ class Pets(
 
         // Pet Preview
         ren2d.drawHollowRect(context, 210, 25, PREVIEW_WIDTH, 185, 1, Palette.Purple)
-        renderPetOverview(context, 210, 25)
+        renderPetOverview(context, 210, 25, mouseX, mouseY)
 
         hoveredPet?.let { if (!it.isEmpty) context.setTooltipForNextFrame(client.font, it, mouseX.toInt(), mouseY.toInt()) }
         hoveredPet = null
@@ -68,7 +68,7 @@ class Pets(
         }
     }
 
-    private fun renderPetOverview(context: GuiGraphicsExtractor, x: Int, y: Int) {
+    private fun renderPetOverview(context: GuiGraphicsExtractor, x: Int, y: Int, mouseX: Float, mouseY: Float) {
         val pet = selectedPet ?: run {
             val noPetText = "§cNo Selected Pet"
             val textX = x + (PREVIEW_WIDTH - client.font.width(noPetText)) / 2
@@ -114,7 +114,7 @@ class Pets(
         pet.heldItem?.let {
             val stack = SkyBlockItemsRepo.getItemStackOrDefault(it)
             ren2d.renderItem(context, stack, x + 75f, y + 45f, 1f)
-            if (isAreaHovered(x + 75f, y + 45f, 16f, 16f)) hoveredPet = stack
+            if (isAreaHovered(x + 75f, y + 45f, 16f, 16f, mouseX, mouseY)) hoveredPet = stack
         }
     }
 

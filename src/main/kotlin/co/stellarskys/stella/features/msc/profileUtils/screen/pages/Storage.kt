@@ -41,7 +41,7 @@ class Storage(
     }
     
     init {
-        searchBar.x = 215f
+        searchBar.x = 220f
         searchBar.y = 5f
     }
 
@@ -85,12 +85,18 @@ class Storage(
         val centerOffset = (SLOT_SIZE - (16 * itemScale)) / 2f // (26 - 24) / 2 = 1.0f
         ren2d.renderItem(ctx, stack, ix + centerOffset, iy + centerOffset, itemScale)
 
-        val q = searchBar.query.lowercase()
-        val itemName = stack.hoverName.string
-        val matches = itemName.lowercase().contains(q) || stack.getLore().any { it.stripped.lowercase().contains(q) }
-        
-        if (q.isNotEmpty() && !matches) {
-            ren2d.drawRect(ctx, ix, iy, SLOT_SIZE, SLOT_SIZE, Palette.Crust.withAlpha(200))
+        val q = searchBar.query
+        if (q.isNotEmpty()) {
+            val queryLower = q.lowercase()
+            val itemName = stack.hoverName.string
+            val matches = itemName.lowercase().contains(queryLower) || stack.getLore().any { it.stripped.lowercase().contains(queryLower) }
+            
+            if (!matches) {
+                ren2d.drawRect(ctx, ix, iy, SLOT_SIZE, SLOT_SIZE, Palette.Crust.withAlpha(200))
+            } else if (isAreaHovered(ix.toFloat(), iy.toFloat(), SLOT_SIZE.toFloat(), SLOT_SIZE.toFloat(), mx, my)) {
+                hoveredStack = stack
+                ren2d.drawRect(ctx, ix + 1, iy + 1, SLOT_SIZE - 2, SLOT_SIZE - 2, Palette.Surface1.withAlpha(80))
+            }
         } else if (isAreaHovered(ix.toFloat(), iy.toFloat(), SLOT_SIZE.toFloat(), SLOT_SIZE.toFloat(), mx, my)) {
             hoveredStack = stack
             ren2d.drawRect(ctx, ix + 1, iy + 1, SLOT_SIZE - 2, SLOT_SIZE - 2, Palette.Surface1.withAlpha(80))

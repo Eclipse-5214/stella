@@ -41,7 +41,7 @@ class SearchBar : ParentElement() {
     }
 
     override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
-        val hovered = isAreaHovered(0f, 0f, width, height) || textHandler.isFocused
+        val hovered = isAreaHovered(0f, 0f, width, height, mouseX, mouseY) || textHandler.isFocused
 
         context.pushPop {
             context.pose().translate(x, y)
