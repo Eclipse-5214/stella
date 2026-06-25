@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture
 
 class FakePlayer(val profile: GameProfile, val armor: List<ItemStack> = listOf()): RemotePlayer(client.level!!, profile) {
     init {
+        id = -1
         equipment.set(EquipmentSlot.HEAD, armor[3])
         equipment.set(EquipmentSlot.CHEST, armor[2])
         equipment.set(EquipmentSlot.LEGS, armor[1])

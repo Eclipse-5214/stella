@@ -3,13 +3,14 @@ package co.stellarskys.stella.features.msc.profileUtils
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith
-//? if >= 26.2 {
-/*import co.stellarskys.stella.api.zenith.setScreen
-*///? }
 import co.stellarskys.stella.features.msc.profileUtils.screen.pages.*
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
 import co.stellarskys.stella.features.msc.profileUtils.screen.ProfileDropdown
 import net.minecraft.client.gui.GuiGraphicsExtractor
+
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.setScreen
+*///? }
 
 class PvScreen private constructor(
     val name: String,
