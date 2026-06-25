@@ -21,7 +21,6 @@ class LuminaPIPRenderer : PictureInPictureRenderer<LuminaPIPRenderer.LuminaRende
         val depthTex = RenderSystem.outputDepthTextureOverride ?: return
         val width = colorTex.getWidth(0)
         val height = colorTex.getHeight(0)
-
         val backend = device.getBackend()
 
         if (backend is VulkanDevice) {

@@ -12,7 +12,7 @@ import co.stellarskys.stella.api.horizon.nvg.TextHandler
 import co.stellarskys.stella.api.lumina.Lumina.Gradient
 import co.stellarskys.stella.api.lumina.Lumina
 import co.stellarskys.stella.api.zenith.*
-import com.mojang.blaze3d.opengl.GlTexture
+import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
@@ -74,6 +74,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     }
 
     override fun onScreenClose() {
+        imageCacheMap.values.forEach { nvg.deleteImage(it) }
         imageCacheMap.clear()
         super.onScreenClose()
     }
@@ -268,8 +269,8 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     fun drawPlayer(x: Float, y: Float, width: Float, height: Float, radius: Float) {
         val skin = player?.skin?.texture ?: return
         imageCacheMap.getOrPut(skin.path) {
-            val texture = textureManager.getTexture(skin).texture as? GlTexture
-            nvg.createNVGImage(texture?.glId() ?: 0, 64, 64)
+            val nativeImage = (textureManager.getTexture(skin) as? DynamicTexture)?.pixels ?: return
+            nvg.createImage(nativeImage)
         }.let { id ->
             nvg.image(id, 64, 64, 8, 8, 8, 8, x, y, width, height, radius)
             nvg.image(id, 64, 64, 40, 8, 8, 8, x, y, width, height, radius)
