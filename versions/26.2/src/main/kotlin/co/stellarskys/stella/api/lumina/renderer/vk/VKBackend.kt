@@ -14,7 +14,6 @@ import org.lwjgl.vulkan.VK13.*
 import java.nio.ByteBuffer
 
 object VKBackend : LuminaBackend {
-    private val logger = org.apache.logging.log4j.LogManager.getLogger("VKBackend")
     private var initialized = false
     private val textures = mutableMapOf<Int, VkTextureHandle>()
     private var nextTexId = 1
@@ -55,7 +54,6 @@ object VKBackend : LuminaBackend {
         if (initialized) return
         VKUtils.init(); VKPipelineManager.init(); VKShapeRenderer.init(); VKTextureRenderer.init()
         initialized = true
-        logger.info("VKBackend initialized")
     }
 
     override fun renderShapes(shapes: List<Lumina.QueuedShape>, vw: Int, vh: Int) {

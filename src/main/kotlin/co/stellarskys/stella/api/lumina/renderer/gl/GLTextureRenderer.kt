@@ -155,6 +155,6 @@ internal object GLTextureRenderer {
     fun destroy() {
         if (!initialized) return
         GL33C.glDeleteProgram(program); GL33C.glDeleteVertexArrays(vao); GL33C.glDeleteBuffers(vbo)
-        program = 0; vao = 0; vbo = 0; initialized = false; tmpQuad.free()
+        MemoryUtil.memFree(buf); program = 0; vao = 0; vbo = 0; initialized = false; tmpQuad.free()
     }
 }

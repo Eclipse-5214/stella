@@ -20,6 +20,7 @@ import co.stellarskys.stella.api.dungeons.map.Room
 import co.stellarskys.stella.api.dungeons.utils.Checkmark
 import co.stellarskys.stella.api.zenith.world
 import co.stellarskys.stella.events.core.ChatEvent
+import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.features.secrets.utils.waypoints.SecretData
 import co.stellarskys.stella.features.secrets.utils.waypoints.SecretsRegistry
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
@@ -88,10 +89,11 @@ object SecretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
         }
 
         on<DungeonEvent.Room.Change> { event ->
-            currentRoom = event.new
-            stepIndex = 0
-            lockedChest = false
-            route = RouteRegistry.getRoute(currentRoom?.name ?: return@on) ?: emptyList()
+            setRoute(event.new, RouteRegistry.getRoute(currentRoom?.name ?: return@on) ?: emptyList())
+        }
+
+        on<LocationEvent.ServerChange> {
+            setRoute(null, emptyList())
         }
 
         on<ChatEvent.Receive> { event ->
@@ -101,12 +103,12 @@ object SecretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
         }
 
         on<RenderEvent.World.Last> {
-            if (currentRoom == null || route.isEmpty() || currentStep == null) return@on
+            if (currentRoom == null || route.isEmpty() || Dungeon.inBoss || currentStep == null) return@on
             if (onlyRenderAfterClear && currentRoom?.checkmark in setOf(Checkmark.NONE, Checkmark.UNEXPLORED, Checkmark.UNDISCOVERED)) return@on
             if (stopRenderAfterGreen && currentRoom?.checkmark == Checkmark.GREEN && currentRoom?.name != "Golden Oasis") return@on
             RoutePlayer.renderRoute(currentStep!!, firstStep)
 
-            if (Dungeon.inBoss || !lockedChest) return@on
+            if (!lockedChest) return@on
             val data = SecretsRegistry.getById(currentRoom?.id ?: -1) ?: return@on
             val levers = data.toWaypoints(config, currentRoom!!, SecretData.Type.LEVER)
             levers.forEach { it.render() }
@@ -129,5 +131,9 @@ object SecretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
 
     fun previousStep() {
         if (stepIndex > 0) stepIndex--
+    }
+
+    fun setRoute(newRoom: Room?, newRoute: List<StepData>) {
+        currentRoom = newRoom; stepIndex = 0; lockedChest = false; route = newRoute
     }
 }

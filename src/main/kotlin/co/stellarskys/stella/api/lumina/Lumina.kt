@@ -8,11 +8,13 @@ import co.stellarskys.stella.api.lumina.types.LuminaSvg
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.events.EventBus
 import co.stellarskys.stella.events.core.GameEvent
+import com.mojang.blaze3d.platform.NativeImage
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import org.joml.Matrix3x2f
 import org.joml.Vector2f
 import org.lwjgl.stb.STBImage
 import org.lwjgl.system.MemoryUtil
+import java.nio.ByteBuffer
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
@@ -178,13 +180,35 @@ object Lumina {
         return font.textWidth(text, size)
     }
 
-    fun createImage(path: String): Any? = imageCache.getOrPut(path) { loadImage(path) }
+    fun createImage(path: String): Any = imageCache.getOrPut(path) { loadImage(path) }
+
+    fun createImage(nativeImage: NativeImage): Any {
+        val size = nativeImage.width * nativeImage.height * 4
+        val copy = MemoryUtil.memAlloc(size)
+        copy.put(MemoryUtil.memByteBuffer(nativeImage.pointer, size))
+        copy.flip()
+        val id = nextWrappedId--
+        wrappedTextures[id] = LuminaImage(nativeImage.width, nativeImage.height, rgbaData = copy)
+        return id
+    }
+
+    fun createImage(width: Int, height: Int, rgbaData: ByteBuffer): Any {
+        val copy = MemoryUtil.memAlloc(rgbaData.remaining())
+        copy.put(rgbaData.duplicate())
+        copy.flip()
+        val id = nextWrappedId--
+        wrappedTextures[id] = LuminaImage(width, height, rgbaData = copy)
+        return id
+    }
 
     fun deleteImage(image: Any?) {
-        if (image is LuminaImage) {
-            val key = imageCache.entries.find { it.value === image }?.key
-            if (key != null) imageCache.remove(key)
-            image.destroy()
+        when (image) {
+            is LuminaImage -> {
+                val key = imageCache.entries.find { it.value === image }?.key
+                if (key != null) imageCache.remove(key)
+                image.destroy()
+            }
+            is Int -> wrappedTextures.remove(image)?.destroy()
         }
     }
 
@@ -208,16 +232,10 @@ object Lumina {
         drawOrder.add(2)
     }
 
-    fun createNVGImage(textureId: Int, textureWidth: Int, textureHeight: Int): Any? {
-        val id = nextWrappedId--
-        wrappedTextures[id] = LuminaImage(textureWidth, textureHeight, textureId, ownsTexture = false)
-        return id
-    }
-
     private fun resolveTexture(image: Any?): Int? = when (image) {
         is LuminaImage -> { image.ensureUploaded(); image.textureId.takeIf { it != 0 } }
         is String -> { val c = imageCache.getOrPut(image) { loadImage(image) }; c.ensureUploaded(); c.textureId.takeIf { it != 0 } }
-        is Int -> wrappedTextures[image]?.textureId?.takeIf { it != 0 }
+        is Int -> wrappedTextures[image]?.let { it.ensureUploaded(); it.textureId.takeIf { id -> id != 0 } }
         else -> null
     }
 
