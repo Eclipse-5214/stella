@@ -53,7 +53,7 @@ abstract class Page(
 
     private fun renderTooltips(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         val tooltip = componentsTooltips.firstOrNull {
-            isAreaHovered(it.x.toFloat(), it.y.toFloat(), it.width.toFloat(), it.height.toFloat())
+            isAreaHovered(it.x.toFloat(), it.y.toFloat(), it.width.toFloat(), it.height.toFloat(), mouseX.toFloat(), mouseY.toFloat())
         } ?: return
 
         // Mimics GuiGraphicsExtractor L 777 - 787
@@ -74,6 +74,7 @@ abstract class Page(
             ren2d.drawString(context, "§d$name's $title!", 10, 10)
             navBar.render(context, mouseX, mouseY, delta)
             onRender(context, mouseX, mouseY, delta)
+            elements.find { it is ProfileDropdown }?.render(context, mouseX, mouseY, delta)
         }
         renderTooltips(context, mouseX.toInt(), mouseY.toInt())
         componentsTooltips.clear()

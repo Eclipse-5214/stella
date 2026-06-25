@@ -6,7 +6,6 @@ import co.stellarskys.stella.api.handlers.Signal.onHover
 import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.zenith.client
-import co.stellarskys.stella.features.msc.ProfileViewer
 import co.stellarskys.stella.features.msc.profileUtils.PetUtils
 import co.stellarskys.stella.features.msc.profileUtils.PetUtils.item
 import co.stellarskys.stella.features.msc.profileUtils.screen.Page
@@ -57,7 +56,7 @@ class Pets(
 
         // Pet Preview
         ren2d.drawHollowRect(context, 210, 25, PREVIEW_WIDTH, 185, 1, Palette.Purple)
-        renderPetOverview(context, 210, 25)
+        renderPetOverview(context, 210, 25, mouseX, mouseY)
 
         hoveredPet?.let { if (!it.isEmpty) context.setTooltipForNextFrame(client.font, it, mouseX.toInt(), mouseY.toInt()) }
         hoveredPet = null
@@ -69,7 +68,7 @@ class Pets(
         }
     }
 
-    private fun renderPetOverview(context: GuiGraphicsExtractor, x: Int, y: Int) {
+    private fun renderPetOverview(context: GuiGraphicsExtractor, x: Int, y: Int, mouseX: Float, mouseY: Float) {
         val pet = selectedPet ?: run {
             val noPetText = "§cNo Selected Pet"
             val textX = x + (PREVIEW_WIDTH - client.font.width(noPetText)) / 2
@@ -115,16 +114,18 @@ class Pets(
         pet.heldItem?.let {
             val stack = SkyBlockItemsRepo.getItemStackOrDefault(it)
             ren2d.renderItem(context, stack, x + 75f, y + 45f, 1f)
-            if (isAreaHovered(x + 75f, y + 45f, 16f, 16f)) hoveredPet = stack
+            if (isAreaHovered(x + 75f, y + 45f, 16f, 16f, mouseX, mouseY)) hoveredPet = stack
         }
     }
 
-    private fun renderPetsGrid(context: GuiGraphicsExtractor, sx: Int, sy: Int, ox: Int, oy: Int, pets: List<SkyblockResponse.Pet>, mouseX: Float, mouseY: Float) =
+    private fun renderPetsGrid(context: GuiGraphicsExtractor, sx: Int, sy: Int, ox: Int, oy: Int, pets: List<SkyblockResponse.Pet>, mouseX: Float, mouseY: Float) {
+        val inScissor = isAreaHovered(ox.toFloat(), oy.toFloat(), 190f, 175f, mouseX, mouseY)
         pets.forEachIndexed { i, stack ->
-            drawPet(context, sx + (i % GRID_ROW_COLS) * STEP_SIZE, sy + (i / GRID_ROW_COLS) * STEP_SIZE, ox, oy, stack, mouseX, mouseY)
+            drawPet(context, sx + (i % GRID_ROW_COLS) * STEP_SIZE, sy + (i / GRID_ROW_COLS) * STEP_SIZE, ox, oy, stack, mouseX, mouseY, inScissor)
         }
+    }
 
-    private fun drawPet(ctx: GuiGraphicsExtractor, ix: Int, iy: Int, ox: Int, oy: Int, pet: SkyblockResponse.Pet, mx: Float, my: Float) {
+    private fun drawPet(ctx: GuiGraphicsExtractor, ix: Int, iy: Int, ox: Int, oy: Int, pet: SkyblockResponse.Pet, mx: Float, my: Float, inScissor: Boolean) {
         val bgColor = Color(pet.rarity.color).withAlpha(40)
         val petItem = pet.item()
 
@@ -135,7 +136,7 @@ class Pets(
         val centerOffset = (SLOT_SIZE - (16 * itemScale)) / 2f
         ren2d.renderItem(ctx, petItem, ix + centerOffset, iy + centerOffset, itemScale)
 
-        if (isAreaHovered((ix + ox).toFloat(), (iy + oy).toFloat() + scrollOffset, SLOT_SIZE.toFloat(), SLOT_SIZE.toFloat(), mx, my)) {
+        if (inScissor && isAreaHovered((ix + ox).toFloat(), (iy + oy).toFloat() + scrollOffset, SLOT_SIZE.toFloat(), SLOT_SIZE.toFloat(), mx, my)) {
             hoveredPet = petItem
             ren2d.drawRect(ctx, ix + 1, iy + 1, SLOT_SIZE - 2, SLOT_SIZE - 2, Palette.Surface1.withAlpha(80))
         }

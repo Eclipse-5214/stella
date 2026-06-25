@@ -19,6 +19,7 @@ object HypixelApi {
     private val Name2UUIDCache = object : LinkedHashMap<String, String>(64, 0.75f, true) { override fun removeEldestEntry(eldest: Map.Entry<String, String>) = size > 512 }
     private val ProfileCache = TtlCache<String, SkyblockResponse.SkyblockMember>(5 * 60 * 1000L)
     private val SecretsCache = TtlCache<String, Int>(5 * 60 * 1000L)
+    private val MuseumCache = TtlCache<String, Long>(5 * 60 * 1000L)
 
     data class MojangProfile(val name: String, val id: String)
 
@@ -67,6 +68,37 @@ object HypixelApi {
                     ProfileCache.put(uuid, member)
                 }
                 onResult(member)
+            }.onFailure {
+                onResult(null)
+            }
+        }
+    }
+
+    fun fetchMuseum(
+        profileId: String,
+        playerUuid: String,
+        cacheMs: Long = 300_000L,
+        force: Boolean = false,
+        onResult: (Long?) -> Unit
+    ) {
+        val cleanUuid = playerUuid.replace("-", "")
+        val cacheKey = "$profileId-$cleanUuid"
+        if (!force) {
+            MuseumCache.get(cacheKey, cacheMs)?.let {
+                onResult(it)
+                return
+            }
+        }
+
+        val apiUrl = "${Stella.API}/skyblock/museum?profile=$profileId"
+        val url = if (force) "$apiUrl&t=${System.currentTimeMillis()}" else apiUrl
+
+        Quasar.fetch<SkyblockResponse.MuseumResponse>(url) { result ->
+            result.onSuccess { response ->
+                val memberMuseum = response.members[cleanUuid]
+                val value = memberMuseum?.value ?: 0L
+                MuseumCache.put(cacheKey, value)
+                onResult(value)
             }.onFailure {
                 onResult(null)
             }
