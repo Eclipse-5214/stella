@@ -46,7 +46,6 @@ object Dungeon {
     val doors = Array<Door?>(60) { null }
     val uniqueRooms = mutableSetOf<Room>()
     val uniqueDoors = mutableSetOf<Door>()
-    val discoveredRooms = mutableMapOf<String, DiscoveredRoom>()
     val puzzles: List<Room> get() = uniqueRooms.filter { it.type == RoomType.PUZZLE }
     val exploredRooms: List<Room> get() = uniqueRooms.filter { it.explored }
 
@@ -101,9 +100,6 @@ object Dungeon {
         24000000.0, 30000000.0, 38000000.0, 48000000.0, 60000000.0,
         75000000.0, 93000000.0, 116250000.0
     )
-
-
-    data class DiscoveredRoom(val x: Int, val z: Int, val room: Room)
 
     /** Initializes all dungeon systems and event listeners */
     init {
@@ -186,7 +182,6 @@ object Dungeon {
         doors.fill(null)
         uniqueRooms.clear()
         uniqueDoors.clear()
-        discoveredRooms.clear()
         currentRoom = null
         bloodClear = false
         bloodDone = false

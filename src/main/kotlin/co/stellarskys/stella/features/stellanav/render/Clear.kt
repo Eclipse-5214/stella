@@ -42,13 +42,16 @@ object Clear {
     }
 
     private fun renderRooms(context: GuiGraphicsExtractor) {
+        /*
         if(!Map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
             Render2D.drawRect(context, it.x * SPACING, it.z * SPACING, ROOM, ROOM, DISCOVERED)
         }
+         */
 
         Dungeon.uniqueRooms.forEach { room ->
-            if (!room.explored && !Map.hiddenRooms) return@forEach
-            val baseColor = room.type.color ?: return@forEach
+            if (room.checkmark == Checkmark.UNDISCOVERED && !Map.hiddenRooms) return@forEach
+            var baseColor = room.type.color ?: return@forEach
+            if (room.checkmark == Checkmark.UNEXPLORED && !Map.hiddenRooms) baseColor = DISCOVERED
             renderRoom(context, room, if (!room.explored) baseColor.darken(Map.tint) else baseColor)
         }
 
@@ -62,7 +65,7 @@ object Clear {
     }
 
     private fun renderRoom(context: GuiGraphicsExtractor, room: Room, color: Color) {
-        for ((x, z) in room.components) {
+        for ((x, z) in room.visibleComponents) {
             val px = x * SPACING
             val pz = z * SPACING
             Render2D.drawRect(context, px, pz, ROOM, ROOM, color)
@@ -70,7 +73,7 @@ object Clear {
             if (room.hasComponent(x, z + 1)) Render2D.drawRect(context, px, pz + ROOM, ROOM, GAP, color)
         }
 
-        if (room.shape == "2x2" && room.components.size == 4) {
+        if (room.shape == "2x2" && room.visibleComponents.size == 4) {
             val minX = room.components.minOf { it.first }
             val minZ = room.components.minOf { it.second }
             Render2D.drawRect(context, minX * SPACING + ROOM, minZ * SPACING + ROOM, GAP, GAP, color)
@@ -79,9 +82,12 @@ object Clear {
 
     private fun renderCheckmarks(context: GuiGraphicsExtractor) {
         val scale = Map.checkmarkScale
+
+        /*
         if(!Map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
             drawIcon(context, it.x.toFloat() * SPACING + HALF, it.z.toFloat() * SPACING + HALF, scale, Checkmark.UNEXPLORED.texture!!, 10, 12, -5f)
         }
+         */
 
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.explored || room.type == RoomType.ENTRANCE) return@forEach
