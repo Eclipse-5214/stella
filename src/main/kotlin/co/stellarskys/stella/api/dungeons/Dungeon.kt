@@ -48,6 +48,7 @@ object Dungeon {
     val uniqueDoors = mutableSetOf<Door>()
     val discoveredRooms = mutableMapOf<String, DiscoveredRoom>()
     val puzzles: List<Room> get() = uniqueRooms.filter { it.type == RoomType.PUZZLE }
+    val exploredRooms: List<Room> get() = uniqueRooms.filter { it.explored }
 
     // Dungeon state
     var bloodClear = false

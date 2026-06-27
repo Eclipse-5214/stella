@@ -32,7 +32,10 @@ class Room(
 
     val components = mutableListOf<Pair<Int, Int>>()
     val realComponents = mutableListOf<Pair<Int, Int>>()
+    var visibleComponents = mutableListOf<Pair<Int, Int>>()
     val cores = mutableListOf<Int>()
+    val predictedTypes = mutableListOf<RoomType>()
+    var known1x1 = false
 
     var roomData: RoomMetadata? = null
     var explored = false
