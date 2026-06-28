@@ -1,6 +1,5 @@
 package co.stellarskys.stella.api.dungeons.map
 
-import co.stellarskys.stella.Stella
 import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.dungeons.score.DungeonScore
 import co.stellarskys.stella.api.dungeons.utils.Checkmark
@@ -8,17 +7,19 @@ import co.stellarskys.stella.api.dungeons.utils.RoomType
 import co.stellarskys.stella.api.dungeons.utils.ScanUtils
 
 object Prediction {
-    val floorNum get() = Dungeon.floorNumber ?: 1
-    val floorMin get() = when (floorNum) {
-        0, 1, 2 -> 3
-        3, 4, 5, 6 -> 4
+    private val floorNum get() = Dungeon.floorNumber ?: 1
+
+    private val maxCol: Int get() = when(floorNum) {
+        0, 1 -> 3
+        2, 3, 4, 5, 6 -> 4
         else -> 5
     }
 
-    private val discoveredRooms get() = Dungeon.uniqueRooms.filter { it.checkmark != Checkmark.UNDISCOVERED }
-
-    val maxCol: Int get() = maxOf(discoveredRooms.flatMap { it.components }.maxOfOrNull { it.first } ?: 0, floorMin)
-    val maxRow: Int get() = maxOf(discoveredRooms.flatMap { it.components }.maxOfOrNull { it.second } ?: 0, floorMin)
+    private val maxRow: Int get() = when(floorNum) {
+        0, 1 -> 3
+        2, 3, 4 -> 4
+        else -> 5
+    }
 
     fun predictRoomType(room: Room): Room {
         if (!room.known1x1) return room

@@ -85,7 +85,7 @@ object Clear {
 
     private fun renderRoom(context: GuiGraphicsExtractor, room: Room) {
         val colors = room.predictedTypes.mapNotNull { it.color }
-        val (gx, gz) = room.components[0]
+        val (gx, gz) = room.visibleComponents[0]
         val px = gx * SPACING
         val pz = gz * SPACING
 
@@ -102,7 +102,6 @@ object Clear {
             }
             2 -> {
                 val (c1, c2) = colors
-                // c1: top-left L (top bar + left bar), c2: bottom-right L (right bar + bottom bar)
                 Render2D.drawRect(context, px, pz, ROOM - BORDER, BORDER, c1)
                 Render2D.drawRect(context, px, pz + BORDER, BORDER, ROOM - BORDER, c1)
                 Render2D.drawRect(context, px + ROOM - BORDER, pz, BORDER, ROOM, c2)
@@ -110,8 +109,7 @@ object Clear {
             }
             else -> {
                 val (c1, c2, c3) = colors
-                val s = ROOM / 3  // 6px per section; 4 sections per color = 24px each
-                // draw c2 and c3 first so c1's top bar wins the top-left corner
+                val s = ROOM / 3
                 Render2D.drawRect(context, px + ROOM - BORDER, pz + s, BORDER, 2 * s, c2)
                 Render2D.drawRect(context, px + s, pz + ROOM - BORDER, ROOM - s, BORDER, c2)
                 Render2D.drawRect(context, px, pz + ROOM - BORDER, s, BORDER, c3)
@@ -218,8 +216,8 @@ object Clear {
     }
 
     private fun Room.center(): Pair<Double, Double> {
-        val xs = components.map { it.first }
-        val zs = components.map { it.second }
+        val xs = visibleComponents.map { it.first }
+        val zs = visibleComponents.map { it.second }
         val minX = xs.min()
         val maxX = xs.max()
         val minZ = zs.min()
@@ -227,7 +225,7 @@ object Clear {
 
         var cz = (minZ + maxZ) / 2.0
         if (shape == "L") {
-            val top = components.count { it.second == minZ }
+            val top = visibleComponents.count { it.second == minZ }
             cz += if (top == 2) -(maxZ - minZ) / 2.0 else (maxZ - minZ) / 2.0
         }
 
