@@ -24,7 +24,6 @@ class Room(
 ) {
     private val hs = ScanUtils.halfRoomSize
     private val OFFSETS = arrayOf(Pair(-hs, -hs), Pair(hs, -hs), Pair(hs, hs), Pair(-hs, hs))
-    private val componentSet = mutableSetOf<Pair<Int, Int>>()
     private var lastUpdatedSize = 0
     private val rot get() = rotation ?: 0
     private val cx get() = corner?.x ?: 0
@@ -61,23 +60,24 @@ class Room(
 
     var clearTime = Chronos.zero
 
+    val isVisible get() = explored || checkmark == Checkmark.UNEXPLORED
+    val shouldPredict get() = known1x1 && predictedTypes.isNotEmpty() && checkmark == Checkmark.UNEXPLORED
+
     init {
         addComponents(listOf(initialComponent))
     }
 
     fun addComponent(comp: Pair<Int, Int>, update: Boolean = true): Room {
-        if (componentSet.add(comp)) {
-            components.add(comp)
-            if (update) update()
-        }
+        if (comp !in components) { components.add(comp); if (update) update() }
         return this
     }
 
     fun addComponents(comps: List<Pair<Int, Int>>) = apply {
-        if (comps.any { componentSet.add(it).also { added -> if (added) components += it } }) update()
+        if (comps.filter { it !in components }.also { components.addAll(it) }.isNotEmpty()) update()
     }
 
-    fun hasComponent(x: Int, z: Int): Boolean = componentSet.contains(x to z)
+    fun hasComponent(x: Int, z: Int): Boolean = (x to z) in components
+    fun hasVisibleComponent(x: Int, z: Int): Boolean = (x to z) in visibleComponents
 
     fun update() {
         if (components.size == lastUpdatedSize) return
@@ -107,7 +107,11 @@ class Room(
         id = data.roomID
         type = RoomType.fromString(data.type)
         secrets = data.secrets; crypts = data.crypts
-        if (type == RoomType.ENTRANCE) explored = true
+        if (type == RoomType.ENTRANCE) {
+            explored = true
+            checkmark = Checkmark.NONE
+            visibleComponents = components
+        }
     }
 
     fun loadFromMapColor(color: Byte): Room {

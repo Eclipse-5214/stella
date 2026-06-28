@@ -19,6 +19,7 @@ object Clear {
     private const val GAP = 4
     private const val SPACING = ROOM + GAP
     private const val HALF = ROOM / 2
+    private const val BORDER = 5
 
     private val DISCOVERED = Color(65, 65, 65, 255)
 
@@ -49,10 +50,11 @@ object Clear {
          */
 
         Dungeon.uniqueRooms.forEach { room ->
-            if (room.checkmark == Checkmark.UNDISCOVERED && !Map.hiddenRooms) return@forEach
+            if (!room.isVisible && !Map.hiddenRooms) return@forEach
             var baseColor = room.type.color ?: return@forEach
             if (room.checkmark == Checkmark.UNEXPLORED && !Map.hiddenRooms) baseColor = DISCOVERED
-            renderRoom(context, room, if (!room.explored) baseColor.darken(Map.tint) else baseColor)
+            if(room.shouldPredict) renderRoom(context, room)
+            else renderRoom(context, room, if (!room.explored) baseColor.darken(Map.tint) else baseColor)
         }
 
         Dungeon.uniqueDoors.forEach { door ->
@@ -65,33 +67,69 @@ object Clear {
     }
 
     private fun renderRoom(context: GuiGraphicsExtractor, room: Room, color: Color) {
-        for ((x, z) in room.visibleComponents) {
+        val comps = if (Map.hiddenRooms) room.components else room.visibleComponents
+        for ((x, z) in comps) {
             val px = x * SPACING
             val pz = z * SPACING
             Render2D.drawRect(context, px, pz, ROOM, ROOM, color)
-            if (room.hasComponent(x + 1, z)) Render2D.drawRect(context, px + ROOM, pz, GAP, ROOM, color)
-            if (room.hasComponent(x, z + 1)) Render2D.drawRect(context, px, pz + ROOM, ROOM, GAP, color)
+            if ((x + 1 to z) in comps) Render2D.drawRect(context, px + ROOM, pz, GAP, ROOM, color)
+            if ((x to z + 1) in comps) Render2D.drawRect(context, px, pz + ROOM, ROOM, GAP, color)
         }
 
-        if (room.shape == "2x2" && room.visibleComponents.size == 4) {
-            val minX = room.components.minOf { it.first }
-            val minZ = room.components.minOf { it.second }
+        if (room.shape == "2x2" && comps.size == 4) {
+            val minX = comps.minOf { it.first }
+            val minZ = comps.minOf { it.second }
             Render2D.drawRect(context, minX * SPACING + ROOM, minZ * SPACING + ROOM, GAP, GAP, color)
+        }
+    }
+
+    private fun renderRoom(context: GuiGraphicsExtractor, room: Room) {
+        val colors = room.predictedTypes.mapNotNull { it.color }
+        val (gx, gz) = room.components[0]
+        val px = gx * SPACING
+        val pz = gz * SPACING
+
+        Render2D.drawRect(context, px, pz, ROOM, ROOM, DISCOVERED)
+        if (colors.isEmpty()) return
+
+        when (colors.size) {
+            1 -> {
+                val c = colors[0]
+                Render2D.drawRect(context, px, pz, ROOM, BORDER, c)
+                Render2D.drawRect(context, px, pz + ROOM - BORDER, ROOM, BORDER, c)
+                Render2D.drawRect(context, px, pz + BORDER, BORDER, ROOM - BORDER * 2, c)
+                Render2D.drawRect(context, px + ROOM - BORDER, pz + BORDER, BORDER, ROOM - BORDER * 2, c)
+            }
+            2 -> {
+                val (c1, c2) = colors
+                // c1: top-left L (top bar + left bar), c2: bottom-right L (right bar + bottom bar)
+                Render2D.drawRect(context, px, pz, ROOM - BORDER, BORDER, c1)
+                Render2D.drawRect(context, px, pz + BORDER, BORDER, ROOM - BORDER, c1)
+                Render2D.drawRect(context, px + ROOM - BORDER, pz, BORDER, ROOM, c2)
+                Render2D.drawRect(context, px + BORDER, pz + ROOM - BORDER, ROOM - BORDER, BORDER, c2)
+            }
+            else -> {
+                val (c1, c2, c3) = colors
+                val s = ROOM / 3  // 6px per section; 4 sections per color = 24px each
+                // draw c2 and c3 first so c1's top bar wins the top-left corner
+                Render2D.drawRect(context, px + ROOM - BORDER, pz + s, BORDER, 2 * s, c2)
+                Render2D.drawRect(context, px + s, pz + ROOM - BORDER, ROOM - s, BORDER, c2)
+                Render2D.drawRect(context, px, pz + ROOM - BORDER, s, BORDER, c3)
+                Render2D.drawRect(context, px, pz, BORDER, ROOM, c3)
+                Render2D.drawRect(context, px, pz, ROOM, BORDER, c1)
+                Render2D.drawRect(context, px + ROOM - BORDER, pz, BORDER, s, c1)
+            }
         }
     }
 
     private fun renderCheckmarks(context: GuiGraphicsExtractor) {
         val scale = Map.checkmarkScale
 
-        /*
-        if(!Map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
-            drawIcon(context, it.x.toFloat() * SPACING + HALF, it.z.toFloat() * SPACING + HALF, scale, Checkmark.UNEXPLORED.texture!!, 10, 12, -5f)
-        }
-         */
-
         Dungeon.uniqueRooms.forEach { room ->
-            if (!room.explored || room.type == RoomType.ENTRANCE) return@forEach
+            if (!room.isVisible || room.type == RoomType.ENTRANCE) return@forEach
             val show = when {
+                room.shouldPredict -> false
+                room.checkmark == Checkmark.UNEXPLORED -> !Map.hiddenRooms
                 Map.replaceText && room.checkmark == Checkmark.GREEN -> true
                 room.type.isNormal && room.secrets > 0 -> Map.roomCheck
                 room.type.isPuzzle -> Map.puzzleCheck
@@ -197,7 +235,7 @@ object Clear {
     }
 
     private fun Room.getAnchorPos(anchor: Anchor): Pair<Double, Double> {
-        val sorted = components
+        val sorted = visibleComponents
             .sortedWith(compareBy({ it.second }, { it.first }))
             .map { it.toDouble()}
 

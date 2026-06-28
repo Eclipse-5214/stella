@@ -79,12 +79,12 @@ object MapScanner {
             return
         }
 
-        if (!room.known1x1) room.known1x1 = Prediction.check1x1(room)
-
         if (center == 119.toByte() || rcolor == 85.toByte()) {
             room.explored = false
             room.checkmark = Checkmark.UNEXPLORED
-            room.visibleComponents.add(rmx to rmz)
+            val comp = rmx to rmz
+            if (comp !in room.visibleComponents) room.visibleComponents.add(comp)
+            if (!room.known1x1) room.known1x1 = Prediction.check1x1(room)
             Prediction.predictRoomType(room)
             return
         }
@@ -94,6 +94,7 @@ object MapScanner {
 
         room.explored = true
         room.visibleComponents = room.components
+        if (!room.known1x1) room.known1x1 = Prediction.check1x1(room)
     }
 
     private fun handleDoor(
