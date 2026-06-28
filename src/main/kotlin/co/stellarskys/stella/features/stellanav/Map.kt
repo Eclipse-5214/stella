@@ -43,6 +43,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     val secretScale by config.property<Float>("secretScale")
     val checkmarkScale by config.property<Float>("checkmarkScale")
     val textShadow by config.property<Boolean>("mtextshadow")
+    val predBdWidth by config.property<Int>("predictionBdWidth")
 
     // behavior
     val roomCheck by config.property<Boolean>("roomCheck")
@@ -59,6 +60,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
 
     val prioMiddle by config.property<Boolean>("prioMiddle")
     val replaceText by config.property<Boolean>("replaceText")
+    val roomPrediction by config.property<Boolean>("roomPrediction")
 
     // map colors
     val NormalColor by config.property<Color>("normalRoomColor")

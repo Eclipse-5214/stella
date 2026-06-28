@@ -57,7 +57,6 @@ object WorldScanner {
                 lastIdx = idx
                 Dungeon.currentRoom = Dungeon.getRoomAt(player.x.toInt(), player.z.toInt())
                 val (rmx, rmz) = Dungeon.currentRoom?.components?.firstOrNull() ?: return@on
-                Dungeon.discoveredRooms.remove("$rmx/$rmz")
             }
         }
     }

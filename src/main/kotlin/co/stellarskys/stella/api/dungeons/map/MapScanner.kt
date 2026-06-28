@@ -82,7 +82,10 @@ object MapScanner {
         if (center == 119.toByte() || rcolor == 85.toByte()) {
             room.explored = false
             room.checkmark = Checkmark.UNEXPLORED
-            Dungeon.discoveredRooms["$rmx/$rmz"] = Dungeon.DiscoveredRoom(x = rmx, z = rmz, room = room)
+            val comp = rmx to rmz
+            if (comp !in room.visibleComponents) room.visibleComponents.add(comp)
+            if (!room.known1x1) room.known1x1 = Prediction.check1x1(room)
+            Prediction.predictRoomType(room)
             return
         }
 
@@ -90,7 +93,8 @@ object MapScanner {
         updateRoomCheckmark(room, center, rcolor)
 
         room.explored = true
-        Dungeon.discoveredRooms.remove("$rmx/$rmz")
+        room.visibleComponents = room.components
+        if (!room.known1x1) room.known1x1 = Prediction.check1x1(room)
     }
 
     private fun handleDoor(

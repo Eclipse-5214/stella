@@ -42,14 +42,18 @@ object Clear {
     }
 
     private fun renderRooms(context: GuiGraphicsExtractor) {
+        /*
         if(!Map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
             Render2D.drawRect(context, it.x * SPACING, it.z * SPACING, ROOM, ROOM, DISCOVERED)
         }
+         */
 
         Dungeon.uniqueRooms.forEach { room ->
-            if (!room.explored && !Map.hiddenRooms) return@forEach
-            val baseColor = room.type.color ?: return@forEach
-            renderRoom(context, room, if (!room.explored) baseColor.darken(Map.tint) else baseColor)
+            if (!room.isVisible && !Map.hiddenRooms) return@forEach
+            var baseColor = room.type.color ?: return@forEach
+            if (room.checkmark == Checkmark.UNEXPLORED && !Map.hiddenRooms) baseColor = DISCOVERED
+            if(room.shouldPredict && Map.roomPrediction && !Map.hiddenRooms) renderRoom(context, room)
+            else renderRoom(context, room, if (!room.explored) baseColor.darken(Map.tint) else baseColor)
         }
 
         Dungeon.uniqueDoors.forEach { door ->
@@ -62,30 +66,68 @@ object Clear {
     }
 
     private fun renderRoom(context: GuiGraphicsExtractor, room: Room, color: Color) {
-        for ((x, z) in room.components) {
+        val comps = if (Map.hiddenRooms) room.components else room.visibleComponents
+        for ((x, z) in comps) {
             val px = x * SPACING
             val pz = z * SPACING
             Render2D.drawRect(context, px, pz, ROOM, ROOM, color)
-            if (room.hasComponent(x + 1, z)) Render2D.drawRect(context, px + ROOM, pz, GAP, ROOM, color)
-            if (room.hasComponent(x, z + 1)) Render2D.drawRect(context, px, pz + ROOM, ROOM, GAP, color)
+            if ((x + 1 to z) in comps) Render2D.drawRect(context, px + ROOM, pz, GAP, ROOM, color)
+            if ((x to z + 1) in comps) Render2D.drawRect(context, px, pz + ROOM, ROOM, GAP, color)
         }
 
-        if (room.shape == "2x2" && room.components.size == 4) {
-            val minX = room.components.minOf { it.first }
-            val minZ = room.components.minOf { it.second }
+        if (room.shape == "2x2" && comps.size == 4) {
+            val minX = comps.minOf { it.first }
+            val minZ = comps.minOf { it.second }
             Render2D.drawRect(context, minX * SPACING + ROOM, minZ * SPACING + ROOM, GAP, GAP, color)
+        }
+    }
+
+    private fun renderRoom(context: GuiGraphicsExtractor, room: Room) {
+        val colors = room.predictedTypes.mapNotNull { it.color }
+        val (gx, gz) = room.visibleComponents[0]
+        val px = gx * SPACING
+        val pz = gz * SPACING
+        val border = Map.predBdWidth
+
+        Render2D.drawRect(context, px, pz, ROOM, ROOM, DISCOVERED)
+        if (colors.isEmpty()) return
+
+        when (colors.size) {
+            1 -> {
+                val c = colors[0]
+                Render2D.drawRect(context, px, pz, ROOM, border, c)
+                Render2D.drawRect(context, px, pz + ROOM - border, ROOM, border, c)
+                Render2D.drawRect(context, px, pz + border, border, ROOM - border * 2, c)
+                Render2D.drawRect(context, px + ROOM - border, pz + border, border, ROOM - border * 2, c)
+            }
+            2 -> {
+                val (c1, c2) = colors
+                Render2D.drawRect(context, px, pz, ROOM - border, border, c1)
+                Render2D.drawRect(context, px, pz + border, border, ROOM - border, c1)
+                Render2D.drawRect(context, px + ROOM - border, pz, border, ROOM, c2)
+                Render2D.drawRect(context, px + border, pz + ROOM - border, ROOM - border, border, c2)
+            }
+            else -> {
+                val (c1, c2, c3) = colors
+                val s = ROOM / 3
+                Render2D.drawRect(context, px + ROOM - border, pz + s, border, 2 * s, c2)
+                Render2D.drawRect(context, px + s, pz + ROOM - border, ROOM - s, border, c2)
+                Render2D.drawRect(context, px, pz + ROOM - border, s, border, c3)
+                Render2D.drawRect(context, px, pz, border, ROOM, c3)
+                Render2D.drawRect(context, px, pz, ROOM, border, c1)
+                Render2D.drawRect(context, px + ROOM - border, pz, border, s, c1)
+            }
         }
     }
 
     private fun renderCheckmarks(context: GuiGraphicsExtractor) {
         val scale = Map.checkmarkScale
-        if(!Map.hiddenRooms) Dungeon.discoveredRooms.values.forEach {
-            drawIcon(context, it.x.toFloat() * SPACING + HALF, it.z.toFloat() * SPACING + HALF, scale, Checkmark.UNEXPLORED.texture!!, 10, 12, -5f)
-        }
 
         Dungeon.uniqueRooms.forEach { room ->
-            if (!room.explored || room.type == RoomType.ENTRANCE) return@forEach
+            if (!room.isVisible || room.type == RoomType.ENTRANCE) return@forEach
             val show = when {
+                room.shouldPredict -> !Map.roomPrediction
+                room.checkmark == Checkmark.UNEXPLORED -> !Map.hiddenRooms
                 Map.replaceText && room.checkmark == Checkmark.GREEN -> true
                 room.type.isNormal && room.secrets > 0 -> Map.roomCheck
                 room.type.isPuzzle -> Map.puzzleCheck
@@ -174,8 +216,9 @@ object Clear {
     }
 
     private fun Room.center(): Pair<Double, Double> {
-        val xs = components.map { it.first }
-        val zs = components.map { it.second }
+        val comps = if (Map.hiddenRooms) components else visibleComponents
+        val xs = comps.map { it.first }
+        val zs = comps.map { it.second }
         val minX = xs.min()
         val maxX = xs.max()
         val minZ = zs.min()
@@ -183,7 +226,7 @@ object Clear {
 
         var cz = (minZ + maxZ) / 2.0
         if (shape == "L") {
-            val top = components.count { it.second == minZ }
+            val top = comps.count { it.second == minZ }
             cz += if (top == 2) -(maxZ - minZ) / 2.0 else (maxZ - minZ) / 2.0
         }
 
@@ -191,10 +234,8 @@ object Clear {
     }
 
     private fun Room.getAnchorPos(anchor: Anchor): Pair<Double, Double> {
-        val sorted = components
-            .sortedWith(compareBy({ it.second }, { it.first }))
-            .map { it.toDouble()}
-
+        val comps = if (Map.hiddenRooms) components else visibleComponents
+        val sorted = comps.sortedWith(compareBy({ it.second }, { it.first })).map { it.toDouble()}
         val size = sorted.size
 
         return when (anchor) {

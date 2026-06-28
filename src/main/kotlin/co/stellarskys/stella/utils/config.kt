@@ -557,6 +557,18 @@ val config = Config(Stella.NAMESPACE) {
                 default = 1f
             }
 
+
+            stepslider {
+                configName = "predictionBdWidth"
+                name = "Prediction Border Width"
+                description = "Width of the prediction border on unknown rooms"
+                min = 1
+                max = 8
+                step = 1
+                default = 5
+                shouldShow { settings -> settings["roomPrediction"] as Boolean }
+            }
+
             toggle {
                 configName = "mtextshadow"
                 name = "Text Shadow"
@@ -638,6 +650,12 @@ val config = Config(Stella.NAMESPACE) {
                 configName = "replaceText"
                 name = "Replace Text"
                 description = "Replace room text with checkmark on complete (overrides checkmark)"
+            }
+
+            toggle {
+                configName = "roomPrediction"
+                name = "Room Prediction"
+                description = "Attempts to predict the type of known 1x1s based on what rooms have already been discovered"
             }
         }
 

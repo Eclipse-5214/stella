@@ -30,6 +30,7 @@ object DungeonScore {
     private val TEAM_DEATHS_PATTERN = Regex("""^Team Deaths: (\d+)$""")
     private val CRYPTS_PATTERN = Regex("""^Crypts: (\d+)$""")
     private val OPENED_ROOMS_PATTERN = Regex("""^Opened Rooms: (\d+)$""")
+    private val PUZZLE_COUNT_PATTERN = Regex("""^Puzzles: \((\d+)\)$""")
     private val CLEAR_PERCENT_PATTERN = Regex("""^Cleared: (\d+)% \(\d+\)$""")
     private val DUNGEON_TIME_PATTERN = Regex("""^Time: (?:(\d+)h)?\s?(?:(\d+)m)?\s?(?:(\d+)s)?$""")
 
@@ -56,6 +57,7 @@ object DungeonScore {
     var milestone by Spark("⓿")
     var currentFloor by Spark<DungeonFloor?>(null)
     var puzzlePenalty by Spark(0)
+    var puzzleCount = 0
 
     val totalRooms by Flare(36) { if (clearedPercent == 0) 36 else ((100.0 / clearedPercent) * completedRooms + 0.4).toInt() }
     val roomRatio by Flare(0.0) {
@@ -94,7 +96,8 @@ object DungeonScore {
         had270 = false; had300 = false; hadCrypts = false; MimicTrigger.reset()
         dungeonSeconds = 0; secretsFound = 0; secretsFoundPercent = 0.0; crypts = 0
         completedRooms = 0; teamDeaths = 0; clearedPercent = 0; secretsPercentNeeded = 1.0
-        openedRooms = 0; milestone = "⓿"; hasSpiritPet = true; puzzlePenalty = 0; currentFloor = null
+        openedRooms = 0; milestone = "⓿"; hasSpiritPet = true; puzzlePenalty = 0;
+        puzzleCount = 0; currentFloor = null
     }
 
     fun init() {
@@ -117,6 +120,7 @@ object DungeonScore {
         teamDeaths = msg.extractInt(TEAM_DEATHS_PATTERN, teamDeaths)
         openedRooms = msg.extractInt(OPENED_ROOMS_PATTERN, openedRooms)
         milestone = msg.extractString(MILESTONES_PATTERN, milestone)
+        puzzleCount = msg.extractInt(PUZZLE_COUNT_PATTERN, puzzleCount)
         puzzlePenalty = Dungeon.puzzles.count { it.checkmark !in setOf(Checkmark.GREEN, Checkmark.WHITE) } * 10
         checkMilestones()
     }

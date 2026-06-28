@@ -28,6 +28,7 @@ enum class DungeonClass(
         fun from(name: String?): DungeonClass = classMap[name] ?: UNKNOWN
     }
 }
+
 enum class Checkmark(
     private val texturePath: String?, // Store the name/path as a String
     val colorCode: String
