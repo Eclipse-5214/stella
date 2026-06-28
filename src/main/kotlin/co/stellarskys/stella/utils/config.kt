@@ -560,8 +560,8 @@ val config = Config(Stella.NAMESPACE) {
 
             stepslider {
                 configName = "predictionBdWidth"
-                name = "Prediction Border Width"
-                description = "Width of the prediction border on unknown rooms"
+                name = "Guess Width"
+                description = "Width of the guess border on unknown rooms"
                 min = 1
                 max = 8
                 step = 1
@@ -654,8 +654,8 @@ val config = Config(Stella.NAMESPACE) {
 
             toggle {
                 configName = "roomPrediction"
-                name = "Room Prediction"
-                description = "Attempts to predict the type of known 1x1s based on what rooms have already been discovered"
+                name = "Room Guessing"
+                description = "Attempts to guess the type of known 1x1s based on what rooms have already been discovered"
             }
         }
 
@@ -979,9 +979,8 @@ val config = Config(Stella.NAMESPACE) {
 
             keybind {
                 configName = "secretRoutes.addCustom"
-                name = "Custom Waypoint Bind"
-                description = "Adds a custom waypoint to the route"
-                default = Zenith.Keys.NONE
+                name = "Custom Bind"
+                description = "Adds a custom waypoint to a route"
             }
         }
 
