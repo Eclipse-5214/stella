@@ -96,16 +96,16 @@ class Hotm(
         val inScissor = isAreaHovered(10f, 25f, 135f, 185f, mouseX, mouseY)
         var cy = 6
 
-        fun drawStatLine(label: String, value: String, isMaxed: Boolean = false, tooltip: List<Component>? = null) {
+        fun drawStatLine(label: String, value: String, isMaxed: Boolean = false, tooltip: (() -> List<Component>)? = null) {
             val valColor = if (isMaxed) "§6" else "§e"
             ren2d.drawString(context, "§7$label: $valColor$value", 5, cy)
 
             if (inScissor && tooltip != null) {
                 val absoluteY = 25 + cy + leftScrollOffset
-                if (isAreaHovered(15f, absoluteY, 110f, 9f, mouseX, mouseY)) {
+                if (isAreaHovered(5f, absoluteY, 110f, 9f, mouseX, mouseY)) {
                     context.setTooltipForNextFrame(
                         client.font,
-                        tooltip.map { it.visualOrderText },
+                        tooltip().map { it.visualOrderText },
                         mouseX.toInt(),
                         mouseY.toInt()
                     )
@@ -125,19 +125,21 @@ class Hotm(
         val tokensSpent = member.skillTree.tokensSpent["mountain"] ?: 0
         val tokens = (totalTokens - tokensSpent).coerceAtLeast(0)
 
-        val tokensTooltip = listOf(
-            Component.literal("§dTokens of the Mountain"),
-            Component.literal("§7Spent: §a$tokensSpent"),
-            Component.literal("§7Unspent: §a$tokens"),
-            Component.literal("§7Total: §a$totalTokens")
-        )
-        drawStatLine("Tokens", "$tokensSpent / $totalTokens", totalTokens >= 25, tokensTooltip)
+        drawStatLine("Tokens", "$tokensSpent / $totalTokens", totalTokens >= 25) {
+            listOf(
+                Component.literal("§dTokens of the Mountain"),
+                Component.literal("§7Spent: §a$tokensSpent"),
+                Component.literal("§7Unspent: §a$tokens"),
+                Component.literal("§7Total: §a$totalTokens")
+            )
+        }
 
-        val potmTooltip = listOf(
-            Component.literal("§6Core of the Mountain"),
-            Component.literal("§7Level: §e$potmLevel / 10")
-        )
-        drawStatLine("Core", "$potmLevel / 10", potmLevel >= 10, potmTooltip)
+        drawStatLine("Core", "$potmLevel / 10", potmLevel >= 10) {
+            listOf(
+                Component.literal("§6Core of the Mountain"),
+                Component.literal("§7Level: §e$potmLevel / 10")
+            )
+        }
 
         val activeAbility = member.skillTree.selectedAbility["mining"]
         val abilityName = HotmUtils.getActiveAbilityName(activeAbility)
@@ -150,46 +152,46 @@ class Hotm(
         cy += 13
 
         val mithrilTotal = member.miningCore.powderSpentMithril + member.miningCore.powderMithril
-        val mithrilTooltip = listOf(
-            Component.literal("§2Mithril Powder"),
-            Component.literal("§7Spent: §a" + "%,d".format(member.miningCore.powderSpentMithril.toLong())),
-            Component.literal("§7Current: §a" + "%,d".format(member.miningCore.powderMithril.toLong())),
-            Component.literal("§7Total: §a" + "%,d".format(mithrilTotal.toLong()))
-        )
         drawStatLine(
             "Mithril",
             "%,d".format(member.miningCore.powderMithril.toLong()),
-            mithrilTotal >= 12500000,
-            mithrilTooltip
-        )
+            mithrilTotal >= 12500000
+        ) {
+            listOf(
+                Component.literal("§2Mithril Powder"),
+                Component.literal("§7Spent: §a" + "%,d".format(member.miningCore.powderSpentMithril.toLong())),
+                Component.literal("§7Current: §a" + "%,d".format(member.miningCore.powderMithril.toLong())),
+                Component.literal("§7Total: §a" + "%,d".format(mithrilTotal.toLong()))
+            )
+        }
 
         val gemstoneTotal = member.miningCore.powderSpentGemstone + member.miningCore.powderGemstone
-        val gemstoneTooltip = listOf(
-            Component.literal("§dGemstone Powder"),
-            Component.literal("§7Spent: §a" + "%,d".format(member.miningCore.powderSpentGemstone.toLong())),
-            Component.literal("§7Current: §a" + "%,d".format(member.miningCore.powderGemstone.toLong())),
-            Component.literal("§7Total: §a" + "%,d".format(gemstoneTotal.toLong()))
-        )
         drawStatLine(
             "Gemstone",
             "%,d".format(member.miningCore.powderGemstone.toLong()),
-            gemstoneTotal >= 20000000,
-            gemstoneTooltip
-        )
+            gemstoneTotal >= 20000000
+        ) {
+            listOf(
+                Component.literal("§dGemstone Powder"),
+                Component.literal("§7Spent: §a" + "%,d".format(member.miningCore.powderSpentGemstone.toLong())),
+                Component.literal("§7Current: §a" + "%,d".format(member.miningCore.powderGemstone.toLong())),
+                Component.literal("§7Total: §a" + "%,d".format(gemstoneTotal.toLong()))
+            )
+        }
 
         val glaciteTotal = member.miningCore.powderSpentGlacite + member.miningCore.powderGlacite
-        val glaciteTooltip = listOf(
-            Component.literal("§bGlacite Powder"),
-            Component.literal("§7Spent: §a" + "%,d".format(member.miningCore.powderSpentGlacite.toLong())),
-            Component.literal("§7Current: §a" + "%,d".format(member.miningCore.powderGlacite.toLong())),
-            Component.literal("§7Total: §a" + "%,d".format(glaciteTotal.toLong()))
-        )
         drawStatLine(
             "Glacite",
             "%,d".format(member.miningCore.powderGlacite.toLong()),
-            glaciteTotal >= 20000000,
-            glaciteTooltip
-        )
+            glaciteTotal >= 20000000
+        ) {
+            listOf(
+                Component.literal("§bGlacite Powder"),
+                Component.literal("§7Spent: §a" + "%,d".format(member.miningCore.powderSpentGlacite.toLong())),
+                Component.literal("§7Current: §a" + "%,d".format(member.miningCore.powderGlacite.toLong())),
+                Component.literal("§7Total: §a" + "%,d".format(glaciteTotal.toLong()))
+            )
+        }
 
         cy += 4
 
@@ -201,35 +203,37 @@ class Hotm(
         drawStatLine("Mineshafts", "%,d".format(mineshafts.toLong()))
 
         val fossilsCount = HotmUtils.getFossilsCount(member.glacite.fossilsDonated)
-        val fossilsTooltip = mutableListOf<Component>().apply {
-            add(Component.literal("§9Donated Fossils"))
-            HotmUtils.fossilsList.forEach { (id, name) ->
-                val shortId = id.split("_").first().uppercase(java.util.Locale.ROOT)
-                val donated = member.glacite.fossilsDonated.contains(shortId)
-                val statusStr = if (donated) "§aDonated" else "§cNot Donated"
-                add(Component.literal("§7- §e$name§7: $statusStr"))
+        drawStatLine("Fossils", "$fossilsCount / 8", fossilsCount >= 8) {
+            mutableListOf<Component>().apply {
+                add(Component.literal("§9Donated Fossils"))
+                HotmUtils.fossilsList.forEach { (shortId, name) ->
+                    val donated = member.glacite.fossilsDonated.contains(shortId)
+                    val statusStr = if (donated) "§aDonated" else "§cNot Donated"
+                    add(Component.literal("§7- §e$name§7: $statusStr"))
+                }
             }
         }
-        drawStatLine("Fossils", "$fossilsCount / 8", fossilsCount >= 8, fossilsTooltip)
 
         val corpses = member.glacite.corpsesLooted
         val corpsesTotal = corpses.values.sum()
-        val corpsesTooltip = listOf(
-            Component.literal("§bCorpses Looted"),
-            Component.literal("§9Lapis: §f${corpses["lapis"] ?: 0}"),
-            Component.literal("§7Tungsten: §f${corpses["tungsten"] ?: 0}"),
-            Component.literal("§6Umber: §f${corpses["umber"] ?: 0}"),
-            Component.literal("§bVanguard: §f${corpses["vanguard"] ?: 0}"),
-            Component.literal("§7Total: §a$corpsesTotal")
-        )
-        drawStatLine("Corpses", "$corpsesTotal", false, corpsesTooltip)
+        drawStatLine("Corpses", "$corpsesTotal", false) {
+            listOf(
+                Component.literal("§bCorpses Looted"),
+                Component.literal("§9Lapis: §f${corpses["lapis"] ?: 0}"),
+                Component.literal("§7Tungsten: §f${corpses["tungsten"] ?: 0}"),
+                Component.literal("§6Umber: §f${corpses["umber"] ?: 0}"),
+                Component.literal("§bVanguard: §f${corpses["vanguard"] ?: 0}"),
+                Component.literal("§7Total: §a$corpsesTotal")
+            )
+        }
 
         val commissionMilestone = HotmUtils.getCommissionMilestone(member.objectives.tutorial)
-        val commissionsTooltip = listOf(
-            Component.literal("§dCommissions"),
-            Component.literal("§7Milestone: §e$commissionMilestone / 6")
-        )
-        drawStatLine("Commissions Milestone", "$commissionMilestone", commissionMilestone >= 6, commissionsTooltip)
+        drawStatLine("Commissions Milestone", "$commissionMilestone", commissionMilestone >= 6) {
+            listOf(
+                Component.literal("§dCommissions"),
+                Component.literal("§7Milestone: §e$commissionMilestone / 6")
+            )
+        }
 
         cy += 4
 
@@ -253,49 +257,49 @@ class Hotm(
         )
 
         val nucRuns = HotmUtils.getNucleusRuns(member.miningCore.crystals)
-        val nucTooltip = mutableListOf<Component>().apply {
-            add(Component.literal("§dCrystal Hollows"))
-            HotmUtils.nucleusRunCrystals.forEachIndexed { index, (apiKey, name) ->
-                val crystal = member.miningCore.crystals[apiKey]
-                val state = crystal?.state ?: "NOT_FOUND"
-                val (color, stateName) = when (state) {
-                    "PLACED" -> "§a" to "Placed"
-                    "FOUND" -> "§e" to "Found"
-                    else -> "§7" to "Not Found"
-                }
-                val nameColor = crystalColors[name] ?: "§7"
-                add(Component.literal("$nameColor$name§7: $color$stateName"))
-            }
-        }
         val hollowColor = when {
             HotmUtils.nucleusRunCrystals.all { member.miningCore.crystals[it.first]?.state == "PLACED" } -> "§a"
             HotmUtils.nucleusRunCrystals.any {
-                member.miningCore.crystals[it.first]?.state in listOf(
-                    "FOUND",
-                    "PLACED"
-                )
+                val state = member.miningCore.crystals[it.first]?.state
+                state == "FOUND" || state == "PLACED"
             } -> "§e"
 
             else -> "§7"
         }
-        drawStatLine("Crystal Hollows", "$hollowColor$nucRuns Runs", false, nucTooltip)
-
-        val otherCrystalsCount = HotmUtils.getOtherCrystalsCount(member.miningCore.crystals)
-        val otherTooltip = mutableListOf<Component>().apply {
-            add(Component.literal("§bGlacite Tunnels"))
-            HotmUtils.otherCrystals.forEachIndexed { index, (apiKey, name) ->
-                val crystal = member.miningCore.crystals[apiKey]
-                val state = crystal?.state ?: "NOT_FOUND"
-                val (color, stateName) = when (state) {
-                    "PLACED" -> "§a" to "Found"
-                    "FOUND" -> "§e" to "Found"
-                    else -> "§7" to "Not Found"
+        drawStatLine("Crystal Hollows", "$hollowColor$nucRuns Runs", false) {
+            mutableListOf<Component>().apply {
+                add(Component.literal("§dCrystal Hollows"))
+                HotmUtils.nucleusRunCrystals.forEach { (apiKey, name) ->
+                    val crystal = member.miningCore.crystals[apiKey]
+                    val state = crystal?.state ?: "NOT_FOUND"
+                    val (color, stateName) = when (state) {
+                        "PLACED" -> "§a" to "Placed"
+                        "FOUND" -> "§e" to "Found"
+                        else -> "§7" to "Not Found"
+                    }
+                    val nameColor = crystalColors[name] ?: "§7"
+                    add(Component.literal("$nameColor$name§7: $color$stateName"))
                 }
-                val nameColor = crystalColors[name] ?: "§7"
-                add(Component.literal("$nameColor$name§7: $color$stateName"))
             }
         }
-        drawStatLine("Glacite Tunnels", "$otherCrystalsCount / 7", otherCrystalsCount >= 7, otherTooltip)
+
+        val otherCrystalsCount = HotmUtils.getOtherCrystalsCount(member.miningCore.crystals)
+        drawStatLine("Glacite Tunnels", "$otherCrystalsCount / 7", otherCrystalsCount >= 7) {
+            mutableListOf<Component>().apply {
+                add(Component.literal("§bGlacite Tunnels"))
+                HotmUtils.otherCrystals.forEach { (apiKey, name) ->
+                    val crystal = member.miningCore.crystals[apiKey]
+                    val state = crystal?.state ?: "NOT_FOUND"
+                    val (color, stateName) = when (state) {
+                        "PLACED" -> "§a" to "Found"
+                        "FOUND" -> "§e" to "Found"
+                        else -> "§7" to "Not Found"
+                    }
+                    val nameColor = crystalColors[name] ?: "§7"
+                    add(Component.literal("$nameColor$name§7: $color$stateName"))
+                }
+            }
+        }
     }
 
     private fun drawRightPanel(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {

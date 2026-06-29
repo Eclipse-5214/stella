@@ -41,42 +41,40 @@ object HotmUtils {
     )
 
     val fossilsList = listOf(
-        "claw_fossil" to "Claw",
-        "spine_fossil" to "Spine",
-        "clubbed_fossil" to "Clubbed",
-        "ugly_fossil" to "Ugly",
-        "helix_fossil" to "Helix",
-        "footprint_fossil" to "Footprint",
-        "webbed_fossil" to "Webbed",
-        "tusk_fossil" to "Tusk"
+        "CLAW" to "Claw",
+        "SPINE" to "Spine",
+        "CLUBBED" to "Clubbed",
+        "UGLY" to "Ugly",
+        "HELIX" to "Helix",
+        "FOOTPRINT" to "Footprint",
+        "WEBBED" to "Webbed",
+        "TUSK" to "Tusk"
     )
 
     val nodes: Map<Int, NodeInfo> by lazy {
         try {
-            val stream = HotmUtils::class.java.getResourceAsStream("/assets/stella/pv/hotm_nodes.json")
-            if (stream != null) {
-                val reader = java.io.InputStreamReader(stream)
-                val rawType = object : com.google.gson.reflect.TypeToken<List<Map<String, Any>>>() {}.type
-                val rawList: List<Map<String, Any>> = com.google.gson.Gson().fromJson(reader, rawType)
-                
-                rawList.mapNotNull { data ->
-                    val pos = data["position"] as? Map<*, *> ?: return@mapNotNull null
-                    val col = (pos["col"] as? Number)?.toInt() ?: 0
-                    val row = (pos["row"] as? Number)?.toInt() ?: 0
-                    val slot = row * 9 + col
-                    
-                    val apiKey = data["apiKey"] as? String ?: return@mapNotNull null
-                    val displayName = data["displayName"] as? String ?: return@mapNotNull null
-                    val typeStr = data["type"] as? String ?: return@mapNotNull null
-                    val type = try { NodeType.valueOf(typeStr) } catch (e: Exception) { NodeType.PERK }
-                    val maxLevel = (data["maxLevel"] as? Number)?.toInt() ?: 0
-                    val tooltipList = (data["tooltip"] as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
-                    
-                    slot to NodeInfo(type, apiKey, displayName, maxLevel, tooltipList)
-                }.toMap()
-            } else {
-                emptyMap()
-            }
+            HotmUtils::class.java.getResourceAsStream("/assets/stella/pv/hotm_nodes.json")?.use { stream ->
+                java.io.InputStreamReader(stream).use { reader ->
+                    val rawType = object : com.google.gson.reflect.TypeToken<List<Map<String, Any>>>() {}.type
+                    val rawList: List<Map<String, Any>> = com.google.gson.Gson().fromJson(reader, rawType)
+
+                    rawList.mapNotNull { data ->
+                        val pos = data["position"] as? Map<*, *> ?: return@mapNotNull null
+                        val col = (pos["col"] as? Number)?.toInt() ?: 0
+                        val row = (pos["row"] as? Number)?.toInt() ?: 0
+                        val slot = row * 9 + col
+
+                        val apiKey = data["apiKey"] as? String ?: return@mapNotNull null
+                        val displayName = data["displayName"] as? String ?: return@mapNotNull null
+                        val typeStr = data["type"] as? String ?: return@mapNotNull null
+                        val type = try { NodeType.valueOf(typeStr) } catch (e: Exception) { NodeType.PERK }
+                        val maxLevel = (data["maxLevel"] as? Number)?.toInt() ?: 0
+                        val tooltipList = (data["tooltip"] as? List<*>)?.filterIsInstance<String>() ?: emptyList()
+
+                        slot to NodeInfo(type, apiKey, displayName, maxLevel, tooltipList)
+                    }.toMap()
+                }
+            } ?: emptyMap()
         } catch (e: Exception) {
             e.printStackTrace()
             emptyMap()
@@ -154,9 +152,7 @@ object HotmUtils {
     }
 
     fun getNucleusRuns(crystals: Map<String, SkyblockResponse.CrystalData>): Int {
-        return crystals
-            .filterKeys { it in listOf("jade_crystal", "amber_crystal", "amethyst_crystal", "sapphire_crystal", "topaz_crystal") }
-            .minOfOrNull { it.value.totalPlaced } ?: 0
+        return nucleusRunCrystals.minOf { (key, _) -> crystals[key]?.totalPlaced ?: 0 }
     }
 
     fun getOtherCrystalsCount(crystals: Map<String, SkyblockResponse.CrystalData>): Int {
@@ -167,7 +163,7 @@ object HotmUtils {
     }
 
     fun getFossilsCount(donated: List<String>): Int {
-        return fossilsList.count { donated.contains(it.first.split("_").first().uppercase(java.util.Locale.ROOT)) }
+        return fossilsList.count { (shortId, _) -> donated.contains(shortId) }
     }
 
     fun getNodeItem(node: NodeInfo, level: Int, isEnabled: Boolean, hotmLevel: Int, selectedAbility: String?): ItemStack {
@@ -257,20 +253,13 @@ object HotmUtils {
                 list.add(Component.literal(cotmRewards[level]))
             }
         } else {
-            val replacements = getReplacements(node.apiKey, level, hotmLevel)
+            val replacements = getReplacements(node.apiKey, if (level <= 0) 1 else level, hotmLevel)
             node.tooltip.forEach { rawLine ->
                 var line = rawLine
                 replacements.forEach { (key, value) ->
                     line = line.replace("%$key%", value)
                 }
-                if (level <= 0) {
-                    val lvl1Replacements = getReplacements(node.apiKey, 1, hotmLevel)
-                    lvl1Replacements.forEach { (key, value) ->
-                        line = line.replace("%$key%", value)
-                    }
-                }
-                val formattedLine = line
-                list.add(Component.literal(formattedLine))
+                list.add(Component.literal(line))
             }
         }
         
@@ -320,9 +309,9 @@ object HotmUtils {
                 Utils.formatCompact(longVal)
             } else {
                 val formatted = if (this * 10 == (this * 10).toLong().toDouble()) {
-                    "%.1f".format(this)
+                    "%.1f".format(java.util.Locale.ROOT, this)
                 } else {
-                    "%.2f".format(this)
+                    "%.2f".format(java.util.Locale.ROOT, this)
                 }
                 formatted.trimEnd('0').trimEnd('.')
             }
@@ -333,9 +322,9 @@ object HotmUtils {
                 Utils.formatCompact(longVal)
             } else {
                 val formatted = if (this * 10 == (this * 10).toLong().toFloat()) {
-                    "%.1f".format(this)
+                    "%.1f".format(java.util.Locale.ROOT, this)
                 } else {
-                    "%.2f".format(this)
+                    "%.2f".format(java.util.Locale.ROOT, this)
                 }
                 formatted.trimEnd('0').trimEnd('.')
             }
