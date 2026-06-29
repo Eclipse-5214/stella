@@ -61,7 +61,7 @@ enum class RoomType(
     val color: Color? get() = colorGetter()
 
     companion object {
-        val unguessable = setOf(NORMAL, BLOOD, FAIRY, ENTRANCE)
+        val unguessable = setOf(BLOOD, FAIRY, ENTRANCE)
 
         fun fromByte(byte: Int): RoomType = when (byte) {
             63 -> NORMAL
