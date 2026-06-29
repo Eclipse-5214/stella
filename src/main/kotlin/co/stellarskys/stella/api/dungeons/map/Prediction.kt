@@ -31,7 +31,7 @@ object Prediction {
     }
 
     fun check1x1(room: Room): Boolean {
-        if (room.type !in setOf(RoomType.TRAP, RoomType.YELLOW, RoomType.PUZZLE)) return false
+        if (room.type in RoomType.unguessable) return false
         if (room.components.size != 1) return false
         val (rmx, rmz) = room.components[0]
 
