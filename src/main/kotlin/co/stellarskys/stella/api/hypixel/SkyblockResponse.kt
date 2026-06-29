@@ -56,6 +56,10 @@ data class SkyblockResponse(
         @SerializedName("profile") val memberProfile: MemberProfile? = null,
         val currencies: Currencies = Currencies(),
         @SerializedName("loadout") val loadout: Loadout = Loadout(),
+        @SerializedName("mining_core") val miningCore: MiningCore = MiningCore(),
+        @SerializedName("skill_tree") val skillTree: SkillTree = SkillTree(),
+        @SerializedName("glacite_player_data") val glacite: GlacitePlayerData = GlacitePlayerData(),
+        val objectives: Objectives = Objectives(),
         @Transient var profile: SkyblockProfile? = null,
         @Transient var allProfiles: List<SkyblockProfile>? = null,
         @Transient var uuid: UUID? = null,
@@ -82,6 +86,10 @@ data class SkyblockResponse(
 
     data class Leveling(
         val experience: Int = 0,
+    )
+
+    data class Objectives(
+        val tutorial: List<String> = emptyList()
     )
 
     data class PlayerData(
@@ -323,5 +331,46 @@ data class SkyblockResponse(
     data class MuseumMember(
         val value: Long = 0L,
         val appraisal: Boolean = false
+    )
+
+    data class MiningCore(
+        @SerializedName("received_free_tier") val receivedFreeTier: Boolean = false,
+        @SerializedName("powder_mithril") val powderMithril: Int = 0,
+        @SerializedName("powder_mithril_total") val powderMithrilTotal: Int = 0,
+        @SerializedName("powder_spent_mithril") val powderSpentMithril: Int = 0,
+        @SerializedName("powder_gemstone") val powderGemstone: Int = 0,
+        @SerializedName("powder_gemstone_total") val powderGemstoneTotal: Int = 0,
+        @SerializedName("powder_spent_gemstone") val powderSpentGemstone: Int = 0,
+        @SerializedName("powder_glacite") val powderGlacite: Int = 0,
+        @SerializedName("powder_glacite_total") val powderGlaciteTotal: Int = 0,
+        @SerializedName("powder_spent_glacite") val powderSpentGlacite: Int = 0,
+        val crystals: Map<String, CrystalData> = emptyMap(),
+        val biomes: Map<String, BiomeData> = emptyMap(),
+        @SerializedName("commissions_completed") val commissionsCompleted: Int = 0,
+        val tokens: Int = 0,
+        @SerializedName("tokens_spent") val tokensSpent: Int = 0
+    )
+
+    data class GlacitePlayerData(
+        @SerializedName("fossils_donated") val fossilsDonated: List<String> = emptyList(),
+        @SerializedName("corpses_looted") val corpsesLooted: Map<String, Int> = emptyMap(),
+        @SerializedName("mineshafts_entered") val mineshaftsEntered: Int = 0
+    )
+
+    data class CrystalData(
+        val state: String = "NOT_FOUND",
+        @SerializedName("total_found") val totalFound: Int = 0,
+        @SerializedName("total_placed") val totalPlaced: Int = 0
+    )
+
+    data class BiomeData(
+        @SerializedName("king_quests_completed") val kingQuestsCompleted: Int = 0
+    )
+
+    data class SkillTree(
+        val nodes: Map<String, Map<String, Any>> = emptyMap(),
+        @SerializedName("tokens_spent") val tokensSpent: Map<String, Int> = emptyMap(),
+        val experience: Map<String, Double> = emptyMap(),
+        @SerializedName("selected_ability") val selectedAbility: Map<String, String> = emptyMap()
     )
 }

@@ -16,7 +16,7 @@ object SkillUtils {
     private var skillRegistry: Map<SkillType, ApiSkillData> = emptyMap()
 
     data class ApiSkillData(val maxLevel: Int, val levels: Map<Int, Long>)
-    data class Skill(val level: Double, val progress: Float, val cap: Int, val xp: Double)
+    data class Skill(val level: Double, val progress: Float, val cap: Int, val xp: Double, val progressXp: Double = 0.0, val nextLevelNeededXp: Double = 0.0, val remainingXp: Double = 0.0)
 
     enum class SkillType(val apiName: String, val displayName: String, val icon: () -> ItemStack, val isCosmetic: Boolean = false) {
         FARMING("farming", "Farming", { Items.WHEAT.defaultInstance }),

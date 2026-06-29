@@ -1,0 +1,701 @@
+[
+  {
+    "apiKey": "mining_speed",
+    "displayName": "Mining Speed",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 4,
+      "row": 0
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%⸕ Mining Speed§7."
+    ]
+  },
+  {
+    "apiKey": "mining_speed_boost",
+    "displayName": "Mining Speed Boost",
+    "type": "ABILITY",
+    "maxLevel": 0,
+    "position": {
+      "col": 2,
+      "row": 1
+    },
+    "tooltip": [
+      "§6Pickaxe Ability: Mining Speed Boost §e§lRIGHT CLICK",
+      "§7Grants §a+%effect%%§6 ⸕ Mining Speed §7for §a%duration%s§7.",
+      "§8Cooldown: §a120s"
+    ]
+  },
+  {
+    "apiKey": "precision_mining",
+    "displayName": "Precision Mining",
+    "type": "UNLEVELABLE",
+    "maxLevel": 0,
+    "position": {
+      "col": 3,
+      "row": 1
+    },
+    "tooltip": [
+      "§7When Mining §6Ores §7or §8Dwarven Metals§7,",
+      "§7a particle target appears on the",
+      "§7block that increases your §6⸕ Mining",
+      "§6Speed §7by §a30% §7when aiming at it."
+    ]
+  },
+  {
+    "apiKey": "mining_fortune",
+    "displayName": "Mining Fortune",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 4,
+      "row": 1
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%☘ Mining Fortune§7."
+    ]
+  },
+  {
+    "apiKey": "titanium_insanium",
+    "displayName": "Titanium Insanium",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 5,
+      "row": 1
+    },
+    "tooltip": [
+      "§7When mining§2 Mithril Ore§7, you have a ",
+      "§a%reward%%§7 chance to convert the block into",
+      "§fTitanium Ore§7."
+    ]
+  },
+  {
+    "apiKey": "pickobulus",
+    "displayName": "Pickobulus",
+    "type": "ABILITY",
+    "maxLevel": 0,
+    "position": {
+      "col": 6,
+      "row": 1
+    },
+    "tooltip": [
+      "§6Pickaxe Ability: Pickobulus §e§lRIGHT CLICK",
+      "§7Throw your pickaxe to create an",
+      "§7explosion mining all ores in a §a3 §7block",
+      "§7radius.",
+      "§8Cooldown: §a%reward%s"
+    ]
+  },
+  {
+    "apiKey": "luck_of_the_cave",
+    "displayName": "Luck of the Cave",
+    "type": "PERK",
+    "maxLevel": 45,
+    "position": {
+      "col": 2,
+      "row": 2
+    },
+    "tooltip": [
+      "§7Increases the chance for you to",
+      "§7trigger rare occurrences in the",
+      "§2Dwarven Mines §7by §a%reward%%§7.",
+      "",
+      "§7Rare occurrences include:",
+      "§7 • §6Golden Goblins",
+      "§7 • §5Fallen Stars",
+      "§7 • §6Powder Ghasts"
+    ]
+  },
+  {
+    "apiKey": "efficient_miner",
+    "displayName": "Efficient Miner",
+    "type": "PERK",
+    "maxLevel": 100,
+    "position": {
+      "col": 4,
+      "row": 2
+    },
+    "tooltip": [
+      "§7Grants §e+%reward%▚ Mining Spread§7."
+    ]
+  },
+  {
+    "apiKey": "quick_forge",
+    "displayName": "Quick Forge",
+    "type": "PERK",
+    "maxLevel": 20,
+    "position": {
+      "col": 6,
+      "row": 2
+    },
+    "tooltip": [
+      "§7Decreases the time it takes to forge by §a%reward%%§7."
+    ]
+  },
+  {
+    "apiKey": "sky_mall",
+    "displayName": "Sky Mall",
+    "type": "UNLEVELABLE",
+    "maxLevel": 0,
+    "position": {
+      "col": 1,
+      "row": 3
+    },
+    "tooltip": [
+      "§7Every Skyblock day, you receive a",
+      "§7random buff while on any §bMining",
+      "§bIsland§7.",
+      "",
+      "§7Possible Buffs",
+      "§7 • §7Gain §6+100⸕ Mining Speed§7.",
+      "§7 • §7Gain §6+50☘ Mining Fortune§7.",
+      "§7 • §7Gain §a+15% §7more Powder while mining.",
+      "§7 • §a-20% §7Pickaxe Ability cooldowns.",
+      "§7 • §a-20% §7chance to find §6Golden §7and",
+      "    §bDiamond Goblins§7.",
+      "§7 • §aGain §a5x §9Titanium §7drops."
+    ]
+  },
+  {
+    "apiKey": "old_school",
+    "displayName": "Old-School",
+    "type": "PERK",
+    "maxLevel": 20,
+    "position": {
+      "col": 2,
+      "row": 3
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%☘ Ore Fortune§7."
+    ]
+  },
+  {
+    "apiKey": "professional",
+    "displayName": "Professional",
+    "type": "PERK",
+    "maxLevel": 140,
+    "position": {
+      "col": 3,
+      "row": 3
+    },
+    "tooltip": [
+      "§7Gain §6+%reward%⸕ Mining Speed§7 when mining",
+      "§7Gemstones."
+    ]
+  },
+  {
+    "apiKey": "mole",
+    "displayName": "Mole",
+    "type": "PERK",
+    "maxLevel": 200,
+    "position": {
+      "col": 4,
+      "row": 3
+    },
+    "tooltip": [
+      "§7Grants §e+%reward%▚ Mining Spread §7when",
+      "§7mining Hard Stone."
+    ]
+  },
+  {
+    "apiKey": "gem_lover",
+    "displayName": "Gem Lover",
+    "type": "PERK",
+    "maxLevel": 20,
+    "position": {
+      "col": 5,
+      "row": 3
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%☘ Gemstone Fortune§7."
+    ]
+  },
+  {
+    "apiKey": "seasoned_mineman",
+    "displayName": "Seasoned Mineman",
+    "type": "PERK",
+    "maxLevel": 100,
+    "position": {
+      "col": 6,
+      "row": 3
+    },
+    "tooltip": [
+      "§7Grants §3%reward%☯ Mining Wisdom§7."
+    ]
+  },
+  {
+    "apiKey": "front_loaded",
+    "displayName": "Front Loaded",
+    "type": "UNLEVELABLE",
+    "maxLevel": 0,
+    "position": {
+      "col": 7,
+      "row": 3
+    },
+    "tooltip": [
+      "§7Grants the following buffs for the",
+      "§7first §a2,500 §5Gemstones §7you mine each",
+      "§7day.",
+      "",
+      "§7 • §53x Gemstone Powder",
+      "§7 • §6+150☘ Gemstone Fortune",
+      "§7 • §6+250⸕ Mining Speed"
+    ]
+  },
+  {
+    "apiKey": "daily_grind",
+    "displayName": "Daily Grind",
+    "type": "UNLEVELABLE",
+    "maxLevel": 0,
+    "position": {
+      "col": 2,
+      "row": 4
+    },
+    "tooltip": [
+      "§7Your first daily commission on each",
+      "§bMining Island §7grants §9+500 Powder§7,",
+      "§7multiplied by your §5HOTM §7level.",
+      "",
+      "§2Dwarven Mines§7: §a%reward% §2Mithril Powder",
+      "§5Crystal Hollows§7: §a%reward% §dGemstone Powder",
+      "§bGlacite Mines§7: §a%reward% §2Glacite Powder"
+    ]
+  },
+  {
+    "apiKey": "core_of_the_mountain",
+    "displayName": "Core of the Mountain",
+    "type": "CORE",
+    "maxLevel": 0,
+    "position": {
+      "col": 4,
+      "row": 4
+    },
+    "tooltip": []
+  },
+  {
+    "apiKey": "daily_powder",
+    "displayName": "Daily Powder",
+    "type": "UNLEVELABLE",
+    "maxLevel": 0,
+    "position": {
+      "col": 6,
+      "row": 4
+    },
+    "tooltip": [
+      "§7The first ore you mine each day",
+      "§7grants §9+500 Powder§7, multiplied by",
+      "§7your §5HOTM §7level.",
+      "",
+      "§2Mithril§7: §a%reward% §2Mithril Powder",
+      "§dGemstone§7: §a%reward% §dGemstone Powder",
+      "§bGlacite§7: §a%reward% §2Glacite Powder"
+    ]
+  },
+  {
+    "apiKey": "anomalous_desire",
+    "displayName": "Tunnel Vision",
+    "type": "ABILITY",
+    "maxLevel": 0,
+    "position": {
+      "col": 1,
+      "row": 5
+    },
+    "tooltip": [
+      "§6Pickaxe Ability: Tunnel Vision §e§lRIGHT CLICK",
+      "§7Increases the chances of triggering",
+      "§7rare occurrences by §a%chance%% §7for §a30s§7.",
+      "",
+      "§7Rare occurrences include:",
+      "§7 • §6Golden Goblins",
+      "§7 • §5Fallen Stars",
+      "§7 • §6Powder Ghasts",
+      "§7 • §6Worms",
+      "§7 • §bGlacite Mineshafts",
+      "§8Cooldown: §a%cooldown%s§7."
+    ]
+  },
+  {
+    "apiKey": "blockhead",
+    "displayName": "Blockhead",
+    "type": "PERK",
+    "maxLevel": 20,
+    "position": {
+      "col": 2,
+      "row": 5
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%☘ Block Fortune§7."
+    ]
+  },
+  {
+    "apiKey": "subterranean_fisher",
+    "displayName": "Subterranean Fisher",
+    "type": "PERK",
+    "maxLevel": 40,
+    "position": {
+      "col": 3,
+      "row": 5
+    },
+    "tooltip": [
+      "§7Grants §b+%fishing_speed% ☂ Fishing Speed and",
+      "§3+%sea_creature_chance% α Sea Creature Chance §7while on",
+      "§bMining Islands§7."
+    ]
+  },
+  {
+    "apiKey": "keep_it_cool",
+    "displayName": "Keep It Cool",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 4,
+      "row": 5
+    },
+    "tooltip": [
+      "§7Grants §c+%reward%♨ Heat Resistance§7."
+    ]
+  },
+  {
+    "apiKey": "lonesome_miner",
+    "displayName": "Lonesome Miner",
+    "type": "PERK",
+    "maxLevel": 45,
+    "position": {
+      "col": 5,
+      "row": 5
+    },
+    "tooltip": [
+      "§7Increases §c❁ Strength§7,§9☣ Crit",
+      "§9Chance§7, §9☠ Crit Damage§7, §a❈ Defense",
+      "§7and §c❤ Health §7statistics gain by §a%reward%%",
+      "§7while on §bMining Islands§7."
+    ]
+  },
+  {
+    "apiKey": "great_explorer",
+    "displayName": "Great Explorer",
+    "type": "PERK",
+    "maxLevel": 20,
+    "position": {
+      "col": 6,
+      "row": 5
+    },
+    "tooltip": [
+      "§7Boosts the chance to find treasure",
+      "§7chests while mining in the §5Crystal",
+      "§5Hollows §7by §a+%chance%% §7and reduces the",
+      "§7amount of locks on the chest by §a%locks_removed%§7."
+    ]
+  },
+  {
+    "apiKey": "maniac_miner",
+    "displayName": "Maniac Miner",
+    "type": "ABILITY",
+    "maxLevel": 0,
+    "position": {
+      "col": 7,
+      "row": 5
+    },
+    "tooltip": [
+      "§6Pickaxe Ability: Maniac Miner §e§lRIGHT CLICK",
+      "§7Grants §2+1Ⓟ Breaking Powder §7and a",
+      "§7stack of §6+%fortune%☘ Mining Fortune §8(caps",
+      "§8at 1000) §7per block broken for §a%duration%s§7.",
+      "§7Each block broken consumes §b20 Mana§7.",
+      "§8Cooldown: §a120s"
+    ]
+  },
+  {
+    "apiKey": "speedy_mineman",
+    "displayName": "Speedy Mineman",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 2,
+      "row": 6
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%⸕ Mining Speed§7."
+    ]
+  },
+  {
+    "apiKey": "powder_buff",
+    "displayName": "Powder Buff",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 4,
+      "row": 6
+    },
+    "tooltip": [
+      "§7Gain §a+%reward%% §7more Powder from any",
+      "§7source."
+    ]
+  },
+  {
+    "apiKey": "fortunate_mineman",
+    "displayName": "Fortunate Mineman",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 6,
+      "row": 6
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%☘ Mining Fortune§7."
+    ]
+  },
+  {
+    "apiKey": "miners_blessing",
+    "displayName": "Miner's Blessing",
+    "type": "UNLEVELABLE",
+    "maxLevel": 0,
+    "position": {
+      "col": 1,
+      "row": 7
+    },
+    "tooltip": [
+      "§7Grants §b+30✯ Magic Find §7on all §bMining",
+      "§bIslands§7."
+    ]
+  },
+  {
+    "apiKey": "no_stone_unturned",
+    "displayName": "No Stone Unturned",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 2,
+      "row": 7
+    },
+    "tooltip": [
+      "§7Increases your chances of finding a",
+      "§9Suspicious Scrap §7when mining in a",
+      "§bGlacite Mineshaft§7 by §a%reward%%§7."
+    ]
+  },
+  {
+    "apiKey": "strong_arm",
+    "displayName": "Strong Arm",
+    "type": "PERK",
+    "maxLevel": 100,
+    "position": {
+      "col": 3,
+      "row": 7
+    },
+    "tooltip": [
+      "§7Gain §6+%reward%⸕ Mining Speed §7when mining",
+      "§6Dwarven Metals§7."
+    ]
+  },
+  {
+    "apiKey": "steady_hand",
+    "displayName": "Steady Hand",
+    "type": "PERK",
+    "maxLevel": 100,
+    "position": {
+      "col": 4,
+      "row": 7
+    },
+    "tooltip": [
+      "§7Grants §e+%reward%▚ Gemstone Spread §7while",
+      "§7in the §bGlacite Mineshafts§7."
+    ]
+  },
+  {
+    "apiKey": "warm_heart",
+    "displayName": "Warm Heart",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 5,
+      "row": 7
+    },
+    "tooltip": [
+      "§7Grants §b+%reward%❄ Cold Resistance§7."
+    ]
+  },
+  {
+    "apiKey": "surveyor",
+    "displayName": "Surveyor",
+    "type": "PERK",
+    "maxLevel": 20,
+    "position": {
+      "col": 6,
+      "row": 7
+    },
+    "tooltip": [
+      "§7Increases your chances of finding a",
+      "§bGlacite Mineshaft §7when mining in the",
+      "§bGlacite Tunnels §7by §a%reward%%§7."
+    ]
+  },
+  {
+    "apiKey": "mineshaft_mayhem",
+    "displayName": "Mineshaft Mayhem",
+    "type": "UNLEVELABLE",
+    "maxLevel": 0,
+    "position": {
+      "col": 7,
+      "row": 7
+    },
+    "tooltip": [
+      "§7Every time you enter a §bGlacite",
+      "§bMineshaft§7, §7you receive a random buff.",
+      "",
+      "§7Possible Buffs",
+      "§7 • §a+5% §7chance to find a §9Suspicious Scrap§7.",
+      "§7 • §7Gain §6+100 ☘ Mining Fortune§7.",
+      "§7 • §7Gain §6+200 ⸕ Mining Speed§7.",
+      "§7 • §7Gain §b+10❄ Cold Resistance§7.",
+      "§7 • §7Reduce Pickaxe Ability cooldowns by §a-25%§7"
+    ]
+  },
+  {
+    "apiKey": "metal_head",
+    "displayName": "Metal Head",
+    "type": "PERK",
+    "maxLevel": 20,
+    "position": {
+      "col": 2,
+      "row": 8
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%☘ Dwarven Metal Fortune§7."
+    ]
+  },
+  {
+    "apiKey": "rags_to_riches",
+    "displayName": "Rags to Riches",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 4,
+      "row": 8
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%☘ Mining Fortune§7 while in a",
+      "§bGlacite Mineshaft§7."
+    ]
+  },
+  {
+    "apiKey": "eager_adventurer",
+    "displayName": "Eager Adventurer",
+    "type": "PERK",
+    "maxLevel": 100,
+    "position": {
+      "col": 6,
+      "row": 8
+    },
+    "tooltip": [
+      "§7Grants §6+%reward%⸕ Mining Speed§7 while in a",
+      "§bGlacite Mineshaft§7."
+    ]
+  },
+  {
+    "apiKey": "gemstone_infusion",
+    "displayName": "Gemstone Infusion",
+    "type": "ABILITY",
+    "maxLevel": 0,
+    "position": {
+      "col": 1,
+      "row": 9
+    },
+    "tooltip": [
+      "§6Pickaxe Ability: Gemstone Infusion §e§lRIGHT CLICK",
+      "§7Increases the effectiveness of",
+      "§6every Gemstone §7in your pick's",
+      "§7Gemstone Slots by §a100% §7for §a%reward%s§7.",
+      "§8Cooldown: §a120s"
+    ]
+  },
+  {
+    "apiKey": "crystalline",
+    "displayName": "Crystalline",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 2,
+      "row": 9
+    },
+    "tooltip": [
+      "§7Increases your chances of finding a",
+      "§bGlacite Mineshaft §7containing a",
+      "§dGemstone Crystal §7by §a%reward%%§7."
+    ]
+  },
+  {
+    "apiKey": "gifts_from_the_departed",
+    "displayName": "Gifts from the Departed",
+    "type": "PERK",
+    "maxLevel": 100,
+    "position": {
+      "col": 3,
+      "row": 9
+    },
+    "tooltip": [
+      "§7Gain a §a%reward%% §7chance to get an extra",
+      "§7item when looting a §bFrozen Corpse§7."
+    ]
+  },
+  {
+    "apiKey": "mining_master",
+    "displayName": "Mining Master",
+    "type": "PERK",
+    "maxLevel": 10,
+    "position": {
+      "col": 4,
+      "row": 9
+    },
+    "tooltip": [
+      "§7Grants §5+%reward%✧ Pristine§7."
+    ]
+  },
+  {
+    "apiKey": "dead_mans_chest",
+    "displayName": "Dead Man's Chest",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 5,
+      "row": 9
+    },
+    "tooltip": [
+      "§7Gain a §a%reward%% §7chance to spawn §a1",
+      "§7additional §bFrozen Corpse §7when you",
+      "§7enter a §bGlacite Mineshaft§7."
+    ]
+  },
+  {
+    "apiKey": "vanguard_seeker",
+    "displayName": "Vanguard Seeker",
+    "type": "PERK",
+    "maxLevel": 50,
+    "position": {
+      "col": 6,
+      "row": 9
+    },
+    "tooltip": [
+      "§7Increases your chances of finding a",
+      "§bGlacite Mineshaft §7containing a",
+      "§fVanguard Corpse§7 by §a%reward%%§7."
+    ]
+  },
+  {
+    "apiKey": "sheer_force",
+    "displayName": "Sheer Force",
+    "type": "ABILITY",
+    "maxLevel": 0,
+    "position": {
+      "col": 7,
+      "row": 9
+    },
+    "tooltip": [
+      "§6Pickaxe Ability: Sheer Force §e§lRIGHT CLICK",
+      "§7Grants §e+200▚ Mining Spread §7for §a%reward%s§7.",
+      "§8Cooldown: §a120s"
+    ]
+  }
+]

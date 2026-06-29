@@ -20,4 +20,6 @@ abstract class ParentElement : BaseElement() {
 
     override fun charTyped(char: Char) = elements.any { it.charTyped(char) }
     override fun keyPressed(keyCode: Int, modifiers: Int) = elements.any { it.keyPressed(keyCode, modifiers) }
+    override fun mouseScrolled(mouseX: Float, mouseY: Float, amount: Float, horizontalAmount: Float) =
+        visibleElements.any { it.mouseScrolled(mouseX, mouseY, amount, horizontalAmount) }
 }

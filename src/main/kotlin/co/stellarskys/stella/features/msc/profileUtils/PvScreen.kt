@@ -27,6 +27,7 @@ class PvScreen private constructor(
             Slayer(name, member, ::switchTo),
             Storage(name, member, ::switchTo),
             Pets(name, member, ::switchTo),
+            Hotm(name, member, ::switchTo),
             Collection(name, member, ::switchTo)
         )
         pages.forEach { it.siblings = pages }
