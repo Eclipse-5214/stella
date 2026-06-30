@@ -148,10 +148,12 @@ class Pets(
     }
 
     override fun mouseScrolled(mouseX: Float, mouseY: Float, amount: Float, horizontalAmount: Float): Boolean {
-        if (!isAreaHovered(10f, 25f, 200f, 185f, mouseX, mouseY)) return false
-        targetOffset = ren2d.calculateScroll(targetOffset, amount, totalHeight, 175)
-        scrollOffset = targetOffset
-        return true
+        if (isAreaHovered(10f, 25f, 200f, 185f, mouseX, mouseY)) {
+            targetOffset = ren2d.calculateScroll(targetOffset, amount, totalHeight, 175)
+            scrollOffset = targetOffset
+            return true
+        }
+        return super.mouseScrolled(mouseX, mouseY, amount, horizontalAmount)
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean =

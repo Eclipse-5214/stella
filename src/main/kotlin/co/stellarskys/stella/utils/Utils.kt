@@ -136,6 +136,17 @@ object Utils {
     inline fun <reified T : Any> animate(coeff: Double = 0.2, type: AnimType = AnimType.LINEAR, error: Double = 0.001) =
         Animation<T>(coeff, error, type, isColor = (T::class == Color::class))
 
+    fun formatCompact(value: Double): String = formatCompact(value.toLong())
+    fun formatCompact(value: Long): String {
+        val absVal = kotlin.math.abs(value)
+        return when {
+            absVal >= 1_000_000_000 -> String.format(java.util.Locale.ROOT, "%.1fB", value / 1_000_000_000.0)
+            absVal >= 1_000_000 -> String.format(java.util.Locale.ROOT, "%.1fM", value / 1_000_000.0)
+            absVal >= 1_000 -> String.format(java.util.Locale.ROOT, "%.0fk", value / 1_000.0)
+            else -> value.toString()
+        }
+    }
+
     class Apogee(private val threshold: Int, private val onTrigger: () -> Unit) : ReadWriteProperty<Any?, Int> {
         private var internalValue = 0
 
