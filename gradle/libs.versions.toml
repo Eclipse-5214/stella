@@ -10,7 +10,7 @@ fabric-language-kotlin = "1.13.12+kotlin.2.4.0"
 fabric-api-26-1 = "0.152.1+26.1.2"
 fabric-api-26-2 = "0.152.1+26.2"
 
-skyblock-api = "4.2.3"
+skyblock-api = "4.2.8"
 
 hypixel-modapi = "1.0.2"
 hypixel-modapi-fabric = "1.0.2+build.1+mc26.1"
