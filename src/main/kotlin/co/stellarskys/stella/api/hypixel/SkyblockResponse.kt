@@ -315,18 +315,16 @@ data class SkyblockResponse(
         val armor: Map<String, JsonElement> = emptyMap(),
         val equipment: Map<String, JsonElement> = emptyMap()
     ) {
-        val armorSets: Map<String, LoadoutArmor> get() {
-            val gson = com.google.gson.Gson()
-            return armor
-                .filter { (_, v) -> v.isJsonObject }
-                .mapValues { (_, v) -> gson.fromJson(v, LoadoutArmor::class.java) }
-        }
+        val armorSets: Map<String, LoadoutArmor> get() = armor
+            .filter { (_, v) -> v.isJsonObject }
+            .mapValues { (_, v) -> GSON.fromJson(v, LoadoutArmor::class.java) }
 
-        val equipmentSets: Map<String, LoadoutEquipment> get() {
-            val gson = com.google.gson.Gson()
-            return equipment
-                .filter { (_, v) -> v.isJsonObject }
-                .mapValues { (_, v) -> gson.fromJson(v, LoadoutEquipment::class.java) }
+        val equipmentSets: Map<String, LoadoutEquipment> get() = equipment
+            .filter { (_, v) -> v.isJsonObject }
+            .mapValues { (_, v) -> GSON.fromJson(v, LoadoutEquipment::class.java) }
+
+        companion object {
+            private val GSON = com.google.gson.Gson()
         }
     }
 

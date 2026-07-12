@@ -23,7 +23,7 @@ import kotlin.math.max
 
 @Module
 object Bars : Feature("bars", true) {
-    private val HEALTH_REGEX = """(§.)(?<current>[\d,]+)/(?<max>[\d,]+)[❤\uE010](?:\+§.[\d,]+.)?""".toRegex()
+    private val HEALTH_REGEX = """(§.)(?<current>[\d,]+)/(?<max>[\d,]+)[❤\uE010](?:\+§.[\d,]+[❤\uE010]?)?""".toRegex()
     private val MANA_REGEX = """§b(?<current>[\d,]+)/(?<max>[\d,]+)[✎\uE003]( Mana)?""".toRegex()
     private val OVERFLOW_REGEX  = """§3(?<overflowMana>[\d,]+)[ʬ\uE017]""".toRegex()
     private val DEFENSE_REGEX = """§.(?<defense>[\d,]+)§.[❈\uE008] Defense""".toRegex()
