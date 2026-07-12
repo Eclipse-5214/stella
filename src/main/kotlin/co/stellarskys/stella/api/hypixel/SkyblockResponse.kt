@@ -11,6 +11,7 @@ import java.util.UUID
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.jvm.optionals.getOrNull
+import com.google.gson.JsonElement
 
 data class SkyblockResponse(
     val success: Boolean = false,
@@ -204,7 +205,7 @@ data class SkyblockResponse(
         val invAndHotbar get() = invContents.items().take(9) to invContents.items().drop(9)
 
         val fullWardrobe: List<ItemStack> get() {
-            val armorMap = loadout.armor
+            val armorMap = loadout.armorSets
             if (armorMap.isEmpty()) return emptyList()
             val maxSlot = armorMap.keys.mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 0
             val totalPages = (maxSlot + 8) / 9
@@ -243,7 +244,7 @@ data class SkyblockResponse(
         }
 
         val loadoutItemStacks: List<ItemData?> get() {
-            val armorMap = loadout.armor
+            val armorMap = loadout.armorSets
             if (armorMap.isEmpty()) return emptyList()
             val maxSlot = armorMap.keys.mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 0
             val totalPages = (maxSlot + 8) / 9
@@ -270,6 +271,35 @@ data class SkyblockResponse(
             }
             return itemDatas
         }
+
+        val fullEquipmentWardrobe: List<ItemStack> get() {
+            val equipMap = loadout.equipmentSets
+            if (equipMap.isEmpty()) return emptyList()
+            val maxSlot = equipMap.keys.mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 0
+            val totalPages = (maxSlot + 8) / 9
+            val items = mutableListOf<ItemStack>()
+
+            for (page in 0 until totalPages) {
+                val startSlot = page * 9 + 1
+                val endSlot = startSlot + 8
+
+                for (piece in listOf("necklace", "cloak", "belt", "gloves")) {
+                    for (slotId in startSlot..endSlot) {
+                        val slotData = equipMap[slotId.toString()]
+                        val contents = when (piece) {
+                            "necklace" -> slotData?.necklace
+                            "cloak" -> slotData?.cloak
+                            "belt" -> slotData?.belt
+                            "gloves" -> slotData?.gloves
+                            else -> null
+                        }
+                        items.add(contents?.items()?.firstOrNull() ?: ItemStack.EMPTY)
+                    }
+                }
+            }
+
+            return items
+        }
     }
 
     data class BagContents(
@@ -282,8 +312,21 @@ data class SkyblockResponse(
     }
 
     data class Loadout(
-        val armor: Map<String, LoadoutArmor> = emptyMap()
-    )
+        val armor: Map<String, JsonElement> = emptyMap(),
+        val equipment: Map<String, JsonElement> = emptyMap()
+    ) {
+        val armorSets: Map<String, LoadoutArmor> get() = armor
+            .filter { (_, v) -> v.isJsonObject }
+            .mapValues { (_, v) -> GSON.fromJson(v, LoadoutArmor::class.java) }
+
+        val equipmentSets: Map<String, LoadoutEquipment> get() = equipment
+            .filter { (_, v) -> v.isJsonObject }
+            .mapValues { (_, v) -> GSON.fromJson(v, LoadoutEquipment::class.java) }
+
+        companion object {
+            private val GSON = com.google.gson.Gson()
+        }
+    }
 
     data class LoadoutArmor(
         val id: Int = 0,
@@ -291,6 +334,14 @@ data class SkyblockResponse(
         @SerializedName("CHESTPLATE") val chestplate: InventoryContents = InventoryContents(),
         @SerializedName("LEGGINGS") val leggings: InventoryContents = InventoryContents(),
         @SerializedName("BOOTS") val boots: InventoryContents = InventoryContents(),
+    )
+
+    data class LoadoutEquipment(
+        val id: Int = 0,
+        @SerializedName("EQUIPMENT_SLOT_1") val necklace: InventoryContents = InventoryContents(),
+        @SerializedName("EQUIPMENT_SLOT_2") val cloak: InventoryContents = InventoryContents(),
+        @SerializedName("EQUIPMENT_SLOT_3") val belt: InventoryContents = InventoryContents(),
+        @SerializedName("EQUIPMENT_SLOT_4") val gloves: InventoryContents = InventoryContents(),
     )
 
     @OptIn(ExperimentalEncodingApi::class)

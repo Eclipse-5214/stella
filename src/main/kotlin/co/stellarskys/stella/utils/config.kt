@@ -1308,6 +1308,21 @@ val config = Config(Stella.NAMESPACE) {
                 default = Color(128, 0, 255, 255)
                 shouldShow { it["bars.overflowManaBar"] as Boolean && it["bars.manaBar"] as Boolean }
             }
+
+            toggle {
+                configName = "bars.defNum"
+                name = "Defense Number HUD"
+                description = "Shows the numeric defense value"
+                default = false
+            }
+
+            colorpicker {
+                configName = "bars.defenseColor"
+                name = "Defense HUD Color"
+                description = "Color of the defense value display"
+                default = Color(0, 255, 128, 255)
+                shouldShow { it["bars.defNum"] as Boolean }
+            }
         }
 
         subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")

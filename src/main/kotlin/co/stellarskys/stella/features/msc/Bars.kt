@@ -23,9 +23,10 @@ import kotlin.math.max
 
 @Module
 object Bars : Feature("bars", true) {
-    private val HEALTH_REGEX = """(§.)(?<current>[\d,]+)/(?<max>[\d,]+)❤""".toRegex()
-    private val MANA_REGEX = """§b(?<current>[\d,]+)/(?<max>[\d,]+)✎( Mana)?""".toRegex()
-    private val OVERFLOW_REGEX  = """§3(?<overflowMana>[\d,]+)ʬ""".toRegex()
+    private val HEALTH_REGEX = """(§.)(?<current>[\d,]+)/(?<max>[\d,]+)[❤\uE010](?:\+§.[\d,]+[❤\uE010]?)?""".toRegex()
+    private val MANA_REGEX = """§b(?<current>[\d,]+)/(?<max>[\d,]+)[✎\uE003]( Mana)?""".toRegex()
+    private val OVERFLOW_REGEX  = """§3(?<overflowMana>[\d,]+)[ʬ\uE017]""".toRegex()
+    private val DEFENSE_REGEX = """§.(?<defense>[\d,]+)§.[❈\uE008] Defense""".toRegex()
 
     val healthBar by config.property<Boolean>("bars.healthBar")
     val absorptionBar by config.property<Boolean>("bars.absorptionBar")
@@ -36,6 +37,9 @@ object Bars : Feature("bars", true) {
     val overflowManaBar by config.property<Boolean>("bars.overflowManaBar")
     val ofMana by config.property<Boolean>("bars.ofMana")
     val mpNum by config.property<Boolean>("bars.mpNum")
+
+    val defNum by config.property<Boolean>("bars.defNum")
+    val defenseColor by config.property<Color>("bars.defenseColor")
 
     // Hide vanilla UI
     val hideVanillaHealth by config.property<Boolean>("bars.hideVanillaHealth")
@@ -67,6 +71,7 @@ object Bars : Feature("bars", true) {
     val MPHudName = "mpHud"
     val OFManaHudName = "ofManaHud"
     val MPNumHudName = "mpNumHud"
+    val DefNumHudName = "defNumHud"
 
     val hpBarWidth get() = ratioWidth(StatsAPI.health, StatsAPI.maxHealth)
     val absBarWidth get() = ratioWidth(max(StatsAPI.health.toDouble() - StatsAPI.maxHealth.toDouble(), 0.0), StatsAPI.maxHealth)
@@ -86,6 +91,7 @@ object Bars : Feature("bars", true) {
         HUDManager.registerCustom(MPHudName, 90, 15, this::mpHudPreview, "bars.manaBar")
         HUDManager.registerCustom(MPNumHudName, 70,19, this::mpNumPreview,"bars.mpNum")
         HUDManager.registerCustom(OFManaHudName, 30,19, this::ofManaPreview,"bars.ofMana")
+        HUDManager.registerCustom(DefNumHudName, 50, 19, this::defNumPreview, "bars.defNum")
 
         on<GuiEvent.RenderHUD> {
             if (healthBar) hpHud(it.context)
@@ -95,6 +101,7 @@ object Bars : Feature("bars", true) {
             if (manaBar) mpHud(it.context)
             if (mpNum) mpNumHud(it.context)
             if (ofMana) ofManaHud(it.context)
+            if (defNum) defNumHud(it.context)
 
             if(healthBar || manaBar) Lumina.flush(it.context)
         }
@@ -139,6 +146,13 @@ object Bars : Feature("bars", true) {
         val string = "400"
         val x = 15 - (string.width() / 2)
         Render2D.drawString(context, string + "ʬ", x,5, color = ofmColor)
+    }
+
+    fun defNumPreview(context: GuiGraphicsExtractor) {
+        val string = "500❈"
+        val x = 25 - (string.width() / 2)
+        Render2D.drawString(context, "500", x, 5, color = defenseColor)
+        Render2D.drawString(context, "§a❈", x + "500".width(), 5)
     }
 
     fun hpHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(HPHudName, context) {
@@ -213,6 +227,15 @@ object Bars : Feature("bars", true) {
         Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = manaColor)
     }
 
+    fun defNumHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(DefNumHudName, context) {
+        val matrix = context.pose()
+        val def = StatsAPI.defense
+        val text = "$def❈"
+        matrix.translate(25f - text.width() / 2f, 5f)
+        Render2D.drawString(context, def.toString(), 0, 0, color = defenseColor)
+        Render2D.drawString(context, "§a❈", def.toString().width(), 0)
+    }
+
     private fun updateHealthDelta() {
         health = StatsAPI.health.toFloat()
 
@@ -240,7 +263,7 @@ object Bars : Feature("bars", true) {
     }
 
     fun cleanAB(text: Component): Component {
-        if (!isEnabled() || (!hpNum && !mpNum && !ofMana)) return text
+        if (!isEnabled() || (!hpNum && !mpNum && !ofMana && !defNum)) return text
 
         val msg = text.string
         val cleaned = msg.let {
@@ -248,6 +271,7 @@ object Bars : Feature("bars", true) {
             if (hpNum) t = HEALTH_REGEX.replace(t, "")
             if (mpNum) t = MANA_REGEX.replace(t, "")
             if (ofMana) t = OVERFLOW_REGEX.replace(t, "")
+            if (defNum) t = DEFENSE_REGEX.replace(t, "")
             t
         }.trim().replace("\\s+".toRegex(), " ")
 

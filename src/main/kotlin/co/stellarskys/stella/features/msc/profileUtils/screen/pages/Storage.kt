@@ -213,8 +213,80 @@ class Storage(
         override val cachedPages by lazy { member.inventory.bags.accessoryBagPages }
     }
 
-    inner class Wardrobe : PagedSubPage("Wardrobe") {
+    inner class Wardrobe : SubPage("Wardrobe") {
         override val icon: ItemStack = Items.LEATHER_CHESTPLATE.defaultInstance
-        override val cachedPages by lazy { member.inventory.fullWardrobe.chunked(36) }
+
+        private var showEquipment = false
+        private var armorPageIdx = 0
+        private var equipPageIdx = 0
+
+        private val armorPages by lazy { member.inventory.fullWardrobe.chunked(36) }
+        private val equipPages by lazy { member.inventory.fullEquipmentWardrobe.chunked(36) }
+
+        override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {
+            val halfW = PAGE_BAR_WIDTH / 2
+            val tabs = listOf(false to "Wardrobe", true to "Equipment")
+            tabs.forEachIndexed { i, (isEquip, label) ->
+                val bx = startX + i * halfW
+                val isSelected = showEquipment == isEquip
+                if (isSelected) ren2d.drawRect(context, bx, 32, halfW, 16, Palette.Surface1.withAlpha(150))
+                ren2d.drawHollowRect(context, bx, 32, halfW, 16, 1, Palette.Purple)
+                if (isAreaHovered(bx.toFloat(), 32f, halfW.toFloat(), 16f, mouseX, mouseY) && !isSelected) {
+                    ren2d.drawRect(context, bx + 1, 33, halfW - 2, 14, Palette.Surface1.withAlpha(50))
+                }
+                ren2d.drawString(context, (if (isSelected) "§d" else "§7") + label, bx + halfW / 2 - (label.width() / 2), 36, 1f)
+            }
+
+            val pages = if (showEquipment) equipPages else armorPages
+            val pageIdx = if (showEquipment) equipPageIdx else armorPageIdx
+
+            val totalPages = pages.size
+            if (totalPages > 1) {
+                val bw = PAGE_BAR_WIDTH / totalPages
+                for (i in 0 until totalPages) {
+                    val bx = startX + (i * bw)
+                    val isSelected = pageIdx == i
+
+                    if (isSelected) ren2d.drawRect(context, bx, 52, bw, 16, Palette.Surface1.withAlpha(150))
+                    ren2d.drawHollowRect(context, bx, 52, bw, 16, 1, Palette.Purple)
+
+                    if (isAreaHovered(bx.toFloat(), 52f, bw.toFloat(), 16f, mouseX, mouseY) && !isSelected) {
+                        ren2d.drawRect(context, bx + 1, 53, bw - 2, 14, Palette.Surface1.withAlpha(50))
+                    }
+                    val txt = (i + 1).toString()
+                    ren2d.drawString(context, (if (isSelected) "§d" else "§7") + txt, bx + (bw / 2) - (txt.width() / 2), 56, 1f)
+                }
+            }
+
+            val currentItems = pages.getOrNull(pageIdx) ?: emptyList()
+            val gridStartY = if (totalPages > 1) 72 else 50
+            val startY = gridStartY + (VIEW_HEIGHT_LIMIT - gridStartY + 50 - (((currentItems.size + 8) / GRID_ROW_COLS) * STEP_SIZE)).coerceAtLeast(0) / 2
+            renderItemGrid(context, startX, startY, currentItems, mouseX, mouseY)
+        }
+
+        override fun mouseClicked(mx: Float, my: Float, button: Int): Boolean {
+            val halfW = PAGE_BAR_WIDTH / 2
+            if (isAreaHovered(startX.toFloat(), 32f, halfW.toFloat(), 16f, mx, my)) {
+                showEquipment = false
+                return true
+            }
+            if (isAreaHovered(startX + halfW.toFloat(), 32f, halfW.toFloat(), 16f, mx, my)) {
+                showEquipment = true
+                return true
+            }
+
+            val pages = if (showEquipment) equipPages else armorPages
+            val total = pages.size
+            if (total > 1) {
+                val bw = PAGE_BAR_WIDTH / total
+                for (i in 0 until total) {
+                    if (isAreaHovered(startX + (i * bw).toFloat(), 52f, bw.toFloat(), 16f, mx, my)) {
+                        if (showEquipment) equipPageIdx = i else armorPageIdx = i
+                        return true
+                    }
+                }
+            }
+            return false
+        }
     }
 }
