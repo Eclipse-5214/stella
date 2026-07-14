@@ -70,6 +70,7 @@ enum class RoomType(
             18 -> BLOOD
             66 -> PUZZLE
             62 -> TRAP
+            82 -> FAIRY
             else -> UNKNOWN
         }
 

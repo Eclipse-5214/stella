@@ -293,11 +293,7 @@ object RouteRecorder {
     }
 
     fun addCustom() {
-        if (!recording) {
-            Signal.fakeMessage("${Stella.PREFIX} §cError: not recording")
-            return
-        }
-
+        if (!recording) return
         val hitresult = client.hitResult as? BlockHitResult ?: return
 
         Chronos.Tick post {
