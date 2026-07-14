@@ -10,6 +10,8 @@ abstract class ChatEvent(val message: Component): Event(cancelable = true) {
 
     open infix fun matches(regex: Regex) = Match(regex.find(stripped))
     open infix fun matchesRaw(regex: Regex) = Match(regex.find(string))
+    open infix fun matchesEntire(regex: Regex) = Match(regex.matchEntire(stripped))
+    open infix fun matchesEntireRaw(regex: Regex) = Match(regex.matchEntire(string))
 
     class Receive(message: Component): ChatEvent(message)
     class ActionBar(message: Component): ChatEvent(message)
@@ -23,6 +25,8 @@ abstract class ChatEvent(val message: Component): Event(cancelable = true) {
 
         override infix fun matches(regex: Regex) = MMatch(this, regex.find(stripped))
         override infix fun matchesRaw(regex: Regex) = MMatch(this, regex.find(string))
+        override infix fun matchesEntire(regex: Regex) = MMatch(this, regex.matchEntire(stripped))
+        override infix fun matchesEntireRaw(regex: Regex) = MMatch(this, regex.matchEntire(string))
 
         class MMatch(val event: Modify, match: MatchResult?): Match(match) {
             infix fun modifyC(new: (MatchResult) -> Component) { match?.let { event.modify(new(it)) } }
