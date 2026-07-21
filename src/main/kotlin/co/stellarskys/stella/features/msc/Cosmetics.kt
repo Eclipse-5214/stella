@@ -64,11 +64,11 @@ object Cosmetics : Feature("cosmetics") {
         }
     }
 
-    data class ExtraPart(val text: String, val color: String)
+    data class ExtraPart(val text: String, val color: String? = null)
     data class NameData(val text: String, val extra: List<ExtraPart>? = null) {
         private var comp: MutableComponent? = null
         private fun toComponent(): MutableComponent = Component.literal(text).also { base ->
-            extra?.forEach { part -> base.append(Component.literal(part.text).withColor(Color.decode(part.color).rgb)) }
+            extra?.forEach { part -> base.append(Component.literal(part.text).apply { part.color?.let { color -> withColor(Color.decode(color).rgb) }}) }
             comp = base
         }
         fun getComponent(): MutableComponent = comp ?: toComponent()
