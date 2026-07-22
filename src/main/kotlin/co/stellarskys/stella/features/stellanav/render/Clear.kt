@@ -203,7 +203,7 @@ object Clear {
         if (Dungeon.inBoss) return
         val me = player ?: return
 
-        DungeonPlayerManager.players.forEach { p ->
+        DungeonPlayerManager.players.sortedBy { it?.name == me.name.string }.forEach { p ->
             if (p == null || (!p.alive && p.name != me.name.string)) return@forEach
 
             val pos = if (Map.smoothMovement) p.pos.getLerped() else p.pos.raw
