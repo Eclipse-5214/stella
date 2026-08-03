@@ -664,6 +664,14 @@ val config = Config(Stella.NAMESPACE) {
                 name = "Room Guessing"
                 description = "Attempts to guess the type of known 1x1s based on what rooms have already been discovered"
             }
+
+            toggle {
+                configName = "hideQuestion"
+                name = "Hide Question Mark"
+                description = "Hides the question mark on a room guess"
+                default = true
+                shouldShow { settings -> settings["roomPrediction"] as Boolean }
+            }
         }
 
         subcategory("Player Icons") {
@@ -1234,6 +1242,12 @@ val config = Config(Stella.NAMESPACE) {
         }
 
         subcategory("Pet Display", "petDisplay", "Enables the pet display") {
+            toggle {
+                configName = "hidePet"
+                name = "Hide pet icon"
+                description = "Hides the pet icon"
+            }
+
             toggle {
                 configName = "autopetMessages"
                 name = "Announce AutoPet"

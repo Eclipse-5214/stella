@@ -31,9 +31,8 @@ import java.awt.Color
  */
 @Module
 object Dungeon {
-    // Textures
-    private const val RED_SKULL_TEXTURE = "eyJ0aW1lc3RhbXAiOjE1NzA5MTUxODU0ODUsInByb2ZpbGVJZCI6IjVkZTZlMTg0YWY4ZDQ5OGFiYmRlMDU1ZTUwNjUzMzE2IiwicHJvZmlsZU5hbWUiOiJBc3Nhc2luSmlhbmVyMjUiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2EyMjNlMzZhYzEzZjBmNzFhYmNmYmYwYzk2ZmRjMjAxMGNjM2UxMWZmMmIwZDgxMTJkMGU2M2Y0YjRhYWEwZGUifX19"
-    private const val WITHER_ESSENCE_TEXTURE = "ewogICJ0aW1lc3RhbXAiIDogMTYwMzYxMDQ0MzU4MywKICAicHJvZmlsZUlkIiA6ICIzM2ViZDMyYmIzMzk0YWQ5YWM2NzBjOTZjNTQ5YmE3ZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJEYW5ub0JhbmFubm9YRCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9lNDllYzdkODJiMTQxNWFjYWUyMDU5Zjc4Y2QxZDE3NTRiOWRlOWIxOGNhNTlmNjA5MDI0YzRhZjg0M2Q0ZDI0IgogICAgfQogIH0KfQ==ewogICJ0aW1lc3RhbXAiIDogMTYwMzYxMDQ0MzU4MywKICAicHJvZmlsZUlkIiA6ICIzM2ViZDMyYmIzMzk0YWQ5YWM2NzBjOTZjNTQ5YmE3ZSIsCiAgInByb2ZpbGVOYW1lIiA6ICJEYW5ub0JhbmFubm9YRCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9lNDllYzdkODJiMTQxNWFjYWUyMDU5Zjc4Y2QxZDE3NTRiOWRlOWIxOGNhNTlmNjA5MDI0YzRhZjg0M2Q0ZDI0IgogICAgfQogIH0KfQ=="
+    private const val RED_SKULL_ID = "fed95410-aba1-39df-9b95-1d4f361eb66e"
+    private const val WITHER_ESSENCE_ID = "2865274b-3097-394e-8149-ec629c72d850"
 
     // Regex patterns for chat parsing
     private val WATCHER_PATTERN = Regex("""\[BOSS] The Watcher: That will be enough for now\.""")
@@ -155,10 +154,10 @@ object Dungeon {
                 else -> {
                     val entity = world.getBlockEntity(pos) ?: return@on
                     if (entity is SkullBlockEntity) {
-                        val texture = entity.ownerProfile?.properties?.get("textures")?.firstOrNull()?.value
-                        when (texture) {
-                            WITHER_ESSENCE_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Essence(entity, pos))
-                            RED_SKULL_TEXTURE -> EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.RED_SKULL, pos))
+                        val id = entity.ownerProfile?.partialProfile()?.id?.toString() ?: return@on
+                        when (id) {
+                            WITHER_ESSENCE_ID -> EventBus.post(DungeonEvent.Secrets.Essence(entity, pos))
+                            RED_SKULL_ID -> EventBus.post(DungeonEvent.Secrets.Misc(DungeonEvent.Secrets.Type.RED_SKULL, pos))
                         }
                     }
                 }

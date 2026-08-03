@@ -61,6 +61,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     val prioMiddle by config.property<Boolean>("prioMiddle")
     val replaceText by config.property<Boolean>("replaceText")
     val roomPrediction by config.property<Boolean>("roomPrediction")
+    val hideQuestion by config.property<Boolean>("hideQuestion")
 
     // map colors
     val NormalColor by config.property<Color>("normalRoomColor")

@@ -7,6 +7,7 @@ import co.stellarskys.stella.events.core.TablistEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.hud.HUDManager
 import co.stellarskys.stella.api.handlers.Capsule
+import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render2D
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import tech.thatgravyboat.skyblockapi.api.data.SkyBlockRarity
@@ -16,6 +17,8 @@ import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 @Module
 object PetDisplay: Feature("petDisplay", true) {
     const val NAME = "petDisplay"
+
+    val hideIcon by config.property<Boolean>("hidePet")
 
     val petSummon = Regex("""You (summoned|despawned) your ([A-Za-z ]+)(?: ✦)?!""")
     val autoPet = Regex("""Autopet equipped your \[Lvl (\d+)] ([A-Za-z ]+)(?: ✦)?! VIEW RULE""")
@@ -141,12 +144,14 @@ object PetDisplay: Feature("petDisplay", true) {
         Render2D.drawString(context,"§b$activePet", 40, 7)
         Render2D.drawString(context,"§7[Lvl $activePetLvl]", 40, 17)
 
-        val stack = SkyBlockPetsRepo.getItemStackOrDefault {
-            id = activePet?.replace(" ", "_").orEmpty().uppercase()
-            rarity = SkyBlockRarity.LEGENDARY
-        }
+        if(!hideIcon) {
+            val stack = SkyBlockPetsRepo.getItemStackOrDefault {
+                id = activePet?.replace(" ", "_").orEmpty().uppercase()
+                rarity = SkyBlockRarity.LEGENDARY
+            }
 
-        Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
+            Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
+        }
 
         matrix.popMatrix()
     }

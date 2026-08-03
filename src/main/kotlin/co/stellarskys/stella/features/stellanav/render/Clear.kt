@@ -126,7 +126,7 @@ object Clear {
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.isVisible || room.type == RoomType.ENTRANCE) return@forEach
             val show = when {
-                room.shouldPredict -> !Map.roomPrediction
+                room.shouldPredict -> !Map.roomPrediction || !Map.hideQuestion
                 room.checkmark == Checkmark.UNEXPLORED -> !Map.hiddenRooms
                 Map.replaceText && room.checkmark == Checkmark.GREEN -> true
                 room.type.isNormal && room.secrets > 0 -> Map.roomCheck
