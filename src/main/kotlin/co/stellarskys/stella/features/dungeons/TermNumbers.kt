@@ -18,8 +18,8 @@ import java.awt.Color
 import kotlin.math.roundToInt
 
 @Module
-object TermNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMBS) {
-    private val presetKeys = listOf("f7", "super_low_m7", "low_m7", "mid_m7", "high_m7")
+object TermNumbers : Feature("termNumbers") {
+    private val presetKeys = listOf("f7", "high_f7", "aee2", "mee2")
     private val roleKeys = listOf("tank", "mage", "berserk", "archer", "healer", "all")
 
     val termLabelMap: Map<String, Pair<String, Color>> = mapOf(
@@ -31,6 +31,7 @@ object TermNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
         "stack" to ("§7( §6S§bt§ca§2c§dk §7)" to Color.white)
     )
 
+    val force by config.property<Boolean>("termForce")
     val selectedRole by config.property<Int>("selectedRole")
     val preset by config.property<Int>("preset")
 
@@ -55,7 +56,7 @@ object TermNumbers : Feature("termNumbers", island = SkyBlockIsland.THE_CATACOMB
 
     override fun initialize() {
         on<RenderEvent.World.Last> {
-            if (!Dungeon.inBoss || Dungeon.floorNumber != 7) return@on
+            if ((!Dungeon.inBoss || !Dungeon.inDungeon || Dungeon.floorNumber != 7) && !force) return@on
 
             val currentPresetKey = presetKeys.getOrElse(preset) { "f7" }
             val currentRoleKey = roleKeys.getOrElse(selectedRole) { "all" }

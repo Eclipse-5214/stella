@@ -141,6 +141,13 @@ val config = Config(Stella.NAMESPACE) {
                 default = false
             }
 
+            toggle {
+                configName = "termForce"
+                name = "Force Enable"
+                description = "Force enables the terminal display regardless of weather your in a dungeon or not (for p3 sim)."
+                shouldShow { it["termNumbers"] as Boolean }
+            }
+
             dropdown {
                 configName = "selectedRole"
                 name = "Your Role"
@@ -154,7 +161,7 @@ val config = Config(Stella.NAMESPACE) {
                 configName = "preset"
                 name = "Role Presets"
                 description = "Which roll presets you want to use (from M7 Guides)"
-                options = listOf("F7", "SL M7", "Low M7", "Mid M7", "High M7")
+                options = listOf("F7", "High F7", "AEE2", "MEE2")
                 default = 1 // All
                 shouldShow { it["termNumbers"] as Boolean }
             }
