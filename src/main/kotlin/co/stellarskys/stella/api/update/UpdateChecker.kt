@@ -15,6 +15,8 @@ import net.minecraft.SharedConstants
 import net.minecraft.network.chat.*
 import java.net.URI
 import java.time.Instant
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.toJavaDuration
 
 @Module
 object UpdateChecker {
@@ -54,8 +56,13 @@ object UpdateChecker {
                 val target = versions.firstOrNull { it.versionType == targetType } ?: return@fetch
                 runCatching {
                     if (isBeta) {
-                        if (Instant.parse(target.datePublished).isAfter(Instant.parse(BuildInfo.BUILD_TIMESTAMP))) {
-                            triggerNotification("https://modrinth.com/mod/$MODRINTH_PROJECT_ID/version/${target.versionId}"); cb(true)
+                        val remoteTime = Instant.parse(target.datePublished)
+                        val localTime = Instant.parse(BuildInfo.BUILD_TIMESTAMP)
+                        val graceWindow = 3.hours.toJavaDuration()
+
+                        if (remoteTime.minus(graceWindow).isAfter(localTime)) {
+                            triggerNotification("https://modrinth.com/mod/$MODRINTH_PROJECT_ID/version/${target.versionId}")
+                            cb(true)
                         } else cb(false)
                     } else if (Version.parse(target.versionNumber) > Version.parse(BuildInfo.VERSION)) {
                         triggerNotification("https://modrinth.com/mod/$MODRINTH_PROJECT_ID/version/${target.versionId}"); cb(true)
