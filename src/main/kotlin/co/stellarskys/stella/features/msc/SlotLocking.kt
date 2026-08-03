@@ -18,6 +18,10 @@ import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.ContainerInput
 import java.awt.Color
 
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.screen
+*///? }
+
 @Module
 object SlotLocking: Feature("slotLocking", true) {
     val lockColor by config.property<Color>("slotLocking.lockColor")

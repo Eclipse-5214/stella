@@ -19,6 +19,10 @@ import java.awt.Color
 import kotlin.collections.first
 import kotlin.collections.isNullOrEmpty
 
+//? if >= 26.2 {
+/*import co.stellarskys.stella.api.zenith.screen
+*///? }
+
 @Module
 object SlotBinding: Feature("slotLocking.bind", true) {
     val bindKb by config.property<Keybind.Handler>("slotLocking.bindKb")
