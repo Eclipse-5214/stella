@@ -1006,6 +1006,13 @@ val config = Config(Stella.NAMESPACE) {
                 default = false
             }
 
+            toggle {
+                configName = "secretRoutes.showLine"
+                name = "Show Line"
+                description = "Renders a line between secrets in the route."
+                default = true
+            }
+
             slider {
                 configName = "secretRoutes.textScale"
                 name = "Text Scale"
@@ -1013,6 +1020,40 @@ val config = Config(Stella.NAMESPACE) {
                 min = 0.1f
                 max = 2f
                 default = 1f
+            }
+
+            slider {
+                configName = "secretRoutes.textScale"
+                name = "Text Scale"
+                description = "Scale of the waypoint text"
+                min = 0.1f
+                max = 2f
+                default = 1f
+            }
+
+            slider {
+                configName = "secretRoutes.lineWidth"
+                name = "Line Width"
+                description = "Width of the line between secrets."
+                min = 1f
+                max = 5f
+                default = 3f
+            }
+
+            colorpicker {
+                configName = "secretRoutes.lineColor"
+                name = "Line Color"
+                description = "Color for the line between secrets."
+                default = Color(255, 0, 0, 255) // red
+            }
+
+            slider {
+                configName = "secretRoutes.boxWidth"
+                name = "Box width"
+                description = "Width of a waypoint box."
+                min = 1f
+                max = 5f
+                default = 3f
             }
 
             colorpicker {

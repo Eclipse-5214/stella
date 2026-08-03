@@ -15,6 +15,10 @@ object RoutePlayer {
     val text by config.property<Boolean>("secretRoutes.text")
     val textScale by config.property<Float>("secretRoutes.textScale")
     val startEsp by config.property<Boolean>("secretRoutes.startEsp")
+    val showLine by config.property<Boolean>("secretRoutes.showLine")
+    val lineWidth by config.property<Float>("secretRoutes.lineWidth")
+    val lineColor by config.property<Color>("secretRoutes.lineColor")
+    val boxWidth by config.property<Float>("secretRoutes.boxWidth")
 
     fun renderRoute(data: StepData, firstStep: Boolean) {
         val room = Dungeon.currentRoom ?: return
@@ -34,6 +38,7 @@ object RoutePlayer {
     }
 
     fun renderLine(data: StepData, room: Room, firstStep: Boolean) {
+        if (!showLine) return
         if (data.line.size <= 1) return
 
         if (firstStep) {
@@ -49,8 +54,8 @@ object RoutePlayer {
             Render3D.drawLine(
                 p1.center,
                 p2.center,
-                3f,
-                Color.RED,
+                lineWidth,
+                lineColor,
             )
         }
     }
@@ -71,7 +76,7 @@ object RoutePlayer {
 
     private fun renderWaypoint(waypoint: WaypointData, room: Room, name: Boolean = true){
         val realPos = room.getRealCoord(waypoint.pos)
-        Render3D.outlineBlock(realPos, waypoint.col, 3f, waypoint.dep)
+        Render3D.outlineBlock(realPos, waypoint.col, boxWidth, waypoint.dep)
         if (name && text) Render3D.drawText(waypoint.label, realPos.center, scale = textScale, depth = false)
     }
 }
