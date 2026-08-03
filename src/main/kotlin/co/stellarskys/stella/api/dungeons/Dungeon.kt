@@ -61,6 +61,7 @@ object Dungeon {
     val floorNumber: Int? get() = floor?.floorNumber
     val inBoss: Boolean get() = DungeonAPI.inBoss
     val inDungeon: Boolean get() = LocationAPI.island == SkyBlockIsland.THE_CATACOMBS
+    var hasStarted: Boolean = false
 
     // Shortcuts
     val players get() = DungeonPlayerManager.players.filterNotNull()
@@ -112,7 +113,10 @@ object Dungeon {
 
         EventBus.on<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val msg = event.stripped
-            if (msg == DUNGEON_START_PATTERN) floor?.let { EventBus.post(DungeonEvent.Start(it)) }
+            if (msg == DUNGEON_START_PATTERN) floor?.let {
+                hasStarted = true
+                EventBus.post(DungeonEvent.Start(it))
+            }
             if (WATCHER_PATTERN.containsMatchIn(msg)) bloodDone = true
             if (DUNGEON_COMPLETE_PATTERN.containsMatchIn(msg)) {
                 complete = true
@@ -186,6 +190,7 @@ object Dungeon {
         bloodClear = false
         bloodDone = false
         complete = false
+        hasStarted = false
         holdingLeaps = false
         WorldScanner.reset()
         DungeonPlayerManager.reset()

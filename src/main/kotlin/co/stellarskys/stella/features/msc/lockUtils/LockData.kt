@@ -35,9 +35,9 @@ data class LockData(
             if (key.isUuid) lockedUUIDs.remove(key.id) else lockedItemIds.remove(key.id)
         }
 
-        fun isItemProtected(item: ItemStack): Boolean {
+        fun isItemProtected(item: ItemStack, starCheck: Boolean = true): Boolean {
             if (item.isEmpty) return false
-            if (item.isStarred() && protectStarred) return true
+            if (item.isStarred() && protectStarred && starCheck) return true
             val key = item.getKey() ?: return false
             return if (key.isUuid) lockedUUIDs.contains(key.id) else lockedItemIds.contains(key.id)
         }

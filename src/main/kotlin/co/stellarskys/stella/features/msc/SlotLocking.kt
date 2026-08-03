@@ -3,6 +3,7 @@ package co.stellarskys.stella.features.msc
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.annotations.Module
 import co.stellarskys.stella.api.config.core.Keybind
+import co.stellarskys.stella.api.dungeons.Dungeon
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.events.core.GuiEvent
@@ -64,6 +65,7 @@ object SlotLocking: Feature("slotLocking", true) {
         }
 
         on<PlayerEvent.DropItem> { event ->
+            if (Dungeon.hasStarted) return@on
             val profile = LockRegistry.getActiveProfile()
             val playerInv = player?.inventory ?: return@on
             val itemInSlot = playerInv.getItem(event.slot)
@@ -100,7 +102,7 @@ object SlotLocking: Feature("slotLocking", true) {
 
             LockRegistry.state.update {
                 val active = getActive()
-                if (active.isItemProtected(item)) {
+                if (active.isItemProtected(item, false)) {
                     active.unprotectItem(item)
                     playLockSound(true)
                 } else {
