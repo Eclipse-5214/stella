@@ -13,11 +13,12 @@
       "MixinGui",
       "MixinEffectsInInventory",
       "MixinClientCommonPacketListenerImpl",
+      "MixinLocalPlayer",
       "MixinLivingEntity",
       "MixinContainer",
       "MixinKeyboardHandler",
       "accessors.AccessorMapState",
       "accessors.AccessorGpuDevice",
-      "accessors.AccessorCommandEncoder"
+      "accessors.AccessorContainer"
     ]
 }

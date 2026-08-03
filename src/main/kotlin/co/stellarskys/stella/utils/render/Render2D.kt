@@ -24,15 +24,28 @@ import tech.thatgravyboat.skyblockapi.platform.texture
 import tech.thatgravyboat.skyblockapi.platform.textureUrl
 import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
 import tech.thatgravyboat.skyblockapi.utils.text.TextUtils.splitLines
+import kotlin.math.*
 
 object Render2D {
     private val textureCache = mutableMapOf<UUID, PlayerSkin>()
     private var lastCacheClear = Chronos.zero
     private val formattingRegex = "(?<!\\\\\\\\)&(?=[0-9a-fk-or])".toRegex()
 
-    fun drawImage(ctx: GuiGraphicsExtractor, image: Identifier?, x: Int, y: Int, width: Int, height: Int) {
+    fun drawImage(ctx: GuiGraphicsExtractor, image: Identifier?, x: Int, y: Int, width: Int, height: Int, color: Color) {
+        drawImage(ctx, image, x, y, width, height, color.rgb)
+    }
+
+    fun drawImage(ctx: GuiGraphicsExtractor, image: Identifier?, x: Int, y: Int, width: Int, height: Int, color: Int = -1) {
         if (image == null) return
-        ctx.blit(RenderPipelines.GUI_TEXTURED, image, x, y, 0f, 0f, width, height, width, height, width, height)
+        ctx.blit(RenderPipelines.GUI_TEXTURED, image, x, y, 0f, 0f, width, height, width, height, width, height, color)
+    }
+
+    fun drawSprite(ctx: GuiGraphicsExtractor, sprite: Identifier, x: Int, y: Int, width: Int, height: Int, color: Color) {
+        drawSprite(ctx, sprite, x, y, width, height, color.rgb)
+    }
+
+    fun drawSprite(ctx: GuiGraphicsExtractor, sprite: Identifier, x: Int, y: Int, width: Int, height: Int, color: Int = -1) {
+        ctx.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, width, height, color)
     }
 
     @JvmOverloads
@@ -196,5 +209,28 @@ object Render2D {
         val barHeight = (viewportHeight.toFloat() / totalHeight) * viewportHeight
         val barY = (-scrollOffset / totalHeight) * viewportHeight
         drawRect(ctx, x, y + barY.toInt(), 1, barHeight.toInt(), color)
+    }
+
+    fun drawLine(
+        ctx: GuiGraphicsExtractor,
+        x1: Float, y1: Float,
+        x2: Float, y2: Float,
+        color: Color,
+        thickness: Float = 1f
+    ) {
+        val dx = x2 - x1
+        val dy = y2 - y1
+        val len = hypot(dx, dy)
+        if (len == 0f) return
+
+        val angle = atan2(dy, dx)
+        val halfWidth = thickness * 0.5f
+
+        ctx.pushPop {
+            val pose = ctx.pose()
+            pose.translate(x1, y1)
+            pose.rotate(angle)
+            ctx.fill(RenderPipelines.GUI, 0, (-halfWidth).toInt(), ceil(len).toInt(), ceil(halfWidth).toInt(), color.rgb)
+        }
     }
 }

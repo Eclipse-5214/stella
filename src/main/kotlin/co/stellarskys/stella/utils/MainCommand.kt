@@ -12,6 +12,7 @@ import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.features.dungeons.JoinInfo
 import co.stellarskys.stella.features.msc.ProfileViewer
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
+import co.stellarskys.stella.features.msc.lockUtils.LockRegistry
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
 
@@ -122,6 +123,33 @@ object MainCommand : Atlas("stella", "sta", "sa") {
             runs<Greedy?> ("name") { arg ->
                 val name = arg?.string ?: player?.name?.string ?: return@runs
                 ProfileViewer.view(name)
+            }
+        }
+
+        literal("slp") {
+            literal("set") {
+                val name by arg.string(suggestions = LockRegistry.getData().listProfiles())
+                runs {
+                    LockRegistry.switchProfile(name)
+                    Signal.modMessage("§bSet active profile to §6$name")
+                }
+            }
+
+            literal("delete") {
+                val name by arg.string(suggestions = LockRegistry.getData().listProfiles())
+                runs {
+                    LockRegistry.deleteProfile(name)
+                    Signal.modMessage("§cDeleted profile §6$name")
+                }
+            }
+
+            literal("list") {
+                runs {
+                    Signal.modMessage("§bSlot Locking Profiles:")
+                    LockRegistry.getData().listProfiles().forEach { profile ->
+                        Signal.fakeMessage("§7 - §6$profile")
+                    }
+                }
             }
         }
 

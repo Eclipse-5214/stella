@@ -8,4 +8,9 @@ sealed class PlayerEvent {
         val slot: Int,
         val item: ItemStack
     ) : Event()
+
+    class DropItem(
+        val slot: Int,
+        val all: Boolean
+    ) : Event(true)
 }

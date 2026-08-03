@@ -1351,6 +1351,71 @@ val config = Config(Stella.NAMESPACE) {
 
         subcategory("Clean Prefixes", "cleanPrefix", "Guild -> G / Party -> P")
 
+        subcategory("Slot Locking", "slotLocking", "Enables the ability to lock slots") {
+            keybind {
+                configName = "slotLocking.lockKb"
+                name = "Lock Keybind"
+                description = "Keybind to lock slots."
+            }
+
+            colorpicker {
+                configName = "slotLocking.lockColor"
+                name = "Lock Color"
+                description = "Color of the lock icon."
+                default = Color.decode("#f38ba8")
+            }
+
+            keybind {
+                configName = "slotLocking.protectKb"
+                name = "Protect Keybind"
+                description = "Keybind to protect item."
+            }
+
+            toggle {
+                configName = "slotLocking.starred"
+                name = "Protect Starred"
+                description = "Protects starred items."
+            }
+
+            toggle {
+                configName = "slotLocking.bind"
+                name = "Slot Binding"
+                description = "Enables the ability to bind slots."
+            }
+
+            keybind {
+                configName = "slotLocking.bindKb"
+                name = "Bind Keybind"
+                description = "Keybind to bind slots."
+                shouldShow { settings -> settings["slotLocking.bind"] as Boolean }
+            }
+
+
+            colorpicker {
+                configName = "slotLocking.bindColor"
+                name = "Bind Color"
+                description = "Color of the slot bind."
+                default = Color.decode("#865dd4")
+                shouldShow { settings -> settings["slotLocking.bind"] as Boolean }
+            }
+
+            toggle {
+                configName = "slotLocking.perSlotColor"
+                name = "Per Slot Color"
+                description = "Changes color by slot"
+                shouldShow { settings -> settings["slotLocking.bind"] as Boolean }
+            }
+
+            dropdown {
+                configName = "slotLocking.bindLines"
+                name = "Show Lines"
+                description = "When to show the bind lines."
+                options = listOf("Always", "On Shift", "Never")
+                default = 1 // On Shift
+                shouldShow { settings -> settings["slotLocking.bind"] as Boolean }
+            }
+        }
+
         /*
         subcategory("Custom Nametags") {
             toggle {

@@ -36,7 +36,7 @@ object InventoryButtons : Feature("buttons",true) {
     private val dungeonMenuPrefixes = listOf("What starts with", "Select all the")
 
     override fun initialize() {
-        on<GuiEvent.Container.Content> { event ->
+        on<GuiEvent.Container.AfterContent> { event ->
             val screen = client.screen ?: return@on
             if (!validScreen(screen)) return@on
             val sw = screen.width.toFloat()

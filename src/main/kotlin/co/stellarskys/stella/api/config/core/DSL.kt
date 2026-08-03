@@ -300,7 +300,6 @@ class Keybind : ConfigElement() {
 
             init {
                 EventBus.on<KeyEvent.Press> {
-                    if (client.screen != null) return@on
                     if (it.keyCode == keyCode && !isDown) {
                         isDown = true
                         pressListeners.forEach { fn -> fn() }
@@ -308,7 +307,6 @@ class Keybind : ConfigElement() {
                 }
 
                 EventBus.on<KeyEvent.Release> {
-                    if (client.screen != null) return@on
                     if (it.keyCode == keyCode && isDown) {
                         isDown = false
                         releaseListeners.forEach { fn -> fn() }
