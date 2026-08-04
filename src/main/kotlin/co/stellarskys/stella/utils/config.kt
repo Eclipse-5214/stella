@@ -672,6 +672,12 @@ val config = Config(Stella.NAMESPACE) {
                 default = true
                 shouldShow { settings -> settings["roomPrediction"] as Boolean }
             }
+
+            toggle {
+                configName = "showPrince"
+                name = "Show Prince"
+                description = "Shows a crown on rooms with a prince in them."
+            }
         }
 
         subcategory("Player Icons") {

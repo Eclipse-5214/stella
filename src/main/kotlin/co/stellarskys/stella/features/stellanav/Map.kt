@@ -26,6 +26,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     val SELF_MARKER by lazy { getOrLoad("markerself") }
     val OTHER_MARKER by lazy { getOrLoad( "markerother") }
     val DEFAULT_MAP by lazy { getOrLoad( "defaultmap") }
+    val PRINCE_CROWN by lazy { getOrLoad("clear/crown") }
 
     // main map configs
     val bossMapEnabled by config.property<Boolean>("bossMapEnabled")
@@ -44,6 +45,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     val checkmarkScale by config.property<Float>("checkmarkScale")
     val textShadow by config.property<Boolean>("mtextshadow")
     val predBdWidth by config.property<Int>("predictionBdWidth")
+    val showPrince by config.property<Boolean>("showPrince")
 
     // behavior
     val roomCheck by config.property<Boolean>("roomCheck")

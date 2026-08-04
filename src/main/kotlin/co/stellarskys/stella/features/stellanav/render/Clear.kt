@@ -125,6 +125,14 @@ object Clear {
 
         Dungeon.uniqueRooms.forEach { room ->
             if (!room.isVisible || room.type == RoomType.ENTRANCE) return@forEach
+
+            if (room.roomData?.prince == true && Map.showPrince && (Map.hiddenRooms || room.explored)) {
+                val (x, y) = room.getAnchorPos(Anchor.LAST)
+                val dx = x.toFloat() * SPACING + ROOM - 8f
+                val dy = y.toFloat() * SPACING + ROOM - 5f
+                Map.PRINCE_CROWN?.let { drawIcon(context, dx, dy, 0.6f, it, 9, 6, 0f) }
+            }
+
             val show = when {
                 room.shouldPredict -> !Map.roomPrediction || !Map.hideQuestion
                 room.checkmark == Checkmark.UNEXPLORED -> !Map.hiddenRooms

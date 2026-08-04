@@ -9,5 +9,6 @@ data class RoomMetadata(
     val secrets: Int = 0,
     val crypts: Int = 0,
     val trappedChests: Int = 0,
-    val reviveStones: Int = 0
+    val reviveStones: Int = 0,
+    val prince: Boolean = false
 )
