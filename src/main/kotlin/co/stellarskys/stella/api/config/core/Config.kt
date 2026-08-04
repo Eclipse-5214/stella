@@ -30,8 +30,8 @@ class Config(
     builder: Config.() -> Unit
 ) {
     @PublishedApi internal val valueCache = mutableMapOf<String, Any?>()
-    private val elementMap = mutableMapOf<String, ConfigElement>()
-    private val categories = mutableMapOf<String, ConfigCategory>()
+    val elementMap = mutableMapOf<String, ConfigElement>()
+    val categories = mutableMapOf<String, ConfigCategory>()
     private val listeners = CopyOnWriteArrayList<(String, Any?) -> Unit>()
     private var configUI: ConfigUI? = null
     private var loaded = false
