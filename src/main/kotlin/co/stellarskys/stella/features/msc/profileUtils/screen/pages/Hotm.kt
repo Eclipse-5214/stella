@@ -1,6 +1,7 @@
 package co.stellarskys.stella.features.msc.profileUtils.screen.pages
 
 import co.stellarskys.stella.api.config.ui.Palette
+import co.stellarskys.stella.api.handlers.Signal.onHover
 import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
 import co.stellarskys.stella.api.zenith.client
@@ -33,6 +34,8 @@ class Hotm(
     private var hoveredItem: ItemStack? = null
     private val perkGrid = Array<ItemStack>(90) { ItemStack.EMPTY }
     private var activePresetIndex = member.skillTree.getSelectedMiningPresetIndex()
+
+    private fun Number.fmt(): String = "%,d".format(this.toLong())
 
     init {
         leftScrollOffset = 0f
@@ -91,27 +94,16 @@ class Hotm(
     }
 
     private fun drawLeftPanel(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {
-        val inScissor = isAreaHovered(10f, 25f, 135f, 185f, mouseX, mouseY)
         var cy = 6
 
-        fun drawStatLine(label: String, value: String, isMaxed: Boolean = false, tooltip: (() -> List<Component>)? = null) {
+        fun drawStatLine(label: String, value: String, isMaxed: Boolean = false, tooltip: String? = null) {
             val valColor = if (isMaxed) "§6" else "§e"
-            ren2d.drawString(context, "§7$label: $valColor$value", 5, cy)
-
-            if (inScissor && tooltip != null) {
-                val absoluteY = 25 + cy + leftScrollOffset
-                if (isAreaHovered(5f, absoluteY, 110f, 9f, mouseX, mouseY)) {
-                    context.setTooltipForNextFrame(
-                        client.font,
-                        tooltip().map { it.visualOrderText },
-                        mouseX.toInt(),
-                        mouseY.toInt()
-                    )
-                }
+            val comp = Component.literal("§7$label: $valColor$value").apply {
+                if (tooltip != null) onHover(tooltip)
             }
+            drawComp(context, comp, 5, cy, leftScrollOffset, 11f, 26f, 133f, 183f)
             cy += 11
         }
-
 
         ren2d.drawString(context, "§d§nHeart of the Mountain", 5, cy)
         cy += 13
@@ -138,20 +130,9 @@ class Hotm(
             val textWidth = client.font.width(numStr)
             val textX = bx + (btnW - textWidth) / 2
             val textY = presetBtnY + (btnH - 8) / 2
-            ren2d.drawString(context, numStr, textX, textY)
-
-            if (inScissor) {
-                val absoluteY = 25 + presetBtnY + leftScrollOffset
-                if (isAreaHovered(bx.toFloat() + 10f, absoluteY, btnW.toFloat(), btnH.toFloat(), mouseX, mouseY)) {
-                    val pName = member.skillTree.getMiningPresetName(pIdx)
-                    context.setTooltipForNextFrame(
-                        client.font,
-                        listOf(Component.literal("§d$pName").visualOrderText),
-                        mouseX.toInt(),
-                        mouseY.toInt()
-                    )
-                }
-            }
+            val pName = member.skillTree.getMiningPresetName(pIdx)
+            val btnComp = Component.literal(numStr).onHover("§d$pName")
+            drawComp(context, btnComp, textX, textY, leftScrollOffset, 11f, 26f, 133f, 183f)
         }
         cy += 18
 
@@ -162,135 +143,86 @@ class Hotm(
         val tokensSpent = member.skillTree.tokensSpent["mountain"] ?: 0
         val tokens = (totalTokens - tokensSpent).coerceAtLeast(0)
 
-        drawStatLine("Tokens", "$tokensSpent / $totalTokens", totalTokens >= 25) {
-            listOf(
-                Component.literal("§dTokens of the Mountain"),
-                Component.literal("§7Spent: §a$tokensSpent"),
-                Component.literal("§7Unspent: §a$tokens"),
-                Component.literal("§7Total: §a$totalTokens")
-            )
-        }
+        drawStatLine(
+            "Tokens",
+            "$tokensSpent / $totalTokens",
+            totalTokens >= 25,
+            "§dTokens of the Mountain\n§7Spent: §a$tokensSpent\n§7Unspent: §a$tokens\n§7Total: §a$totalTokens"
+        )
 
-        drawStatLine("Core", "$potmLevel / 10", potmLevel >= 10) {
-            listOf(
-                Component.literal("§6Core of the Mountain"),
-                Component.literal("§7Level: §e$potmLevel / 10")
-            )
-        }
+        drawStatLine(
+            "Core",
+            "$potmLevel / 10",
+            potmLevel >= 10,
+            "§6Core of the Mountain\n§7Level: §e$potmLevel / 10"
+        )
 
         val activeAbility = member.skillTree.selectedAbility["mining"]
         val abilityName = HotmUtils.getActiveAbilityName(activeAbility)
         drawStatLine("Ability", abilityName)
-
         cy += 4
-
 
         ren2d.drawString(context, "§d§nPowders", 5, cy)
         cy += 13
 
-        val mithrilTotal = member.miningCore.powderSpentMithril + member.miningCore.powderMithril
+        val mithrilTotal = member.miningCore.powderMithril
+        val mithrilCurrent = (mithrilTotal - member.miningCore.powderSpentMithril).coerceAtLeast(0)
         drawStatLine(
             "Mithril",
-            "%,d".format(member.miningCore.powderMithril.toLong()),
-            mithrilTotal >= 12500000
-        ) {
-            listOf(
-                Component.literal("§2Mithril Powder"),
-                Component.literal("§7Spent: §a" + "%,d".format(member.miningCore.powderSpentMithril.toLong())),
-                Component.literal("§7Current: §a" + "%,d".format(member.miningCore.powderMithril.toLong())),
-                Component.literal("§7Total: §a" + "%,d".format(mithrilTotal.toLong()))
-            )
-        }
+            mithrilTotal.fmt(),
+            mithrilTotal >= 12500000,
+            "§2Mithril Powder\n§7Spent: §a${member.miningCore.powderSpentMithril.fmt()}\n§7Current: §a${mithrilCurrent.fmt()}\n§7Total: §a${mithrilTotal.fmt()}"
+        )
 
-        val gemstoneTotal = member.miningCore.powderSpentGemstone + member.miningCore.powderGemstone
+        val gemstoneTotal = member.miningCore.powderGemstone
+        val gemstoneCurrent = (gemstoneTotal - member.miningCore.powderSpentGemstone).coerceAtLeast(0)
         drawStatLine(
             "Gemstone",
-            "%,d".format(member.miningCore.powderGemstone.toLong()),
-            gemstoneTotal >= 20000000
-        ) {
-            listOf(
-                Component.literal("§dGemstone Powder"),
-                Component.literal("§7Spent: §a" + "%,d".format(member.miningCore.powderSpentGemstone.toLong())),
-                Component.literal("§7Current: §a" + "%,d".format(member.miningCore.powderGemstone.toLong())),
-                Component.literal("§7Total: §a" + "%,d".format(gemstoneTotal.toLong()))
-            )
-        }
+            gemstoneTotal.fmt(),
+            gemstoneTotal >= 20000000,
+            "§dGemstone Powder\n§7Spent: §a${member.miningCore.powderSpentGemstone.fmt()}\n§7Current: §a${gemstoneCurrent.fmt()}\n§7Total: §a${gemstoneTotal.fmt()}"
+        )
 
-        val glaciteTotal = member.miningCore.powderSpentGlacite + member.miningCore.powderGlacite
+        val glaciteTotal = member.miningCore.powderGlacite
+        val glaciteCurrent = (glaciteTotal - member.miningCore.powderSpentGlacite).coerceAtLeast(0)
         drawStatLine(
             "Glacite",
-            "%,d".format(member.miningCore.powderGlacite.toLong()),
-            glaciteTotal >= 20000000
-        ) {
-            listOf(
-                Component.literal("§bGlacite Powder"),
-                Component.literal("§7Spent: §a" + "%,d".format(member.miningCore.powderSpentGlacite.toLong())),
-                Component.literal("§7Current: §a" + "%,d".format(member.miningCore.powderGlacite.toLong())),
-                Component.literal("§7Total: §a" + "%,d".format(glaciteTotal.toLong()))
-            )
-        }
-
+            glaciteTotal.fmt(),
+            glaciteTotal >= 20000000,
+            "§bGlacite Powder\n§7Spent: §a${member.miningCore.powderSpentGlacite.fmt()}\n§7Current: §a${glaciteCurrent.fmt()}\n§7Total: §a${glaciteTotal.fmt()}"
+        )
         cy += 4
-
 
         ren2d.drawString(context, "§d§nGlacite Tunnels", 5, cy)
         cy += 13
 
         val mineshafts = member.glacite.mineshaftsEntered
-        drawStatLine("Mineshafts", "%,d".format(mineshafts.toLong()))
+        drawStatLine("Mineshafts", mineshafts.fmt())
 
         val fossilsCount = HotmUtils.getFossilsCount(member.glacite.fossilsDonated)
-        drawStatLine("Fossils", "$fossilsCount / 8", fossilsCount >= 8) {
-            mutableListOf<Component>().apply {
-                add(Component.literal("§9Donated Fossils"))
-                HotmUtils.fossilsList.forEach { (shortId, name) ->
-                    val donated = member.glacite.fossilsDonated.contains(shortId)
-                    val statusStr = if (donated) "§aDonated" else "§cNot Donated"
-                    add(Component.literal("§7- §e$name§7: $statusStr"))
-                }
-            }
+        val fossilsTooltip = "§9Donated Fossils\n" + HotmUtils.fossilsList.joinToString("\n") { (shortId, name) ->
+            val donated = member.glacite.fossilsDonated.contains(shortId)
+            val statusStr = if (donated) "§aDonated" else "§cNot Donated"
+            "§7- §e$name§7: $statusStr"
         }
+        drawStatLine("Fossils", "$fossilsCount / 8", fossilsCount >= 8, fossilsTooltip)
 
         val corpses = member.glacite.corpsesLooted
         val corpsesTotal = corpses.values.sum()
-        drawStatLine("Corpses", "$corpsesTotal", false) {
-            listOf(
-                Component.literal("§bCorpses Looted"),
-                Component.literal("§9Lapis: §f${corpses["lapis"] ?: 0}"),
-                Component.literal("§7Tungsten: §f${corpses["tungsten"] ?: 0}"),
-                Component.literal("§6Umber: §f${corpses["umber"] ?: 0}"),
-                Component.literal("§bVanguard: §f${corpses["vanguard"] ?: 0}"),
-                Component.literal("§7Total: §a$corpsesTotal")
-            )
-        }
+        val corpsesTooltip = "§bCorpses Looted\n§9Lapis: §f${corpses["lapis"] ?: 0}\n§7Tungsten: §f${corpses["tungsten"] ?: 0}\n§6Umber: §f${corpses["umber"] ?: 0}\n§bVanguard: §f${corpses["vanguard"] ?: 0}\n§7Total: §a$corpsesTotal"
+        drawStatLine("Corpses", "$corpsesTotal", false, corpsesTooltip)
 
         val commissionMilestone = HotmUtils.getCommissionMilestone(member.objectives.tutorial)
-        drawStatLine("Commissions Milestone", "$commissionMilestone", commissionMilestone >= 6) {
-            listOf(
-                Component.literal("§dCommissions"),
-                Component.literal("§7Milestone: §e$commissionMilestone / 6")
-            )
-        }
-
+        drawStatLine("Commissions Milestone", "$commissionMilestone", commissionMilestone >= 6, "§dCommissions\n§7Milestone: §e$commissionMilestone / 6")
         cy += 4
-
 
         ren2d.drawString(context, "§d§nCrystals", 5, cy)
         cy += 13
 
         val crystalColors = mapOf(
-            "Jade" to "§a",
-            "Amber" to "§6",
-            "Amethyst" to "§5",
-            "Sapphire" to "§b",
-            "Topaz" to "§e",
-            "Ruby" to "§c",
-            "Jasper" to "§d",
-            "Opal" to "§f",
-            "Aquamarine" to "§b",
-            "Citrine" to "§c",
-            "Peridot" to "§a",
-            "Onyx" to "§8"
+            "Jade" to "§a", "Amber" to "§6", "Amethyst" to "§5", "Sapphire" to "§b",
+            "Topaz" to "§e", "Ruby" to "§c", "Jasper" to "§d", "Opal" to "§f",
+            "Aquamarine" to "§b", "Citrine" to "§c", "Peridot" to "§a", "Onyx" to "§8"
         )
 
         val nucRuns = HotmUtils.getNucleusRuns(member.miningCore.crystals)
@@ -300,49 +232,41 @@ class Hotm(
                 val state = member.miningCore.crystals[it.first]?.state
                 state == "FOUND" || state == "PLACED"
             } -> "§e"
-
             else -> "§7"
         }
-        drawStatLine("Crystal Hollows", "$hollowColor$nucRuns Runs", false) {
-            mutableListOf<Component>().apply {
-                add(Component.literal("§dCrystal Hollows"))
-                HotmUtils.nucleusRunCrystals.forEach { (apiKey, name) ->
-                    val crystal = member.miningCore.crystals[apiKey]
-                    val state = crystal?.state ?: "NOT_FOUND"
-                    val (color, stateName) = when (state) {
-                        "PLACED" -> "§a" to "Placed"
-                        "FOUND" -> "§e" to "Found"
-                        else -> "§7" to "Not Found"
-                    }
-                    val nameColor = crystalColors[name] ?: "§7"
-                    add(Component.literal("$nameColor$name§7: $color$stateName"))
-                }
+        val hollowTooltip = "§dCrystal Hollows\n" + HotmUtils.nucleusRunCrystals.joinToString("\n") { (apiKey, name) ->
+            val crystal = member.miningCore.crystals[apiKey]
+            val state = crystal?.state ?: "NOT_FOUND"
+            val (color, stateName) = when (state) {
+                "PLACED" -> "§a" to "Placed"
+                "FOUND" -> "§e" to "Found"
+                else -> "§7" to "Not Found"
             }
+            val nameColor = crystalColors[name] ?: "§7"
+            "$nameColor$name§7: $color$stateName"
         }
+        drawStatLine("Crystal Hollows", "$hollowColor$nucRuns Runs", false, hollowTooltip)
 
         val otherCrystalsCount = HotmUtils.getOtherCrystalsCount(member.miningCore.crystals)
-        drawStatLine("Glacite Tunnels", "$otherCrystalsCount / 7", otherCrystalsCount >= 7) {
-            mutableListOf<Component>().apply {
-                add(Component.literal("§bGlacite Tunnels"))
-                HotmUtils.otherCrystals.forEach { (apiKey, name) ->
-                    val crystal = member.miningCore.crystals[apiKey]
-                    val state = crystal?.state ?: "NOT_FOUND"
-                    val (color, stateName) = when (state) {
-                        "PLACED" -> "§a" to "Found"
-                        "FOUND" -> "§e" to "Found"
-                        else -> "§7" to "Not Found"
-                    }
-                    val nameColor = crystalColors[name] ?: "§7"
-                    add(Component.literal("$nameColor$name§7: $color$stateName"))
-                }
+        val glaciteTooltip = "§bGlacite Tunnels\n" + HotmUtils.otherCrystals.joinToString("\n") { (apiKey, name) ->
+            val crystal = member.miningCore.crystals[apiKey]
+            val state = crystal?.state ?: "NOT_FOUND"
+            val (color, stateName) = when (state) {
+                "PLACED" -> "§a" to "Found"
+                "FOUND" -> "§e" to "Found"
+                else -> "§7" to "Not Found"
             }
+            val nameColor = crystalColors[name] ?: "§7"
+            "$nameColor$name§7: $color$stateName"
         }
+        drawStatLine("Glacite Tunnels", "$otherCrystalsCount / 7", otherCrystalsCount >= 7, glaciteTooltip)
     }
 
     private fun drawRightPanel(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float) {
         val inScissor = isAreaHovered(150f, 25f, 190f, 185f, mouseX, mouseY)
         val cellSize = 24
         val cellStep = 25
+        val currentNodes = member.skillTree.getMiningPresetNodes(activePresetIndex)
 
         val maxRow = 9
         for (idx in 0 until 90) {
@@ -382,7 +306,6 @@ class Hotm(
                         mouseY
                     )
                 ) {
-                    val currentNodes = member.skillTree.getMiningPresetNodes(activePresetIndex)
                     val levelVal = currentNodes[node.apiKey]
                     val level = (levelVal as? Number)?.toInt() ?: 0
                     val isEnabledVal = currentNodes["toggle_${node.apiKey}"]
@@ -409,12 +332,12 @@ class Hotm(
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (button == 0 && isAreaHovered(10f, 25f, 135f, 185f, mouseX, mouseY)) {
-            val presetBtnY = 25 + 6 + 13 + 11 + leftScrollOffset
-            val btnW = 22
-            val btnH = 13
+            val presetBtnY = 56f + leftScrollOffset
+            val btnW = 22f
+            val btnH = 13f
             for (pIdx in 0 until 5) {
-                val bx = 11 + 5 + pIdx * 24
-                if (isAreaHovered(bx.toFloat(), presetBtnY, btnW.toFloat(), btnH.toFloat(), mouseX, mouseY)) {
+                val absoluteX = 16f + pIdx * 24f
+                if (isAreaHovered(absoluteX, presetBtnY, btnW, btnH, mouseX, mouseY)) {
                     if (activePresetIndex != pIdx) {
                         activePresetIndex = pIdx
                         rebuildPerkGrid()
