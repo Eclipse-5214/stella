@@ -1,6 +1,7 @@
 package co.stellarskys.stella.features.msc.profileUtils.screen.pages
 
 import co.stellarskys.stella.api.config.ui.Palette
+import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.handlers.Signal.onHover
 import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
@@ -69,7 +70,7 @@ class Hotm(
     override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
 
         ren2d.drawHollowRect(context, 10, 25, 135, 185, 1, Palette.Purple)
-        val leftPanelHeight = 240
+        val leftPanelHeight = 260
         ren2d.renderScrolled(context, 11, 26, 133, 183, leftScrollOffset) {
             drawLeftPanel(context, mouseX, mouseY)
         }
@@ -266,18 +267,16 @@ class Hotm(
         val inScissor = isAreaHovered(150f, 25f, 190f, 185f, mouseX, mouseY)
         val cellSize = 24
         val cellStep = 25
+        val maxRow = 9
         val currentNodes = member.skillTree.getMiningPresetNodes(activePresetIndex)
 
-        val maxRow = 9
         for (idx in 0 until 90) {
             val col = (idx % 9) - 1
             val row = idx / 9
-
             if (col !in 0..6) continue
 
             val rx = col * cellStep + 7
             val ry = (maxRow - row) * cellStep + 5
-
             val screenX = 150 + rx
             val screenY = 25 + ry
 
@@ -285,45 +284,45 @@ class Hotm(
             val node = HotmUtils.nodes[idx]
 
             if (node != null && !stack.isEmpty) {
+                val level = (currentNodes[node.apiKey] as? Number)?.toInt() ?: 0
+                val isEnabled = currentNodes["toggle_${node.apiKey}"] as? Boolean ?: true
+                val maxLvl = if (node.type == NodeType.CORE) 10 else node.maxLevel
+                val isMaxed = level > 0 && (maxLvl == 0 || level >= maxLvl)
+                val isUnlocked = level > 0 && !isMaxed
 
-                ren2d.drawRect(context, rx, ry, cellSize, cellSize, Palette.Crust)
-                ren2d.drawHollowRect(context, rx, ry, cellSize, cellSize, 1, Palette.Surface0)
+                val borderColor = when {
+                    !isEnabled -> Palette.Red.withAlpha(180)
+                    isMaxed    -> Palette.Sapphire
+                    isUnlocked -> Palette.Green
+                    else       -> Palette.Surface0
+                }
+                val bgColor = when {
+                    !isEnabled -> Palette.Red.withAlpha(20)
+                    isMaxed    -> Palette.Sapphire.withAlpha(30)
+                    isUnlocked -> Palette.Green.withAlpha(20)
+                    else       -> Palette.Crust
+                }
 
+                ren2d.drawRect(context, rx, ry, cellSize, cellSize, bgColor)
+                ren2d.drawHollowRect(context, rx, ry, cellSize, cellSize, 1, borderColor)
                 ren2d.renderItem(
-                    context,
-                    stack,
+                    context, stack,
                     rx.toFloat() + ((cellSize - 16) / 2f),
                     ry.toFloat() + ((cellSize - 16) / 2f),
                     1f
                 )
 
                 if (inScissor && isAreaHovered(
-                        screenX.toFloat(),
-                        screenY.toFloat() + rightScrollOffset,
-                        cellSize.toFloat(),
-                        cellSize.toFloat(),
-                        mouseX,
-                        mouseY
+                        screenX.toFloat(), screenY.toFloat() + rightScrollOffset,
+                        cellSize.toFloat(), cellSize.toFloat(), mouseX, mouseY
                     )
                 ) {
-                    val levelVal = currentNodes[node.apiKey]
-                    val level = (levelVal as? Number)?.toInt() ?: 0
-                    val isEnabledVal = currentNodes["toggle_${node.apiKey}"]
-                    val isEnabled = isEnabledVal as? Boolean ?: true
-
                     hoveredItem = stack
                     val tooltipComps = HotmUtils.getFormattedTooltip(
-                        node,
-                        level,
-                        isEnabled,
-                        hotmLevel,
-                        member.skillTree.selectedAbility["mining"]
+                        node, level, isEnabled, hotmLevel, member.skillTree.selectedAbility["mining"]
                     )
                     context.setTooltipForNextFrame(
-                        client.font,
-                        tooltipComps.map { it.visualOrderText },
-                        mouseX.toInt(),
-                        mouseY.toInt()
+                        client.font, tooltipComps.map { it.visualOrderText }, mouseX.toInt(), mouseY.toInt()
                     )
                 }
             }

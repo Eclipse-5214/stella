@@ -278,6 +278,9 @@ data class SkyblockResponse(
             val maxSlot = equipMap.keys.mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 0
             val totalPages = (maxSlot + 8) / 9
             val items = mutableListOf<ItemStack>()
+            val equippedSet = (loadout.equipment["equipped_set"]
+                ?.takeIf { it.isJsonPrimitive }
+                ?.asInt) ?: 0
 
             for (page in 0 until totalPages) {
                 val startSlot = page * 9 + 1
@@ -295,6 +298,14 @@ data class SkyblockResponse(
                         }
                         items.add(contents?.items()?.firstOrNull() ?: ItemStack.EMPTY)
                     }
+                }
+            }
+
+            if (items.isNotEmpty() && equippedSet > 0) {
+                val equippedItems = equipment.items()
+                equippedItems.forEachIndexed { pieceIdx, stack ->
+                    val slotIdx = (((equippedSet - 1) / 9) * 36) + (pieceIdx * 9) + ((equippedSet - 1) % 9)
+                    if (slotIdx < items.size && !stack.isEmpty) items[slotIdx] = stack
                 }
             }
 
