@@ -85,7 +85,7 @@ object Bars : Feature("bars", true) {
 
     override fun initialize() {
         HUDManager.registerCustom(HPHudName, 90, 15, this::hpHudPreview, "bars.healthBar", setOf("bars.healthColor", "bars.absorptionBar", "bars.absorptionColor"))
-        HUDManager.registerCustom(HPNumHudName, 70,19, this::hpNumPreview,"bars.hpNum", setOf("bars.healthColor"))
+        HUDManager.registerCustom(HPNumHudName, 70,19, this::hpNumPreview,"bars.hpNum", setOf("bars.healthColor", "bars.absorptionColor"))
         HUDManager.registerCustom(HPChangeHudName, 30,19, this::hpChangePreview,"bars.hpChange")
 
         HUDManager.registerCustom(MPHudName, 90, 15, this::mpHudPreview, "bars.manaBar", setOf("bars.manaColor", "bars.overflowManaBar", "bars.ofmColor"))
