@@ -57,7 +57,7 @@ object PetDisplay: Feature("petDisplay", true) {
 
 
     override fun initialize() {
-        HUDManager.registerCustom(NAME, 120, 30,this::hudEditorRender, "petDisplay")
+        HUDManager.registerCustom(NAME, 120, 30,this::hudEditorRender, "petDisplay", setOf("hidePet"))
 
         getLastActivePet()?.let { (name, lvl) ->
             activePet = name

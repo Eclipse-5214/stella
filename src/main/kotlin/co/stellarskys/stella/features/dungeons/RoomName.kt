@@ -16,7 +16,7 @@ object RoomName : Feature("showRoomName", island = SkyBlockIsland.THE_CATACOMBS)
     private val chroma by config.property<Boolean>("roomNameChroma")
 
     override fun initialize() {
-        HUDManager.register("roomname", "No Room Found", "showRoomName")
+        HUDManager.register("roomname", "No Room Found", "showRoomName", setOf("roomNameChroma"))
         on<GuiEvent.RenderHUD> { renderHUD(it.context) }
     }
 

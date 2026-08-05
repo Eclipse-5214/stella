@@ -83,7 +83,7 @@ val config = Config(Stella.NAMESPACE) {
             }
 
             button {
-                configName + "update.check"
+                configName = "update.check"
                 name = "Check Now"
 
                 onclick {
