@@ -1391,6 +1391,29 @@ val config = Config(Stella.NAMESPACE) {
                 default = Color(0, 255, 128, 255)
                 shouldShow { it["bars.defNum"] as Boolean }
             }
+
+            toggle {
+                configName = "bars.vitalityBar"
+                name = "Vitality Bar"
+                description = "Shows a custom vitality bar"
+                default = false
+            }
+
+            toggle {
+                configName = "bars.vitalityNum"
+                name = "Vitality Number HUD"
+                description = "Shows the numeric vitality value"
+                default = false
+                shouldShow { it["bars.vitalityBar"] as Boolean }
+            }
+
+            colorpicker {
+                configName = "bars.vitalityColor"
+                name = "Vitality Bar Color"
+                description = "Color of the custom vitality bar"
+                default = Color(180, 0, 0, 255)
+                shouldShow { it["bars.vitalityBar"] as Boolean }
+            }
         }
 
         subcategory("Soulflow Display", "soulflowDisplay", "Enables the soulflow display")
