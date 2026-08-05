@@ -96,19 +96,26 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     var tint = 0.7
 
     override fun initialize() {
-        HUDManager.registerCustom(name, 148, 148, this::hudEditorRender, "mapEnabled")
+        HUDManager.registerCustom(name, 148, 148, this::hudEditorRender, "mapEnabled", mapRelatedKeys())
 
         on<GuiEvent.RenderHUD> { event ->
             renderMap(event.context)
         }
     }
 
+    private fun mapRelatedKeys(): Set<String> =
+        config.categories[name]?.subcategories?.values
+            ?.filter { it.subName != "Extra" }
+            ?.flatMap { sub -> sub.elements.keys + sub.configName }
+            ?.filterTo(mutableSetOf()) { it.isNotBlank() && it != "mapEnabled" }
+            ?: emptySet()
+
     fun hudEditorRender(context: GuiGraphicsExtractor){
         MapRenderer.renderPreview(context, 5f, 5f, 1f)
     }
 
     fun renderMap(context: GuiGraphicsExtractor) {
-        if (!HUDManager.shouldRender) return
+        if (!HUDManager.shouldRenderHuds) return
 
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)

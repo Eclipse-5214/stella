@@ -59,7 +59,7 @@ object SecretRoutes: Feature("secretRoutes", island = SkyBlockIsland.THE_CATACOM
     private val currentSecret: WaypointData? get() = currentStep?.waypoints?.firstOrNull() { it.type in WaypointType.SECRET }
 
     init {
-        HUDManager.registerCustom(rHudName, 100, 110, RouteRecorder::hudPreview, "secretRoutes.recordingHud")
+        HUDManager.registerCustom(rHudName, 100, 110, RouteRecorder::hudPreview, "secretRoutes.recordingHud", setOf("secretRoutes.recordingHud.minimized"))
         on<GuiEvent.RenderHUD> { if (recordingHud) RouteRecorder.hud(it.context) }
 
         on<DungeonEvent.Secrets.Chest> { event ->

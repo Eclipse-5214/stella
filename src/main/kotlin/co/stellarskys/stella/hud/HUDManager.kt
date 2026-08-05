@@ -1,7 +1,6 @@
 package co.stellarskys.stella.hud
 
 import co.stellarskys.stella.api.handlers.Capsule
-import co.stellarskys.stella.utils.render.Render2D
 import com.google.gson.reflect.TypeToken
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import tech.thatgravyboat.skyblockapi.platform.pushPop
@@ -13,7 +12,7 @@ object HUDManager {
     val elements = mutableMapOf<String, HUDElement>()
     val customRenderers = mutableMapOf<String, (GuiGraphicsExtractor) -> Unit>()
     val customSizes = mutableMapOf<String, Pair<Int, Int>>()
-    var shouldRender: Boolean = true
+    var shouldRenderHuds: Boolean = true
 
     data class HudLayoutData(
         var x: Float,
@@ -27,8 +26,8 @@ object HUDManager {
         typeToken = object : TypeToken<MutableMap<String, HudLayoutData>>() {}
     )
 
-    fun register(id: String, text: String, configKey: String? = null) {
-        elements[id] = HUDElement(id, 20f, 20f, 0, 0, text = text, configKey = configKey)
+    fun register(id: String, text: String, configKey: String? = null, related: Set<String> = emptySet()) {
+        elements[id] = HUDElement(id, 20f, 20f, 0, 0, text = text, configKey = configKey, related = related)
         loadLayout(id)
     }
 
@@ -37,11 +36,12 @@ object HUDManager {
         width: Int,
         height: Int,
         renderer: (GuiGraphicsExtractor) -> Unit,
-        configKey: String? =  null
+        configKey: String? =  null,
+        related: Set<String> = emptySet()
     ) {
         customRenderers[id] = renderer
         customSizes[id] = width to height
-        elements[id] = HUDElement(id, 20f, 20f, width, height, configKey = configKey)
+        elements[id] = HUDElement(id, 20f, 20f, width, height, configKey = configKey, related = related)
         loadLayout(id)
     }
 
@@ -70,7 +70,7 @@ object HUDManager {
     fun getScale(id: String): Float = elements[id]?.scale ?: 1f
 
     inline fun renderHud(name: String, context: GuiGraphicsExtractor, block: () -> Unit) {
-        if (!shouldRender) return
+        if (!shouldRenderHuds) return
         val matrix = context.pose()
         val x = getX(name)
         val y = getY(name)

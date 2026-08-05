@@ -84,14 +84,15 @@ object Bars : Feature("bars", true) {
     private var smoothOf by Utils.animate<Float>(0.15)
 
     override fun initialize() {
-        HUDManager.registerCustom(HPHudName, 90, 15, this::hpHudPreview, "bars.healthBar")
-        HUDManager.registerCustom(HPNumHudName, 70,19, this::hpNumPreview,"bars.hpNum")
+        HUDManager.registerCustom(HPHudName, 90, 15, this::hpHudPreview, "bars.healthBar", setOf("bars.healthColor", "bars.absorptionBar", "bars.absorptionColor"))
+        HUDManager.registerCustom(HPNumHudName, 70,19, this::hpNumPreview,"bars.hpNum", setOf("bars.healthColor", "bars.absorptionColor"))
         HUDManager.registerCustom(HPChangeHudName, 30,19, this::hpChangePreview,"bars.hpChange")
 
-        HUDManager.registerCustom(MPHudName, 90, 15, this::mpHudPreview, "bars.manaBar")
-        HUDManager.registerCustom(MPNumHudName, 70,19, this::mpNumPreview,"bars.mpNum")
-        HUDManager.registerCustom(OFManaHudName, 30,19, this::ofManaPreview,"bars.ofMana")
-        HUDManager.registerCustom(DefNumHudName, 50, 19, this::defNumPreview, "bars.defNum")
+        HUDManager.registerCustom(MPHudName, 90, 15, this::mpHudPreview, "bars.manaBar", setOf("bars.manaColor", "bars.overflowManaBar", "bars.ofmColor"))
+        HUDManager.registerCustom(MPNumHudName, 70,19, this::mpNumPreview,"bars.mpNum", setOf("bars.manaColor"))
+        HUDManager.registerCustom(OFManaHudName, 30,19, this::ofManaPreview,"bars.ofMana", setOf("bars.ofmColor"))
+
+        HUDManager.registerCustom(DefNumHudName, 50, 19, this::defNumPreview, "bars.defNum", setOf("bars.defenseColor"))
 
         on<GuiEvent.RenderHUD> {
             if (healthBar) hpHud(it.context)
