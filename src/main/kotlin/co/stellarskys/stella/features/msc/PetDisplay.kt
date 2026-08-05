@@ -129,17 +129,8 @@ object PetDisplay: Feature("petDisplay", true) {
         Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
     }
 
-    fun renderHud(context: GuiGraphicsExtractor) {
-        if (activePet == null) return
-        val matrix = context.pose()
-
-        val x = HUDManager.getX(NAME)
-        val y = HUDManager.getY(NAME)
-        val scale = HUDManager.getScale(NAME)
-
-        matrix.pushMatrix()
-        matrix.translate(x, y)
-        matrix.scale(scale, scale)
+    fun renderHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(NAME, context) {
+        if (activePet == null) return@renderHud
 
         Render2D.drawString(context,"§b$activePet", 40, 7)
         Render2D.drawString(context,"§7[Lvl $activePetLvl]", 40, 17)
@@ -152,8 +143,5 @@ object PetDisplay: Feature("petDisplay", true) {
 
             Render2D.renderItem(context,stack, 0f, -5f, 2.3f)
         }
-
-        matrix.popMatrix()
     }
-
 }

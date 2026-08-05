@@ -13,6 +13,7 @@ object HUDManager {
     val elements = mutableMapOf<String, HUDElement>()
     val customRenderers = mutableMapOf<String, (GuiGraphicsExtractor) -> Unit>()
     val customSizes = mutableMapOf<String, Pair<Int, Int>>()
+    var shouldRender: Boolean = true
 
     data class HudLayoutData(
         var x: Float,
@@ -69,6 +70,7 @@ object HUDManager {
     fun getScale(id: String): Float = elements[id]?.scale ?: 1f
 
     inline fun renderHud(name: String, context: GuiGraphicsExtractor, block: () -> Unit) {
+        if (!shouldRender) return
         val matrix = context.pose()
         val x = getX(name)
         val y = getY(name)

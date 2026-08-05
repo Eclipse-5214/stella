@@ -30,11 +30,13 @@ class HUDEditor : Aperture("HUD Editor") {
 
     override fun onInitialize(width: Int, height: Int) {
         HUDManager.loadAllLayouts()
+        HUDManager.shouldRender = false
         super.onInitialize(width, height)
     }
 
     override fun onScreenClose() {
         super.onScreenClose()
+        HUDManager.shouldRender = true
         HUDManager.saveAllLayouts()
     }
 

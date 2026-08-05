@@ -245,16 +245,10 @@ object RouteRecorder {
         matirix.popMatrix()
     }
 
-    fun hud(context: GuiGraphicsExtractor) {
+    fun hud(context: GuiGraphicsExtractor) = HUDManager.renderHud(SecretRoutes.rHudName, context) {
         val matrix = context.pose()
 
-        val x = HUDManager.getX(SecretRoutes.rHudName)
-        val y = HUDManager.getY(SecretRoutes.rHudName)
-        val scale = HUDManager.getScale(SecretRoutes.rHudName)
-
         matrix.pushMatrix()
-        matrix.translate(x,y)
-        matrix.scale(scale)
         matrix.translate(5f, 5f)
 
         if(!recording) {

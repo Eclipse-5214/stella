@@ -108,6 +108,8 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     }
 
     fun renderMap(context: GuiGraphicsExtractor) {
+        if (!HUDManager.shouldRender) return
+
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)
         val scale = HUDManager.getScale(name)
