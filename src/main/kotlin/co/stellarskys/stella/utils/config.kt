@@ -469,6 +469,15 @@ val config = Config(Stella.NAMESPACE) {
         }
 
         subcategory("Join Info", "joinInfo", "Shows extra info when someone joins your party")
+
+        subcategory("Wish For NEXD_", "pleaseWish", "Tells you when to wish in F/M7 for the healer class") {
+            textinput {
+                configName = "pleaseWish.message"
+                name = "Message"
+                description = "Message to display when you should wish"
+                placeholder = "&6Wish"
+            }
+        }
     }
 
     category("StellaNav") {

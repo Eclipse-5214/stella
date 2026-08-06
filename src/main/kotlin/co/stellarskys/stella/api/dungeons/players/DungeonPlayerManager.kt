@@ -21,6 +21,7 @@ object DungeonPlayerManager {
     val playerGhostPattern = Regex(" ☠ (?<name>[A-Za-z0-9_]+) .+ became a ghost\\.")
 
     val players = Array<DungeonPlayer?>(5) { null }
+    val you get() = player?.name?.string?.let { name -> players.find { it?.name == name } }
 
     fun init() {
         EventBus.on<TablistEvent.Change>(SkyBlockIsland.THE_CATACOMBS){ event ->
