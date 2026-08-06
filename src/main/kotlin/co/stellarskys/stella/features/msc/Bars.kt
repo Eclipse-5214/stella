@@ -84,7 +84,7 @@ object Bars : Feature("bars", true) {
     val absBarWidth get() = ratioWidth(max(StatsAPI.health.toDouble() - StatsAPI.maxHealth.toDouble(), 0.0), StatsAPI.maxHealth)
     val mpBarWidth get() = ratioWidth(StatsAPI.mana, StatsAPI.maxMana)
     val ofBarWidth get() = ratioWidth(StatsAPI.overflowMana, StatsAPI.maxMana)
-    val vitalityBarWidth get() = ratioWidth(StatsAPI.vitaliy, StatsAPI.maxVitaliy)
+    val vitalityBarWidth get() = ratioWidth(StatsAPI.vitaliy, StatsAPI.maxVitaliy, 41f)
 
     private var smoothHp by Utils.animate<Float>(0.15)
     private var smoothAbs by Utils.animate<Float>(0.15)
@@ -103,7 +103,7 @@ object Bars : Feature("bars", true) {
 
         HUDManager.registerCustom(DefNumHudName, 50, 19, this::defNumPreview, "bars.defNum", setOf("bars.defenseColor"))
 
-        HUDManager.registerCustom(VitalityHudName, 90, 15, this::vitalityHudPreview, "bars.vitalityBar", setOf("bars.vitalityColor"))
+        HUDManager.registerCustom(VitalityHudName, 50, 15, this::vitalityHudPreview, "bars.vitalityBar", setOf("bars.vitalityColor"))
         HUDManager.registerCustom(VitalityNumHudName, 70, 19, this::vitalityNumPreview, "bars.vitalityNum", setOf("bars.vitalityColor"))
 
         on<GuiEvent.RenderHUD> {
@@ -171,7 +171,7 @@ object Bars : Feature("bars", true) {
     }
 
     fun vitalityHudPreview(context: GuiGraphicsExtractor) = context.drawLumina {
-        Lumina.rect(5f, 5f, 80f, 5f, vitalityColor.rgb, 3f)
+        Lumina.rect(5f, 5f, 40f, 5f, vitalityColor.rgb, 3f)
     }
 
     fun vitalityNumPreview(context: GuiGraphicsExtractor) {
@@ -269,7 +269,7 @@ object Bars : Feature("bars", true) {
 
         smoothVitality = vitalityBarWidth
 
-        drawBar(context, smoothVitality, 0f, false, vitalityColor, Color.BLACK)
+        drawBar(context, smoothVitality, 0f, false, vitalityColor, Color.BLACK, 43f)
     }
 
     fun vitalityNumHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(VitalityNumHudName, context) {
@@ -294,10 +294,10 @@ object Bars : Feature("bars", true) {
         }
     }
 
-    private fun drawBar(context: GuiGraphicsExtractor, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color) {
+    private fun drawBar(context: GuiGraphicsExtractor, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color, barWidth: Float = 80f) {
         context.drawLumina(flush = false) {
-            Lumina.drawMasked(0f, 0f, 80f, 5f, 3f) {
-                Lumina.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
+            Lumina.drawMasked(0f, 0f, barWidth, 5f, 3f) {
+                Lumina.rect(0f, 0f, barWidth, 5f, Color.BLACK.rgb)
                 Lumina.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
                 if (showSecondary) {
                     Lumina.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.rgb, 3f)

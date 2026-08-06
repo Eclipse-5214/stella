@@ -71,17 +71,17 @@ class Hotm(
 
         ren2d.drawHollowRect(context, 10, 25, 135, 185, 1, Palette.Purple)
         val leftPanelHeight = 260
-        ren2d.renderScrolled(context, 11, 26, 133, 183, leftScrollOffset) {
+        ren2d.renderScrolled(context, 11, 26, 127, 183, leftScrollOffset) {
             drawLeftPanel(context, mouseX, mouseY)
         }
-        ren2d.drawScrollbar(context, 146, 25, 185, leftScrollOffset, leftPanelHeight, Palette.Purple)
+        ren2d.drawScrollbar(context, 140, 28, 179, leftScrollOffset, leftPanelHeight, Palette.Purple)
 
         ren2d.drawHollowRect(context, 150, 25, 190, 185, 1, Palette.Purple)
         val rightPanelHeight = 265
-        ren2d.renderScrolled(context, 151, 26, 188, 183, rightScrollOffset) {
+        ren2d.renderScrolled(context, 151, 26, 182, 183, rightScrollOffset) {
             drawRightPanel(context, mouseX, mouseY)
         }
-        ren2d.drawScrollbar(context, 341, 25, 185, rightScrollOffset, rightPanelHeight, Palette.Purple)
+        ren2d.drawScrollbar(context, 335, 28, 179, rightScrollOffset, rightPanelHeight, Palette.Purple)
 
         hoveredItem?.let {
             if (!it.isEmpty) context.setTooltipForNextFrame(
@@ -102,7 +102,7 @@ class Hotm(
             val comp = Component.literal("§7$label: $valColor$value").apply {
                 if (tooltip != null) onHover(tooltip)
             }
-            drawComp(context, comp, 5, cy, leftScrollOffset, 11f, 26f, 133f, 183f)
+            drawComp(context, comp, 5, cy, leftScrollOffset, 11f, 26f, 127f, 183f)
             cy += 11
         }
 
@@ -133,7 +133,7 @@ class Hotm(
             val textY = presetBtnY + (btnH - 8) / 2
             val pName = member.skillTree.getMiningPresetName(pIdx)
             val btnComp = Component.literal(numStr).onHover("§d$pName")
-            drawComp(context, btnComp, textX, textY, leftScrollOffset, 11f, 26f, 133f, 183f)
+            drawComp(context, btnComp, textX, textY, leftScrollOffset, 11f, 26f, 127f, 183f)
         }
         cy += 18
 
