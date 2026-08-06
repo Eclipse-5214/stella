@@ -11,7 +11,8 @@ class HUDElement(
     var scale: Float = 1f,
     var text: String = "",
     var configKey: String? = null,
-    var related: Set<String> = emptySet()
+    var related: Set<String> = emptySet(),
+    var dynamicVisibility: Boolean = false
 ) {
     fun isHovered(mouseX: Float, mouseY: Float): Boolean {
         val scaledWidth = width * scale
