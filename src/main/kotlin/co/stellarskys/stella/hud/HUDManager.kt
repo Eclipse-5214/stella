@@ -26,8 +26,14 @@ object HUDManager {
         typeToken = object : TypeToken<MutableMap<String, HudLayoutData>>() {}
     )
 
-    fun register(id: String, text: String, configKey: String? = null, related: Set<String> = emptySet()) {
-        elements[id] = HUDElement(id, 20f, 20f, 0, 0, text = text, configKey = configKey, related = related)
+    fun register(
+        id: String,
+        text: String,
+        configKey: String? = null,
+        related: Set<String> = emptySet(),
+        dynamicVisibility: Boolean = false
+    ) {
+        elements[id] = HUDElement(id, 20f, 20f, 0, 0, text = text, configKey = configKey, related = related, dynamicVisibility = dynamicVisibility)
         loadLayout(id)
     }
 
@@ -37,11 +43,12 @@ object HUDManager {
         height: Int,
         renderer: (GuiGraphicsExtractor) -> Unit,
         configKey: String? =  null,
-        related: Set<String> = emptySet()
+        related: Set<String> = emptySet(),
+        dynamicVisibility: Boolean = false
     ) {
         customRenderers[id] = renderer
         customSizes[id] = width to height
-        elements[id] = HUDElement(id, 20f, 20f, width, height, configKey = configKey, related = related)
+        elements[id] = HUDElement(id, 20f, 20f, width, height, configKey = configKey, related = related, dynamicVisibility = dynamicVisibility)
         loadLayout(id)
     }
 
