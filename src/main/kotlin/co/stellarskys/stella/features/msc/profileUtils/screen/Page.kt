@@ -17,7 +17,16 @@ abstract class Page(
     protected val name: String,
     private val navigate: (Page) -> Unit
 ) : ParentElement() {
-    data class Tooltip(val x: Int, val y: Int, val width: Int, val height: Int, val comp: Style)
+    data class ScissorBox(val x: Float, val y: Float, val width: Float, val height: Float)
+
+    data class Tooltip(
+        val x: Int,
+        val y: Int,
+        val width: Int,
+        val height: Int,
+        val comp: Style,
+        val scissorBox: ScissorBox? = null
+    )
 
     abstract val icon: ItemStack
 
@@ -44,16 +53,35 @@ abstract class Page(
 
     fun navigateTo(page: Page) = navigate(page)
 
-    fun drawComp(context: GuiGraphicsExtractor, comp: MutableComponent, x: Int, y: Int) {
+    fun drawComp(
+        context: GuiGraphicsExtractor,
+        comp: MutableComponent,
+        x: Int,
+        y: Int,
+        scrollOffset: Float = 0f,
+        scissorX: Float = 0f,
+        scissorY: Float = 0f,
+        scissorW: Float = 0f,
+        scissorH: Float = 0f
+    ) {
         ren2d.drawString(context, comp, x, y)
         comp.style.hoverEvent?.let {
-            componentsTooltips.add(Tooltip(x, y, client.font.width(comp), client.font.lineHeight, comp.style))
+            val absX = if (scissorW > 0) (scissorX + x).toInt() else x
+            val absY = if (scissorH > 0) (scissorY + y + scrollOffset).toInt() else y
+            val sBox = if (scissorW > 0) ScissorBox(scissorX, scissorY, scissorW, scissorH) else null
+            componentsTooltips.add(Tooltip(absX, absY, client.font.width(comp), client.font.lineHeight, comp.style, sBox))
         }
     }
 
     private fun renderTooltips(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         val tooltip = componentsTooltips.firstOrNull {
-            isAreaHovered(it.x.toFloat(), it.y.toFloat(), it.width.toFloat(), it.height.toFloat(), mouseX.toFloat(), mouseY.toFloat())
+            val isHovered = isAreaHovered(it.x.toFloat(), it.y.toFloat(), it.width.toFloat(), it.height.toFloat(), mouseX.toFloat(), mouseY.toFloat())
+            if (!isHovered) return@firstOrNull false
+            if (it.scissorBox != null) {
+                val box = it.scissorBox
+                if (!isAreaHovered(box.x, box.y, box.width, box.height, mouseX.toFloat(), mouseY.toFloat())) return@firstOrNull false
+            }
+            true
         } ?: return
 
         // Mimics GuiGraphicsExtractor L 777 - 787
