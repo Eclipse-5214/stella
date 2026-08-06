@@ -96,7 +96,7 @@ object Map: Feature("mapEnabled", island = SkyBlockIsland.THE_CATACOMBS) {
     var tint = 0.7
 
     override fun initialize() {
-        HUDManager.registerCustom(name, 148, 148, this::hudEditorRender, "mapEnabled", mapRelatedKeys())
+        HUDManager.registerCustom(name, 148, 148, this::hudEditorRender, "mapEnabled", mapRelatedKeys(), true)
 
         on<GuiEvent.RenderHUD> { event ->
             renderMap(event.context)
