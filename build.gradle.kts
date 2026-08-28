@@ -36,6 +36,8 @@ dependencies {
     implementation(libs.hypixel.modapi)
     implementation(libs.hypixel.modapi.fabric)
 
+    shadow(libs.jsvg)
+
     api(libs.skyblock.api) {
         capabilities { requireCapability("tech.thatgravyboat:skyblock-api-$mc") }
     }

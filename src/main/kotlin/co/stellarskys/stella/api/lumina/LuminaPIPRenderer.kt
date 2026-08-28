@@ -1,5 +1,6 @@
 package co.stellarskys.stella.api.lumina
 
+/*
 import co.stellarskys.stella.mixins.accessors.AccessorGpuDevice
 import com.mojang.blaze3d.opengl.GlTexture
 import com.mojang.blaze3d.systems.RenderSystem
@@ -71,3 +72,4 @@ class LuminaPIPRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureI
         }
     }
 }
+ */

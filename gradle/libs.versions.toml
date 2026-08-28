@@ -10,6 +10,8 @@ fabric-language-kotlin = "1.13.12+kotlin.2.4.0"
 fabric-api-26-1 = "0.152.1+26.1.2"
 fabric-api-26-2 = "0.152.1+26.2"
 
+jsvg = "2.1.0"
+
 skyblock-api = "4.2.8"
 
 hypixel-modapi = "1.0.2"
@@ -22,6 +24,8 @@ fabric-language-kotlin = { module = "net.fabricmc:fabric-language-kotlin", versi
 devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
 fabric-api-26-1 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-26-1" }
 fabric-api-26-2 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-26-2" }
+
+jsvg = { module = "com.github.weisj:jsvg", version.ref = "jsvg" }
 
 skyblock-api = { module = "tech.thatgravyboat:skyblock-api", version.ref = "skyblock-api" }
 
