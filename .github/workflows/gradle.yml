@@ -3,6 +3,7 @@ name: Run Gradle Build
 on:
   - push
   - pull_request
+  - workflow_dispatch
 
 jobs:
   gradle:

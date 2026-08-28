@@ -11,7 +11,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-import tech.thatgravyboat.skyblockapi.platform.pushPop
 
 class Collection(
     name: String,
@@ -43,15 +42,9 @@ class Collection(
                 
                 ren2d.drawHollowRect(context, ix, iy, 110, 25, 1, if (locked) Palette.Surface0 else Palette.Purple)
                 ren2d.renderItem(context, CollectionUtils.getIcon(item.id), ix + 5f, iy + 5f, 1f)
-                
-                val title = Component.literal("${if (locked) "§8" else "§a"}${item.name}").onHover("§b${item.name}\n§bTier: §6${item.currentTier} / ${item.maxTier}\n§fAmount: §7${"%,d".format(item.amount)}")
-                
-                val sy = iy + scrollOffset
-                if (sy >= -25 && sy < 185) context.pushPop {
-                    context.pose().translate(-105f, -(25f + scrollOffset))
-                    drawComp(context, title, 105 + ix + 25, 25 + iy + 5 + scrollOffset.toInt())
-                } else ren2d.drawString(context, title, ix + 25, iy + 5)
-                
+                val title = Component.literal("${if (locked) "§8" else "§a"}${item.name}")
+                    .onHover("§b${item.name}\n§bTier: §6${item.currentTier} / ${item.maxTier}\n§fAmount: §7${"%,d".format(item.amount)}")
+                drawComp(context, title, ix + 25, iy + 5, scrollOffset, 105f, 25f, 235f, 185f)
                 ren2d.drawRect(context, ix + 25, iy + 15, 80, 5, Palette.Crust)
                 if (!locked) ren2d.drawRect(context, ix + 25, iy + 15, (80 * progress.coerceAtMost(1f)).toInt(), 5, if (item.currentTier == item.maxTier) Palette.Sapphire else Palette.Green)
             }

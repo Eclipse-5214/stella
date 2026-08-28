@@ -24,9 +24,10 @@ import kotlin.math.max
 @Module
 object Bars : Feature("bars", true) {
     private val HEALTH_REGEX = """(§.)(?<current>[\d,]+)/(?<max>[\d,]+)[❤\uE010](?:\+§.[\d,]+[❤\uE010]?)?""".toRegex()
-    private val MANA_REGEX = """§b(?<current>[\d,]+)/(?<max>[\d,]+)[✎\uE003]( Mana)?""".toRegex()
-    private val OVERFLOW_REGEX  = """§3(?<overflowMana>[\d,]+)[ʬ\uE017]""".toRegex()
-    private val DEFENSE_REGEX = """§.(?<defense>[\d,]+)§.[❈\uE008] Defense""".toRegex()
+    private val MANA_REGEX = """§.(?<current>[\d,]+)/(?<max>[\d,]+)[✎\uE003](?: Mana)?""".toRegex()
+    private val OVERFLOW_REGEX  = """§.(?<overflowMana>[\d,]+)[ʬ\uE017]""".toRegex()
+    private val DEFENSE_REGEX = """§.(?<defense>[\d,]+)(?:§.)?[❈\uE008](?: Defense)?""".toRegex()
+    private val VITALITY_REGEX = """§.(?<vitality>[\d,]+)/(?<max>[\d,]+)[\uE028]""".toRegex()
 
     val healthBar by config.property<Boolean>("bars.healthBar")
     val absorptionBar by config.property<Boolean>("bars.absorptionBar")
@@ -40,6 +41,10 @@ object Bars : Feature("bars", true) {
 
     val defNum by config.property<Boolean>("bars.defNum")
     val defenseColor by config.property<Color>("bars.defenseColor")
+
+    val vitalityBar by config.property<Boolean>("bars.vitalityBar")
+    val vitalityNum by config.property<Boolean>("bars.vitalityNum")
+    val vitalityColor by config.property<Color>("bars.vitalityColor")
 
     // Hide vanilla UI
     val hideVanillaHealth by config.property<Boolean>("bars.hideVanillaHealth")
@@ -72,16 +77,20 @@ object Bars : Feature("bars", true) {
     val OFManaHudName = "ofManaHud"
     val MPNumHudName = "mpNumHud"
     val DefNumHudName = "defNumHud"
+    val VitalityHudName = "vitalityHud"
+    val VitalityNumHudName = "vitalityNumHud"
 
     val hpBarWidth get() = ratioWidth(StatsAPI.health, StatsAPI.maxHealth)
     val absBarWidth get() = ratioWidth(max(StatsAPI.health.toDouble() - StatsAPI.maxHealth.toDouble(), 0.0), StatsAPI.maxHealth)
     val mpBarWidth get() = ratioWidth(StatsAPI.mana, StatsAPI.maxMana)
     val ofBarWidth get() = ratioWidth(StatsAPI.overflowMana, StatsAPI.maxMana)
+    val vitalityBarWidth get() = ratioWidth(StatsAPI.vitaliy, StatsAPI.maxVitaliy, 41f)
 
     private var smoothHp by Utils.animate<Float>(0.15)
     private var smoothAbs by Utils.animate<Float>(0.15)
     private var smoothMp by Utils.animate<Float>(0.15)
     private var smoothOf by Utils.animate<Float>(0.15)
+    private var smoothVitality by Utils.animate<Float>(0.15)
 
     override fun initialize() {
         HUDManager.registerCustom(HPHudName, 90, 15, this::hpHudPreview, "bars.healthBar", setOf("bars.healthColor", "bars.absorptionBar", "bars.absorptionColor"))
@@ -94,6 +103,9 @@ object Bars : Feature("bars", true) {
 
         HUDManager.registerCustom(DefNumHudName, 50, 19, this::defNumPreview, "bars.defNum", setOf("bars.defenseColor"))
 
+        HUDManager.registerCustom(VitalityHudName, 50, 15, this::vitalityHudPreview, "bars.vitalityBar", setOf("bars.vitalityColor"))
+        HUDManager.registerCustom(VitalityNumHudName, 70, 19, this::vitalityNumPreview, "bars.vitalityNum", setOf("bars.vitalityColor"))
+
         on<GuiEvent.RenderHUD> {
             if (healthBar) hpHud(it.context)
             if (hpNum) hpNumHud(it.context)
@@ -103,8 +115,10 @@ object Bars : Feature("bars", true) {
             if (mpNum) mpNumHud(it.context)
             if (ofMana) ofManaHud(it.context)
             if (defNum) defNumHud(it.context)
+            if (vitalityBar) vitalityHud(it.context)
+            if (vitalityNum) vitalityNumHud(it.context)
 
-            if(healthBar || manaBar) Lumina.flush(it.context)
+            if (healthBar || manaBar || vitalityBar) Lumina.flush(it.context)
         }
 
         on<ChatEvent.Modify.ActionBar> { event ->
@@ -154,6 +168,18 @@ object Bars : Feature("bars", true) {
         val x = 25 - (string.width() / 2)
         Render2D.drawString(context, "500", x, 5, color = defenseColor)
         Render2D.drawString(context, "§a❈", x + "500".width(), 5)
+    }
+
+    fun vitalityHudPreview(context: GuiGraphicsExtractor) = context.drawLumina {
+        Lumina.rect(5f, 5f, 40f, 5f, vitalityColor.rgb, 3f)
+    }
+
+    fun vitalityNumPreview(context: GuiGraphicsExtractor) {
+        val string = "100/100"
+        val x = 35 - (string.width() / 2)
+        Render2D.drawString(context, "100", x, 5, color = vitalityColor)
+        Render2D.drawString(context, "§8/", x + "100".width(), 5)
+        Render2D.drawString(context, "100", x + "100/".width(), 5, color = vitalityColor)
     }
 
     fun hpHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(HPHudName, context) {
@@ -237,6 +263,29 @@ object Bars : Feature("bars", true) {
         Render2D.drawString(context, "§a❈", def.toString().width(), 0)
     }
 
+    fun vitalityHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(VitalityHudName, context) {
+        val matrix = context.pose()
+        matrix.translate(5f, 5f)
+
+        smoothVitality = vitalityBarWidth
+
+        drawBar(context, smoothVitality, 0f, false, vitalityColor, Color.BLACK, 43f)
+    }
+
+    fun vitalityNumHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(VitalityNumHudName, context) {
+        val matrix = context.pose()
+
+        val left = StatsAPI.vitaliy
+        val right = StatsAPI.maxVitaliy
+        val text = "$left/$right"
+
+        matrix.translate(35f - text.width() / 2, 5f)
+
+        Render2D.drawString(context, left.toString(), 0, 0, color = vitalityColor)
+        Render2D.drawString(context, "§8/", left.toString().width(), 0)
+        Render2D.drawString(context, right.toString(), "$left/".width(), 0, color = vitalityColor)
+    }
+
     private fun updateHealthDelta() {
         health = StatsAPI.health.toFloat()
 
@@ -245,10 +294,10 @@ object Bars : Feature("bars", true) {
         }
     }
 
-    private fun drawBar(context: GuiGraphicsExtractor, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color) {
+    private fun drawBar(context: GuiGraphicsExtractor, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color, barWidth: Float = 80f) {
         context.drawLumina(flush = false) {
-            Lumina.drawMasked(0f, 0f, 80f, 5f, 3f) {
-                Lumina.rect(0f, 0f, 80f, 5f, Color.BLACK.rgb)
+            Lumina.drawMasked(0f, 0f, barWidth, 5f, 3f) {
+                Lumina.rect(0f, 0f, barWidth, 5f, Color.BLACK.rgb)
                 Lumina.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
                 if (showSecondary) {
                     Lumina.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.rgb, 3f)
@@ -264,7 +313,7 @@ object Bars : Feature("bars", true) {
     }
 
     fun cleanAB(text: Component): Component {
-        if (!isEnabled() || (!hpNum && !mpNum && !ofMana && !defNum)) return text
+        if (!isEnabled() || (!hpNum && !mpNum && !ofMana && !defNum && !vitalityNum)) return text
 
         val msg = text.string
         val cleaned = msg.let {
@@ -273,6 +322,7 @@ object Bars : Feature("bars", true) {
             if (mpNum) t = MANA_REGEX.replace(t, "")
             if (ofMana) t = OVERFLOW_REGEX.replace(t, "")
             if (defNum) t = DEFENSE_REGEX.replace(t, "")
+            if (vitalityNum) t = VITALITY_REGEX.replace(t, "")
             t
         }.trim().replace("\\s+".toRegex(), " ")
 

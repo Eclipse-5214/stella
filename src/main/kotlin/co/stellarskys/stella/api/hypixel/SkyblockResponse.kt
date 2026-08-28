@@ -278,6 +278,9 @@ data class SkyblockResponse(
             val maxSlot = equipMap.keys.mapNotNull { it.toIntOrNull() }.maxOrNull() ?: 0
             val totalPages = (maxSlot + 8) / 9
             val items = mutableListOf<ItemStack>()
+            val equippedSet = (loadout.equipment["equipped_set"]
+                ?.takeIf { it.isJsonPrimitive }
+                ?.asInt) ?: 0
 
             for (page in 0 until totalPages) {
                 val startSlot = page * 9 + 1
@@ -295,6 +298,14 @@ data class SkyblockResponse(
                         }
                         items.add(contents?.items()?.firstOrNull() ?: ItemStack.EMPTY)
                     }
+                }
+            }
+
+            if (items.isNotEmpty() && equippedSet > 0) {
+                val equippedItems = equipment.items()
+                equippedItems.forEachIndexed { pieceIdx, stack ->
+                    val slotIdx = (((equippedSet - 1) / 9) * 36) + (pieceIdx * 9) + ((equippedSet - 1) % 9)
+                    if (slotIdx < items.size && !stack.isEmpty) items[slotIdx] = stack
                 }
             }
 
@@ -422,6 +433,35 @@ data class SkyblockResponse(
         val nodes: Map<String, Map<String, Any>> = emptyMap(),
         @SerializedName("tokens_spent") val tokensSpent: Map<String, Int> = emptyMap(),
         val experience: Map<String, Double> = emptyMap(),
-        @SerializedName("selected_ability") val selectedAbility: Map<String, String> = emptyMap()
-    )
+        @SerializedName("selected_ability") val selectedAbility: Map<String, String> = emptyMap(),
+        @SerializedName("selected_skill_tree_slot") val selectedSkillTreeSlot: Map<String, Int> = emptyMap(),
+        val mining: Map<String, Any>? = null,
+        @SerializedName("mining_2") val mining2: Map<String, Any>? = null,
+        @SerializedName("mining_3") val mining3: Map<String, Any>? = null,
+        @SerializedName("mining_4") val mining4: Map<String, Any>? = null,
+        @SerializedName("mining_5") val mining5: Map<String, Any>? = null
+    ) {
+        fun getSelectedMiningPresetIndex(): Int {
+            val slot = selectedSkillTreeSlot["mining"] ?: 1
+            return (slot - 1).coerceIn(0, 4)
+        }
+
+        fun getMiningPresetName(index: Int): String {
+            val meta = when (index) {
+                0 -> mining
+                1 -> mining2
+                2 -> mining3
+                3 -> mining4
+                4 -> mining5
+                else -> null
+            }
+            val customName = meta?.get("custom_name") as? String
+            return if (!customName.isNullOrBlank()) customName else "Preset ${index + 1}"
+        }
+
+        fun getMiningPresetNodes(index: Int): Map<String, Any> {
+            val key = if (index == 0) "mining" else "mining_${index + 1}"
+            return nodes[key] ?: emptyMap()
+        }
+    }
 }
