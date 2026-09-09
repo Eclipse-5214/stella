@@ -20,6 +20,7 @@ class LuminaFont(data: ByteArray, val config: FontConfig) {
     val atlas: LuminaImage
     val ascentPx: Float
     val descentPx: Float
+    val alignTopPx: Float
 
     data class FontConfig(
         val bakeSize: Float, val oversample: Int,
@@ -48,7 +49,7 @@ class LuminaFont(data: ByteArray, val config: FontConfig) {
         val buffer = MemoryUtil.memAlloc(data.size).put(data).flip()
         if (!STBTruetype.stbtt_InitFont(info, buffer)) error("Failed to init font")
 
-        val scale = STBTruetype.stbtt_ScaleForPixelHeight(info, config.bakeSize)
+        val scale = STBTruetype.stbtt_ScaleForMappingEmToPixels(info, config.bakeSize)
         val ascent = IntArray(1)
         val descent = IntArray(1)
         val lineGap = IntArray(1)
@@ -58,13 +59,15 @@ class LuminaFont(data: ByteArray, val config: FontConfig) {
 
         ascentPx = ascent[0] * scale
         descentPx = descent[0] * scale
+        val fontHeight = ascent[0] + lineGap[0] - descent[0]
+        alignTopPx = (ascent[0] + lineGap[0]).toFloat() / fontHeight * config.bakeSize
 
         val context = STBTTPackContext.malloc()
         val atlasBuffer = MemoryUtil.memCalloc(config.atlasWidth * config.atlasHeight)
 
         STBTruetype.stbtt_PackBegin(context, atlasBuffer, config.atlasWidth, config.atlasHeight, 0, 3, 0L)
         STBTruetype.stbtt_PackSetOversampling(context, config.oversample, config.oversample)
-        STBTruetype.stbtt_PackFontRange(context, buffer, 0, config.bakeSize, config.firstChar, chars)
+        STBTruetype.stbtt_PackFontRange(context, buffer, 0, -config.bakeSize, config.firstChar, chars)
         STBTruetype.stbtt_PackEnd(context)
         context.free()
         MemoryUtil.memFree(buffer)
@@ -86,8 +89,17 @@ class LuminaFont(data: ByteArray, val config: FontConfig) {
     fun getGlyphQuad(char: Char, xCursor: FloatArray, yCursor: FloatArray): GlyphQuad? {
         val charIndex = char.code - config.firstChar
         if (charIndex !in 0 until config.numChars) return null
-        STBTruetype.stbtt_GetPackedQuad(chars, config.atlasWidth, config.atlasHeight, charIndex, xCursor, yCursor, quad, true)
+        STBTruetype.stbtt_GetPackedQuad(chars, config.atlasWidth, config.atlasHeight, charIndex, xCursor, yCursor, quad, false)
         return GlyphQuad.fromAlinged(quad)
+    }
+
+    fun textWidth(text: String, size: Float = config.bakeSize): Float {
+        if (text.isEmpty()) return 0f
+        val xCursor = floatArrayOf(0f)
+        val yCursor = floatArrayOf(0f)
+
+        for (char in text) getGlyphQuad(char, xCursor, yCursor)
+        return xCursor[0] * (size / config.bakeSize)
     }
 
     fun destroy() {

@@ -6,8 +6,10 @@ import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.Utils.toHex
 import co.stellarskys.stella.api.config.ui.ConfigUI
+import co.stellarskys.stella.api.events.Event
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.events.core.ConfigEvent
 import com.google.gson.*
 import java.awt.Color
 import java.io.File
@@ -59,10 +61,11 @@ class Config(
     // Helper functions
     fun registerListener(callback: (configName: String, value: Any?) -> Unit) { listeners += callback }
 
-    internal fun notifyListeners(configName: String, newValue: Any?) {
+    internal fun notifyListeners(configName: String, oldValue: Any?, newValue: Any?) {
         if (valueCache[configName] == newValue) return
         valueCache[configName] = newValue
         listeners.forEach { it(configName, newValue) }
+        EventBus.post(ConfigEvent.Update(configName, oldValue, newValue))
         configUI?.updateUI(this)
     }
 
@@ -274,8 +277,9 @@ class Config(
 
         operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
             val element = elementMap[key] ?: error("No config entry found for key '$key'")
+            val old = element.value
             element.value = if (value is Enum<*>) value.ordinal else value
-            notifyListeners(key, value)
+            notifyListeners(key, old, value)
         }
     }
 

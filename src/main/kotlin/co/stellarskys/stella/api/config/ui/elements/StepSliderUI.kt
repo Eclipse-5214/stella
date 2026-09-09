@@ -3,19 +3,16 @@ package co.stellarskys.stella.api.config.ui.elements
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.config.core.StepSlider
-import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
-import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import co.stellarskys.stella.api.config.ui.base.ConfigBase
 import co.stellarskys.stella.api.horizon.nvg.TextBox
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.math.roundToInt
 
-class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseElement() {
+class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) :  ConfigBase(initX, initY, slider, 60f) {
     private var visualProgressAnim = Utils.animate<Float>(0.2, AnimType.EASE_OUT)
-    private var offsetAnim = Utils.animate<Float>(0.15)
     private var visualProgress by visualProgressAnim
-    private var offset by offsetAnim
     private var dragging = false
     private var lastFocusState = false
 
@@ -34,8 +31,6 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
     ).apply { parent = this@StepSliderUI }
 
     init {
-        x = initX; y = initY
-        offset = if (visible) 0f else HEIGHT; height = HEIGHT - offset
         visualProgress = getProgress()
         valueInput.x = width - valueInput.width - 12f
     }
@@ -50,9 +45,7 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
         return stepped.coerceIn(slider.min, slider.max)
     }
 
-    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
-        if (!visible && !isAnimating) return
-
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (lastFocusState && !valueInput.isFocused) {
             val finalValue = snapValue((slider.value as Int).toFloat())
             slider.value = finalValue
@@ -61,23 +54,12 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
 
         if (dragging || !valueInput.isFocused) valueInput.setText((slider.value as Int).toString())
         lastFocusState = valueInput.isFocused
-
-        if (isAnimating) {
-            height = (HEIGHT - offset).coerceAtLeast(0f)
-            if (offsetAnim.done()) isAnimating = false
-        }
-
-        if (isTextHovered(slider.name,12f, 14f)) ConfigUI.tooltip.show(slider)
-        else ConfigUI.tooltip.hide(slider)
-
         visualProgress = getProgress()
 
-        val trackX = 16f; val trackW = width - 32f; val trackY = HEIGHT - 16f
+        val trackX = 16f
+        val trackW = width - 32f
+        val trackY = HEIGHT - 16f
         val knobX = trackX + (trackW * visualProgress)
-
-        nvg.push(); nvg.translate(x, y); nvg.pushScissor(0f, 0f, width, height)
-        nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
-        nvg.text(slider.name, 12f, 14f, 16f, Palette.Text.rgb, nvg.inter)
 
         valueInput.render(context, mouseX, mouseY, delta)
 
@@ -91,7 +73,6 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
             if (alpha > 0) nvg.hollowRect(knobX - 8f, trackY - 6f, 16f, 16f, 2f, Palette.Purple.withAlpha(alpha).rgb, 8f)
         }
 
-        nvg.popScissor(); nvg.pop()
         if (dragging) updateValue(mouseX)
     }
 
@@ -101,12 +82,6 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
         val percent = ((mouseX - trackX) / trackW).coerceIn(0f, 1f)
         val rawValue = slider.min + percent * (slider.max - slider.min)
         slider.value = snapValue(rawValue)
-    }
-
-    override fun setVisibility(value: Boolean) {
-        super.setVisibility(value)
-        offset = if (value) 0f else HEIGHT
-        isAnimating = true
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
@@ -134,6 +109,4 @@ class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) : BaseEle
 
     override fun charTyped(char: Char) = valueInput.charTyped(char)
     override fun keyPressed(keyCode: Int, modifiers: Int) = valueInput.keyPressed(keyCode, modifiers)
-
-    companion object { const val HEIGHT = 60f }
 }

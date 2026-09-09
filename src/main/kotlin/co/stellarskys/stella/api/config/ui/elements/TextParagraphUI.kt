@@ -1,18 +1,13 @@
 package co.stellarskys.stella.api.config.ui.elements
 
-import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.api.config.core.TextParagraph
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
-import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import co.stellarskys.stella.api.config.ui.base.ConfigBase
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
-class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) : BaseElement() {
-    private var offsetAnim = Utils.animate<Float>(0.15)
-    private var offset by offsetAnim
-    private var calculatedHeight = 0f
-
+class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) : ConfigBase(initX, initY, paragraph) {
     private val colorMap = mapOf(
         '0' to Color(0, 0, 0).rgb,
         '1' to Color(0, 0, 170).rgb,
@@ -33,40 +28,30 @@ class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) 
     )
 
     init {
-        x = initX; y = initY
-
         val titleH = calculateMinecraftHeight("§f${paragraph.name}", 16f, width - 24f)
         val descH = calculateMinecraftHeight("§7${paragraph.description}", 14f, width - 24f)
-        calculatedHeight = titleH + descH + 24f // Base padding
-
-        offset = if (visible) 0f else calculatedHeight
-        height = (calculatedHeight - offset).coerceAtLeast(0f)
-    }
-
-    override fun setVisibility(value: Boolean) {
-        super.setVisibility(value)
-        offset = if (value) 0f else calculatedHeight
-        isAnimating = true
+        HEIGHT = titleH + descH + 24f // Base padding
+        height = (HEIGHT - offset).coerceAtLeast(0f)
     }
 
     override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         if (!visible && !isAnimating) return
 
         if (isAnimating) {
-            height = (calculatedHeight - offset).coerceAtLeast(0f)
+            height = HEIGHT - offset
             if (offsetAnim.done()) isAnimating = false
         }
 
-        nvg.push(); nvg.translate(x, y); nvg.pushScissor(0f, 0f, width, height)
-        nvg.rect(0f, 0f, width, calculatedHeight, Palette.Crust.withAlpha(150).rgb)
+        nvg.pushPop {
+            nvg.translate(x, y)
+            nvg.pushScissor(0f, 0f, width, HEIGHT - offset)
+            nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
 
-        // Render Title
-        val titleHeight = drawMinecraftText("§f${paragraph.name}", 12f, 12f, 16f, width - 24f)
+            val titleHeight = drawMinecraftText("§f${paragraph.name}", 12f, 12f, 16f, width - 24f)
+            drawMinecraftText("§7${paragraph.description}", 12f, 12f + titleHeight + 4f, 14f, width - 24f)
 
-        // Render Description starting after the title
-        drawMinecraftText("§7${paragraph.description}", 12f, 12f + titleHeight + 4f, 14f, width - 24f)
-
-        nvg.popScissor(); nvg.pop()
+            nvg.popScissor()
+        }
     }
 
     private fun drawMinecraftText(text: String, xPos: Float, yPos: Float, size: Float, maxWidth: Float): Float {

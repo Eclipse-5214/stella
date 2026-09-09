@@ -4,7 +4,7 @@ import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
 import co.stellarskys.stella.api.horizon.nvg.TextBox
-import co.stellarskys.stella.api.lumina.Lumina.Gradient
+import co.stellarskys.stella.api.luminav2.types.GradientType
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.Utils.toHex
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -83,14 +83,14 @@ class ColorPicker(pickerWidth: Float) : BaseElement() {
     }
 
     private fun drawSBArea(lx: Float, ly: Float, s: Float) {
-        nvg.gradientRect(lx, ly, s, s, -1, Color.HSBtoRGB(hsb[0], 1f, 1f), Gradient.LeftToRight, 6f)
-        nvg.gradientRect(lx, ly, s, s, 0, 0xFF000000.toInt(), Gradient.TopToBottom, 6f)
+        nvg.gradientRect(lx, ly, s, s, -1, Color.HSBtoRGB(hsb[0], 1f, 1f), GradientType.LeftToRight, 6f)
+        nvg.gradientRect(lx, ly, s, s, 0, 0xFF000000.toInt(), GradientType.TopToBottom, 6f)
         nvg.hollowRect(lx + hsb[1] * s - 3f, ly + (1f - hsb[2]) * s - 3f, 6f, 6f, 2f, -1, 7f)
     }
 
     private fun drawHueSlider(lx: Float, ly: Float, w: Float, h: Float) {
         val step = h / 6f
-        for (i in 0..5) nvg.gradientRect(lx, ly + i * step, w, step + 1f, Color.HSBtoRGB(i / 6f, 1f, 1f), Color.HSBtoRGB((i + 1) / 6f, 1f, 1f), Gradient.TopToBottom)
+        for (i in 0..5) nvg.gradientRect(lx, ly + i * step, w, step + 1f, Color.HSBtoRGB(i / 6f, 1f, 1f), Color.HSBtoRGB((i + 1) / 6f, 1f, 1f), GradientType.TopToBottom)
         nvg.rect(lx - 2f, ly + hsb[0] * h - 3f, w + 4f, 6f, -1, 2f)
     }
 

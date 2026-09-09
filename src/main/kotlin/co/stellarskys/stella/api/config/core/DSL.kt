@@ -217,9 +217,8 @@ open class ConfigElement {
     open var value: Any?
         get() = _value
         set(v) {
+            config?.notifyListeners(configName, _value, v)
             _value = v
-            // We need a reference to the parent Config to notify it
-            config?.notifyListeners(configName, v)
         }
 
     // Reference set when building the DSL

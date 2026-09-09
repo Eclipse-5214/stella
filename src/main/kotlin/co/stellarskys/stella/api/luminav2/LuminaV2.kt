@@ -3,6 +3,8 @@ package co.stellarskys.stella.api.luminav2
 import co.stellarskys.stella.api.luminav2.render.LuminaShapeRenderer
 import co.stellarskys.stella.api.luminav2.render.LuminaTextureRenderer
 import co.stellarskys.stella.api.luminav2.render.LuminaV2PipRenderer
+import co.stellarskys.stella.api.luminav2.types.Gradient
+import co.stellarskys.stella.api.luminav2.types.GradientType
 import co.stellarskys.stella.api.luminav2.types.LuminaFont
 import co.stellarskys.stella.api.luminav2.types.LuminaImage
 import co.stellarskys.stella.api.zenith.Zenith
@@ -38,10 +40,6 @@ object LuminaV2 {
 
         fun toScreen(x: Float, y: Float, dpr: Float): Vector2f =
             transform.transformPosition(Vector2f(x, y)).mul(dpr)
-    }
-
-    class Gradient(val color1: Int, val color2: Int, val type: Type) {
-        enum class Type {LeftToRight, TopToBottom, TopLeftToBottomRight, BottomRightToTopLeft }
     }
 
     enum class Mask { In, Write, None }
@@ -129,11 +127,11 @@ object LuminaV2 {
         else hollowRect(x, y, w, h, thickness, color, 0f, 0f, radius, radius)
     }
 
-    fun gradientRect(x: Float, y: Float, w: Float, h: Float, color1: Int, color2: Int, gradientType: Gradient.Type, radius: Float = 0f) {
+    fun gradientRect(x: Float, y: Float, w: Float, h: Float, color1: Int, color2: Int, gradientType: GradientType, radius: Float = 0f) {
         addShape(x, y, w, h, radius, radius, radius, radius, 0f, 0, Gradient(color1, color2, gradientType))
     }
 
-    fun hollowGradientRect(x: Float, y: Float, w: Float, h: Float, thickness: Float, color1: Int, color2: Int, gradientType: Gradient.Type, radius: Float = 0f) {
+    fun hollowGradientRect(x: Float, y: Float, w: Float, h: Float, thickness: Float, color1: Int, color2: Int, gradientType: GradientType, radius: Float = 0f) {
         addShape(x, y, w, h, radius, radius, radius, radius, thickness, 0, Gradient(color1, color2, gradientType))
     }
 
@@ -164,5 +162,10 @@ object LuminaV2 {
     fun text(text: String, x: Float, y: Float, size: Float, color: Int, font: LuminaFont = inter) {
         if (text.isEmpty()) return
         queue.add(LuminaTextureRenderer.TextEntry(text, x, y, size, color, font, Matrix3x2f(currentTransform), scissorStack.lastOrNull()))
+    }
+
+    fun textWidth(text: String, size: Float, font: LuminaFont = inter): Float {
+        if (text.isEmpty()) return 0f
+        return font.textWidth(text, size)
     }
 }

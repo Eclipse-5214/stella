@@ -1,50 +1,22 @@
 package co.stellarskys.stella.api.config.ui.elements
 
-import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.api.config.core.Keybind
-import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
-import co.stellarskys.stella.api.horizon.nvg.BaseElement
+import co.stellarskys.stella.api.config.ui.base.ConfigBase
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import org.lwjgl.glfw.GLFW
 
-class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement() {
-    private var offsetAnim = Utils.animate<Float>(0.15)
-    private var offset by offsetAnim
-
+class KeybindUI(initX: Float, initY: Float, val keybind: Keybind): ConfigBase(initX, initY, keybind, 52f) {
     private var isListening = false
     private val handler = keybind.value as Keybind.Handler
 
-    init {
-        x = initX; y = initY
-        offset = if (visible) 0f else HEIGHT; height = HEIGHT - offset
-    }
-
     override fun setVisibility(value: Boolean) {
         super.setVisibility(value)
-        offset = if (value) 0f else HEIGHT
-        isAnimating = true
         if (!value) isListening = false // Stop listening if hidden
     }
 
-    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
-        if (!visible && !isAnimating) return
-
-        if (isAnimating) {
-            height = (HEIGHT - offset).coerceAtLeast(0f)
-            if (offsetAnim.done()) isAnimating = false
-        }
-
-        if (isTextHovered(keybind.name,12f, 16f)) ConfigUI.tooltip.show(keybind)
-        else ConfigUI.tooltip.hide(keybind)
-
-        nvg.push(); nvg.translate(x, y); nvg.pushScissor(0f, 0f, width, height)
-
-        // Background
-        nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
-        nvg.text(keybind.name, 12f, 16f, 16f, Palette.Text.rgb, nvg.inter)
-
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         // Keybind Box
         val boxW = 40f
         val boxH = 28f
@@ -67,8 +39,6 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
         val textX = boxX + (boxW - textWidth) / 2f
         val textY = boxY + (boxH / 2f) - (fontSize / 2f)
         nvg.text(displayStr, textX, textY, fontSize, Palette.Text.rgb, nvg.inter)
-
-        nvg.popScissor(); nvg.pop()
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
@@ -118,6 +88,4 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind) : BaseElement(
             } ?: "K$keyCode"
         }
     }
-
-    companion object { const val HEIGHT = 52f }
 }

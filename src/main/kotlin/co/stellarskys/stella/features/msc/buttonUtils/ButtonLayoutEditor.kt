@@ -1,7 +1,7 @@
 package co.stellarskys.stella.features.msc.buttonUtils
 
 import co.stellarskys.stella.api.config.ui.ConfigUI.Companion.UI_SCALE
-import co.stellarskys.stella.api.lumina.Lumina
+import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.utils.render.Render2D
 import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith
@@ -23,7 +23,7 @@ class ButtonLayoutEditor : Aperture() {
         val invY = (height - 166) / 2
 
         context.drawLumina {
-            Lumina.hollowRect(
+            LuminaV2.hollowRect(
                 invX.toFloat(),
                 invY.toFloat(),
                 176f,
@@ -37,7 +37,7 @@ class ButtonLayoutEditor : Aperture() {
                 for (index in 0 until anchor.slots) {
                     val (x, y) = ButtonManager.resolveAnchorPosition(anchor, index, invX, invY)
 
-                    Lumina.hollowRect(
+                    LuminaV2.hollowRect(
                         x.toFloat(),
                         y.toFloat(),
                         slotSize.toFloat(),
@@ -62,10 +62,10 @@ class ButtonLayoutEditor : Aperture() {
         }
 
         context.drawLumina(false) {
-            Lumina.push()
-            Lumina.scale(UI_SCALE, UI_SCALE)
-            popup.render(context, mx, my, tickDelta)
-            Lumina.pop()
+            LuminaV2.pushPop {
+                LuminaV2.scale(UI_SCALE, UI_SCALE)
+                popup.render(context, mx, my, tickDelta)
+            }
         }
 
         super.onRender(context, mouseX, mouseY, tickDelta)

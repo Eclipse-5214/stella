@@ -6,8 +6,8 @@ import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.horizon.nvg.ParentElement
 import co.stellarskys.stella.api.horizon.nvg.TextBox
 import co.stellarskys.stella.api.horizon.nvg.addTo
-import co.stellarskys.stella.api.lumina.Lumina
-import co.stellarskys.stella.api.lumina.Lumina.Gradient
+import co.stellarskys.stella.api.luminav2.LuminaV2
+import co.stellarskys.stella.api.luminav2.types.GradientType
 import co.stellarskys.stella.api.zenith.Aperture
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
@@ -16,7 +16,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.core.BlockPos
 
 class WaypointEditor(val pos: BlockPos) : Aperture("Add Custom Waypoint") {
-    private val nvg get() = Lumina
+    private val nvg get() = LuminaV2
     private val mouse = Zenith.Mouse
     private val mx get() = mouse.rawX.toFloat() / ConfigUI.Companion.UI_SCALE
     private val my get() = mouse.rawY.toFloat() / ConfigUI.Companion.UI_SCALE
@@ -31,7 +31,7 @@ class WaypointEditor(val pos: BlockPos) : Aperture("Add Custom Waypoint") {
             nvg.translate(x, y)
 
             nvg.rect(0f, 0f, DIALOG_W, DIALOG_H, Palette.Crust.rgb, 12f)
-            nvg.hollowGradientRect(0f, 0f, DIALOG_W, DIALOG_H, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 12f)
+            nvg.hollowGradientRect(0f, 0f, DIALOG_W, DIALOG_H, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, GradientType.TopLeftToBottomRight, 12f)
 
             nvg.text("Add Custom Waypoint", PADDING, TITLE_Y, 18f, Palette.Text.rgb, nvg.inter)
             nvg.text("Position: (${pos.x}, ${pos.y}, ${pos.z})", PADDING, POS_Y, 13f, Palette.Subtext1.rgb, nvg.inter)

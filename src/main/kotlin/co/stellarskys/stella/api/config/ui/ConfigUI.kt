@@ -9,8 +9,10 @@ import co.stellarskys.stella.api.config.ui.elements.*
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
 import co.stellarskys.stella.api.horizon.nvg.ParentElement
 import co.stellarskys.stella.api.horizon.nvg.TextHandler
-import co.stellarskys.stella.api.lumina.Lumina.Gradient
-import co.stellarskys.stella.api.lumina.Lumina
+import co.stellarskys.stella.api.luminav2.LuminaV2
+import co.stellarskys.stella.api.luminav2.types.GradientType
+import co.stellarskys.stella.api.luminav2.types.LuminaImage
+import co.stellarskys.stella.api.luminav2.types.LuminaSvg
 import co.stellarskys.stella.api.zenith.*
 import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -24,11 +26,11 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     private val elementContainers = mutableMapOf<String, BaseElement>()
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private var needsVisibilityUpdate = false
-    private val imageCacheMap = HashMap<String, Any?>()
+    private val imageCacheMap = HashMap<String, LuminaImage>()
     private val revealDelegate = Utils.animate<Float>(0.0375, AnimType.EASE_OUT)
     private var reveal by revealDelegate
     private var opening = true
-    private val nvg get() = Lumina
+    private val nvg get() = LuminaV2
     private val rez get() = Zenith.Res
     private val mouse = Zenith.Mouse
     private val mx get() = mouse.rawX.toFloat() / UI_SCALE
@@ -74,7 +76,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     }
 
     override fun onScreenClose() {
-        imageCacheMap.values.forEach { nvg.deleteImage(it) }
+        imageCacheMap.values.forEach { it.destroy() }
         imageCacheMap.clear()
         super.onScreenClose()
     }
@@ -89,20 +91,20 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         super.onRender(context, mouseX, mouseY, tickDelta)
 
         val renderBlock: () -> Unit = {
-            nvg.push()
-            applyOpeningScissor()
-            nvg.scale(UI_SCALE, UI_SCALE)
+            nvg.pushPop {
+                applyOpeningScissor()
+                nvg.scale(UI_SCALE, UI_SCALE)
 
-            drawHeader()
-            panels.forEach {
-                it.render(context, mx, my, tickDelta)
+                drawHeader()
+                panels.forEach {
+                    it.render(context, mx, my, tickDelta)
+                }
+
+                tooltip.render(context, mx, my, tickDelta)
+
+                drawSearchBar(context, tickDelta)
+                nvg.popScissor()
             }
-
-            tooltip.render(context, mx, my, tickDelta)
-
-            drawSearchBar(context, tickDelta)
-            nvg.popScissor()
-            nvg.pop()
         }
 
         renderBlock()
@@ -217,14 +219,14 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
 
     fun drawHeader() {
         val swx = (rez.windowWidth / UI_SCALE) / 2
-        nvg.push()
-        nvg.translate(swx - 100f, 20f)
-        nvg.rect(0f, 0f, 200f, 60f, Palette.Crust.rgb, 30f)
-        drawPlayer(20f, 5f, 50f, 50f,  6f)
-        nvg.text(player?.name?.stripped ?: "",80f, 10f, 20f, Palette.Text.rgb, nvg.inter)
-        nvg.text("Stella User",80f, 34f, 16f, Palette.Subtext1.rgb, nvg.inter)
-        nvg.hollowGradientRect(0f, 0f, 200f, 60f, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 30f)
-        nvg.pop()
+        nvg.pushPop {
+            nvg.translate(swx - 100f, 20f)
+            nvg.rect(0f, 0f, 200f, 60f, Palette.Crust.rgb, 30f)
+            drawPlayer(20f, 5f, 50f, 50f,  6f)
+            nvg.text(player?.name?.stripped ?: "",80f, 10f, 20f, Palette.Text.rgb, nvg.inter)
+            nvg.text("Stella User",80f, 34f, 16f, Palette.Subtext1.rgb, nvg.inter)
+            nvg.hollowGradientRect(0f, 0f, 200f, 60f, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, GradientType.TopLeftToBottomRight, 30f)
+        }
     }
 
     fun drawSearchBar(context: GuiGraphicsExtractor, delta: Float) {
@@ -232,27 +234,27 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         val bx = swx - 150f
         val by = (rez.windowHeight / UI_SCALE) - 100f
 
-        nvg.push()
-        nvg.translate(bx, by)
-        nvg.rect(0f, 0f, 250f, 40f, Palette.Crust.rgb, 8f)
-        nvg.hollowGradientRect(
-            0f, 0f, 250f, 40f, 2f,
-            Palette.Purple.rgb, Palette.Mauve.rgb,
-            Gradient.LeftToRight, 8f
-        )
+        nvg.pushPop {
+            nvg.translate(bx, by)
+            nvg.rect(0f, 0f, 250f, 40f, Palette.Crust.rgb, 8f)
+            nvg.hollowGradientRect(
+                0f, 0f, 250f, 40f, 2f,
+                Palette.Purple.rgb, Palette.Mauve.rgb,
+                GradientType.LeftToRight, 8f
+            )
 
-        if (searchQuery.isEmpty() && !searchHandler.isFocused) nvg.text("Search settings...", 10f, 11f, 18f, Palette.Overlay0.rgb, nvg.inter)
+            if (searchQuery.isEmpty() && !searchHandler.isFocused) nvg.text("Search settings...", 10f, 11f, 18f, Palette.Overlay0.rgb, nvg.inter)
 
-        nvg.translate(260f, 0f)
-        nvg.rect(0f, 0f, 40f, 40f, Palette.Crust.rgb, 8f)
-        nvg.hollowGradientRect(
-            0f, 0f, 40f, 40f, 2f,
-            Palette.Purple.rgb, Palette.Mauve.rgb,
-            Gradient.LeftToRight, 8f
-        )
+            nvg.translate(260f, 0f)
+            nvg.rect(0f, 0f, 40f, 40f, Palette.Crust.rgb, 8f)
+            nvg.hollowGradientRect(
+                0f, 0f, 40f, 40f, 2f,
+                Palette.Purple.rgb, Palette.Mauve.rgb,
+                GradientType.LeftToRight, 8f
+            )
 
-        nvg.image(pencilImage, 2.5f, 2.5f, 35f, 35f, Palette.Text.rgb)
-        nvg.pop()
+            nvg.image(pencilImage, 2.5f, 2.5f, 35f, 35f, Palette.Text.rgb)
+        }
 
         searchHandler.x = bx
         searchHandler.y = by
@@ -270,7 +272,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
         val skin = player?.skin?.texture ?: return
         imageCacheMap.getOrPut(skin.path) {
             val nativeImage = (textureManager.getTexture(skin) as? DynamicTexture)?.pixels ?: return
-            nvg.createImage(nativeImage)
+            LuminaImage(nativeImage, borrowing = true)
         }.let { id ->
             nvg.image(id, 64, 64, 8, 8, 8, 8, x, y, width, height, radius)
             nvg.image(id, 64, 64, 40, 8, 8, 8, x, y, width, height, radius)
@@ -330,9 +332,10 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     }
 
     companion object {
-        val caretImage = Lumina.createImage("/assets/stella/logos/dropdown.svg")
-        val pencilImage = Lumina.createImage("/assets/stella/logos/editLocations.svg")
+        val caretImage = LuminaSvg.fromResource("logos/dropdown.svg")
+        val pencilImage = LuminaSvg.fromResource("logos/edit_locations.svg")
         val UI_SCALE get() = minOf(Zenith.Res.windowWidth.toFloat() / 1920f, Zenith.Res.windowHeight.toFloat() / 1080f).coerceAtLeast(0.5f)
+
         lateinit var tooltip: Tooltip
             private set
     }

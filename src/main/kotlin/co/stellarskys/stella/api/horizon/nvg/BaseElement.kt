@@ -1,13 +1,13 @@
 package co.stellarskys.stella.api.horizon.nvg
 
 import co.stellarskys.stella.api.config.ui.ConfigUI
-import co.stellarskys.stella.api.lumina.Lumina
-import co.stellarskys.stella.api.lumina.types.LuminaFont
+import co.stellarskys.stella.api.luminav2.LuminaV2
+import co.stellarskys.stella.api.luminav2.types.LuminaFont
 import co.stellarskys.stella.api.zenith.Zenith
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 abstract class BaseElement {
-    val nvg get() = Lumina
+    val nvg get() = LuminaV2
     val rez get() = Zenith.Res
     val mouse = Zenith.Mouse
 

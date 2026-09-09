@@ -8,7 +8,7 @@ import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.handlers.Flare
 import co.stellarskys.stella.api.handlers.Spark
-import co.stellarskys.stella.api.lumina.Lumina
+import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.config
 import co.stellarskys.stella.utils.render.Render2D
@@ -118,7 +118,7 @@ object Bars : Feature("bars", true) {
             if (vitalityBar) vitalityHud(it.context)
             if (vitalityNum) vitalityNumHud(it.context)
 
-            if (healthBar || manaBar || vitalityBar) Lumina.flush(it.context)
+            if (healthBar || manaBar || vitalityBar) LuminaV2.flush(it.context)
         }
 
         on<ChatEvent.Modify.ActionBar> { event ->
@@ -127,7 +127,7 @@ object Bars : Feature("bars", true) {
     }
 
     fun hpHudPreview(context: GuiGraphicsExtractor) = context.drawLumina {
-        Lumina.rect(5f, 5f, 80f, 5f, healthColor.rgb, 3f)
+        LuminaV2.rect(5f, 5f, 80f, 5f, healthColor.rgb, 3f)
     }
 
 
@@ -146,7 +146,7 @@ object Bars : Feature("bars", true) {
     }
 
     fun mpHudPreview(context: GuiGraphicsExtractor) = context.drawLumina {
-            Lumina.rect(5f, 5f, 80f, 5f, manaColor.rgb, 3f)
+            LuminaV2.rect(5f, 5f, 80f, 5f, manaColor.rgb, 3f)
     }
 
     fun mpNumPreview(context: GuiGraphicsExtractor) {
@@ -171,7 +171,7 @@ object Bars : Feature("bars", true) {
     }
 
     fun vitalityHudPreview(context: GuiGraphicsExtractor) = context.drawLumina {
-        Lumina.rect(5f, 5f, 40f, 5f, vitalityColor.rgb, 3f)
+        LuminaV2.rect(5f, 5f, 40f, 5f, vitalityColor.rgb, 3f)
     }
 
     fun vitalityNumPreview(context: GuiGraphicsExtractor) {
@@ -296,11 +296,11 @@ object Bars : Feature("bars", true) {
 
     private fun drawBar(context: GuiGraphicsExtractor, mainWidth: Float, secondaryWidth: Float, showSecondary: Boolean, mainColor: Color, secondaryColor: Color, barWidth: Float = 80f) {
         context.drawLumina(flush = false) {
-            Lumina.drawMasked(0f, 0f, barWidth, 5f, 3f) {
-                Lumina.rect(0f, 0f, barWidth, 5f, Color.BLACK.rgb)
-                Lumina.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
+            LuminaV2.pushPopMask( { LuminaV2.rect(0f, 0f, barWidth, 5f, -1, 3f) } ) {
+                LuminaV2.rect(0f, 0f, barWidth, 5f, Color.BLACK.rgb)
+                LuminaV2.rect(-1f, 0f, mainWidth, 5f, mainColor.rgb, 3f)
                 if (showSecondary) {
-                    Lumina.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.rgb, 3f)
+                    LuminaV2.rect(-1f, 0f, secondaryWidth, 5f, secondaryColor.rgb, 3f)
                 }
             }
         }

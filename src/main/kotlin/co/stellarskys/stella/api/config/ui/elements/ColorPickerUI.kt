@@ -7,17 +7,14 @@ import co.stellarskys.stella.api.config.core.ColorPicker
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
+import co.stellarskys.stella.api.config.ui.base.ConfigSub
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
 import co.stellarskys.stella.api.horizon.nvg.TextBox
-import co.stellarskys.stella.api.lumina.Lumina.Gradient
+import co.stellarskys.stella.api.luminav2.types.GradientType
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
-class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseElement() {
-    private var expansionAnim = Utils.animate<Float>(0.2, AnimType.EASE_OUT)
-    private var offsetAnim = Utils.animate<Float>(0.15)
-    private var expansion by expansionAnim
-    private var offset by offsetAnim
+class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : ConfigSub(initX, initY, picker, CONTENT_HEIGHT) {
     private var hsb = FloatArray(3)
     private var alpha = (picker.value as Color).alpha / 255f
     private var draggingArea = false
@@ -34,20 +31,9 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     }
 
     init {
-        x = initX
-        y = initY
         width = 240f
-        offset = if (visible) 0f else HEIGHT
-        height = HEIGHT - offset
-        expansion = 0f
         Color.RGBtoHSB((picker.value as Color).red, (picker.value as Color).green, (picker.value as Color).blue, hsb)
         hexBox.parent = this
-    }
-
-    override fun setVisibility(value: Boolean) {
-        super.setVisibility(value)
-        offset = if (value) 0f else (HEIGHT + (CONTENT_HEIGHT * expansion))
-        isAnimating = true
     }
 
     private fun applyColor(color: Color, updateHex: Boolean = true) {
@@ -57,62 +43,59 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
         updatePickerValue(updateHex)
     }
 
-    override fun render(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
-        if (!visible && !isAnimating) return
-
-        val currentFullHeight = HEIGHT + (CONTENT_HEIGHT * expansion)
-
-        if (isAnimating) {
-            height = (currentFullHeight - offset).coerceAtLeast(0f)
-            if (expansionAnim.done() && offsetAnim.done()) isAnimating = false
-        }
-
-        if (isTextHovered(picker.name,12f, 17f)) ConfigUI.tooltip.show(picker)
-        else ConfigUI.tooltip.hide(picker)
-
-        nvg.push()
-        nvg.translate(x, y)
-        nvg.pushScissor(0f, 0f, width, height)
-
-        nvg.rect(0f, 0f, width, HEIGHT, Palette.Crust.withAlpha(150).rgb)
-        nvg.text(picker.name, 12f, 17f, 16f, Palette.Text.rgb, nvg.inter)
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         nvg.rect(width - 40f, 11f, 28f, 28f, (picker.value as Color).rgb, 14f)
+        if (draggingArea || draggingHue || draggingAlpha) updateFromMouse(mouseX, mouseY)
+    }
 
-        if (expansion > 0.01f) {
-            nvg.pushScissor(0f, HEIGHT, width, height - HEIGHT)
-            nvg.rect(0f, HEIGHT, width, height - HEIGHT, Palette.Crust.withAlpha(100).rgb)
-            val startY = HEIGHT + 12f
+    override fun onExpand(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
+        nvg.rect(0f, HEIGHT, width, height - HEIGHT, Palette.Crust.withAlpha(100).rgb)
+        val startY = HEIGHT + 12f
 
-            nvg.push()
+        nvg.pushPop {
             nvg.translate(16f, startY)
             drawRoundedSBArea(PICKER_SIZE)
-            nvg.translate(PICKER_SIZE + GAP, 0f); drawVerticalHueSlider(SLIDER_WIDTH, PICKER_SIZE)
-            nvg.translate(SLIDER_WIDTH + GAP, 0f); drawVerticalAlphaSlider(SLIDER_WIDTH, PICKER_SIZE)
-            nvg.pop()
-
-            val rowY = startY + PICKER_SIZE + 16f
-            hexBox.apply { y = rowY; render(context, mouseX, mouseY, delta) }
-
-            var rx = 16f + hexBox.width + 20f
-            recentColors.forEach { nvg.rect(rx, rowY + 2f, 24f, 24f, it.rgb, 12f); nvg.hollowRect(rx, rowY + 2f, 24f, 24f, 2f, Palette.Purple.withAlpha(150).rgb, 12f); rx += 32f }
-            nvg.popScissor()
+            nvg.translate(PICKER_SIZE + GAP, 0f)
+            drawVerticalHueSlider(SLIDER_WIDTH, PICKER_SIZE)
+            nvg.translate(SLIDER_WIDTH + GAP, 0f)
+            drawVerticalAlphaSlider(SLIDER_WIDTH, PICKER_SIZE)
         }
 
-        nvg.popScissor()
-        nvg.pop()
+        val rowY = startY + PICKER_SIZE + 16f
+        hexBox.apply {
+            y = rowY
+            render(context, mouseX, mouseY, delta)
+        }
 
-        if (draggingArea || draggingHue || draggingAlpha) updateFromMouse(mouseX, mouseY)
+        var rx = 16f + hexBox.width + 20f
+        recentColors.forEach {
+            nvg.rect(rx, rowY + 2f, 24f, 24f, it.rgb, 12f)
+            nvg.hollowRect(rx, rowY + 2f, 24f, 24f, 2f, Palette.Purple.withAlpha(150).rgb, 12f)
+            rx += 32f
+        }
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (parent?.canReceiveInput  == false || parent?.isAnimating == true || !visible) return false
-        if (isAreaHovered(0f, 0f, width, HEIGHT)) { expansion = if (expansion > 0.5f) 0f else 1f; isAnimating = true; return true }
-        if (expansion <= 0.5f) return false
+
+        if (isAreaHovered(0f, 0f, width, HEIGHT)) {
+            toggleExpansion()
+            return true
+        }
+
+        if (opening) return false
         hexBox.mouseClicked(mouseX, mouseY, button)
 
-        val startY = HEIGHT + 12f; val rowY = startY + PICKER_SIZE + 16f
+        val startY = HEIGHT + 12f
+        val rowY = startY + PICKER_SIZE + 16f
         var rx = 16f + hexBox.width + 20f
-        recentColors.forEach { if (isAreaHovered(rx, rowY, 24f, 24f, mouseX, mouseY)) { applyColor(it); return true }; rx += 32f }
+        recentColors.forEach {
+            if (isAreaHovered(rx, rowY, 24f, 24f, mouseX, mouseY)) {
+                applyColor(it)
+                return true
+            }
+            rx += 32f
+        }
 
         if (isAreaHovered(16f, startY, PICKER_SIZE, PICKER_SIZE)) draggingArea = true
         else if (isAreaHovered(16f + PICKER_SIZE + GAP, startY, SLIDER_WIDTH, PICKER_SIZE)) draggingHue = true
@@ -124,7 +107,9 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) {
         if (!visible) return
         if (draggingArea || draggingHue || draggingAlpha) saveToHistory(picker.value as Color)
-        draggingArea = false; draggingHue = false; draggingAlpha = false
+        draggingArea = false
+        draggingHue = false
+        draggingAlpha = false
         hexBox.mouseReleased(mouseX, mouseY, button)
     }
 
@@ -156,30 +141,29 @@ class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : BaseE
     override fun keyPressed(keyCode: Int, modifiers: Int) = hexBox.keyPressed(keyCode, modifiers)
 
     private fun drawRoundedSBArea(s: Float) {
-        nvg.gradientRect(0f, 0f, s, s, -1, Color.HSBtoRGB(hsb[0], 1f, 1f), Gradient.LeftToRight, 6f)
-        nvg.gradientRect(0f, 0f, s, s, 0, 0xFF000000.toInt(), Gradient.TopToBottom, 6f)
+        nvg.gradientRect(0f, 0f, s, s, -1, Color.HSBtoRGB(hsb[0], 1f, 1f), GradientType.LeftToRight, 6f)
+        nvg.gradientRect(0f, 0f, s, s, 0, 0xFF000000.toInt(), GradientType.TopToBottom, 6f)
         nvg.hollowRect(hsb[1] * s - 3f, (1f - hsb[2]) * s - 3f, 6f, 6f, 2f, -1, 7f)
     }
 
     private fun drawVerticalHueSlider(w: Float, h: Float) {
         val s = h / 6f
-        for (i in 0..5) nvg.gradientRect(0f, i * s, w, s + 1f, Color.HSBtoRGB(i/6f, 1f, 1f), Color.HSBtoRGB((i+1)/6f, 1f, 1f), Gradient.TopToBottom)
+        for (i in 0..5) nvg.gradientRect(0f, i * s, w, s + 1f, Color.HSBtoRGB(i/6f, 1f, 1f), Color.HSBtoRGB((i+1)/6f, 1f, 1f), GradientType.TopToBottom)
         nvg.rect(-2f, hsb[0] * h - 3f, w + 4f, 6f, -1, 2f)
     }
 
     private fun drawVerticalAlphaSlider(w: Float, h: Float) {
         nvg.pushScissor(0f, 0f, w, h)
-        nvg.push()
-        nvg.rect(0f, 0f, w, h, -1)
-        for (i in 0..(h / (w / 2f)).toInt()) nvg.rect(if (i % 2 == 0) 0f else w / 2f, i * (w / 2f), w / 2f, w / 2f, 0xFFCCCCCC.toInt())
-        nvg.pop()
-        nvg.gradientRect(0f, 0f, w, h, Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2])).withAlpha(0).rgb, Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2])).withAlpha(255).rgb, Gradient.TopToBottom)
+        nvg.pushPop {
+            nvg.rect(0f, 0f, w, h, -1)
+            for (i in 0..(h / (w / 2f)).toInt()) nvg.rect(if (i % 2 == 0) 0f else w / 2f, i * (w / 2f), w / 2f, w / 2f, 0xFFCCCCCC.toInt())
+        }
+        nvg.gradientRect(0f, 0f, w, h, Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2])).withAlpha(0).rgb, Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2])).withAlpha(255).rgb, GradientType.TopToBottom)
         nvg.popScissor()
         nvg.rect(-2f, alpha * h - 3f, w + 4f, 6f, -1, 2f)
     }
 
     companion object {
-        const val HEIGHT = 50f
         const val CONTENT_HEIGHT = 220f
         const val PICKER_SIZE = 144f
         const val SLIDER_WIDTH = 20f

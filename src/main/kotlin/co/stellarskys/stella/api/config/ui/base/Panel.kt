@@ -4,7 +4,8 @@ import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.horizon.nvg.ParentElement
-import co.stellarskys.stella.api.lumina.Lumina.Gradient
+import co.stellarskys.stella.api.luminav2.LuminaV2
+import co.stellarskys.stella.api.luminav2.types.GradientType
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class Panel(initX: Float, initY: Float, val title: String = ""): ParentElement() {
@@ -54,7 +55,7 @@ class Panel(initX: Float, initY: Float, val title: String = ""): ParentElement()
 
         nvg.popScissor()
 
-        nvg.hollowGradientRect(0f, 0f, width, bodyHeight + 50 + scrollOffset, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 10f)
+        nvg.hollowGradientRect(0f, 0f, width, bodyHeight + 50 + scrollOffset, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, GradientType.TopLeftToBottomRight, 10f)
 
         nvg.pop()
     }

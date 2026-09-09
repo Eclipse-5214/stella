@@ -2,8 +2,7 @@ package co.stellarskys.stella.api.horizon.nvg
 
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
-import co.stellarskys.stella.api.lumina.Lumina
-import co.stellarskys.stella.api.lumina.types.LuminaFont
+import co.stellarskys.stella.api.luminav2.types.LuminaFont
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.math.abs

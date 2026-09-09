@@ -7,7 +7,6 @@ import co.stellarskys.stella.api.dungeons.score.DungeonScore
 import co.stellarskys.stella.api.handlers.Atlas
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Signal
-import co.stellarskys.stella.api.luminav2.LuminaTest
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.api.zenith.player
 import co.stellarskys.stella.features.dungeons.JoinInfo
@@ -150,14 +149,6 @@ object MainCommand : Atlas("stella", "sta", "sa") {
                     LockRegistry.getData().listProfiles().forEach { profile ->
                         Signal.fakeMessage("§7 - §6$profile")
                     }
-                }
-            }
-        }
-
-        literal("test") {
-            runs {
-                Chronos.Tick post {
-                    client.gui.setScreen(LuminaTest())
                 }
             }
         }

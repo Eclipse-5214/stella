@@ -1,7 +1,6 @@
 package co.stellarskys.stella
 
 import co.stellarskys.stella.api.horizon.animation.DeltaTracker
-import co.stellarskys.stella.api.lumina.LuminaPIPRenderer
 import co.stellarskys.stella.api.luminav2.render.LuminaV2PipRenderer
 import co.stellarskys.stella.managers.FeatureManager
 import co.stellarskys.stella.utils.config
@@ -30,7 +29,6 @@ object Stella: ClientModInitializer {
         PictureInPictureRendererRegistry.register { LuminaPIPRenderer(it.minecraft().renderBuffers().bufferSource()) }
         //? } else {
         /*PictureInPictureRendererRegistry.register { LuminaV2PipRenderer() }
-        PictureInPictureRendererRegistry.register { LuminaPIPRenderer() }
         *///? }
 
     }

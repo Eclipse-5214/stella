@@ -1,6 +1,5 @@
 package co.stellarskys.stella.api.luminav2.render
 
-import co.stellarskys.stella.api.luminav2.render.LuminaPipelines
 import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.api.luminav2.LuminaV2.Mask
 import co.stellarskys.stella.api.luminav2.types.LuminaFont
@@ -75,7 +74,7 @@ object LuminaTextureRenderer {
             val scale = entry.size / font.config.bakeSize
 
             val xCursor = floatArrayOf(0f)
-            val yCursor = floatArrayOf(font.ascentPx * scale)
+            val yCursor = floatArrayOf(font.alignTopPx)
 
             val quads = entry.text.map { entry.font.getGlyphQuad(it, xCursor, yCursor) }.filterNotNull()
             val vertices = VERTICIES_PER_QUAD * quads.size

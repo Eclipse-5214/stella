@@ -10,7 +10,7 @@ import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import net.minecraft.resources.Identifier
 
-open class LuminaImage(val native: NativeImage, val filterMode: FilterMode = FilterMode.NEAREST) {
+open class LuminaImage(val native: NativeImage, val filterMode: FilterMode = FilterMode.NEAREST, val borrowing: Boolean = false) {
     private var uploaded = false
     private var destroyed = false
 
@@ -32,13 +32,13 @@ open class LuminaImage(val native: NativeImage, val filterMode: FilterMode = Fil
         texture = tex
 
         device.createCommandEncoder().writeToTexture(tex, native)
-        native.close()
+        if(!borrowing) native.close()
         uploaded = true
     }
 
     fun destroy() {
         if (!uploaded) {
-            native.close()
+            if(!borrowing) native.close()
             destroyed = true
             return
         }

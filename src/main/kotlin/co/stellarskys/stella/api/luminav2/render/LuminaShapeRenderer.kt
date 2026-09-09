@@ -1,8 +1,9 @@
 package co.stellarskys.stella.api.luminav2.render
 
-import co.stellarskys.stella.api.luminav2.render.LuminaPipelines
 import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.api.luminav2.LuminaV2.Mask
+import co.stellarskys.stella.api.luminav2.types.Gradient
+import co.stellarskys.stella.api.luminav2.types.GradientType
 import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.systems.GpuDevice
@@ -38,7 +39,7 @@ object LuminaShapeRenderer {
         val tl: Float, val tr: Float, val br: Float, val bl: Float, // Radii
         val border: Float, val color: Int,
         transform: Matrix3x2f, scissor: LuminaV2.ScissorRect?,
-        val gradient: LuminaV2.Gradient? = null
+        val gradient: Gradient? = null
     ): LuminaV2.Entry(transform, scissor) {
         val outlinePoints by lazy (LazyThreadSafetyMode.NONE) { getOutline(x, y, w, h, outlineClamps) }
         val outlineClamps by lazy (LazyThreadSafetyMode.NONE) { clampRadii(tl, tr, br, bl, w, h) }
@@ -189,10 +190,10 @@ object LuminaShapeRenderer {
         val u = ((point.x - shape.x) / shape.w).coerceIn(0f, 1f)
         val v = ((point.y - shape.y) / shape.h).coerceIn(0f, 1f)
         return when (type) {
-            LuminaV2.Gradient.Type.LeftToRight -> u
-            LuminaV2.Gradient.Type.TopToBottom -> v
-            LuminaV2.Gradient.Type.TopLeftToBottomRight -> (u + v) / 2f
-            LuminaV2.Gradient.Type.BottomRightToTopLeft -> 1f - (u + v) / 2f
+            GradientType.LeftToRight -> u
+            GradientType.TopToBottom -> v
+            GradientType.TopLeftToBottomRight -> (u + v) / 2f
+            GradientType.BottomRightToTopLeft -> 1f - (u + v) / 2f
         }
     }
 

@@ -2,7 +2,7 @@ package co.stellarskys.stella.utils.render
 
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
-import co.stellarskys.stella.api.lumina.Lumina
+import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.ChatFormatting
@@ -173,19 +173,21 @@ object Render2D {
 
     fun GuiGraphicsExtractor.drawLumina(scaled: Boolean = true, flush: Boolean = true, block: (snapshot: Matrix3x2f) -> Unit) {
         val snapshot = Matrix3x2f(this.pose())
-        Lumina.push()
-        if (scaled) {
-            val sf = Zenith.Res.scaleFactor.toFloat() / Lumina.dpr
-            Lumina.resetTransform()
-            Lumina.setTransform(Matrix3x2f(
-                snapshot.m00 * sf, snapshot.m01 * sf,
-                snapshot.m10 * sf, snapshot.m11 * sf,
-                snapshot.m20 * sf, snapshot.m21 * sf
-            ))
+        LuminaV2.pushPop {
+            if (scaled) {
+                val sf = Zenith.Res.scaleFactor.toFloat() / LuminaV2.dpr
+                LuminaV2.resetTransform()
+                LuminaV2.setTransform(
+                    Matrix3x2f(
+                        snapshot.m00 * sf, snapshot.m01 * sf,
+                        snapshot.m10 * sf, snapshot.m11 * sf,
+                        snapshot.m20 * sf, snapshot.m21 * sf
+                    )
+                )
+            }
+            block(snapshot)
         }
-        block(snapshot)
-        Lumina.pop()
-        if (flush) Lumina.flush(this)
+        if (flush) LuminaV2.flush(this)
     }
 
     fun renderScrolled(ctx: GuiGraphicsExtractor, x: Int, y: Int, width: Int, height: Int, scrollOffset: Float, block: () -> Unit) {

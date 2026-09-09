@@ -4,7 +4,7 @@ import co.stellarskys.stella.api.config.core.ConfigElement
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
-import co.stellarskys.stella.api.lumina.Lumina.Gradient
+import co.stellarskys.stella.api.luminav2.types.GradientType
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 class Tooltip: BaseElement() {
@@ -42,7 +42,7 @@ class Tooltip: BaseElement() {
         nvg.translate(x - textWidth / 2f, y)
         nvg.rect(-padding / 2f, -padding / 2f , textWidth + padding, 16f + padding, Palette.Crust.rgb, 8f)
         nvg.text(text, 0f, 0f, 16f, Palette.Text.rgb, nvg.inter)
-        nvg.hollowGradientRect(-padding / 2f, -padding / 2f , textWidth + padding, 16f + padding, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, Gradient.TopLeftToBottomRight, 8f)
+        nvg.hollowGradientRect(-padding / 2f, -padding / 2f , textWidth + padding, 16f + padding, 2f, Palette.Purple.rgb, Palette.Mauve.rgb, GradientType.TopLeftToBottomRight, 8f)
         nvg.pop()
     }
 }
