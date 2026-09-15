@@ -12,22 +12,46 @@ import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import org.joml.Matrix3x2f
 import org.joml.Matrix4f
+import org.joml.Vector3f
+import org.joml.Vector4f
 import java.util.Optional
+import java.util.OptionalInt
 import kotlin.math.roundToInt
 
-class LuminaV2PipRenderer: PictureInPictureRenderer<LuminaV2PipRenderer.LuminaRenderState>() {
-    override fun renderToTexture(
-        renderState: LuminaRenderState,
-        poseStack: PoseStack,
-        submitNodeCollector: SubmitNodeCollector
-    ) {
+//? if < 26.2 {
+import net.minecraft.client.renderer.MultiBufferSource
+//? }
+
+//? if > 26.1 {
+ /*class LuminaV2PipRenderer: PictureInPictureRenderer<LuminaV2PipRenderer.LuminaRenderState>() {
+*///? } else {
+class LuminaV2PipRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPictureRenderer<LuminaV2PipRenderer.LuminaRenderState>(bufferSource) {
+//? }
+    override fun renderToTexture(renderState: LuminaRenderState, poseStack: PoseStack /*? if > 26.1 {*//*, submitNodeCollector: SubmitNodeCollector *//*?}*/) {
         val colorView = RenderSystem.outputColorTextureOverride!!
         val device = RenderSystem.getDevice()
         val entries = renderState.entries
+        val transform = RenderSystem.getDynamicUniforms().writeTransform(
+            Matrix4f(),
+            //? if < 26.2 {
+            Vector4f(1f, 1f, 1f, 1f),
+            Vector3f(),
+            Matrix4f()
+            //? }
+        )
 
-        device.createCommandEncoder().createRenderPass({ "Lumina v2" }, colorView, Optional.empty()).use { pass ->
+        //? if < 26.2 {
+        entries.forEach {
+            when(it) {
+                is LuminaTextureRenderer.ImageEntry -> it.image.upload()
+                is LuminaTextureRenderer.TextEntry -> it.font.atlas.upload()
+            }
+        }
+        //?}
+
+        device.createCommandEncoder().createRenderPass({ "Lumina v2" }, colorView, /*? if > 26.1 {*//*Optional.empty()*//*?} else {*/OptionalInt.empty()/*?}*/).use { pass ->
             RenderSystem.bindDefaultUniforms(pass)
-            pass.setUniform("DynamicTransforms", RenderSystem.getDynamicUniforms().writeTransform(Matrix4f()))
+            pass.setUniform("DynamicTransforms", transform)
 
             var i = 0
             while (i < entries.size) {

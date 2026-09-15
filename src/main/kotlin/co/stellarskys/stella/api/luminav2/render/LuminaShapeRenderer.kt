@@ -4,7 +4,6 @@ import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.api.luminav2.LuminaV2.Mask
 import co.stellarskys.stella.api.luminav2.types.Gradient
 import co.stellarskys.stella.api.luminav2.types.GradientType
-import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.systems.GpuDevice
 import com.mojang.blaze3d.systems.RenderPass
@@ -17,6 +16,12 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
+
+//? if > 26.1 {
+ /*import com.mojang.blaze3d.PrimitiveTopology
+*///? } else {
+import com.mojang.blaze3d.vertex.VertexFormat
+//? }
 
 object LuminaShapeRenderer {
     private val FORMAT = DefaultVertexFormat.POSITION_COLOR
@@ -78,7 +83,7 @@ object LuminaShapeRenderer {
         }
 
         ByteBufferBuilder(vertices * VERTEX_STRIDE).use { bb ->
-            BufferBuilder(bb, PrimitiveTopology.TRIANGLES, FORMAT).apply {
+            BufferBuilder(bb, /*? if > 26.1 {*//*PrimitiveTopology.TRIANGLES*//*?} else {*/ VertexFormat.Mode.TRIANGLES /*?}*/, FORMAT).apply {
                 for (shape in shapes) {
                     if (shape.border > 0f) {
                         ring(shape, dpr, shape.outlinePoints, shape.innerPoints, shape.outlineNormalPoints, shape.innerNormalPoints)
@@ -92,8 +97,8 @@ object LuminaShapeRenderer {
             }.buildOrThrow().use { mesh ->
                 device.createBuffer({ "lumina shapes" }, GpuBuffer.USAGE_VERTEX, mesh.vertexBuffer()).use { buffer ->
                     pass.setPipeline(getPipeline(shapes))
-                    pass.setVertexBuffer(0, buffer.slice())
-                    pass.draw(vertices, 1, 0, 0)
+                    pass.setVertexBuffer(0, buffer /*? if > 26.1 {*//*.slice()*//*?}*/)
+                    pass.draw(/*? if < 26.2 { */ 0, vertices /*? } else { *//*vertices, 1, 0, 0 *//*? } */)
                 }
             }
         }

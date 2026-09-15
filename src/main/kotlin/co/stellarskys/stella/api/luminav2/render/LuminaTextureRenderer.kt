@@ -4,7 +4,6 @@ import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.api.luminav2.LuminaV2.Mask
 import co.stellarskys.stella.api.luminav2.types.LuminaFont
 import co.stellarskys.stella.api.luminav2.types.LuminaImage
-import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.systems.GpuDevice
 import com.mojang.blaze3d.systems.RenderPass
@@ -13,6 +12,13 @@ import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.ByteBufferBuilder
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import org.joml.Matrix3x2f
+
+//? if > 26.1 {
+ /*import com.mojang.blaze3d.PrimitiveTopology
+*///? } else {
+import com.mojang.blaze3d.vertex.VertexFormat
+//? }
+
 
 object LuminaTextureRenderer {
     private val FORMAT = DefaultVertexFormat.POSITION_TEX_COLOR
@@ -42,7 +48,7 @@ object LuminaTextureRenderer {
             val sampler = RenderSystem.getSamplerCache().getClampToEdge(entry.image.filterMode)
 
             ByteBufferBuilder(VERTICIES_PER_QUAD * VERTEX_STRIDE).use { bb ->
-                BufferBuilder(bb, PrimitiveTopology.TRIANGLES, FORMAT).apply {
+                BufferBuilder(bb, /*? if > 26.1 {*//*PrimitiveTopology.TRIANGLES*//*?} else {*/ VertexFormat.Mode.TRIANGLES /*?}*/, FORMAT).apply {
                     val x0 = entry.x;
                     val y0 = entry.y;
                     val x1 = entry.x + entry.w;
@@ -55,9 +61,9 @@ object LuminaTextureRenderer {
                         val texView = entry.image.textureView ?: return@use
 
                         pass.setPipeline(getPipeline(images))
-                        pass.setVertexBuffer(0, buffer.slice())
+                        pass.setVertexBuffer(0, buffer /*? if > 26.1 {*//*.slice()*//*?}*/)
                         pass.bindTexture("Sampler0", texView, sampler)
-                        pass.draw(VERTICIES_PER_QUAD, 1, 0, 0)
+                        pass.draw(/*? if < 26.2 { */ 0, VERTICIES_PER_QUAD /*? } else { *//*VERTICIES_PER_QUAD, 1, 0, 0 *//*? } */)
                     }
                 }
             }
@@ -82,8 +88,8 @@ object LuminaTextureRenderer {
             val sampler = RenderSystem.getSamplerCache().getClampToEdge(font.atlas.filterMode)
 
             ByteBufferBuilder(VERTEX_STRIDE * vertices).use { bb ->
-                BufferBuilder(bb, PrimitiveTopology.TRIANGLES, FORMAT).apply {
-                    for (quad in quads) {
+                BufferBuilder(bb, /*? if > 26.1 {*//*PrimitiveTopology.TRIANGLES*//*?} else {*/ VertexFormat.Mode.TRIANGLES /*?}*/, FORMAT).apply {
+                for (quad in quads) {
                         val x0 = entry.x + quad.x0 * scale
                         val y0 = entry.y + quad.y0 * scale
                         val x1 = entry.x + quad.x1 * scale
@@ -97,9 +103,9 @@ object LuminaTextureRenderer {
                         val texView = font.atlas.textureView ?: return@use
 
                         pass.setPipeline(getPipeline(texts))
-                        pass.setVertexBuffer(0, buffer.slice())
+                        pass.setVertexBuffer(0, buffer /*? if > 26.1 {*//*.slice()*//*?}*/)
                         pass.bindTexture("Sampler0", texView, sampler)
-                        pass.draw(vertices, 1, 0, 0)
+                        pass.draw(/*? if < 26.2 { */ 0, vertices /*? } else { *//*vertices, 1, 0, 0 *//*? } */)
                     }
                 }
             }

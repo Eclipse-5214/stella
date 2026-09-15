@@ -26,7 +26,7 @@ object Stella: ClientModInitializer {
         FeatureManager.initializeFeatures()
 
         //? if < 26.2 {
-        PictureInPictureRendererRegistry.register { LuminaPIPRenderer(it.minecraft().renderBuffers().bufferSource()) }
+        PictureInPictureRendererRegistry.register { LuminaV2PipRenderer( it.bufferSource() ) }
         //? } else {
         /*PictureInPictureRendererRegistry.register { LuminaV2PipRenderer() }
         *///? }
