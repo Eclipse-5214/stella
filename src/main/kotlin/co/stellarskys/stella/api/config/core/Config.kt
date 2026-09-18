@@ -61,6 +61,7 @@ class Config(
         listeners.forEach { it(configName, newValue) }
         EventBus.post(ConfigEvent.Update(configName, oldValue, newValue))
         configUI?.updateUI(this)
+        save()
     }
 
     internal fun registerInternalElement(id: String, element: ConfigElement) {
