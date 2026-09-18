@@ -32,6 +32,7 @@ class Config(
     private var configUI: ConfigUI? = null
     private var loaded = false
     private var loading = false
+    private var dirty = false
 
     private val resolvedFile: File get() = configPath ?: File("config/$modID/settings.json")
     val path get() = "config/$modID"
@@ -39,6 +40,7 @@ class Config(
     init {
         builder()
         EventBus.on<GameEvent.Stop> { save() }
+        Chronos.Tick every 20 run { if (dirty) save() }
     }
 
     // DSL functions
@@ -61,7 +63,7 @@ class Config(
         listeners.forEach { it(configName, newValue) }
         EventBus.post(ConfigEvent.Update(configName, oldValue, newValue))
         configUI?.updateUI(this)
-        save()
+        dirty = true
     }
 
     internal fun registerInternalElement(id: String, element: ConfigElement) {
@@ -165,6 +167,8 @@ class Config(
     }
 
     fun save() {
+        dirty = false
+
         try {
             resolvedFile.parentFile?.mkdirs()
             resolvedFile.writeText(GsonBuilder().setPrettyPrinting().create().toJson(toJson()))
