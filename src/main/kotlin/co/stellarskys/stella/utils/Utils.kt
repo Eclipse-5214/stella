@@ -17,10 +17,6 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 object Utils {
-    /**
-     * Calculates the squared Euclidean distance between two 3D points.
-     * Faster than [calcDistance] because it avoids the square root.
-     */
     fun calcDistanceSq(pos1: BlockPos, pos2: BlockPos) = calcDistanceSq(Triple(pos1.x, pos1.y, pos1.z), Triple(pos2.x, pos2.y, pos2.z))
     fun calcDistanceSq(a: Triple<Int, Int, Int>, b: Triple<Int, Int, Int>): Double {
         val dx = (a.first - b.first).toDouble()
@@ -29,13 +25,6 @@ object Utils {
         return sqrt(dx * dx + dy * dy + dz * dz)
     }
 
-    /**
-     * Calculates the Euclidean distance between two 3D points.
-     *
-     * @param a First point as Triple(x, y, z)
-     * @param b Second point as Triple(x, y, z)
-     * @return The straight-line distance between the points.
-     */
     fun calcDistance(pos1: BlockPos, pos2: BlockPos) = calcDistance(Triple(pos1.x, pos1.y, pos1.z), Triple(pos2.x, pos2.y, pos2.z))
     fun calcDistance(a: Triple<Int, Int, Int>, b: Triple<Int, Int, Int>): Double {
         val dx = (a.first - b.first).toDouble()
@@ -61,10 +50,6 @@ object Utils {
 
     fun mapRange(n: Double, inMin: Double, inMax: Double, outMin: Double, outMax: Double): Double = (n - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
 
-    /**
-     * Converts a java.awt.Color to a Hex string.
-     * @param includeAlpha If true, returns #rrggbbaa; otherwise #rrggbb.
-     */
     fun Color.toHex(includeAlpha: Boolean = true): String {
         return if (includeAlpha) {
             String.format("#%02x%02x%02x%02x", red, green, blue, alpha)
@@ -73,10 +58,6 @@ object Utils {
         }
     }
 
-    /**
-     * Parses a hex string into a java.awt.Color.
-     * Supports #rgb, #rgba, #rrggbb, and #rrggbbaa.
-     */
     fun colorFromHex(hex: String): Color {
         val cleaned = hex.trim().lowercase().removePrefix("#")
 
@@ -96,10 +77,6 @@ object Utils {
         return Color(r, g, b, a)
     }
 
-    /**
-     * Darkens the color by a given factor.
-     * @param factor The multiplier (0.0 to 1.0).
-     */
     fun Color.darken(factor: Double): Color {
         val r = max(0, (red * factor).toInt())
         val g = max(0, (green * factor).toInt())
@@ -144,16 +121,6 @@ object Utils {
             absVal >= 1_000_000 -> String.format(java.util.Locale.ROOT, "%.1fM", value / 1_000_000.0)
             absVal >= 1_000 -> String.format(java.util.Locale.ROOT, "%.0fk", value / 1_000.0)
             else -> value.toString()
-        }
-    }
-
-    class Apogee(private val threshold: Int, private val onTrigger: () -> Unit) : ReadWriteProperty<Any?, Int> {
-        private var internalValue = 0
-
-        override fun getValue(thisRef: Any?, property: KProperty<*>): Int = internalValue
-        override fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
-            if (value > internalValue && threshold in (internalValue + 1)..value) onTrigger()
-            internalValue = value
         }
     }
 }
