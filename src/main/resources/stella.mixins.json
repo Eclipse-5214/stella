@@ -1,24 +1,24 @@
 {
-    "required": true,
-    "package": "co.stellarskys.stella.mixins",
-    "compatibilityLevel": "JAVA_21",
-    "injectors": {
-        "defaultRequire": 1
-    },
-    "mixins": [],
-    "client": [
-      "MixinFont",
-      "MixinClientLevel",
-      "MixinConnection",
-      "MixinGui",
-      "MixinEffectsInInventory",
-      "MixinClientCommonPacketListenerImpl",
-      "MixinLocalPlayer",
-      "MixinLivingEntity",
-      "MixinContainer",
-      "MixinKeyboardHandler",
-      "accessors.AccessorMapState",
-      "accessors.AccessorGpuDevice",
-      "accessors.AccessorContainer"
-    ]
+  "required": true,
+  "package": "co.stellarskys.stella.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [],
+  "client": [
+    "MixinClientCommonPacketListenerImpl",
+    "MixinClientLevel",
+    "MixinConnection",
+    "MixinContainer",
+    "MixinEffectsInInventory",
+    "MixinFont",
+    "MixinGui",
+    "MixinKeyboardHandler",
+    "MixinLivingEntity",
+    "MixinLocalPlayer",
+    "accessors.AccessorContainer",
+    "accessors.AccessorMapState",
+    "accessors.AccessorPictureInPictureRenderer"
+  ]
 }

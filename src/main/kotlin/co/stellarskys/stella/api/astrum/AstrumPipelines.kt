@@ -1,22 +1,27 @@
 package co.stellarskys.stella.api.astrum
 
 import co.stellarskys.stella.Stella
-import com.mojang.blaze3d.pipeline.DepthStencilState
+import com.mojang.blaze3d.pipeline.BlendFunction
+import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 import java.util.Optional
 
 object AstrumPipelines {
+    val TRANSLUCENT = ColorTargetState(BlendFunction.TRANSLUCENT)
+
     val LINES: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
             .withLocation(id( "lines"))
+            .withColorTargetState(TRANSLUCENT)
             .build()
     )
 
     val LINES_THROUGH_WALLS: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
             .withLocation(id( "lines_through_walls"))
+            .withColorTargetState(TRANSLUCENT)
             .withDepthStencilState(Optional.empty())
             .build()
     )
@@ -24,12 +29,14 @@ object AstrumPipelines {
     val FILLED: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withLocation(id("filled"))
+            .withColorTargetState(TRANSLUCENT)
             .build()
     )
 
     val FILLED_THROUGH_WALLS: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withLocation(id("filled_through_walls"))
+            .withColorTargetState(TRANSLUCENT)
             .withDepthStencilState(Optional.empty())
             .build()
     )

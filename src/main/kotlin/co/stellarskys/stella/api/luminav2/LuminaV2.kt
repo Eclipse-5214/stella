@@ -21,9 +21,13 @@ object LuminaV2 {
     private var masking = false
 
     val dpr: Float get() {
+        //? if > 26.2 {
+        /*return Zenith.window.pixelDensity
+        *///? } else {
         val fbw = Zenith.Res.viewportWidth.toFloat()
         val ww = Zenith.Res.windowWidth.toFloat()
         return if (ww == 0f) 1f else fbw / ww
+        //? }
     }
 
     val mask: Mask get() = when  {

@@ -259,7 +259,7 @@ object Astrum {
         batch.forEach { queued ->
             pose.pushPose()
             pose.translate(queued.pos.x, queued.pos.y, queued.pos.z)
-            pose.mulPose(cam.rotation())
+            pose /*? if < 26.3 {*/ .mulPose(cam.rotation()) /*?} else {*/ /*.rotate(cam.rotation()) *//*?}*/
             val s = queued.scale * 0.025f
             pose.scale(s, -s, s)
             val textWidth = font.width(queued.text)

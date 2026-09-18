@@ -47,6 +47,6 @@ abstract class Aperture(title: String = "") : Screen(Component.literal(title)) {
     final override fun mouseReleased(event: MouseButtonEvent): Boolean = onMouseRelease(event.button(), event.x(), event.y(), event.modifiers()) || super.mouseReleased(event)
     final override fun mouseDragged(event: MouseButtonEvent, deltaX: Double, deltaY: Double): Boolean = onMouseDrag(event.button(), event.x(), event.y(), deltaX, deltaY, 0L, event.modifiers()) || super.mouseDragged(event, deltaX, deltaY)
     final override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontal: Double, vertical: Double): Boolean = onMouseScroll(mouseX, mouseY, vertical, horizontal) || super.mouseScrolled(mouseX, mouseY, horizontal, vertical)
-    final override fun keyPressed(event: KeyEvent): Boolean = onKeyPress(event.key(), event.scancode(), event.modifiers()) || super.keyPressed(event)
+    final override fun keyPressed(event: KeyEvent): Boolean = onKeyPress(event.key(), event /*? if < 26.3 {*/ .scancode() /*?} else {*/ /*.keycode() *//*?}*/, event.modifiers()) || super.keyPressed(event)
     final override fun charTyped(event: CharacterEvent): Boolean = onCharTyped(event.codepoint.toChar()) || super.charTyped(event)
 }

@@ -5,6 +5,7 @@ import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.handlers.Signal.onHover
 import co.stellarskys.stella.api.horizon.animation.AnimType
 import co.stellarskys.stella.api.hypixel.SkyblockResponse
+import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.features.msc.profileUtils.HotmUtils
 import co.stellarskys.stella.features.msc.profileUtils.NodeType
@@ -330,7 +331,7 @@ class Hotm(
     }
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
-        if (button == 0 && isAreaHovered(10f, 25f, 135f, 185f, mouseX, mouseY)) {
+        if (button == Zenith.Keys.LEFT && isAreaHovered(10f, 25f, 135f, 185f, mouseX, mouseY)) {
             val presetBtnY = 56f + leftScrollOffset
             val btnW = 22f
             val btnH = 13f

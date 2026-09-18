@@ -10,7 +10,7 @@ import co.stellarskys.stella.api.horizon.nvg.TextBox
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.math.roundToInt
 
-class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider) :  ConfigBase(initX, initY, slider, 60f) {
+class StepSliderUI(initX: Float, initY: Float, val slider: StepSlider): ConfigBase(initX, initY, slider, 60f) {
     private var visualProgressAnim = Utils.animate<Float>(0.2, AnimType.EASE_OUT)
     private var visualProgress by visualProgressAnim
     private var dragging = false

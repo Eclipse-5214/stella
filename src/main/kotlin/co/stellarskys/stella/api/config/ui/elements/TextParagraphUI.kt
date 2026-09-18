@@ -7,7 +7,7 @@ import co.stellarskys.stella.api.config.ui.base.ConfigBase
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
-class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph) : ConfigBase(initX, initY, paragraph) {
+class TextParagraphUI(initX: Float, initY: Float, val paragraph: TextParagraph): ConfigBase(initX, initY, paragraph) {
     private val colorMap = mapOf(
         '0' to Color(0, 0, 0).rgb,
         '1' to Color(0, 0, 170).rgb,

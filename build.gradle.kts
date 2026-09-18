@@ -97,7 +97,7 @@ tasks {
         filesMatching("fabric.mod.json") { expand(props) }
     }
 
-    val generateBuildInfo by registering {
+    val generateBuildInfo = register("generateBuildInfo") {
         group = "build"
         description = "Generates the dynamic BuildInfo metadata source file."
 

@@ -14,7 +14,7 @@ import co.stellarskys.stella.api.luminav2.types.GradientType
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
-class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker) : ConfigSub(initX, initY, picker, CONTENT_HEIGHT) {
+class ColorPickerUI(initX: Float, initY: Float, val picker: ColorPicker): ConfigSub(initX, initY, picker, CONTENT_HEIGHT) {
     private var hsb = FloatArray(3)
     private var alpha = (picker.value as Color).alpha / 255f
     private var draggingArea = false

@@ -2,6 +2,7 @@ package co.stellarskys.stella.api.luminav2.render
 
 import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.api.zenith.Zenith
+import co.stellarskys.stella.mixins.accessors.AccessorPictureInPictureRenderer
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
@@ -25,10 +26,11 @@ import net.minecraft.client.renderer.MultiBufferSource
 //? if > 26.1 {
  /*class LuminaV2PipRenderer: PictureInPictureRenderer<LuminaV2PipRenderer.LuminaRenderState>() {
 *///? } else {
-class LuminaV2PipRenderer(bufferSource: MultiBufferSource.BufferSource) : PictureInPictureRenderer<LuminaV2PipRenderer.LuminaRenderState>(bufferSource) {
+class LuminaV2PipRenderer(bufferSource: MultiBufferSource.BufferSource): PictureInPictureRenderer<LuminaV2PipRenderer.LuminaRenderState>(bufferSource) {
 //? }
     override fun renderToTexture(renderState: LuminaRenderState, poseStack: PoseStack /*? if > 26.1 {*//*, submitNodeCollector: SubmitNodeCollector *//*?}*/) {
-        val colorView = RenderSystem.outputColorTextureOverride!!
+        @Suppress("CAST_NEVER_SUCCEEDS")
+        val colorView = (this as AccessorPictureInPictureRenderer).texterView!!
         val device = RenderSystem.getDevice()
         val entries = renderState.entries
         val transform = RenderSystem.getDynamicUniforms().writeTransform(
@@ -40,14 +42,12 @@ class LuminaV2PipRenderer(bufferSource: MultiBufferSource.BufferSource) : Pictur
             //? }
         )
 
-        //? if < 26.2 {
         entries.forEach {
             when(it) {
                 is LuminaTextureRenderer.ImageEntry -> it.image.upload()
                 is LuminaTextureRenderer.TextEntry -> it.font.atlas.upload()
             }
         }
-        //?}
 
         device.createCommandEncoder().createRenderPass({ "Lumina v2" }, colorView, /*? if > 26.1 {*//*Optional.empty()*//*?} else {*/OptionalInt.empty()/*?}*/).use { pass ->
             RenderSystem.bindDefaultUniforms(pass)

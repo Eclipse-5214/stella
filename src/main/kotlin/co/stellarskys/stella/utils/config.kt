@@ -18,6 +18,10 @@ import java.net.URI
 /*import co.stellarskys.stella.api.zenith.setScreen
 *///? }
 
+//? if >= 26.3 {
+/*import com.mojang.blaze3d.Blaze3D
+*///? }
+
 val config = Config(Stella.NAMESPACE) {
     category("General") {
         subcategory("Info") {
@@ -39,7 +43,11 @@ val config = Config(Stella.NAMESPACE) {
 
                 onclick {
                     val uri = URI("https://stellarskys.co")
-                    Util.getPlatform().openUri(uri)
+                    //? if < 26.3 {
+                     Util.getPlatform().openUri(uri)
+                    //?} else {
+                    /*Blaze3D.openUri(uri)
+                    *///?}
                 }
             }
 
@@ -50,7 +58,11 @@ val config = Config(Stella.NAMESPACE) {
 
                 onclick {
                     val uri = URI("https://discord.gg/EzEfQyGdAg")
-                    Util.getPlatform().openUri(uri)
+                    //? if < 26.3 {
+                     Util.getPlatform().openUri(uri)
+                    //?} else {
+                    /*Blaze3D.openUri(uri)
+                    *///?}
                 }
             }
 
@@ -61,7 +73,11 @@ val config = Config(Stella.NAMESPACE) {
 
                 onclick {
                     val uri = URI("https://github.com/Eclipse-5214/stella")
-                    Util.getPlatform().openUri(uri)
+                    //? if < 26.3 {
+                     Util.getPlatform().openUri(uri)
+                    //?} else {
+                    /*Blaze3D.openUri(uri)
+                    *///?}
                 }
             }
         }
@@ -470,11 +486,11 @@ val config = Config(Stella.NAMESPACE) {
 
         subcategory("Join Info", "joinInfo", "Shows extra info when someone joins your party")
 
-        subcategory("Wish For NEXD_", "pleaseWish", "Tells you when to wish in F/M7 for the healer class") {
+        subcategory("Healer Wish Alert", "pleaseWish", "Tells you when to wish in F/M7 for the healer class") {
             textinput {
                 configName = "pleaseWish.message"
                 name = "Message"
-                description = "Message to display when you should wish"
+                description = "Message to display when you should"
                 placeholder = "&6Wish"
             }
         }

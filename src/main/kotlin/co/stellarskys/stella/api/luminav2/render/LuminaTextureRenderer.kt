@@ -2,6 +2,7 @@ package co.stellarskys.stella.api.luminav2.render
 
 import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.api.luminav2.LuminaV2.Mask
+import co.stellarskys.stella.api.luminav2.render.LuminaPipelines.usePipeline
 import co.stellarskys.stella.api.luminav2.types.LuminaFont
 import co.stellarskys.stella.api.luminav2.types.LuminaImage
 import com.mojang.blaze3d.buffers.GpuBuffer
@@ -57,12 +58,11 @@ object LuminaTextureRenderer {
                     quad(entry, dpr, x0, y0, x1, y1, entry.u0, entry.v0, entry.u1, entry.v1, entry.color)
                 }.buildOrThrow().use { mesh ->
                     device.createBuffer({ "lumina image" }, GpuBuffer.USAGE_VERTEX, mesh.vertexBuffer()).use { buffer ->
-                        entry.image.upload()
                         val texView = entry.image.textureView ?: return@use
 
-                        pass.setPipeline(getPipeline(images))
+                        pass.usePipeline(getPipeline(images))
                         pass.setVertexBuffer(0, buffer /*? if > 26.1 {*//*.slice()*//*?}*/)
-                        pass.bindTexture("Sampler0", texView, sampler)
+                        /*? if >= 26.3 {*/ /*pass.setUniform("Sampler0", texView, sampler) *//*?} else {*/ pass.bindTexture("Sampler0", texView, sampler) /*?}*/
                         pass.draw(/*? if < 26.2 { */ 0, VERTICIES_PER_QUAD /*? } else { *//*VERTICIES_PER_QUAD, 1, 0, 0 *//*? } */)
                     }
                 }
@@ -99,12 +99,11 @@ object LuminaTextureRenderer {
                     }
                 }.buildOrThrow().use { mesh ->
                     device.createBuffer({ "lumina image" }, GpuBuffer.USAGE_VERTEX, mesh.vertexBuffer()).use { buffer ->
-                        font.atlas.upload()
                         val texView = font.atlas.textureView ?: return@use
 
-                        pass.setPipeline(getPipeline(texts))
+                        pass.usePipeline(getPipeline(texts))
                         pass.setVertexBuffer(0, buffer /*? if > 26.1 {*//*.slice()*//*?}*/)
-                        pass.bindTexture("Sampler0", texView, sampler)
+                        /*? if >= 26.3 {*/ /*pass.setUniform("Sampler0", texView, sampler) *//*?} else {*/ pass.bindTexture("Sampler0", texView, sampler) /*?}*/
                         pass.draw(/*? if < 26.2 { */ 0, vertices /*? } else { *//*vertices, 1, 0, 0 *//*? } */)
                     }
                 }

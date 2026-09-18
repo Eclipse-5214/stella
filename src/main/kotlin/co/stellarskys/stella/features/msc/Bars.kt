@@ -84,7 +84,7 @@ object Bars : Feature("bars", true) {
     val absBarWidth get() = ratioWidth(max(StatsAPI.health.toDouble() - StatsAPI.maxHealth.toDouble(), 0.0), StatsAPI.maxHealth)
     val mpBarWidth get() = ratioWidth(StatsAPI.mana, StatsAPI.maxMana)
     val ofBarWidth get() = ratioWidth(StatsAPI.overflowMana, StatsAPI.maxMana)
-    val vitalityBarWidth get() = ratioWidth(StatsAPI.vitaliy, StatsAPI.maxVitaliy, 41f)
+    val vitalityBarWidth get() = ratioWidth(StatsAPI.vitality, StatsAPI.maxVitality, 41f)
 
     private var smoothHp by Utils.animate<Float>(0.15)
     private var smoothAbs by Utils.animate<Float>(0.15)
@@ -275,8 +275,8 @@ object Bars : Feature("bars", true) {
     fun vitalityNumHud(context: GuiGraphicsExtractor) = HUDManager.renderHud(VitalityNumHudName, context) {
         val matrix = context.pose()
 
-        val left = StatsAPI.vitaliy
-        val right = StatsAPI.maxVitaliy
+        val left = StatsAPI.vitality
+        val right = StatsAPI.maxVitality
         val text = "$left/$right"
 
         matrix.translate(35f - text.width() / 2, 5f)

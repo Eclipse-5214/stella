@@ -31,14 +31,7 @@ class FeatureProcessor(private val codeGenerator: CodeGenerator, private val pro
     }
 
     private fun generateRegistry(moduleDecls: List<KSClassDeclaration>, commandDecls: List<KSClassDeclaration>, className: String) {
-        val sourceFiles = (moduleDecls + commandDecls)
-            .mapNotNull { it.containingFile }
-            .distinct()
-            .toTypedArray()
-
-        val deps = if (sourceFiles.isEmpty()) Dependencies.ALL_FILES else Dependencies(true, *sourceFiles)
-
-        val file = codeGenerator.createNewFile(deps, "co.stellarskys.stella.generated", className)
+        val file = codeGenerator.createNewFile(Dependencies.ALL_FILES, "co.stellarskys.stella.generated", className)
         file.writer().use { out ->
             out.appendLine("package co.stellarskys.stella.generated")
             out.appendLine()
@@ -60,7 +53,7 @@ class FeatureProcessor(private val codeGenerator: CodeGenerator, private val pro
         }
 
         val spiFile = codeGenerator.createNewFile(
-            dependencies = deps,
+            dependencies = Dependencies.ALL_FILES,
             packageName = "",
             fileName = "META-INF/services/co.stellarskys.stella.managers.ModuleProvider",
             extensionName = ""

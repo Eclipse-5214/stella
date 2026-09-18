@@ -3,7 +3,7 @@ package co.stellarskys.stella.api.config.ui
 import java.awt.Color
 
 /**
- * Palette – Mutable color palette inspired by Catppuccin Mocha.
+ * Palette – Mutable color palette by Catppuccin Mocha.
  */
 object Palette {
 

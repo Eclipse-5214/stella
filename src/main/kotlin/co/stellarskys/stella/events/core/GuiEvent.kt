@@ -33,9 +33,7 @@ sealed class GuiEvent {
     ) : Event(cancelable = true)
 
     class Key(
-        val keyName: String?,
         val key: Int,
-        val character: Char,
         val scanCode: Int,
         val screen: Screen
     ) : Event(cancelable = true)

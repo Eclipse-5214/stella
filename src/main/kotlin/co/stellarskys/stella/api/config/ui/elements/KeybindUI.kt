@@ -4,8 +4,8 @@ import co.stellarskys.stella.api.config.core.Keybind
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.config.ui.Palette.withAlpha
 import co.stellarskys.stella.api.config.ui.base.ConfigBase
+import co.stellarskys.stella.api.zenith.Zenith
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import org.lwjgl.glfw.GLFW
 
 class KeybindUI(initX: Float, initY: Float, val keybind: Keybind): ConfigBase(initX, initY, keybind, 52f) {
     private var isListening = false
@@ -61,7 +61,7 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind): ConfigBase(in
     override fun keyPressed(keyCode: Int, modifiers: Int): Boolean {
         if (!isListening) return false
 
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+        if (keyCode == Zenith.Keys.ESCAPE) {
             handler.setCode(0) // Set to None
         } else {
             handler.setCode(keyCode)
@@ -73,19 +73,15 @@ class KeybindUI(initX: Float, initY: Float, val keybind: Keybind): ConfigBase(in
 
     private fun getKeyStringName(keyCode: Int): String = when (keyCode) {
         0 -> "None"
-        340 -> "LShift"
-        344 -> "RShift"
-        341 -> "LCtrl"
-        345 -> "RCtrl"
-        342 -> "LAlt"
-        346 -> "RAlt"
-        257 -> "Enter"
-        256 -> "Esc"
-        in 290..301 -> "F${keyCode - 289}"
-        else -> {
-            GLFW.glfwGetKeyName(keyCode, 0)?.let {
-                if (it.length == 1) it.uppercase() else it
-            } ?: "K$keyCode"
+        Zenith.Keys.L_SHIFT -> "LShift"
+        Zenith.Keys.R_SHIFT -> "RShift"
+        Zenith.Keys.L_CONTROL -> "LCtrl"
+        Zenith.Keys.R_CONTROL -> "RCtrl"
+        Zenith.Keys.L_ALT -> "LAlt"
+        Zenith.Keys.R_ALT -> "RAlt"
+        Zenith.Keys.ESCAPE -> "Esc"
+        else -> Zenith.Keys.name(keyCode).let {
+            if (it.length == 1) it.uppercase() else it
         }
     }
 }

@@ -14,12 +14,7 @@ class ButtonUI(initX: Float, initY: Float, val button: Button): ConfigBase(initX
 
     init { buttonColor = Palette.Base }
 
-    override fun onRender(
-        context: GuiGraphicsExtractor,
-        mouseX: Float,
-        mouseY: Float,
-        delta: Float
-    ) {
+    override fun onRender(context: GuiGraphicsExtractor, mouseX: Float, mouseY: Float, delta: Float) {
         nvg.translate(width - 80f, 8f,)
         nvg.rect(0f, 0f, 64f, HEIGHT - 16, buttonColor.rgb, 10f)
 

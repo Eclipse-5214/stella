@@ -1,7 +1,6 @@
 package co.stellarskys.stella.api.astrum
 
 import net.minecraft.client.renderer.rendertype.LayeringTransform
-import net.minecraft.client.renderer.rendertype.OutputTarget
 import net.minecraft.client.renderer.rendertype.RenderSetup
 import net.minecraft.client.renderer.rendertype.RenderType
 
@@ -11,6 +10,13 @@ object AstrumLayers {
         RenderSetup.builder(AstrumPipelines.FILLED)
             .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
             .sortOnUpload()
+            .createRenderSetup()
+    )
+
+    private val LINES = RenderType.create(
+        "lines",
+        RenderSetup.builder(AstrumPipelines.LINES)
+            .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
             .createRenderSetup()
     )
 
@@ -24,15 +30,6 @@ object AstrumLayers {
     private val LINES_THROUGH_WALLS = RenderType.create(
         "lines_through_walls",
         RenderSetup.builder(AstrumPipelines.LINES_THROUGH_WALLS)
-            .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
-            .createRenderSetup()
-    )
-
-    private val LINES = RenderType.create(
-        "lines",
-        RenderSetup.builder(AstrumPipelines.LINES)
-            .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-            .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
             .createRenderSetup()
     )
 

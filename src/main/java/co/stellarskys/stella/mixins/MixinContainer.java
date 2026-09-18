@@ -25,7 +25,7 @@ public class MixinContainer {
         EventBus.INSTANCE.post(new GuiEvent.Container.AfterContent(graphics, mouseX, mouseY, leftPos, topPos, imageWidth, imageHeight));
     }
 
-    @Inject(method = "slotClicked", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("HEAD"), cancellable = true)
     public void onClickedSlot(Slot slot, int slotId, int buttonNum, ContainerInput containerInput, CallbackInfo ci) {
         AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
         GuiEvent.Container.SlotClick event = new  GuiEvent.Container.SlotClick(screen, slot, slotId, buttonNum, containerInput);

@@ -1,7 +1,8 @@
 package co.stellarskys.stella.api.luminav2.render
 
 import co.stellarskys.stella.Stella
-
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.RenderPipeline
@@ -16,7 +17,6 @@ import java.util.Optional
   import com.mojang.blaze3d.platform.BlendOp
   import net.minecraft.client.renderer.BindGroupLayouts
 *///? } else {
-
 import com.mojang.blaze3d.platform.DestFactor
 import com.mojang.blaze3d.platform.SourceFactor
 import com.mojang.blaze3d.shaders.UniformType
@@ -96,4 +96,7 @@ object LuminaPipelines {
 
     private fun id(location: String): Identifier = Identifier.fromNamespaceAndPath(Stella.NAMESPACE, location)
     private fun setAlpha(blend: BlendFunction) = ColorTargetState(Optional.of(blend), /*? if > 26.1 { */ /*GpuFormat.RGBA8_UNORM, *//*? }*/ ColorTargetState.WRITE_ALPHA)
+
+    fun RenderPass.usePipeline(pipeline: RenderPipeline) =
+        setPipeline(/*? if >= 26.3 {*/ /*RenderSystem.getCompiledPipeline(pipeline) *//*?} else {*/ pipeline /*?}*/)
 }

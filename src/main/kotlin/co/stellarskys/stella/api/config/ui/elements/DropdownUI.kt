@@ -10,7 +10,7 @@ import co.stellarskys.stella.api.config.ui.base.ConfigSub
 import co.stellarskys.stella.api.horizon.nvg.BaseElement
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
-class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown) : ConfigSub(initX, initY, dropdown, dropdown.options.size * OPTION_HEIGHT) {
+class DropdownUI(initX: Float, initY: Float, val dropdown: Dropdown): ConfigSub(initX, initY, dropdown, dropdown.options.size * OPTION_HEIGHT) {
     private var caretRot by Utils.animate<Double>(0.15)
     private var hoveredIndex = -1
 

@@ -5,6 +5,7 @@ import co.stellarskys.stella.api.config.core.ConfigSubcategory
 import co.stellarskys.stella.api.config.ui.ConfigUI
 import co.stellarskys.stella.api.config.ui.Palette
 import co.stellarskys.stella.api.horizon.nvg.ParentElement
+import co.stellarskys.stella.api.zenith.Zenith
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import java.awt.Color
 
@@ -103,7 +104,7 @@ class Subcategory(initX: Float, initY: Float, val subcategory: ConfigSubcategory
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible) return false
         if (isAreaHovered(4f, 4f, width - 8f, HEIGHT - 8)) {
-            if (button == 0 && !subcategory.configName.isEmpty()) {
+            if (button == Zenith.Mouse.LEFT && !subcategory.configName.isEmpty()) {
                 subcategory.value = !value
                 if (value) {
                     buttonColor = Palette.Purple

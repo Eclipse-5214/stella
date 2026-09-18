@@ -15,9 +15,6 @@ import kotlin.reflect.KProperty
 open class ConfigCategory(val name: String, val config: Config) {
     val subcategories = mutableMapOf<String, ConfigSubcategory>()
 
-    /**
-     * Finds or creates a [ConfigSubcategory] within this category.
-     */
     fun subcategory(name: String, configName: String = "", description: String = "" , builder: ConfigSubcategory.() -> Unit = {}) {
         subcategories[name] = ConfigSubcategory(
             name,
@@ -39,22 +36,11 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         value = false
     }
 
-    /**
-     * Adds a [Button] element to the config category.
-     *
-     * @param builder Lambda used to configure the Button.
-     */
     fun button(builder: Button.() -> Unit) {
         val button = Button().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[button.configName] = button
     }
 
-
-    /**
-     * Adds a [ColorPicker] element to the config category.
-     *
-     * @param builder Lambda used to configure the ColorPicker.
-     */
     fun colorpicker(builder: ColorPicker.() -> Unit) {
         val color = ColorPicker().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[color.configName] = color
@@ -64,11 +50,6 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         add(ColorPicker().apply { configName = id; this.name = name; description = desc; default = def; showIf = show }, def)
 
 
-    /**
-     * Adds a [Dropdown] element to the config category.
-     *
-     * @param builder Lambda used to configure the Dropdown.
-     */
     fun dropdown(builder: Dropdown.() -> Unit) {
         val dropdown = Dropdown().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[dropdown.configName] = dropdown
@@ -77,11 +58,6 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
     fun dropdown(id: String, name: String, desc: String = "", options: List<String>, def: Int = 0, show: ((Config) -> Boolean)? = null) =
         add(Dropdown().apply { configName = id; this.name = name; description = desc; this.options = options; default = def; showIf = show }, def)
 
-    /**
-     * Adds a [Keybind] element to the config category.
-     *
-     * @param builder Lambda used to configure the Keybind.
-     */
     fun keybind(builder: Keybind.() -> Unit) {
         val keybind = Keybind().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[keybind.configName] = keybind
@@ -97,11 +73,6 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         }
     }
 
-    /**
-     * Adds a [Slider] element to the config category.
-     *
-     * @param builder Lambda used to configure the Slider.
-     */
     fun slider(builder: Slider.() -> Unit) {
         val slider = Slider().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[slider.configName] = slider
@@ -111,11 +82,6 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
         add(Slider().apply { configName = id; this.name = name; description = desc; this.min = min; this.max = max; default = def; showIf = show }, def)
 
 
-    /**
-     * Adds a [StepSlider] element to the config category.
-     *
-     * @param builder Lambda used to configure the StepSlider.
-     */
     fun stepslider(builder: StepSlider.() -> Unit) {
         val step = StepSlider().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[step.configName] = step
@@ -124,11 +90,6 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
     fun stepslider(id: String, name: String, desc: String = "", min: Int = 0, max: Int = 10, step: Int = 1, def: Int = 0, show: ((Config) -> Boolean)? = null) =
         add(StepSlider().apply { configName = id; this.name = name; description = desc; this.min = min; this.max = max; this.step = step; default = def; showIf = show }, def)
 
-    /**
-     * Adds a [TextInput] element to the config category.
-     *
-     * @param builder Lambda used to configure the TextInput.
-     */
     fun textinput(builder: TextInput.() -> Unit) {
         val input = TextInput().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[input.configName] = input
@@ -137,22 +98,11 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
     fun textinput(id: String, name: String, desc: String = "", def: String = "", show: ((Config) -> Boolean)? = null, onChange: ((String) -> Unit)? = null) =
         add(TextInput().apply { configName = id; this.name = name; description = desc; placeholder = def; showIf = show; onValueChanged = onChange }, def)
 
-
-    /**
-     * Adds a [TextParagraph] element to the config category.
-     *
-     * @param builder Lambda used to configure the TextParagraph.
-     */
     fun textparagraph(builder: TextParagraph.() -> Unit) {
         val para = TextParagraph().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[para.configName] = para
     }
 
-    /**
-     * Adds a [Toggle] element (boolean switch) to the config category.
-     *
-     * @param builder Lambda used to configure the Toggle.
-     */
     fun toggle(builder: Toggle.() -> Unit) {
         val toggle = Toggle().apply{ this.config = this@ConfigSubcategory.config;  builder() }
         elements[toggle.configName] = toggle
@@ -161,29 +111,14 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
     fun toggle(id: String, name: String, desc: String = "", def: Boolean = false, show: ((Config) -> Boolean)? = null) =
         add(Toggle().apply { configName = id; this.name = name; description = desc; default = def; showIf = show }, def)
 
-
-    /**
-     * Sets the click behavior for a [Button].
-     *
-     * @param cb A lambda that will be executed when the button is clicked.
-     */
     fun Button.onclick(cb: () -> Unit) {
         this.onClick = cb
     }
 
-    /**
-     * Sets the value change listener for a [TextInput].
-     *
-     * @param cb A lambda that will be triggered whenever the value changes.
-     */
     fun TextInput.onvaluechange(cb: (String) -> Unit) {
         this.onValueChanged = cb
     }
 
-    /**
-     * Internal helper to register an element and return a ReadWrite property delegate.
-     * This links the local property directly to the [Config] value cache.
-     */
     private fun <T : Any> add(el: ConfigElement, def: T): ReadWriteProperty<Any?, T> {
         el.config = this.config
         elements[el.configName] = el
@@ -203,16 +138,10 @@ open class ConfigSubcategory(val subName: String, conf: Config, confName: String
 }
 
 open class ConfigElement {
-    /** Unique identifier for the element used in saving/loading. */
     var configName: String = ""
-
-    /** Display name shown in the UI. */
     var name: String = ""
-
-    /** Short description, shown as hover text or under headers. */
     var description: String = ""
 
-    /** The current value of the element (can be Boolean, String, Int, etc). */
     private var _value: Any? = null
     open var value: Any?
         get() = _value
@@ -221,16 +150,9 @@ open class ConfigElement {
             _value = v
         }
 
-    // Reference set when building the DSL
     var config: Config? = null
-
     var showIf: ((Config) -> Boolean)? = null
 
-    /**
-     * Assigns a conditional visibility predicate.
-     *
-     * @param predicate Lambda that receives flattened config values.
-     */
     fun shouldShow(predicate: (Config) -> Boolean) {
         showIf = predicate
     }
@@ -240,7 +162,6 @@ open class ConfigElement {
     }
 }
 
-// Elements
 class Button : ConfigElement() {
     var placeholder: String = "Click"
     var onClick: (() -> Unit)? = null
@@ -313,7 +234,6 @@ class Keybind : ConfigElement() {
                 }
             }
 
-        // Register listeners
         fun onPress(block: () -> Unit) {
             pressListeners += block
         }

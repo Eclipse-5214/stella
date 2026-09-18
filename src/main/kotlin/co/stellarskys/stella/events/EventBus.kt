@@ -18,7 +18,6 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.resources.Identifier
-import org.lwjgl.glfw.GLFW
 import co.stellarskys.stella.events.core.GuiEvent
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
@@ -73,8 +72,7 @@ object EventBus : EventBus() {
             }
 
             ScreenKeyboardEvents.allowKeyPress(screen).register { _, keyInput ->
-               val charTyped = GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode)?.firstOrNull() ?: '\u0000'
-               !post(GuiEvent.Key(GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode), keyInput.key, charTyped, keyInput.key, screen))
+               !post(GuiEvent.Key( keyInput.key, keyInput.key, screen))
             }
         }
 

@@ -113,7 +113,7 @@ object SlotBinding: Feature("slotLocking.bind", true) {
                         if (hovered != slot || i > 0) return@forEachIndexed
                     } else if (idx < other) return@forEachIndexed
 
-                    val isShiftDown = InputConstants.isKeyDown(client.window, Zenith.Keys.L_SHIFT)
+                    val isShiftDown = Zenith.Keys.isDown(Zenith.Keys.L_SHIFT)
                     if (showLines == 2 || (showLines == 1 && !isShiftDown)) return@forEachIndexed
 
                     Render2D.drawLine(

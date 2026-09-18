@@ -2,6 +2,7 @@ package co.stellarskys.stella.api.horizon.mc
 
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
+import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import co.stellarskys.stella.api.zenith.Zenith.Keys
@@ -90,7 +91,7 @@ class TextHandler(
 
     override fun mouseClicked(mouseX: Float, mouseY: Float, button: Int): Boolean {
         isFocused = isAreaHovered(0f, 0f, width, height, mouseX, mouseY)
-        if (isFocused && button == 0) {
+        if (isFocused && button == Zenith.Mouse.LEFT) {
             dragging = true
             caretFromMouse(mouseX)
             selection = caret

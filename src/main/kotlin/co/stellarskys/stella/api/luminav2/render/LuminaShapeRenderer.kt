@@ -2,6 +2,7 @@ package co.stellarskys.stella.api.luminav2.render
 
 import co.stellarskys.stella.api.luminav2.LuminaV2
 import co.stellarskys.stella.api.luminav2.LuminaV2.Mask
+import co.stellarskys.stella.api.luminav2.render.LuminaPipelines.usePipeline
 import co.stellarskys.stella.api.luminav2.types.Gradient
 import co.stellarskys.stella.api.luminav2.types.GradientType
 import com.mojang.blaze3d.buffers.GpuBuffer
@@ -96,7 +97,7 @@ object LuminaShapeRenderer {
                 }
             }.buildOrThrow().use { mesh ->
                 device.createBuffer({ "lumina shapes" }, GpuBuffer.USAGE_VERTEX, mesh.vertexBuffer()).use { buffer ->
-                    pass.setPipeline(getPipeline(shapes))
+                    pass.usePipeline(getPipeline(shapes))
                     pass.setVertexBuffer(0, buffer /*? if > 26.1 {*//*.slice()*//*?}*/)
                     pass.draw(/*? if < 26.2 { */ 0, vertices /*? } else { *//*vertices, 1, 0, 0 *//*? } */)
                 }

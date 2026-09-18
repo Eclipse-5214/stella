@@ -7,7 +7,7 @@ import co.stellarskys.stella.api.config.ui.base.ConfigBase
 import co.stellarskys.stella.api.horizon.nvg.TextBox
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
-class TextInputUI(initX: Float, initY: Float, val input: TextInput) :  ConfigBase(initX, initY, input, 72f) {
+class TextInputUI(initX: Float, initY: Float, val input: TextInput): ConfigBase(initX, initY, input, 72f) {
     private val textField: TextBox = TextBox(
         x = 16f, y = 34f, w = 208f, h = 24f,
         initialText = input.value as String,

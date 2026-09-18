@@ -6,24 +6,28 @@ ksp = "2.3.9"
 devauth = "1.2.2"
 
 fabric-loader = "0.19.3"
-fabric-language-kotlin = "1.13.12+kotlin.2.4.0"
-fabric-api-26-1 = "0.152.1+26.1.2"
-fabric-api-26-2 = "0.152.1+26.2"
+fabric-language-kotlin = "1.14.1+kotlin.2.4.20"
+fabric-api-26-1 = "0.155.3+26.1.2"
+fabric-api-26-2 = "0.160.0+26.2"
+fabric-api-26-3 = "0.160.7+26.3"
 
 jsvg = "2.1.0"
 
-skyblock-api = "4.2.18"
+skyblock-api = "4.2.25"
 
 hypixel-modapi = "1.0.2"
 hypixel-modapi-fabric = "1.0.2+build.1+mc26.1"
 
 [libraries]
+ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+
 fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
 fabric-language-kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric-language-kotlin" }
 
 devauth = { module = "me.djtheredstoner:DevAuth-fabric", version.ref = "devauth" }
 fabric-api-26-1 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-26-1" }
 fabric-api-26-2 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-26-2" }
+fabric-api-26-3 = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api-26-3" }
 
 jsvg = { module = "com.github.weisj:jsvg", version.ref = "jsvg" }
 

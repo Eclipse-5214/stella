@@ -20,12 +20,6 @@ import kotlin.reflect.KProperty
 /*import co.stellarskys.stella.api.zenith.setScreen
 *///? }
 
-/**
- * Main configuration system for Stella.
- * Handles the DSL building, serialization to JSON, and property delegation.
- * * @param modID Unique identifier for the mod, used for the folder name.
- * @param configPath Optional custom file path for the settings JSON.
- */
 class Config(
     val modID: String,
     val configPath: File? = null,
@@ -76,11 +70,6 @@ class Config(
         }
     }
 
-    /**
-     * Finds or creates a subcategory.
-     * If [category] is null, it searches existing ones by Name or ConfigID.
-     * If provided and not found, it creates a new box in that category.
-     */
     fun subcategory(name: String, category: String? = null, configName: String = "", desc: String = ""): ConfigSubcategory {
         for (cat in categories.values) {
             cat.subcategories.values.find { it.configName == name }?.let { return it }
@@ -188,7 +177,6 @@ class Config(
         if (loading) return
         loading = true
         try {
-            // Map the elements FIRST so fromJson has something to work with
             categories.values.forEach { cat ->
                 cat.subcategories.values.forEach { sub ->
                     if (sub.configName.isNotBlank()) {
@@ -204,7 +192,6 @@ class Config(
                 }
             }
 
-            // Now overwrite those defaults with the file content
             if (resolvedFile.exists()) {
                 try {
                     val json = Gson().fromJson(resolvedFile.readText(), JsonObject::class.java)
@@ -222,10 +209,6 @@ class Config(
         }
     }
 
-    /**
-     * Copies the corrupted settings file aside before defaults silently overwrite it on the next [save],
-     * so the user doesn't lose their old config without a trace.
-     */
     private fun backupCorruptedFile() {
         try {
             val backup = File(resolvedFile.parentFile, "${resolvedFile.name}.corrupted")
