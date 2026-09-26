@@ -6,7 +6,6 @@ import co.stellarskys.stella.events.core.GameEvent
 import co.stellarskys.stella.utils.Utils
 import co.stellarskys.stella.utils.Utils.toHex
 import co.stellarskys.stella.api.config.ui.ConfigUI
-import co.stellarskys.stella.api.events.Event
 import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.events.core.ConfigEvent

@@ -2,9 +2,9 @@ package co.stellarskys.stella.managers
 
 import co.stellarskys.stella.Stella
 import co.stellarskys.stella.events.EventBus
+import co.stellarskys.stella.events.core.ConfigEvent
 import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.features.Feature
-import co.stellarskys.stella.utils.config
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import java.util.ServiceLoader
 import java.util.concurrent.ConcurrentHashMap
@@ -32,8 +32,8 @@ object FeatureManager {
         EventBus.on<LocationEvent.AreaChange> { for (f in areaFeatures) f.update() }
         EventBus.on<LocationEvent.DungeonFloorChange> { for (f in dungeonFloorFeatures) f.update() }
 
-        config.registerListener { name, _ ->
-            configListeners[name]?.let { list ->
+        EventBus.on<ConfigEvent.Update> { event ->
+            configListeners[event.id]?.let { list ->
                 for (f in list) f.update()
             }
         }

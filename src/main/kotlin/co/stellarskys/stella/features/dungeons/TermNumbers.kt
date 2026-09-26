@@ -31,6 +31,9 @@ object TermNumbers : Feature("termNumbers") {
         "stack" to ("§7( §6S§bt§ca§2c§dk §7)" to Color.white)
     )
 
+    val showLevers by config.property<Boolean>("showLevers")
+    val showDevs by config.property<Boolean>("showDevs")
+
     val force by config.property<Boolean>("termForce")
     val selectedRole by config.property<Int>("selectedRole")
     val preset by config.property<Int>("preset")
@@ -89,6 +92,9 @@ object TermNumbers : Feature("termNumbers") {
                 }
 
                 mergedTasks.values.forEach { task ->
+                    if (task.type == TaskType.LEVER && !showLevers) return@forEach
+                    if (task.type == TaskType.DEVICE && !showDevs) return@forEach
+
                     val coord = TermRegistry.getCoord(phaseName, task.type, task.id) ?: return@forEach
                     val isStack = task.roles.size >= 4
 

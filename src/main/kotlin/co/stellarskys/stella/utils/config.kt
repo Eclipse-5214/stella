@@ -95,7 +95,7 @@ val config = Config(Stella.NAMESPACE) {
                 name = "Update Stream"
                 description = "Choose which channel to monitor for updates."
                 options = listOf("Release", "Beta", "Nightly")
-                default = 1
+                default = 0
             }
 
             button {
@@ -155,6 +155,22 @@ val config = Config(Stella.NAMESPACE) {
                 name = "Enabled"
                 description = "Shows terminal numbers and class labels in F7/M7 boss."
                 default = false
+            }
+
+            toggle {
+                configName = "showLevers"
+                name = "Show Levers"
+                description = "Shows labels for levers"
+                default = true
+                shouldShow { it["termNumbers"] as Boolean }
+            }
+
+            toggle {
+                configName = "showDevs"
+                name = "Show Devices"
+                description = "Shows labels for devices"
+                default = true
+                shouldShow { it["termNumbers"] as Boolean }
             }
 
             toggle {
