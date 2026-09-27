@@ -315,6 +315,7 @@ internal class ConfigUI(categories: Map<String, ConfigCategory>, config: Config)
     }
 
     override fun onMouseRelease(button: Int, x: Double, y: Double, modifiers: Int): Boolean {
+        searchHandler.mouseReleased(mx, my, button)
         for (panel in panels) panel.mouseReleased(mx, my, button)
         return super.onMouseRelease(button, x, y, modifiers)
     }

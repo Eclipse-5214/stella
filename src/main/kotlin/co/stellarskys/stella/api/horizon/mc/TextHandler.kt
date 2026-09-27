@@ -36,8 +36,14 @@ class TextHandler(
     private var caretX = 0f
     private var caretBlinkTime = Chronos.zero
     private var dragging = false
-    var isFocused = false
     var textSidePadding = 8f
+
+    var isFocused = false
+        set(value) {
+            if (field == value) return
+            field = value
+            applyTextInput(value)
+        }
 
     private val history = mutableListOf<String>()
     private var historyIndex = -1
@@ -100,7 +106,7 @@ class TextHandler(
         return isFocused
     }
 
-    override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) { if (button == 0) dragging = false }
+    override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) { if (button == Zenith.Mouse.LEFT) dragging = false }
 
     override fun charTyped(char: Char): Boolean {
         if (isFocused && filter(char) && text.length < maxLength) insert(char.toString())
@@ -250,5 +256,12 @@ class TextHandler(
             selection = text.length.also { caret = it }
             updateCaretPosition()
         }
+    }
+
+    private fun applyTextInput(active: Boolean) {
+        //? if >= 26.3 {
+        /*val manager = client.textInputManager()
+        if (active) manager.startTextInput(this) else manager.stopTextInput(this)
+        *///?}
     }
 }

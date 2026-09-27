@@ -4,6 +4,9 @@ import co.stellarskys.stella.api.handlers.Chronos
 import co.stellarskys.stella.api.handlers.Chronos.millis
 import co.stellarskys.stella.api.luminav2.types.LuminaFont
 import co.stellarskys.stella.api.zenith.Zenith
+import co.stellarskys.stella.api.zenith.Zenith.Keys
+import co.stellarskys.stella.api.zenith.Zenith.Keys.isCtrlDown
+import co.stellarskys.stella.api.zenith.Zenith.Keys.isShiftDown
 import co.stellarskys.stella.api.zenith.client
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import kotlin.math.abs
@@ -40,9 +43,15 @@ class TextHandler(
     private var caretX = 0f
     private var caretBlinkTime = Chronos.zero
     private var dragging = false
-    var isFocused = false
     var padding = 8f
     var textSidePadding = 8f
+
+    var isFocused = false
+        set(value) {
+            if (field == value) return
+            field = value
+            applyTextInput(value)
+        }
 
     private val history = mutableListOf<String>()
     private var historyIndex = -1
@@ -101,7 +110,7 @@ class TextHandler(
         return isFocused
     }
 
-    override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) { if (button == 0) dragging = false }
+    override fun mouseReleased(mouseX: Float, mouseY: Float, button: Int) { if (button == Zenith.Mouse.LEFT) dragging = false }
 
     override fun charTyped(char: Char): Boolean {
         if (isFocused && filter(char) && text.length < maxLength) insert(char.toString())
@@ -110,39 +119,39 @@ class TextHandler(
 
     override fun keyPressed(keyCode: Int, modifiers: Int): Boolean {
         if (!isFocused) return false
-        val ctrl = (modifiers and 2) != 0
-        val shift = (modifiers and 1) != 0
+        val ctrl = modifiers.isCtrlDown
+        val shift = modifiers.isShiftDown
         val kh = client.keyboardHandler
 
         when (keyCode) {
-            256 -> isFocused = false
-            259 -> if (selection != caret) deleteSelection() else if (caret > 0) {
+            Keys.ESCAPE -> isFocused = false
+            Keys.BACKSPACE -> if (selection != caret) deleteSelection() else if (caret > 0) {
                 textSetter(text.removeRange(caret - 1, caret))
                 caret--
                 selection = caret
             }
-            261 -> if (selection != caret) deleteSelection() else if (caret < text.length) textSetter(text.removeRange(caret, caret + 1))
-            263 -> { if (caret > 0) caret--; if (!shift) selection = caret }
-            262 -> { if (caret < text.length) caret++; if (!shift) selection = caret }
-            65 -> if (ctrl) { selection = 0; caret = text.length }
-            67 -> if (ctrl && selection != caret) {
+            Keys.DELETE -> if (selection != caret) deleteSelection() else if (caret < text.length) textSetter(text.removeRange(caret, caret + 1))
+            Keys.LEFT -> { if (caret > 0) caret--; if (!shift) selection = caret }
+            Keys.RIGHT -> { if (caret < text.length) caret++; if (!shift) selection = caret }
+            Keys.A -> if (ctrl) { selection = 0; caret = text.length }
+            Keys.C -> if (ctrl && selection != caret) {
                 val start = minOf(caret, selection)
                 val end = maxOf(caret, selection)
                 kh.clipboard = text.substring(start, end)
             }
-            88 -> if (ctrl && selection != caret) {
+            Keys.X -> if (ctrl && selection != caret) {
                 val start = minOf(caret, selection)
                 val end = maxOf(caret, selection)
                 kh.clipboard = text.substring(start, end)
                 deleteSelection()
             }
-            86 -> if (ctrl) { // Ctrl + V (Paste)
+            Keys.V -> if (ctrl) { // Ctrl + V (Paste)
                 val content = kh.clipboard
                     .replace("\n", "")
                     .replace("\r", "")
                 insert(content)
             }
-            90 -> if (ctrl) undo()
+            Keys.Z -> if (ctrl) undo()
         }
         updateCaretPosition()
         return true
@@ -214,5 +223,12 @@ class TextHandler(
             selection = text.length.also { caret = it }
             updateCaretPosition()
         }
+    }
+
+    private fun applyTextInput(active: Boolean) {
+        //? if >= 26.3 {
+        /*val manager = client.textInputManager()
+        if (active) manager.startTextInput(this) else manager.stopTextInput(this)
+        *///?}
     }
 }
