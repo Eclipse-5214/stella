@@ -35,7 +35,7 @@ object Boss {
             context.blit(RenderPipelines.GUI_TEXTURED, tex, (-viewX).toInt(), (-viewZ).toInt(), 0f, 0f, w, h, w, h, w, h)
 
             val you = p.name.string
-            for (dp in DungeonPlayerManager.players) {
+            for (dp in DungeonPlayerManager.players.sortedBy { it?.name == you }) {
                 if (dp == null || (!dp.alive && dp.name != you)) continue
                 val entity = dp.entity ?: continue
 
