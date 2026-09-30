@@ -83,6 +83,8 @@ object LuminaTextureRenderer {
             val yCursor = floatArrayOf(font.alignTopPx)
 
             val quads = entry.text.map { entry.font.getGlyphQuad(it, xCursor, yCursor) }.filterNotNull()
+            if (quads.isEmpty()) continue
+
             val vertices = VERTICIES_PER_QUAD * quads.size
 
             val sampler = RenderSystem.getSamplerCache().getClampToEdge(font.atlas.filterMode)
