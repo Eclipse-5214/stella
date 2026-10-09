@@ -22,6 +22,7 @@ import co.stellarskys.stella.events.core.GuiEvent
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.common.ClientboundPingPacket
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 import tech.thatgravyboat.skyblockapi.api.area.dungeon.DungeonFloor
 import tech.thatgravyboat.skyblockapi.api.location.SkyBlockArea
@@ -104,6 +105,10 @@ object EventBus : EventBus() {
     }
 
     fun onPacketReceived(packet: Packet<*>): Boolean {
+        if (packet is ClientboundPingPacket && packet.id != 0) {
+            post(TickEvent.Server())
+            Chronos.Server.pulse()
+        }
         return post(PacketEvent.Received(packet))
     }
 

@@ -510,6 +510,67 @@ val config = Config(Stella.NAMESPACE) {
                 placeholder = "&6Wish"
             }
         }
+
+        subcategory("ADG Helper") {
+            toggle {
+                configName = "healerTT"
+                name = "Healer Tick Timer"
+                description = "Tick timers for leap and Purple for ADG storm"
+                default = false
+            }
+
+            toggle {
+                configName = "healerTT.hud"
+                name = "Timer Hud"
+                description = "Hud for the tick timer"
+                default = false
+                shouldShow { settings -> settings["healerTT"] as Boolean }
+            }
+
+            toggle {
+                configName = "healerTT.inTicks"
+                name = "In Ticks"
+                description = "Shows ticks in the hud instead of seconds"
+                default = false
+                shouldShow { settings -> settings["healerTT"] as Boolean }
+            }
+
+            stepslider {
+                configName = "healerTT.leap"
+                name = "Leap Threshold"
+                description = "When to trigger leap text in ticks (Default 399)"
+                min = 0
+                max = 600
+                step = 1
+                default = 399
+            }
+
+            textinput {
+                configName = "healerTT.leapMessage"
+                name = "Leap Message"
+                description = "Message to display at the leap threshold"
+                placeholder = "&bLeap Mage!"
+                shouldShow { settings -> settings["healerTT"] as Boolean }
+            }
+
+            stepslider {
+                configName = "healerTT.pad"
+                name = "Pad Threshold"
+                description = "When to trigger pad text in ticks (Default 559)"
+                min = 0
+                max = 600
+                step = 1
+                default = 559
+            }
+
+            textinput {
+                configName = "healerTT.padMessage"
+                name = "Pad Message"
+                description = "Message to display at the pad threshold"
+                placeholder = "&dPad!"
+                shouldShow { settings -> settings["healerTT"] as Boolean }
+            }
+        }
     }
 
     category("StellaNav") {

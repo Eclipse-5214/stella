@@ -13,7 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Connection.class)
 public class MixinConnection {
-    @Inject(method = "channelRead0*", at = @At("HEAD"), cancellable = true)
+   //@Inject(method = "channelRead0*", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "channelRead0*", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;genericsFtw(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;)V"), cancellable = true)
     private void stella$onReceivePacket(ChannelHandlerContext ctx, Packet<?> packet, CallbackInfo ci) {
         if (EventBus.INSTANCE.onPacketReceived(packet)) ci.cancel();
     }
