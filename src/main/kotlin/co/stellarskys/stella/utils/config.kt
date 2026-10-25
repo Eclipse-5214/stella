@@ -540,7 +540,7 @@ val config = Config(Stella.NAMESPACE) {
                 name = "Leap Threshold"
                 description = "When to trigger leap text in ticks (Default 399)"
                 min = 0
-                max = 600
+                max = 700
                 step = 1
                 default = 399
             }
@@ -556,11 +556,11 @@ val config = Config(Stella.NAMESPACE) {
             stepslider {
                 configName = "healerTT.pad"
                 name = "Pad Threshold"
-                description = "When to trigger pad text in ticks (Default 559)"
+                description = "When to trigger pad text in ticks (Default 599)"
                 min = 0
-                max = 600
+                max = 700
                 step = 1
-                default = 559
+                default = 599
             }
 
             textinput {

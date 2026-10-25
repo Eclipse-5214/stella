@@ -5,6 +5,7 @@ import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.features.Feature
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonManager
 import co.stellarskys.stella.api.handlers.Chronos
+import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.utils.config
@@ -60,7 +61,7 @@ object InventoryButtons : Feature("buttons",true) {
             val mouseY = event.mouseY.toInt()
             val mouseButton = event.mouseButton
 
-            if (mouseButton != 0) return@on
+            if (mouseButton != Zenith.Mouse.LEFT) return@on
 
             lastClick = Chronos.now
             ButtonManager.handleMouseClicked(gui, mouseX, mouseY)
