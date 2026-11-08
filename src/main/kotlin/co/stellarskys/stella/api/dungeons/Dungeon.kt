@@ -177,6 +177,7 @@ object Dungeon {
         DungeonPlayerManager.init()
         DungeonScore.init()
         MapUtils.init()
+        Phases.init()
     }
 
     /** Clears all dungeon state */
@@ -195,6 +196,7 @@ object Dungeon {
         DungeonPlayerManager.reset()
         DungeonScore.reset()
         MapUtils.reset()
+        Phases.reset()
     }
 
     /** Updates leap detection based on held item */

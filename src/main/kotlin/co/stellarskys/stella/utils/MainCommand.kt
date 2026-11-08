@@ -15,6 +15,7 @@ import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.msc.lockUtils.LockRegistry
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.hud.HUDEditor
+import co.stellarskys.stella.features.dungeons.adg.editor.BossWaypointManager
 
 //? if >= 26.2 {
 /*import co.stellarskys.stella.api.zenith.setScreen
@@ -35,6 +36,14 @@ object MainCommand : Atlas("stella", "sta", "sa") {
             runs {
                 Chronos.Tick post {
                     client.setScreen(ButtonLayoutEditor())
+                }
+            }
+        }
+
+        literal("bosswp") {
+            runs {
+                Chronos.Tick post {
+                    client.setScreen(BossWaypointManager())
                 }
             }
         }

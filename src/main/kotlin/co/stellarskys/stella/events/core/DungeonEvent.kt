@@ -2,6 +2,7 @@ package co.stellarskys.stella.events.core
 
 import co.stellarskys.stella.api.dungeons.players.DungeonPlayer
 import co.stellarskys.stella.api.dungeons.utils.Checkmark
+import co.stellarskys.stella.api.dungeons.utils.Phases
 import co.stellarskys.stella.api.events.Event
 import net.minecraft.core.BlockPos
 import net.minecraft.world.entity.Entity
@@ -91,4 +92,6 @@ sealed class DungeonEvent {
         class MimicDead() : Event()
         class AllCrypts() : Event()
     }
+
+    class PhaseChange(val phase: Phases.F7): Event()
 }

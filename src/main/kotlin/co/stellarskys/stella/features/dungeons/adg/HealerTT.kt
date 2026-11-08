@@ -1,7 +1,8 @@
 package co.stellarskys.stella.features.dungeons.adg
 
 import co.stellarskys.stella.annotations.Module
-import co.stellarskys.stella.events.core.ChatEvent
+import co.stellarskys.stella.api.dungeons.utils.Phases
+import co.stellarskys.stella.events.core.DungeonEvent
 import co.stellarskys.stella.events.core.GuiEvent
 import co.stellarskys.stella.events.core.LocationEvent
 import co.stellarskys.stella.events.core.TickEvent
@@ -16,8 +17,6 @@ import tech.thatgravyboat.skyblockapi.api.location.SkyBlockIsland
 
 @Module
 object HealerTT: Feature("healerTT", island = SkyBlockIsland.THE_CATACOMBS) {
-    const val STORM_START = "[BOSS] Storm: Pathetic Maxor, just like expected."
-
     val leapThreshold by config.property<Int>("healerTT.leap")
     val leapMessage by config.property<String>("healerTT.leapMessage")
     val padThreshold by config.property<Int>("healerTT.pad")
@@ -49,8 +48,8 @@ object HealerTT: Feature("healerTT", island = SkyBlockIsland.THE_CATACOMBS) {
             }
         }
 
-        on<ChatEvent.Receive> { event ->
-            if (event.stripped != STORM_START) return@on
+        on<DungeonEvent.PhaseChange> { event ->
+            if (event.phase != Phases.F7.P2) return@on
             startedStorm = true
         }
 

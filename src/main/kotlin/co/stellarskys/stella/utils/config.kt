@@ -6,6 +6,7 @@ import co.stellarskys.stella.api.handlers.Signal
 import co.stellarskys.stella.api.update.UpdateChecker
 import co.stellarskys.stella.api.zenith.Zenith
 import co.stellarskys.stella.api.zenith.client
+import co.stellarskys.stella.features.dungeons.adg.editor.BossWaypointManager
 import co.stellarskys.stella.features.msc.buttonUtils.ButtonLayoutEditor
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRecorder
 import co.stellarskys.stella.features.secrets.utils.routes.RouteRegistry
@@ -570,6 +571,40 @@ val config = Config(Stella.NAMESPACE) {
                 placeholder = "&dPad!"
                 shouldShow { settings -> settings["healerTT"] as Boolean }
             }
+
+            toggle {
+                configName = "bossWP"
+                name = "Boss Waypoints"
+                description = "Class based waypoints for the F7/M7 boss"
+                default = false
+            }
+
+            toggle {
+                configName = "bossWP.editing"
+                name = "Edit"
+                description = "Toggles editing mode"
+                default = false
+                shouldShow { settings -> settings["bossWP"] as Boolean }
+            }
+
+            keybind {
+                configName = "bossWP.addWaypoint"
+                name = "Add Waypoint"
+                description = "Add waypoint bind"
+                shouldShow { settings -> settings["bossWP"] as Boolean }
+            }
+
+            button {
+                configName = "bossWP.manage"
+                name = "Manage Waypoints"
+                description = "Opens the boss waypoint manager (/sa bosswp)"
+                placeholder = "Open"
+                shouldShow { settings -> settings["bossWP"] as Boolean }
+
+                onclick {
+                    client.setScreen(BossWaypointManager())
+                }
+            }
         }
     }
 
@@ -1100,11 +1135,7 @@ val config = Config(Stella.NAMESPACE) {
                 default = Zenith.Keys.L_BRACKET
             }
 
-            keybind {
-                configName = "secretRoutes.addCustom"
-                name = "Custom Bind"
-                description = "Adds a custom waypoint to a route"
-            }
+
         }
 
         subcategory("Route Rendering") {
@@ -1285,6 +1316,12 @@ val config = Config(Stella.NAMESPACE) {
                 onclick {
                     RouteRecorder.saveRoute()
                 }
+            }
+
+            keybind {
+                configName = "secretRoutes.addCustom"
+                name = "Custom Bind"
+                description = "Adds a custom waypoint to a route"
             }
         }
     }
