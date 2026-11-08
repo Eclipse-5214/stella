@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.MultiBufferSource.BufferSource
 //? } else {
 /*import net.minecraft.client.gui.font.TextRenderable
 import net.minecraft.client.renderer.SubmitNodeCollector
+import net.minecraft.network.chat.Component
 *///? }
 
 
@@ -266,14 +267,13 @@ object Astrum {
             val xOffset = -textWidth / 2f
             val displayMode = if (queued.depth) Font.DisplayMode.NORMAL else Font.DisplayMode.SEE_THROUGH
 
-            val prepared = font.prepareText(queued.text, xOffset, 0f, queued.color, queued.shadow, queued.bgColor)
-            prepared.visit(object : Font.GlyphVisitor {
-                override fun acceptRenderable(renderable: TextRenderable) {
-                    collector.submitCustomGeometry(pose, renderable.renderType(displayMode)) { poseEntry, buffer ->
-                        renderable.render(poseEntry.pose(), buffer, 0xF000F0, false)
-                    }
-                }
-            })
+            collector.submitText(
+                pose,
+                xOffset, 0f,
+                Component.literal(queued.text).visualOrderText,
+                queued.shadow, displayMode, 0xF000F0,
+                queued.color, queued.bgColor, 0
+            )
             pose.popPose()
         }
     }
