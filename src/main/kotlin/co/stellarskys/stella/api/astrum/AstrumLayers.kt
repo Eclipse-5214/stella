@@ -8,6 +8,7 @@ object AstrumLayers {
     val FILLED: RenderType = RenderType.create(
         "filled",
         RenderSetup.builder(AstrumPipelines.FILLED)
+            /*?if > 26.2 {*/ /*.setOitPipelines(AstrumPipelines.OIT_FILLED) *//*?}*/
             .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
             .sortOnUpload()
             .createRenderSetup()
@@ -16,6 +17,7 @@ object AstrumLayers {
     private val LINES = RenderType.create(
         "lines",
         RenderSetup.builder(AstrumPipelines.LINES)
+            /*?if > 26.2 {*/ /*.setOitPipelines(AstrumPipelines.OIT_LINES) *//*?}*/
             .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
             .createRenderSetup()
     )
@@ -23,6 +25,7 @@ object AstrumLayers {
     val FILLED_THROUGH_WALLS: RenderType = RenderType.create(
         "filled_through_walls",
         RenderSetup.builder(AstrumPipelines.FILLED_THROUGH_WALLS)
+            /*?if > 26.2 {*/ /*.setOitPipelines(AstrumPipelines.OIT_FILLED_THROUGH_WALLS) *//*?}*/
             .sortOnUpload()
             .createRenderSetup()
     )
@@ -30,6 +33,7 @@ object AstrumLayers {
     private val LINES_THROUGH_WALLS = RenderType.create(
         "lines_through_walls",
         RenderSetup.builder(AstrumPipelines.LINES_THROUGH_WALLS)
+            /*?if > 26.2 {*/ /*.setOitPipelines(AstrumPipelines.OIT_LINES_THROUGH_WALLS) *//*?}*/
             .createRenderSetup()
     )
 

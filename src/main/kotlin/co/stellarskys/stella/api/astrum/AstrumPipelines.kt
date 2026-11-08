@@ -8,6 +8,10 @@ import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 import java.util.Optional
 
+//? if > 26.2 {
+/*import net.minecraft.client.renderer.oit.OitPipelineSet
+*///?}
+
 object AstrumPipelines {
     val TRANSLUCENT = ColorTargetState(BlendFunction.TRANSLUCENT)
 
@@ -42,4 +46,28 @@ object AstrumPipelines {
     )
 
     private fun id(path: String) = Identifier.fromNamespaceAndPath(Stella.NAMESPACE, path)
+
+    //? if > 26.2 {
+    /*val OIT_LINES: OitPipelineSet = RenderPipelines.register(
+        OitPipelineSet.builder("stella_lines", RenderPipeline.builder(RenderPipelines.OIT_LINES_SNIPPET))
+            .build()
+    )
+
+    val OIT_LINES_THROUGH_WALLS: OitPipelineSet = RenderPipelines.register(
+        OitPipelineSet.builder("stella_lines_through_walls", RenderPipeline.builder(RenderPipelines.OIT_LINES_SNIPPET))
+            .withoutDepthTest()
+            .build()
+    )
+
+    val OIT_FILLED: OitPipelineSet = RenderPipelines.register(
+        OitPipelineSet.builder("stella_filled", RenderPipeline.builder(RenderPipelines.OIT_DEBUG_FILLED_SNIPPET))
+            .build()
+    )
+
+    val OIT_FILLED_THROUGH_WALLS: OitPipelineSet = RenderPipelines.register(
+        OitPipelineSet.builder("stella_filled_through_walls", RenderPipeline.builder(RenderPipelines.OIT_DEBUG_FILLED_SNIPPET))
+            .withoutDepthTest()
+            .build()
+    )
+    *///?}
 }
