@@ -29,44 +29,44 @@ object SkyblockAPI {
     }
 
     @Subscription
-    fun onTabListUpdate(event: TabListChangeEvent) {
+    private fun onTabListUpdate(event: TabListChangeEvent) {
         EventBus.post(TablistEvent.Change(event.old, event.new))
     }
 
     @Subscription
-    fun onScoreboardTitleUpdate(event: ScoreboardTitleUpdateEvent) {
+    private fun onScoreboardTitleUpdate(event: ScoreboardTitleUpdateEvent) {
         EventBus.post(ScoreboardEvent.UpdateTitle(event.old, event.new))
     }
 
     @Subscription
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         EventBus.post(ScoreboardEvent.Update(event.old, event.new, event.newComponents))
     }
 
     @Subscription
-    fun onPlayerHotbarUpdate(event: PlayerHotbarChangeEvent) {
+    private fun onPlayerHotbarUpdate(event: PlayerHotbarChangeEvent) {
         EventBus.post(PlayerEvent.HotbarChange(event.slotIndex, event.item))
     }
 
     @Subscription
-    fun onAriaChange(event: AreaChangeEvent) {
+    private fun onAriaChange(event: AreaChangeEvent) {
         EventBus.post(LocationEvent.AreaChange(event.old, event.new))
     }
 
     @Subscription
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandChange(event: IslandChangeEvent) {
         EventBus.post(LocationEvent.IslandChange(event.old, event.new))
     }
 
     @Subscription
-    fun onServerChange(event: ServerChangeEvent) {
+    private fun onServerChange(event: ServerChangeEvent) {
         val isOnSkyBlock = event.type == GameType.SKYBLOCK
         if (isOnSkyBlock) EventBus.post(LocationEvent.SkyblockJoin())
         else EventBus.post(LocationEvent.SkyblockLeave())
     }
 
     @Subscription
-    fun onKeyPickup(event: DungeonKeyPickedUpEvent) {
+    private fun onKeyPickup(event: DungeonKeyPickedUpEvent) {
         EventBus.post(DungeonEvent.KeyPickUp(event.key))
     }
 }

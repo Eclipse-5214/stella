@@ -13,7 +13,7 @@ fabric-api-26-3 = "0.160.7+26.3"
 
 jsvg = "2.1.0"
 
-skyblock-api = "4.2.25"
+skyblock-api = "4.2.43"
 
 hypixel-modapi = "1.0.2"
 hypixel-modapi-fabric = "1.0.2+build.1+mc26.1"
