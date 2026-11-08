@@ -117,8 +117,11 @@ class BossWaypointEditor(
         }
     }
 
-    override fun onMouseClick(button: Int, x: Double, y: Double, modifiers: Int) =
-        dialogPanel.mouseClicked(mx, my, button) || super.onMouseClick(button, x, y, modifiers)
+    override fun onMouseClick(button: Int, x: Double, y: Double, modifiers: Int): Boolean {
+        labelBox.isFocused = false
+        colorPicker.hexBox.isFocused = false
+        return dialogPanel.mouseClicked(mx, my, button) || super.onMouseClick(button, x, y, modifiers)
+    }
 
     override fun onMouseRelease(button: Int, x: Double, y: Double, modifiers: Int): Boolean {
         dialogPanel.mouseReleased(mx, my, button)

@@ -15,8 +15,7 @@ import net.minecraft.SharedConstants
 import net.minecraft.network.chat.*
 import java.net.URI
 import java.time.Instant
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.toJavaDuration
+import kotlin.time.Duration.Companion.milliseconds
 
 @Module
 object UpdateChecker {
@@ -40,31 +39,20 @@ object UpdateChecker {
 
     fun check(cb: (Boolean) -> Unit = {}) {
         when (stream) {
-            UpdateStream.RELEASE -> checkModrinth(false, cb)
-            UpdateStream.BETA -> checkModrinth(true, cb)
+            UpdateStream.RELEASE -> checkModrinth(cb)
             UpdateStream.NIGHTLY -> checkGitHubNightly(cb)
         }
     }
 
-    private fun checkModrinth(isBeta: Boolean, cb: (Boolean) -> Unit) {
+    private fun checkModrinth(cb: (Boolean) -> Unit) {
         val mc = SharedConstants.getCurrentVersion().id()
         val url = "https://api.modrinth.com/v2/project/$MODRINTH_PROJECT_ID/version?loaders=[%22fabric%22]&game_versions=[%22$mc%22]&include_changelog=false"
 
         Quasar.fetch<List<ModrinthVersion>>(url) { res ->
             res.onSuccess { versions ->
-                val targetType = if (isBeta) "beta" else "release"
-                val target = versions.firstOrNull { it.versionType == targetType } ?: return@fetch
+                val target = versions.firstOrNull { it.versionType == "release" } ?: return@fetch
                 runCatching {
-                    if (isBeta) {
-                        val remoteTime = Instant.parse(target.datePublished)
-                        val localTime = Instant.parse(BuildInfo.BUILD_TIMESTAMP)
-                        val graceWindow = 3.hours.toJavaDuration()
-
-                        if (remoteTime.minus(graceWindow).isAfter(localTime)) {
-                            triggerNotification("https://modrinth.com/mod/$MODRINTH_PROJECT_ID/version/${target.versionId}")
-                            cb(true)
-                        } else cb(false)
-                    } else if (Version.parse(target.versionNumber) > Version.parse(BuildInfo.VERSION)) {
+                    if (Version.parse(target.versionNumber) > Version.parse(BuildInfo.VERSION)) {
                         triggerNotification("https://modrinth.com/mod/$MODRINTH_PROJECT_ID/version/${target.versionId}"); cb(true)
                     } else cb(false)
                 }.onFailure { Stella.LOGGER.error("[Stella UpdateChecker] Modrinth check error: ${it.message}"); cb(false) }
@@ -87,8 +75,8 @@ object UpdateChecker {
     }
 
     private fun triggerNotification(url: String) = Stella.scope.launch {
-        while (client.level == null) delay(2000)
-        delay(1000)
+        while (client.level == null) delay(2000.milliseconds)
+        delay(1000.milliseconds)
         client.execute {
             Signal.fakeMessage("§7${Signal.LINE}")
             Signal.fakeMessage("${Stella.PREFIX} §bA new ${stream.friendlyName} update is available!")

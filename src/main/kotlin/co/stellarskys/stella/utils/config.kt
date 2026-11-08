@@ -95,7 +95,7 @@ val config = Config(Stella.NAMESPACE) {
                 configName = "update.stream"
                 name = "Update Stream"
                 description = "Choose which channel to monitor for updates."
-                options = listOf("Release", "Beta", "Nightly")
+                options = listOf("Release", "Nightly")
                 default = 0
             }
 
